@@ -4,12 +4,23 @@ php:
   - 5.2
   - 5.3
   - 5.4
-  - 5.5
+
+env:
+  - DB=mysql
+
+matrix:
+  include:
+    - php: 5.4
+      env:
+        - PHPCS=1
 
 before_script:
   - chmod -R 777 ./app/tmp
   - cp app/Config/constants.php.default app/Config/constants.php
-  - sh -c "CREATE DATABASE cakephp_test;"
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
+  - sudo apt-get install lighttpd
+    - sh -c "if [ '$PHPCS' = '1' ]; then pear channel-discover pear.cakephp.org; fi"
+    - sh -c "if [ '$PHPCS' = '1' ]; then pear install --alldeps cakephp/CakePHP_CodeSniffer; fi"
   - phpenv rehash
   - set +H
   - echo "<?php
@@ -45,6 +56,10 @@ before_script:
             }
         }
     }" > app/Config/database.php
+
+script:
+  - sh -c "if [ '$PHPCS' = '1' ]; then phpcs -p --extensions=php --standard=CakePHP ./lib/Cake; elif [ '$DB' = 'mysql' ]; then ./lib/Cake/Console/cake test core AllTests --stderr; else ./lib/Cake/Console/cake test core AllDbRelated --stderr; fi"
+
 
 notifications:
   email: false

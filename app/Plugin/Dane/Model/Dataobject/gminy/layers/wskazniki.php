@@ -1,0 +1,3 @@
+<?php
+
+return $this->DB->query("SELECT `pl_wskazniki`.`id`, `pl_wskazniki`.`tytul`, `pl_wskazniki`.`jednostka`, `pl_wskazniki_gminy`.`lv`, `pl_wskazniki_gminy`.`ly`, `pl_wskazniki`.`icon`, `pl_wskazniki`.`sid`, `BDL_wymiary_kombinacje`.`podgrupa_id` FROM `pl_wskazniki_gminy` JOIN `pl_wskazniki` ON `pl_wskazniki_gminy`.`wskaznik_id` = `pl_wskazniki`.`id` JOIN `BDL_wymiary_kombinacje` ON `pl_wskazniki`.`sid` = `BDL_wymiary_kombinacje`.`id` WHERE `pl_wskazniki_gminy`.`gmina_id`='$id' ORDER BY `pl_wskazniki`.`ord` ASC");

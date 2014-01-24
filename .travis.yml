@@ -34,7 +34,7 @@ before_script:
             if (!empty(\$_SERVER['DB'])) {
                 \$db = \$_SERVER['DB'];
             }
-            foreach (array('default') as \$source) {
+            foreach (array('default')) as \$source) {
                 \$config = array_merge(\$this->{\$source}, \$this->identities[\$db]);
                 if (is_array(\$config['database'])) {
                     \$config['database'] = \$config['database'][\$source];

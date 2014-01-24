@@ -12,7 +12,7 @@ env:
 before_script:
   - chmod -R 777 ./app/tmp
   - cp app/Config/constants.php.default app/Config/constants.php
-  - CREATE DATABASE cakephp_test
+  - mysql -e 'CREATE DATABASE cakephp_test;'
   - sudo apt-get install lighttpd
   - phpenv rehash
   - set +H

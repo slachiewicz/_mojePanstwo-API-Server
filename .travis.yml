@@ -17,9 +17,10 @@ before_script:
     class DATABASE_CONFIG {
         private \$identities = array(
             'mysql' => array(
-            'datasource' => 'Database/Mysql',
-            'host' => '0.0.0.0',
-            'login' => 'travis'
+                'datasource' => 'Database/Mysql',
+                'host' => '0.0.0.0',
+                'login' => 'travis'
+            )
         );
         public \$default = array(
             'persistent' => false,
@@ -34,13 +35,13 @@ before_script:
             if (!empty(\$_SERVER['DB'])) {
                 \$db = \$_SERVER['DB'];
             }
-            foreach (array('default')) as \$source) {
+            foreach (array('default') as \$source) {
                 \$config = array_merge(\$this->{\$source}, \$this->identities[\$db]);
-                if (is_array(\$config['database'])) {
-                    \$config['database'] = \$config['database'][\$source];
-                }
+                    if (is_array(\$config['database'])) {
+                        \$config['database'] = \$config['database'][\$source];
+                    }
                 if (!empty(\$config['schema']) && is_array(\$config['schema'])) {
-                    \$config['schema'] = \$config['schema'][\$source];
+                  \$config['schema'] = \$config['schema'][\$source];
                 }
                 \$this->{\$source} = \$config;
             }

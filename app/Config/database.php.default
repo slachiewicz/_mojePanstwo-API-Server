@@ -1,0 +1,45 @@
+<?
+
+class DATABASE_CONFIG
+{
+    public $default = array(
+        'datasource' => 'Database/Mysql',
+        'persistent' => false,
+        'host' => '',
+        'login' => '',
+        'password' => '',
+        'database' => '',
+        'prefix' => '',
+        'encoding' => 'utf8',
+    );
+
+    public $internal = array(
+        'datasource' => 'Database/Mysql',
+        'persistent' => false,
+        'host' => '',
+        'login' => '',
+        'password' => '',
+        'database' => '',
+        'prefix' => '',
+        'encoding' => 'utf8',
+    );
+
+    public $solr = array(
+        'datasource' => 'solrSource',
+        'database' => false,
+        'host' => '',
+        'port' => '',
+        'core' => 'solr/objects',
+    );
+
+    public $passport = array(
+        'datasource' => 'Database/Mysql',
+        'persistent' => false,
+        'host' => '',
+        'login' => '',
+        'password' => '',
+        'database' => '',
+        'prefix' => '',
+        'encoding' => 'utf8',
+    );
+}

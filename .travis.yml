@@ -1,0 +1,17 @@
+language: php
+
+php:
+  - 5.2
+  - 5.3
+  - 5.4
+
+env:
+  - DB=mysql
+
+before_script:
+  - chmod -R 777 ./app/tmp
+  - cp app/Config/database.php.default app/Config/constants.php
+  - cp app/Config/constants.php.default app/Config/constants.php
+
+notifications:
+  email: false

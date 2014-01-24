@@ -1,0 +1,7 @@
+<?
+
+class Dane extends AppModel
+{
+
+
+}

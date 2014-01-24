@@ -1,0 +1,27 @@
+<?php
+
+class WojewodztwaController extends AppController
+{
+    public $uses = array('Geo.Wojewodztwo');
+
+    public function index()
+    {
+        $wojewodztwa = $this->Wojewodztwo->find('all', array(
+            'fields' => array(
+                'id',
+                'nazwa',
+                'enspat',
+                'spat',
+                'typ',
+            ),
+            'order' => array(
+                'nazwa' => 'ASC',
+            ),
+        ));
+
+        $this->set(array(
+            'wojewodztwa' => $wojewodztwa,
+            '_serialize' => array('wojewodztwa'),
+        ));
+    }
+} 

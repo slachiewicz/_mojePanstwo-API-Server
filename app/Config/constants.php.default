@@ -1,0 +1,19 @@
+<?
+
+define('CAKE_salt', "alphanumeric");
+define('CAKE_cipherSeed', 'numeric');
+
+define('OAUTH_client_id', 'alphanumeric');
+define('OAUTH_client_secret', 'alphanumeric');
+
+define('PASSPORT_client', 'alphanumeric');
+define('PASSPORT_salt', 'alphanumeric');
+
+define('SEJMOMETR_USERS_SALT', 'alphanumeric');
+define('MPAPI_path', '/path/to/api/client/');
+
+define('S3_LOGIN','s3login');
+define('S3_SECRET', 's3pass');
+define('S3_ENDPOINT', 's3endpoint');
+
+define('CLIENT_IP', '127.0.0.1');

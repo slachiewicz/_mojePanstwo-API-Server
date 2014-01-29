@@ -31,5 +31,41 @@ class BdlController extends AppController
         $this->set('_serialize', array('data'));
 
     }
+    
+    public function chartDataForDimmesions()
+    {
+
+        $data = array();
+        $dim_ids = isset( $this->request->query['dims'] ) ? $this->request->query['dims'] : array();
+                
+        App::import('model', 'DB');
+        $this->DB = new DB();
+        
+        
+        
+        $db_data = $this->DB->selectAssocs("SELECT `kombinacja_id` as 'dim_id', `rocznik` as 'y', `v`, `a` FROM `BDL_data_pl` WHERE (`kombinacja_id`='" . implode("' OR `kombinacja_id`='", $dim_ids) . "') AND `deleted`='0' AND `zero`='0' ORDER BY kombinacja_id ASC, rocznik ASC");
+        
+        $temp = array();
+        foreach( $db_data as $d )
+		{
+			$dim_id = $d['dim_id'];
+			unset( $d['dim_id'] );
+			$temp[ $dim_id ][] = $d;
+		}
+        
+        if( !empty($temp) )
+        	foreach( $temp as $dim_id => $dims_data )
+        		$data[] = array(
+        			'id' => $dim_id,
+        			'data' => $dims_data,
+        		);        
+        
+        
+        
+        $this->set('data', $data);
+        $this->set('_serialize', array('data'));
+
+    }
+    
 
 }

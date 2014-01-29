@@ -32,6 +32,41 @@ class BdlController extends AppController
 
     }
     
+    public function dataForDimmesion()
+    {
+	    
+	    $data = array();
+	    
+	    App::import('model', 'DB');
+        $this->DB = new DB();
+	    
+	    $dim_id = isset( $this->request->params['pass'][0] ) ? $this->request->params['pass'][0] : false;
+	    if( $dim_id )
+	    {
+		    
+		    $db_data = $this->DB->selectAssoc("SELECT id, podgrupa_id, jednostka, ly, lv, ply, dv, `w1`, `w2`, `w3`, `w4`, `w5` FROM `BDL_wymiary_kombinacje` WHERE id='" . addslashes( $dim_id ) . "' LIMIT 1");
+		    if( $db_data )
+		    {
+		    	$data = array(
+		    		'id' => $db_data['id'],
+		    		'jednostka' => $db_data['jednostka'],
+		    		'ly' => $db_data['ly'],
+		    		'lv' => $db_data['lv'],
+		    		'ply' => $db_data['ply'],
+		    		'dv' => $db_data['dv'],
+		    		'dim_str' => $db_data['w1'] . ',' . $db_data['w2'] . ',' . $db_data['w3'] . ',' . $db_data['w4'] . ',' . $db_data['w5'],
+		    		'levels' => $this->DB->selectAssocs("SELECT `BDL_ntss`.`tab_id` as 'id', `BDL_ntss`.`tab_name` as 'label' FROM `BDL_podgrupy-ntss` JOIN `BDL_ntss` ON `BDL_podgrupy-ntss`.`nts_id` = `BDL_ntss`.`id` WHERE `BDL_podgrupy-ntss`.`podgrupa_id`='" . $db_data['podgrupa_id'] . "' AND `BDL_podgrupy-ntss`.`deleted`='0' AND `BDL_podgrupy-ntss`.`csv_s3`='1' AND `BDL_ntss`.`tab_id`!='' GROUP BY `BDL_ntss`.`tab_id` ORDER BY `BDL_ntss`.`id`"),
+		    	);
+								
+		    }
+		    
+	    }
+	    
+	    $this->set('data', $data);
+	    $this->set('_serialize', array('data'));
+	    
+    }
+    
     public function chartDataForDimmesions()
     {
 

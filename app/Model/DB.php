@@ -66,11 +66,14 @@ class DB extends AppModel
 
         $output = array();
         $data = $this->query($q);
-
+				
         if (is_array($data) && !empty($data))
             foreach ($data as &$d)
                 if (is_array($d) && !empty($d)) {
-                    $output[] = array_shift($d);
+                    $o = array();
+                    foreach( $d as $_d )
+                    	$o = array_merge($o, $_d);
+                    $output[] = $o;
                 }
 
 

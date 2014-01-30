@@ -190,7 +190,7 @@ class BdlController extends AppController
 					'dim_id' => $dim_id,
 					'local_id' => $d[ $data_table ][ $data_table_field ],
 					'local_name' => $d[$units_table]['nazwa'],
-					'data' => $parts,
+					// 'data' => $parts,
 				);	
 				
 				if( $part )

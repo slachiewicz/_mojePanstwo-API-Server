@@ -11,7 +11,7 @@ class BdlController extends AppController
         
         App::import('model', 'DB');
         $this->DB = new DB();
-        
+                
         foreach( $dims as $dim )
         {
 	        
@@ -19,11 +19,13 @@ class BdlController extends AppController
 	        for( $i=0; $i<5; $i++ )
 	        	$db_params[ $i ] = isset( $dim[ $i ] ) ? $dim[ $i ] : 0;
 	        
-	        $db_data = $this->DB->selectAssoc("SELECT id, jednostka, ly, lv, ply, dv FROM `BDL_wymiary_kombinacje` WHERE `w1` = '" . addslashes( $db_params[0] ) . "' AND `w2` = '" . addslashes( $db_params[1] ) . "' AND `w3` = '" . addslashes( $db_params[2] ) . "' AND `w4` = '" . addslashes( $db_params[3] ) . "' AND `w5` = '" . addslashes( $db_params[4] ) . "' LIMIT 1");	        	
-	        	
-	        $data[] = array_merge($db_data, array(
-	        	'dim_str' => implode(',', $db_params),
-	        ));
+	        $db_data = $this->DB->selectAssoc("SELECT id, jednostka, ly, lv, ply, dv FROM `BDL_wymiary_kombinacje` WHERE `w1` = '" . addslashes( $db_params[0] ) . "' AND `w2` = '" . addslashes( $db_params[1] ) . "' AND `w3` = '" . addslashes( $db_params[2] ) . "' AND `w4` = '" . addslashes( $db_params[3] ) . "' AND `w5` = '" . addslashes( $db_params[4] ) . "' LIMIT 1");
+	        
+	        
+	        if( !empty($db_data) )	        	        	
+		        $data[] = array_merge($db_data, array(
+		        	'dim_str' => implode(',', $db_params),
+		        ));
 	        		        
         }
         
@@ -77,8 +79,12 @@ class BdlController extends AppController
         $this->DB = new DB();
         
         
+        $q = "SELECT `kombinacja_id` as 'dim_id', `rocznik` as 'y', `v`, `a` FROM `BDL_data_pl` WHERE (`kombinacja_id`='" . implode("' OR `kombinacja_id`='", $dim_ids) . "') AND `deleted`='0' AND `zero`='0' ORDER BY kombinacja_id ASC, rocznik ASC";
+        echo $q; die();
+        $db_data = $this->DB->selectAssocs($q);
         
-        $db_data = $this->DB->selectAssocs("SELECT `kombinacja_id` as 'dim_id', `rocznik` as 'y', `v`, `a` FROM `BDL_data_pl` WHERE (`kombinacja_id`='" . implode("' OR `kombinacja_id`='", $dim_ids) . "') AND `deleted`='0' AND `zero`='0' ORDER BY kombinacja_id ASC, rocznik ASC");
+        
+        var_export( $db_data ); die();
         
         $temp = array();
         foreach( $db_data as $d )

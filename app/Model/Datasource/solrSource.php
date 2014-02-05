@@ -142,7 +142,7 @@ class solrSource extends DataSource
             $params['facet'] = 'on';
 
         if (@$request['filters']['dataset']) {
-
+						
             if (!in_array($request['filters']['dataset'], $available_datasets)) {
                 return array(
                     'pagination' => array(
@@ -153,6 +153,11 @@ class solrSource extends DataSource
                 );
             }
 
+            $datasetOptions = ClassRegistry::init('Dane.Dataset')->find('first', array(
+            	'conditions' => array(
+            		'Dataset.base_alias' => $request['filters']['dataset'],
+            	),
+            ));            
             $fields = ClassRegistry::init('Dane.Dataset')->getFields($request['filters']['dataset'], false);
             $filters = ClassRegistry::init('Dane.Dataset')->getFilters($request['filters']['dataset'], false);
             $switchers = ClassRegistry::init('Dane.Dataset')->getSwitchers($request['filters']['dataset'], true);
@@ -431,6 +436,16 @@ class solrSource extends DataSource
                                     break;
 
                                 }
+                                
+                                case 'rady_gmin_debaty.posiedzenie_id':
+                                {
+									
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_debaty AND _data_posiedzenie_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
 
                             }
 
@@ -476,8 +491,9 @@ class solrSource extends DataSource
 
         if (is_array($order) && !empty($order))
             $order = $order[0];
-
-        $solr_order_parts = array('score desc');
+			
+		if ($request['q'] && !in_array($request['q'], array('*', '*:*')))
+	        $solr_order_parts = array('score desc');
 
 
         if (!empty($order)) {
@@ -515,8 +531,18 @@ class solrSource extends DataSource
             $solr_field = $this->getSolrField($orders[0]['sorting']['field'], @$request['filters']['dataset']);
             $solr_order_parts[] = $solr_field . ' ' . $orders[0]['sorting']['direction'];
         }
-
+		
+		
+		if( !empty($datasetOptions['Dataset']['default_sort']) )
+		{
+			$default_sort_parts = explode(',', $datasetOptions['Dataset']['default_sort']);
+			if( !empty($default_sort_parts) )
+				foreach( $default_sort_parts as $p )
+					$solr_order_parts[] = trim( $p );			
+		}
+		
         $solr_order_parts[] = 'date desc';
+                
         $params['sort'] = implode(', ', $solr_order_parts);
 
 

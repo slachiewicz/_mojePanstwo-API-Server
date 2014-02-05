@@ -39,6 +39,7 @@ class Dataset extends AppModel
                 'Dataset.class',
                 'Dataset.count',
                 'Dataset.channel_id',
+                'Dataset.default_sort',
                 'Datachannel.id',
                 'Datachannel.nazwa',
                 'Datachannel.slug',

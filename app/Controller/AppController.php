@@ -46,30 +46,43 @@ class AppController extends Controller
         $this->loadModel('Paszport.UserAdditionalData');
 
 //        if(env('REMOTE_ADDR') == CLIENT_IP) {
-        if (env('HTTP_AUTH_USER_ID')) {
-            $this->user_id = Sanitize::paranoid(env('HTTP_AUTH_USER_ID'));
+        
+        
+        if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY)
+        {
+            $this->devaccess = true;
+            Configure::write('devaccess', true);
+        }      
+        
+        if (env('HTTP_X_USER-ID'))
+        {
+            $this->user_id = Sanitize::paranoid(env('HTTP_X_USER-ID'));
             Configure::write('User.id', $this->user_id);
         }
 
-        if (env('HTTP_AUTH_STREAM_ID') && env('HTTP_AUTH_USER_ID')) {
-            $this->stream_id = Sanitize::paranoid(env('HTTP_AUTH_STREAM_ID'));
-            if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {
+        if (env('HTTP_X_USER-ID') && env('HTTP_X_STREAM-ID'))
+        {
+            
+            $this->stream_id = Sanitize::paranoid(env('HTTP_X_STREAM-ID'));
+            if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id))
+            {
                 Configure::write('Stream.id', 1);
                 $this->stream_id = 1;
-            } else {
+            }
+            else
+            {
                 Configure::write('Stream.id', $this->stream_id);
             }
 
-        } else {
+        }
+        else
+        {
             Configure::write('Stream.id', 1);
             $this->stream_id = 1;
         }
 
 
-        if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY) {
-            $this->devaccess = true;
-            Configure::write('devaccess', true);
-        }
+        
 
 
         parent::beforeFilter();

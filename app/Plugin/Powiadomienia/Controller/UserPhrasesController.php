@@ -6,12 +6,11 @@ class UserPhrasesController extends AppController
 
     public function index()
     {
-        $user_id = $this->user_id;
-        $stream_id = 1;
+    	$this->user_id = 1;
         $phrases = $this->UserPhrase->find('all', array(
             'conditions' => array(
-                'UserPhrase.user_id' => $user_id,
-                'Phrase.stream_id' => $stream_id,
+                'UserPhrase.user_id' => $this->user_id,
+                'Phrase.stream_id' => $this->stream_id,
             ),
         ));
         $this->set('phrases', $phrases);

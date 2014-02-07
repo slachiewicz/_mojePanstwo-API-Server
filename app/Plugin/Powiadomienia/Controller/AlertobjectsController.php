@@ -6,8 +6,8 @@ class AlertobjectsController extends AppController
 
     public function index()
     {
-        $user_id = $this->user_id;
-        $stream_id = 1;
+    	$this->user_id = 1;
+        $this->stream_id = 1;
 
         $offset = (isset($this->data['offset'])) ? $this->data['offset'] : 0;
         $limit = 20;
@@ -21,8 +21,8 @@ class AlertobjectsController extends AppController
 
         $search = $this->Alertobject->find('all', array(
             'conditions' => array(
-                'user_id' => $user_id,
-                'stream_id' => $stream_id,
+                'user_id' => $this->user_id,
+                'stream_id' => $this->stream_id,
                 'visited' => $visited,
                 'keyword_id' => $ids,
             ),

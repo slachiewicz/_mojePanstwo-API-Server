@@ -35,7 +35,7 @@ class Alertobject extends AppModel
 
 
         $sql_fields = "`m_alerts-objects`.`object_id` as '_object_id', `m_alerts-objects`.`score`, `m_alerts-objects`.`hl`, `objects`.`dataset`, `objects`.`object_id`, `api_datasets`.`results_class`";
-        $sql_order = "`m_alerts-objects`.`object_id` DESC";
+        $sql_order = "`objects`.`date` DESC, `m_alerts-objects`.`object_id` DESC";
 
 
         if (empty($keyword_id)) {
@@ -45,7 +45,7 @@ class Alertobject extends AppModel
             JOIN `m_alerts-objects` ON `m_user-objects`.`object_id`=`m_alerts-objects`.`object_id`
             JOIN `m_alerts-users` ON `m_alerts-objects`.`alert_id`=`m_alerts-users`.alert_id AND `m_user-objects`.`user_id`=`m_alerts-users`.`user_id`
             JOIN `objects` ON `m_user-objects`.`object_id`=`objects`.`id`
-            JOIN `api_datasets` ON `objects`.`dataset` = `api_datasets`.`base_alias`
+            JOIN `api_datasets` ON `objects`.`dataset_id` = `api_datasets`.`id`
             JOIN `m_alerts` ON `m_alerts-objects`.`alert_id`=`m_alerts`.`id`
             WHERE objects.unindexed='0' AND " .
                 "`m_alerts` . `stream_id` = '$stream_id' AND " .
@@ -63,7 +63,7 @@ class Alertobject extends AppModel
             JOIN `m_alerts-objects` ON `m_user-objects`.`object_id`=`m_alerts-objects`.`object_id`
             JOIN `m_alerts-users` ON `m_alerts-objects`.`alert_id`=`m_alerts-users`.alert_id AND `m_user-objects`.`user_id`=`m_alerts-users`.`user_id`
             JOIN `objects` ON `m_user-objects`.`object_id`=`objects`.`id`
-            JOIN `api_datasets` ON `objects`.`dataset` = `api_datasets`.`base_alias`
+            JOIN `api_datasets` ON `objects`.`dataset_id` = `api_datasets`.`id`
             JOIN `m_alerts` ON `m_alerts-objects`.`alert_id`=`m_alerts`.`id`
             WHERE objects.unindexed='0' AND " .
                 "`m_alerts` . `stream_id` = '$stream_id' AND " .
@@ -89,8 +89,8 @@ class Alertobject extends AppModel
         foreach ($objects as $i => $object) {
             array_push($ids, $object['m_alerts-objects']['_object_id']);
             $hl_texts[$object['m_alerts-objects']['_object_id']] = $object['m_alerts-objects']['hl'];
-
         }
+        
 
 
         if (!empty($ids)) {
@@ -99,12 +99,14 @@ class Alertobject extends AppModel
                 'conditions' => array(
                     'id' => $ids,
                 ),
+                'order' => 'date desc',
             ));
 
             $dataobjects = $data['dataobjects'];
             foreach ($dataobjects as &$object) {
                 $object['hl_text'] = $hl_texts[$object['id']];
             }
+            
         } else {
             $count = 0;
             $dataobjects = array();

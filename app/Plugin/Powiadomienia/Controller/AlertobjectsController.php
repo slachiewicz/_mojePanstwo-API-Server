@@ -6,9 +6,6 @@ class AlertobjectsController extends AppController
 
     public function index()
     {
-    	$this->user_id = 1;
-        $this->stream_id = 1;
-
         $offset = (isset($this->data['offset'])) ? $this->data['offset'] : 0;
         $limit = 20;
 

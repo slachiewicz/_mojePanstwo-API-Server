@@ -40,8 +40,13 @@ class DatachannelsController extends AppController
         if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {
 
         }
-        foreach ($datachannels as $dkey => &$datachannel) {
-            foreach ($datachannel['Dataset'] as $key => $dataset) {
+        
+        
+        foreach ($datachannels as $dkey => &$datachannel)
+        {
+              
+            foreach ($datachannel['Dataset'] as $key => $dataset)
+            {
                 $found = false;
                 foreach ($dataset['Stream'] as $stream) {
                     if ($stream['id'] == $this->stream_id) {
@@ -52,9 +57,35 @@ class DatachannelsController extends AppController
                     unset($datachannel['Dataset'][$key]);
                 }
             }
-            if (count($datachannel['Dataset']) < 1) {
+            
+            if (count($datachannel['Dataset']) < 1)
                 unset($datachannels[$dkey]);
+           	
+            if( isset($this->request->query['includeContent']) && $this->request->query['includeContent'] )
+            {
+				
+				$conditions = isset( $this->request->query['conditions'] ) ? $this->request->query['conditions'] : array();
+								
+				$queryData = array(
+					'conditions' => array(
+						'datachannel' => $datachannel['Datachannel']['slug'],
+					),
+					'facets' => true,
+					'limit' => 12,
+				);
+				
+				if( isset($conditions['q']) && $conditions['q'] )
+					$queryData['conditions']['q'] = $conditions['q'];
+				
+		        $search = $this->Dataobject->find('all', $queryData);		        
+		        
+		        $datachannel = array_merge($datachannel, array(
+		        	'dataobjects' => isset($search['dataobjects']) ? $search['dataobjects'] : array(),
+		        	'facets' => isset($search['facets']) ? $search['facets'] : array(),
+		        ));
+		        	            
             }
+
         }
         $this->set('datachannels', $datachannels);
         $this->set('_serialize', array('datachannels'));

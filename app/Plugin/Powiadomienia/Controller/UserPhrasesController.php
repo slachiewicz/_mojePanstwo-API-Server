@@ -6,7 +6,6 @@ class UserPhrasesController extends AppController
 
     public function index()
     {
-    	$this->user_id = 1;
         $phrases = $this->UserPhrase->find('all', array(
             'conditions' => array(
                 'UserPhrase.user_id' => $this->user_id,

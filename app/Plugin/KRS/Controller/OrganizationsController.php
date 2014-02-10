@@ -148,7 +148,7 @@ class OrganizationsController extends AppController
 	    	array(
 	    		'id' => 'najwieksze_spolki',
 	    		'label' => 'Największe spółki',
-	    		'content' => $najwieksze_spolki,
+	    		'content' => $najwieksze_spolki
 	    	),
 	    );
 	    

@@ -52,3 +52,10 @@ function solr_q($q = null)
     return $q;
 
 }
+
+function pl_wiek( $data )
+{
+	$birthDate = explode("-", substr($data, 0, 10));
+    $age = (date("md", date("U", mktime(0, 0, 0, $birthDate[1], $birthDate[2], $birthDate[0]))) > date("md") ? ((date("Y") - $birthDate[0]) - 1) : (date("Y") - $birthDate[0]));
+    return $age;
+}

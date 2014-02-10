@@ -71,54 +71,46 @@ class UsersController extends PaszportAppController
         exit();
     }
 
-    public function info($id = null)
+    public function info()
     {
-        $applications = ClassRegistry::init('Application')->find('all');
-        if (!is_null($id) || !is_null($this->user_id)) {
-            if (is_null($id)) {
-                $id = $this->user_id;
-            }
-            $user = $this->User->find('first', array('conditions' => array('User.id' => $id)));
-            $user = $user['User'];
-        } else {
-            $user = array();
-        }
-        if (isset($this->data['portalHeader'])) {
-            if (is_null($id)) {
-                $portalHeaderTemplate = file_get_contents(ROOT . DS . 'app' . DS . 'Plugin' . DS . 'Paszport' . DS . 'webroot' . DS . 'bar.ctp');
-            } else {
-                $portalHeaderTemplate = file_get_contents(ROOT . DS . 'app' . DS . 'Plugin' . DS . 'Paszport' . DS . 'webroot' . DS . 'bar_logged.ctp');
-            }
-        } else {
-            $portalHeaderTemplate = array();
-        }
-        $streams = $this->UserAdditionalData->Stream->find('list', array('fields' => array('id', 'name'), 'conditions' => array('Stream.id' => 1)));
-        // gathering additional data
-        if (isset($user['id'])) {
+    
+    	$user = false;
+    	$streams = array();
+    	$applications = ClassRegistry::init('Application')->find('all');
+    	
+    	
+    	if( $this->user_id )
+		{
+			
+			$user = $this->User->find('first', array('conditions' => array('User.id' => $this->user_id)));
+			$user = ( $user && isset($user['User']) ) ? $user['User'] : false;
+		
+		}		        
+
+        if( $user )
+        {
             $this->UserAdditionalData->id = $user['id'];
             $data = $this->UserAdditionalData->read(null, $user['id']);
-            if ($data['UserAdditionalData']['group'] == '2') {
+            
+            if ($data['UserAdditionalData']['group'] == '2')
+            {
                 $streams = $this->UserAdditionalData->Stream->find('list', array('fields' => array('id', 'name')));
-            } else {
+            }
+            else
+            {
                 foreach ($data['Stream'] as $stream) {
                     $streams[$stream['id']] = $stream['name'];
                 }
             }
-            $user['streams'] = $streams;
+            
             $user['unread_count'] = $data['UserAdditionalData']['alerts_unread_count'];
             $user['group'] = $data['UserAdditionalData']['group'];
         }
-        $datasets_in_stream = $this->UserAdditionalData->Stream->find('first', array(
-                'conditions' => array('Stream.id' => $this->stream_id),
-                'contain' => array(
-                    'Dataset.base_alias',
-                )
-            )
-        );
+        
         $this->set('user', $user);
         $this->set('applications', $applications);
-        $this->set('portalHeaderTemplate', $portalHeaderTemplate);
-        $this->set('_serialize', array('user', 'applications', 'portalHeaderTemplate'));
+        $this->set('streams', $streams);
+        $this->set('_serialize', array('user', 'applications', 'streams'));
 
     }
 

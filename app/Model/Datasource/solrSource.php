@@ -173,10 +173,11 @@ class solrSource extends DataSource
                     'Datachannel.slug' => $request['filters']['datachannel'],
                 ),
             ));
-
-            foreach ($datachannel['Dataset'] as $dataset)
-                if (in_array($dataset['alias'], $available_datasets))
-                    $fq_datasets[] = $dataset['alias'];
+            
+			if( !empty($datachannel['Dataset']) )
+	            foreach ($datachannel['Dataset'] as $dataset)
+	                if (in_array($dataset['alias'], $available_datasets))
+	                    $fq_datasets[] = $dataset['alias'];
 
             $filters[] = array(
                 'filter' => array(
@@ -244,10 +245,11 @@ class solrSource extends DataSource
 
         }
 
-
-        $params['fq[' . $fq_iterator . ']'] = 'dataset:(' . implode(" OR ", $fq_datasets) . ')';
-        $fq_iterator++;
-
+		if( !empty($fq_datasets) )
+		{
+	        $params['fq[' . $fq_iterator . ']'] = 'dataset:(' . implode(" OR ", $fq_datasets) . ')';
+	        $fq_iterator++;
+		}
 
         // PROCCESSING FILTERS
 
@@ -446,6 +448,14 @@ class solrSource extends DataSource
                                     break;
 
                                 }
+                                
+                                case 'crawlerSites.pages':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:crawler_pages AND _data_site_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
 
                             }
 
@@ -546,7 +556,7 @@ class solrSource extends DataSource
         $params['sort'] = implode(', ', $solr_order_parts);
 
 
-        /*
+		/*        
 		echo "\n";
 		echo $request['q'];
 		echo "\n";

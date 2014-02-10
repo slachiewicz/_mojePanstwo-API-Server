@@ -23,28 +23,23 @@ class DatachannelsController extends AppController
     public function index()
     {
         $datachannels = $this->Datachannel->find('all', array(
-                'contain' => array(
-                    'Dataset' => array(
-                        'fields' => array(
-                            'id',
-                            'alias',
-                            'count',
-                            'name',
-                            'class',
-                        ),
-                    ),
-                    'Dataset.Stream'
-                )
-            )
-        );
-        if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {
+        	'contain' => array(
+            	'Dataset' => array(
+                	'fields' => array('id', 'alias', 'count', 'name', 'class'),
+                ),
+                'Dataset.Stream',
+            ),
+        ));
+        
+        // var_export( $datachannels ); die();
+        
+        // if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {
 
-        }
+        // }
         
         
         foreach ($datachannels as $dkey => &$datachannel)
         {
-              
             foreach ($datachannel['Dataset'] as $key => $dataset)
             {
                 $found = false;
@@ -73,7 +68,7 @@ class DatachannelsController extends AppController
 					'facets' => true,
 					'limit' => 12,
 				);
-				
+								
 				if( isset($conditions['q']) && $conditions['q'] )
 					$queryData['conditions']['q'] = $conditions['q'];
 				

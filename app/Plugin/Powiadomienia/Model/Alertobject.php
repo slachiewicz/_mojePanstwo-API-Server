@@ -20,10 +20,9 @@ class Alertobject extends AppModel
 
     public function find($type = 'first', $queryData = array())
     {
-
         $user_id = $queryData['conditions']['user_id'];
         $stream_id = $queryData['conditions']['stream_id'];
-        $visited = $queryData['conditions']['visited'];
+        $visited = $queryData['conditions']['visited'] ? '1' : '0';
         $keyword_id = $queryData['conditions']['keyword_id'];
 
         $offset = $queryData['offset'];
@@ -37,7 +36,7 @@ class Alertobject extends AppModel
         $sql_fields = "`m_alerts-objects`.`object_id` as '_object_id', `m_alerts-objects`.`score`, `m_alerts-objects`.`hl`, `objects`.`dataset`, `objects`.`object_id`, `api_datasets`.`results_class`";
         $sql_order = "`objects`.`date` DESC, `m_alerts-objects`.`object_id` DESC";
 
-
+		
         if (empty($keyword_id)) {
 
             $q = "SELECT SQL_CALC_FOUND_ROWS $sql_fields
@@ -73,12 +72,13 @@ class Alertobject extends AppModel
 //          if ($min)
 //              $q .= " AND `m_user-objects`.`object_id`<'$min'";
             $q .= " GROUP BY `m_user-objects`.`object_id` ORDER BY $sql_order LIMIT $offset, $limit";
-
+            
 
         }
 
 
         $data = $this->DB->queryCount($q);
+                
         $objects = $data[0];
         $count = $data[1];
         unset($data);
@@ -89,8 +89,7 @@ class Alertobject extends AppModel
         foreach ($objects as $i => $object) {
             array_push($ids, $object['m_alerts-objects']['_object_id']);
             $hl_texts[$object['m_alerts-objects']['_object_id']] = $object['m_alerts-objects']['hl'];
-        }
-        
+        }        
 
 
         if (!empty($ids)) {
@@ -103,10 +102,10 @@ class Alertobject extends AppModel
             ));
 
             $dataobjects = $data['dataobjects'];
-            foreach ($dataobjects as &$object) {
-                $object['hl_text'] = $hl_texts[$object['id']];
-            }
-            
+            foreach ($dataobjects as &$object)
+            	if( array_key_exists($object['id'], $hl_texts) )
+	                $object['hl_text'] = $hl_texts[$object['id']];
+                        
         } else {
             $count = 0;
             $dataobjects = array();

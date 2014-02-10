@@ -6,15 +6,19 @@ class AlertobjectsController extends AppController
 
     public function index()
     {
-        $offset = (isset($this->data['offset'])) ? $this->data['offset'] : 0;
+        
+        $conditions = ( isset($this->data['conditions']) && is_array($this->data['conditions']) ) ? $this->data['conditions'] : array();
+        
+        $page = (isset($this->data['page']) && $this->data['page']) ? $this->data['page'] : 1;
         $limit = 20;
+        $offset = $limit * ($page - 1);
 
-        $ids = (isset($this->data['ids'])) ? $this->data['ids'] : array();
+        $ids = (isset($conditions['keyword'])) ? $conditions['keyword'] : array();
         if ($ids && !is_array($ids))
             $ids = array($ids);
 
-        $visited = (isset($this->data['visited'])) ? $this->data['visited'] : 0;
-
+        $mode = (isset($conditions['mode'])) ? $conditions['mode'] : 0;
+		$visited = ($mode=='2') ? true : false;
 
         $search = $this->Alertobject->find('all', array(
             'conditions' => array(

@@ -77,5 +77,84 @@ class OrganizationsController extends AppController
         }
 
     }
+    
+    public function getFeaturedByGroups()
+    {
+	   	
+	   	
+	   	
+	   	// NAJNOWSZE ORGANIZACJE
+	   	
+	   	$data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
+	   		'conditions' => array(
+	   			'dataset' => 'krs_podmioty',
+	   		),
+	   		'order' => 'data_rejestracji desc',
+	   		'limit' => 12,
+	   	));
+	   	
+	   	$najnowsze_organizacje = array();
+	   	if( isset($data['dataobjects']) )
+	   	{
+		    foreach( $data['dataobjects'] as $object )
+		    {
+			    $najnowsze_organizacje[] = array(
+			    	'type' => 'organization',
+			    	'id' => $object['data']['id'],
+			    	'nazwa' => $object['data']['nazwa'],
+			    	'field_name' => 'Rejestracja',
+			    	'field_value' => substr($object['data']['data_rejestracji'], 0, 10),
+			    );
+		    }
+	   	}
+	   	
+	   		   	
+	   	
+	   	// NAJWIĘKSZE SPÓŁKI
+	   	
+	   	$data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
+	   		'conditions' => array(
+	   			'dataset' => 'krs_podmioty',
+	   		),
+	   		'order' => 'wartosc_kapital_zakladowy desc',
+	   		'limit' => 12,
+	   	));
+	   	
+	   	$najwieksze_spolki = array();
+	   	if( isset($data['dataobjects']) )
+	   	{
+		    foreach( $data['dataobjects'] as $object )
+		    {
+			    $najwieksze_spolki[] = array(
+			    	'type' => 'organization',
+			    	'id' => $object['data']['id'],
+			    	'nazwa' => $object['data']['nazwa'],
+			    	'field_name' => 'Kapitał zakładowy',
+			    	'field_value' => substr($object['data']['wartosc_kapital_zakladowy'], 0, 10),
+			    );
+		    }
+	   	}
+	   	
+	   	
+	   	
+	   	
+	   		    
+	    $groups = array(
+	    	array(
+	    		'id' => 'najnowsze_organizacje',
+	    		'label' => 'Najnowsze organizacje',
+	    		'content' => $najnowsze_organizacje,
+	    	),
+	    	array(
+	    		'id' => 'najwieksze_spolki',
+	    		'label' => 'Największe spółki',
+	    		'content' => $najwieksze_spolki,
+	    	),
+	    );
+	    
+	    $this->set('groups', $groups);
+        $this->set('_serialize', array('groups'));
+	    
+    }
 
 } 

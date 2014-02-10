@@ -98,6 +98,7 @@ class UsersController extends PaszportAppController
             }
             else
             {
+            	$streams['1'] = '_mojePaństwo: wydanie główne';
                 foreach ($data['Stream'] as $stream) {
                     $streams[$stream['id']] = $stream['name'];
                 }

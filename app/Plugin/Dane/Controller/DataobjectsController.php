@@ -2,7 +2,9 @@
 
 class DataobjectsController extends AppController
 {
-
+	
+	public $components = array('S3');
+	
     public function search()
     {
         $objects = $this->Dataobject->find('all', $this->data);

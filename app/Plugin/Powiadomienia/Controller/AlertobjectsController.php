@@ -59,10 +59,11 @@ class AlertobjectsController extends AppController
         $this->Dataobject->query($q);
     }
 
-    public function flagObject()
+    public function flag()
     {
-        $user_id = $this->user_id;
-        $object_id = $this->params->object_id;
-        //@TODO : to w koncu jest oznaczanie pojedynczego obiektu czy nie ?
+        $result = $this->Alertobject->flag($this->user_id, $this->params->object_id);
+        
+        $this->set('result', $result);  
+	    $this->set('_serialize', array('result'));
     }
 } 

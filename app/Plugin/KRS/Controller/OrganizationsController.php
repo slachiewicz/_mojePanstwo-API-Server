@@ -102,8 +102,9 @@ class OrganizationsController extends AppController
 			    	'type' => 'organization',
 			    	'id' => $object['data']['id'],
 			    	'nazwa' => $object['data']['nazwa'],
-			    	'field_name' => 'Rejestracja',
-			    	'field_value' => substr($object['data']['data_rejestracji'], 0, 10),
+			    	'data_rejestracji' => $object['data']['data_rejestracji'],
+			    	'kapital_zakladowy' => $object['data']['wartosc_kapital_zakladowy'],
+			    	'miejscowosc' => $object['data']['adres_miejscowosc'],
 			    );
 		    }
 	   	}
@@ -129,8 +130,9 @@ class OrganizationsController extends AppController
 			    	'type' => 'organization',
 			    	'id' => $object['data']['id'],
 			    	'nazwa' => $object['data']['nazwa'],
-			    	'field_name' => 'Kapitał zakładowy',
-			    	'field_value' => substr($object['data']['wartosc_kapital_zakladowy'], 0, 10),
+			    	'data_rejestracji' => $object['data']['data_rejestracji'],
+			    	'kapital_zakladowy' => $object['data']['wartosc_kapital_zakladowy'],
+			    	'miejscowosc' => $object['data']['adres_miejscowosc'],
 			    );
 		    }
 	   	}

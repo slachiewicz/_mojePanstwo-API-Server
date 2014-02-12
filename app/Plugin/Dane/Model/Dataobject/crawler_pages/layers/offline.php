@@ -1,5 +1,5 @@
 <?
-	$data = S3::getObject('crawler', '1');
+	$data = S3::getObject('crawler', $id);
 	return array(
 		'html' => @$data->body,
 	);

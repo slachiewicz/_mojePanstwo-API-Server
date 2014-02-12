@@ -17,7 +17,7 @@ class KrsAppController extends AppController
 					'datachannel' => 'krs',
 					'q' => $q,
 				),
-				'limit' => 12,
+				'limit' => 10,
 			));
 			if( isset($data['dataobjects']) && !empty($data['dataobjects']) )
 			{

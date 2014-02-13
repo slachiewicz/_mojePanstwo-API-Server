@@ -112,7 +112,7 @@ class OrganizationsController extends AppController
 	   		   	
 	   	
 	   	// NAJWIĘKSZE SPÓŁKI
-	   	
+	   	/*
 	   	$data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
 	   		'conditions' => array(
 	   			'dataset' => 'krs_podmioty',
@@ -136,7 +136,7 @@ class OrganizationsController extends AppController
 			    );
 		    }
 	   	}
-	   	
+	   	*/
 	   	
 	   	
 	   	
@@ -147,11 +147,13 @@ class OrganizationsController extends AppController
 	    		'label' => 'Najnowsze organizacje',
 	    		'content' => $najnowsze_organizacje,
 	    	),
+	    	/*
 	    	array(
 	    		'id' => 'najwieksze_spolki',
 	    		'label' => 'Największe spółki',
 	    		'content' => $najwieksze_spolki
 	    	),
+	    	*/
 	    );
 	    
 	    $this->set('groups', $groups);

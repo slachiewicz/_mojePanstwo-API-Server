@@ -31,3 +31,4 @@ Thumbs.db
 # PHP Storm generated files #
 #############################
 .idea
+app/tmp

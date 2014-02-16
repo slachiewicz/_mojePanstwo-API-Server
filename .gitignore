@@ -32,3 +32,6 @@ Thumbs.db
 #############################
 .idea
 app/tmp
+app/Plugin/Composer/
+
+app/Vendor/everyman/neo4jphp/

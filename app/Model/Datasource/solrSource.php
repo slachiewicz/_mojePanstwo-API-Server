@@ -39,7 +39,9 @@ class solrSource extends DataSource
         $params = array();
         $mode = false;
         $userObject = ClassRegistry::init('Paszport.UserAdditionalData');
-
+		$_dataset = false;
+		$datasetOptions = array();
+		
 
         // FIXING QUERY
         if (isset($queryData['conditions']['q'])) {
@@ -142,28 +144,39 @@ class solrSource extends DataSource
             $params['facet'] = 'on';
 
         if (@$request['filters']['dataset']) {
-						
-            if (!in_array($request['filters']['dataset'], $available_datasets)) {
+			
+			if( !is_array($request['filters']['dataset']) )
+				$request['filters']['dataset'] = array( $request['filters']['dataset'] );
+			
+			$datasets = array_intersect($request['filters']['dataset'], $available_datasets);
+
+            if( empty($datasets) )
                 return array(
                     'pagination' => array(
                         'total' => 0,
                     ),
                     'dataobjects' => array(),
-
                 );
+			
+			
+			if( count($datasets)===1 )
+			{
+				
+				$_dataset = $datasets[0];
+	            $datasetOptions = ClassRegistry::init('Dane.Dataset')->find('first', array(
+	            	'conditions' => array(
+	            		'Dataset.base_alias' => $_dataset,
+	            	),
+	            ));
+	                     
+	            $fields = ClassRegistry::init('Dane.Dataset')->getFields($_dataset, false);
+	            $filters = ClassRegistry::init('Dane.Dataset')->getFilters($_dataset, false);
+	            $switchers = ClassRegistry::init('Dane.Dataset')->getSwitchers($_dataset, true);
+	            $orders = ClassRegistry::init('Dane.Dataset')->getSortings($_dataset, false);
+            
             }
 
-            $datasetOptions = ClassRegistry::init('Dane.Dataset')->find('first', array(
-            	'conditions' => array(
-            		'Dataset.base_alias' => $request['filters']['dataset'],
-            	),
-            ));            
-            $fields = ClassRegistry::init('Dane.Dataset')->getFields($request['filters']['dataset'], false);
-            $filters = ClassRegistry::init('Dane.Dataset')->getFilters($request['filters']['dataset'], false);
-            $switchers = ClassRegistry::init('Dane.Dataset')->getSwitchers($request['filters']['dataset'], true);
-            $orders = ClassRegistry::init('Dane.Dataset')->getSortings($request['filters']['dataset'], false);
-
-            $fq_datasets[] = $request['filters']['dataset'];
+            $fq_datasets = array_merge($fq_datasets, $datasets);
 
 
         } elseif (@$request['filters']['datachannel']) {
@@ -227,7 +240,7 @@ class solrSource extends DataSource
 
 
             $filter = $filters[$i]['filter'];
-            $solr_field = $this->getSolrField($filter['field'], @$request['filters']['dataset']);
+            $solr_field = $this->getSolrField($filter['field'], @$_dataset);
             $filters[$i]['filter']['solr_field'] = $solr_field;
 
             if ($request['facet'] && in_array($filter['typ_id'], array('1', '2', '5'))) {
@@ -316,7 +329,7 @@ class solrSource extends DataSource
                         if ($cvalue != '') {
 
 
-                            $solr_field = $this->getSolrField($ckey, @$request['filters']['dataset']);
+                            $solr_field = $this->getSolrField($ckey, @$_dataset);
 
                             if ($solr_field === false)
                                 continue;
@@ -523,7 +536,7 @@ class solrSource extends DataSource
                     continue;
 
 
-                $solr_field = $this->getSolrField($order_part_parts[0], @$request['filters']['dataset']);
+                $solr_field = $this->getSolrField($order_part_parts[0], @$_dataset);
 
 
                 if ($order_part_parts_count > 1)
@@ -538,7 +551,7 @@ class solrSource extends DataSource
         }
 
         if (!empty($orders)) {
-            $solr_field = $this->getSolrField($orders[0]['sorting']['field'], @$request['filters']['dataset']);
+            $solr_field = $this->getSolrField($orders[0]['sorting']['field'], @$_dataset);
             $solr_order_parts[] = $solr_field . ' ' . $orders[0]['sorting']['direction'];
         }
 		
@@ -556,7 +569,7 @@ class solrSource extends DataSource
         $params['sort'] = implode(', ', $solr_order_parts);
 
 
-		/*        
+		/*
 		echo "\n";
 		echo $request['q'];
 		echo "\n";
@@ -695,9 +708,9 @@ class solrSource extends DataSource
                             'options' => $options,
                         );
 
-                    } elseif (@$request['filters']['dataset']) {
+                    } elseif (@$_dataset) {
 
-                        $filter['params'] = ClassRegistry::init('Dane.Dataset')->getFilterParams($request['filters']['dataset'], $field, $counts);
+                        $filter['params'] = ClassRegistry::init('Dane.Dataset')->getFilterParams($_dataset, $field, $counts);
 
                     }
 

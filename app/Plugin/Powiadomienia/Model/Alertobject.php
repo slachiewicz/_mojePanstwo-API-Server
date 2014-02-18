@@ -132,52 +132,15 @@ class Alertobject extends AppModel
 	    App::import('model', 'DB');
 	    $this->DB = new DB();
 	    
-	    $this->DB->query("INSERT INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
-	    $this->DB->query("UPDATE `m_user-objects` SET `visited`='1', `visited_ts`=NOW() WHERE `user_id`='$user_id' AND object_id='$object_id' AND `visited`='0'");
+	    $this->DB->query("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
+	    $this->DB->query("UPDATE `m_user-objects` SET `m_user-objects`.`visited`='1', `m_user-objects`.`visited_ts`=NOW() WHERE `m_user-objects`.`user_id`='$user_id' AND `m_user-objects`.object_id='$object_id' AND `m_user-objects`.`visited`='0'");
 	    
-	    if( $affected_rows = $this->DB->getAffectedRows() )
-	    {
-		    
+	    $affected_rows = $this->DB->getAffectedRows();
 	    
-			$total_unread_count = $this->DB->selectValue("SELECT COUNT(DISTINCT(`m_alerts-objects`.`object_id`)) FROM `m_user-objects` JOIN `m_alerts-objects` ON `m_user-objects`.`object_id`=`m_alerts-objects`.`object_id` JOIN `m_alerts-users` ON `m_alerts-objects`.`alert_id`=`m_alerts-users`.alert_id AND `m_user-objects`.`user_id`=`m_alerts-users`.`user_id` JOIN `objects` ON `m_user-objects`.`object_id`=`objects`.`id` JOIN `api_datasets` ON `objects`.`dataset` = `api_datasets`.`base_alias` WHERE `m_user-objects`.`user_id`='" . $user_id . "' AND `m_user-objects`.`visited`='0' AND `m_alerts-users`.`deleted`='0'");
+	    
+	    if( $affected_rows|| true )
+			$this->DB->query( "UPDATE `m_alerts-users` JOIN `m_alerts-objects` ON `m_alerts-users`.`alert_id` = `m_alerts-objects`.`alert_id` SET `m_alerts-users`.analiza='1', `m_alerts-users`.analiza_ts=NOW() WHERE `m_alerts-objects`.`object_id`='$object_id'" );
 			
-			$q = "SELECT `m_alerts-users`.id, `m_user-objects`.`visited`, COUNT(*) as 'count'
-	FROM `m_user-objects`
-	JOIN `m_alerts-objects` ON `m_user-objects`.`object_id` = `m_alerts-objects`.`object_id`
-	JOIN `m_alerts-users` ON `m_alerts-users`.`alert_id` = `m_alerts-objects`.`alert_id`
-	AND `m_alerts-users`.`user_id` = `m_user-objects`.`user_id`
-	WHERE `m_user-objects`.`user_id` = '$user_id'
-	AND `m_user-objects`.`deleted` = '0'
-	AND (`m_user-objects`.`visited` = '0' OR `m_user-objects`.`visited` = '1')
-	GROUP BY `m_alerts-objects`.alert_id, `m_user-objects`.`visited`";
-			$data = $this->DB->selectAssocs( $q );
-			
-	
-			
-			// $this->DB->autocommit(false);
-			$q = "UPDATE `m_alerts-users` SET `alerts_unread_count`=0, `alerts_read_count`=0 WHERE `user_id`='$user_id'";
-			$this->DB->query($q);
-			
-			foreach( $data as $d ) {
-				
-				$column = false;
-				if( $d['visited']=='0' )
-					$column = 'alerts_unread_count';
-				if( $d['visited']=='1' )
-					$column = 'alerts_read_count';
-					
-				if( $column )
-				{
-					$q = "UPDATE `m_alerts-users` SET `$column`='" . $d['count'] . "' WHERE id='" . $d['id'] . "'";
-					$this->DB->query($q);
-				}
-				
-			}
-			
-			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$total_unread_count' WHERE `id`='$user_id'");		
-			// $this->DB->autocommit(true);
-		
-		}
 		
 		$result = array(
 	    	'status' => $affected_rows,

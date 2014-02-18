@@ -3,7 +3,9 @@
 class UserPhrasesController extends AppController
 {
     public $uses = array('Powiadomienia.UserPhrase', 'Powiadomienia.Phrase');
-
+	public $components = array('RequestHandler');
+	
+	
     public function index()
     {
         $phrases = $this->UserPhrase->find('all', array(
@@ -60,6 +62,12 @@ class UserPhrasesController extends AppController
             '_serialize' => array('powiadomienia'),
         ));
     }
+    
+    
+    
+    
+    
+    
     /*
 public function markallread($user_id)
 {

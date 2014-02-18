@@ -1,5 +1,4 @@
 <?
-
 Router::connect('/powiadomienia/phrases', array('plugin' => 'Powiadomienia', 'controller' => 'userPhrases', 'action' => 'index', '[method]' => 'GET'));
 Router::connect('/powiadomienia/phrases', array('plugin' => 'Powiadomienia', 'controller' => 'userPhrases', 'action' => 'add', '[method]' => 'POST'));
 Router::connect('/powiadomienia/phrases/:phrase_id', array('plugin' => 'Powiadomienia', 'controller' => 'userPhrases', 'action' => 'remove', '[method]' => 'DELETE'));

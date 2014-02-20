@@ -27,7 +27,7 @@ class UserPhrase extends AppModel
         $queryData = array_merge_recursive(array(
             'fields' => array('Phrase.id', 'Phrase.q', 'id', 'alerts_unread_count', 'alerts_read_count'),
             'order' => array('Phrase.q' => 'asc'),
-            'limit' => 10,
+            'limit' => 100,
         ), $queryData);
 
         return parent::find($type, $queryData);

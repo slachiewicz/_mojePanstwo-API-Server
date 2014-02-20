@@ -33,62 +33,52 @@ class Alertobject extends AppModel
         $this->DB = new DB();
 
 
-        $sql_fields = "`m_alerts-objects`.`object_id` as '_object_id', `m_alerts-objects`.`score`, `m_alerts-objects`.`hl`, `objects`.`dataset`, `objects`.`object_id`, `api_datasets`.`results_class`";
-        $sql_order = "`objects`.`date` DESC, `m_alerts-objects`.`object_id` DESC";
+        $sql_fields = "`m_user-objects`.`object_id`, `m_alerts-objects`.`score`, `m_alerts-objects`.`hl`";
+        $sql_order = "`m_user-objects`.`dstamp` DESC";
 
 		
         if (empty($keyword_id)) {
 
-            $q = "SELECT SQL_CALC_FOUND_ROWS $sql_fields
-            FROM `m_user-objects`
-            JOIN `m_alerts-objects` ON `m_user-objects`.`object_id`=`m_alerts-objects`.`object_id`
-            JOIN `m_alerts-users` ON `m_alerts-objects`.`alert_id`=`m_alerts-users`.alert_id AND `m_user-objects`.`user_id`=`m_alerts-users`.`user_id`
-            JOIN `objects` ON `m_user-objects`.`object_id`=`objects`.`id`
-            JOIN `api_datasets` ON `objects`.`dataset_id` = `api_datasets`.`id`
-            JOIN `m_alerts` ON `m_alerts-objects`.`alert_id`=`m_alerts`.`id`
-            WHERE objects.unindexed='0' AND " .
-                "`m_alerts` . `stream_id` = '$stream_id' AND " .
-                "`m_user-objects`.`user_id`='" . $user_id . "' AND " .
-                "`m_user-objects`.`visited`='$visited' AND " .
-                "`m_alerts-users`.`deleted`='0'";
-//          if ($min)
-//                $q .= " AND `m_user-objects`.`object_id`<'$min'";
-            $q .= "GROUP BY `m_user-objects`.`object_id` ORDER BY $sql_order LIMIT $offset, $limit";
-
+            $q = "SELECT $sql_fields
+            FROM `m_user-objects` 
+            USE INDEX (`user_objects`) 
+            JOIN `m_alerts-objects` ON `m_user-objects`.`dstamp`=`m_alerts-objects`.`dstamp` 
+			WHERE `m_user-objects`.`user_id`='" . $user_id . "'";
+			$q .= " AND `m_user-objects`.`visited`='" . $visited . "'";
+			$q .= " AND `m_alerts-objects`.`stream_id`='" . $stream_id . "'";
+            $q .= " GROUP BY `m_user-objects`.`dstamp`";
+            $q .= " ORDER BY $sql_order";
+            $q .= " LIMIT $offset, $limit";
+			
+			// TODO: objects.unindex, m_alerts-users.deleted
 
         } else {
-            $q = "SELECT SQL_CALC_FOUND_ROWS $sql_fields
-            FROM `m_user-objects`
-            JOIN `m_alerts-objects` ON `m_user-objects`.`object_id`=`m_alerts-objects`.`object_id`
-            JOIN `m_alerts-users` ON `m_alerts-objects`.`alert_id`=`m_alerts-users`.alert_id AND `m_user-objects`.`user_id`=`m_alerts-users`.`user_id`
-            JOIN `objects` ON `m_user-objects`.`object_id`=`objects`.`id`
-            JOIN `api_datasets` ON `objects`.`dataset_id` = `api_datasets`.`id`
-            JOIN `m_alerts` ON `m_alerts-objects`.`alert_id`=`m_alerts`.`id`
-            WHERE objects.unindexed='0' AND " .
-                "`m_alerts` . `stream_id` = '$stream_id' AND " .
-                "`m_user-objects`.`user_id`='" . $user_id . "' AND " .
-                "`m_user-objects`.`visited`='$visited' AND " .
-                "(`m_alerts-objects`.`alert_id`='" . implode("' OR `m_alerts-objects`.`alert_id`='", $keyword_id) . "') AND `m_alerts-users`.`deleted`='0'";
-//          if ($min)
-//              $q .= " AND `m_user-objects`.`object_id`<'$min'";
-            $q .= " GROUP BY `m_user-objects`.`object_id` ORDER BY $sql_order LIMIT $offset, $limit";
             
+            $q = "SELECT $sql_fields
+            FROM `m_user-objects` 
+            USE INDEX (`user_objects`) 
+            JOIN `m_alerts-objects` ON `m_user-objects`.`dstamp`=`m_alerts-objects`.`dstamp` 
+			WHERE `m_user-objects`.`user_id`='" . $user_id . "'";
+			$q .= " AND `m_user-objects`.`visited`='" . $visited . "'";
+			$q .= " AND `m_alerts-objects`.`stream_id`='" . $stream_id . "'";
+			$q .= " AND (`m_alerts-objects`.`alert_id`='" . implode("' OR `m_alerts-objects`.`alert_id`='", $keyword_id) . "')";
+            $q .= " GROUP BY `m_user-objects`.`dstamp`";
+            $q .= " ORDER BY $sql_order";
+            $q .= " LIMIT $offset, $limit";         
 
         }
-
-
-        $data = $this->DB->queryCount($q);
+		
+		
+        $objects = $this->DB->query($q);
                 
-        $objects = $data[0];
-        $count = $data[1];
-        unset($data);
+        
 
 
         $ids = array();
         $hl_texts = array();
         foreach ($objects as $i => $object) {
-            array_push($ids, $object['m_alerts-objects']['_object_id']);
-            $hl_texts[$object['m_alerts-objects']['_object_id']] = $object['m_alerts-objects']['hl'];
+            array_push($ids, $object['m_user-objects']['object_id']);
+            $hl_texts[$object['m_user-objects']['object_id']] = $object['m_alerts-objects']['hl'];
         }        
 
 
@@ -107,19 +97,15 @@ class Alertobject extends AppModel
 	                $object['hl_text'] = $hl_texts[$object['id']];
                         
         } else {
-            $count = 0;
             $dataobjects = array();
         }
 
 
         $this->objects = $dataobjects;
-        $this->pagination = array(
-            'total' => $count,
-        );
+        
 
         return array(
             'objects' => $this->getObjects(),
-            'pagination' => $this->getPagination(),
         );
 
     }

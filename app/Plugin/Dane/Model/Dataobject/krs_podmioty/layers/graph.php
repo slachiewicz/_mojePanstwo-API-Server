@@ -1,16 +1,30 @@
-<?
+<?	
 	
-	$q = 'MATCH (a:podmiot {mp_id: "114"})-[r]-(b)-[t]-(c) RETURN a,b,c LIMIT 100';
+	require(APP . '/Vendor/autoload.php');
+	use Everyman\Neo4j\Relationship,
+	Everyman\Neo4j\Traversal;
 	
-	$ch = curl_init();
-
-	curl_setopt($ch, CURLOPT_URL,"http://neo.epf.p2.tiktalik.com:7474/db/data/transaction/commit");
-	curl_setopt($ch, CURLOPT_POST, 1);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('statements' => array($q))));
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	$server_output = curl_exec($ch);
+	if(
+		( $client = new Everyman\Neo4j\Client('neo.epf.p2.tiktalik.com', 7474) ) &&
+		( $neo_id = $this->DB->selectValue("SELECT neo_id FROM krs_pozycje WHERE id='$id'") ) &&
+		( $node = $client->getNode($neo_id) ) && 
+		( $traversal = new Everyman\Neo4j\Traversal($client) )
+	)
+	{
+		
+		/*
+		echo "<br/>";
+		echo $neo_id;
+		echo "<br/>";
+		var_export( $node );
+		*/
+		
+		$traversal->addRelationship('*', Relationship::DirectionOut)
+		    ->setPruneEvaluator(Traversal::PruneNone)
+		    ->setReturnFilter(Traversal::ReturnAll)
+		    ->setMaxDepth(4);
+		
+		return $traversal->getResults($node, Traversal::ReturnTypeNode);
+		
 	
-	curl_close( $ch );
-	
-	var_export( $server_output );
-	die();
+	} else return false;

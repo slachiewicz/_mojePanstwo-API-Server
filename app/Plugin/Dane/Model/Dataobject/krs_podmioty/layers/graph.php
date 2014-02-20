@@ -12,6 +12,10 @@
 	)
 	{
 		
+		$depth = isset( $_REQUEST['depth'] ) ? (int) $_REQUEST['depth'] : 3;
+		$depth = min($depth, 5);
+		$depth = max($depth, 1);
+		
 		/*
 		echo "<br/>";
 		echo $neo_id;
@@ -19,12 +23,44 @@
 		var_export( $node );
 		*/
 		
-		$traversal->addRelationship('*', Relationship::DirectionOut)
-		    ->setPruneEvaluator(Traversal::PruneNone)
+		$traversal->setPruneEvaluator(Traversal::PruneNone)
 		    ->setReturnFilter(Traversal::ReturnAll)
-		    ->setMaxDepth(4);
+		    ->setMaxDepth( $depth );
 		
-		return $traversal->getResults($node, Traversal::ReturnTypeNode);
+		
+		$output = array(
+			'nodes' => array(),
+			'relationships' => array(),
+		);
+		
+		$nodes = $traversal->getResults($node, Traversal::ReturnTypeNode);
+		$relationships = $traversal->getResults($node, Traversal::ReturnTypeRelationship);
+		
+		foreach( $nodes as $node )
+		{
+			$labels = $node->getLabels();
+			$label = array_shift($labels);
+			
+			$output['nodes'][] = array(
+				'id' => $node->getId(),
+				'data' => $node->getProperties(),
+				'label' => $label->getName(),
+			);
+		}
+		
+		foreach( $relationships as $relationship )
+		{
+			$output['relationships'][] = array(
+				'id' => $relationship->getId(),
+				'type' => $relationship->getType(),
+				'data' => $relationship->getProperties(),
+				'start' => $relationship->getStartNode()->getId(),
+				'end' => $relationship->getEndNode()->getId(),
+			);
+		}
+		
+		
+		return $output;
 		
 	
 	} else return false;

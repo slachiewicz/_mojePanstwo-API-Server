@@ -24,7 +24,7 @@ class Application extends AppModel
         $this->belongsTo['Folder']['conditions'][$enabledField] = '1';
 
 
-        $fields = array('Application.id', 'Application.slug', 'Application.name', 'Application.plugin', 'Application.type',);
+        $fields = array('Application.id', 'Application.slug', 'Application.name', 'Application.plugin', 'Application.type', 'Application.home');
 
         if (Configure::read('devaccess'))
             $fields = array_merge($fields, array(

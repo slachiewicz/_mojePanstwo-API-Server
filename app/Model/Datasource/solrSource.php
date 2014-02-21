@@ -485,6 +485,38 @@ class solrSource extends DataSource
                                     $fq_iterator++;
                                     break;
                                 }
+                                
+                                case 'gminy.zamowienia_publiczne':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:zamowienia_publiczne AND _data_gmina_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.organizacje':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:krs_podmioty AND _data_gmina_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.radni':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin AND _data_gmina_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.dotacje_ue':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:dotacje_ue AND _multidata_gmina_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }                                
 
                             }
 

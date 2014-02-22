@@ -160,5 +160,32 @@ class OrganizationsController extends AppController
         $this->set('_serialize', array('groups'));
 	    
     }
+    
+    public function getOrganizationIdBy()
+    {
+	 	
+	 	$data = false;
+	 	   
+	    $dotacje_ue_beneficjent_id = isset($this->request->query['dotacje_ue_beneficjent_id']) ? 
+	    	$this->request->query['dotacje_ue_beneficjent_id'] : 
+	    	false;
+	    
+	    if( $dotacje_ue_beneficjent_id )
+	    {
+	    	
+	    	$DB = $this->loadModel('DB');
+		    $data = (int) $this->DB->selectValue("SELECT id
+FROM `krs_pozycje`
+WHERE `dotacje_ue_beneficjent_id` = '" . addslashes( $dotacje_ue_beneficjent_id ) . "'
+LIMIT 1");
+
+		}
+		
+		
+	    	
+	    $this->set('data', $data);
+	    $this->set('_serialize', 'data');
+	    
+    }
 
 } 

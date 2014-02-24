@@ -422,6 +422,36 @@ class solrSource extends DataSource
                                     break;
                                 }
 
+                                case 'poslowie.wystapienia':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_wystapienia AND _data_ludzie.posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.interpelacje':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_interpelacje AND _multidata_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.projekty_ustaw':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:legislacja_projekty_ustaw AND _multidata_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
                                 case 'poslowie.glosowania':
                                 {
 

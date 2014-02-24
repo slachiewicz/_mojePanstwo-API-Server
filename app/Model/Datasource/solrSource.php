@@ -510,7 +510,7 @@ class solrSource extends DataSource
                                 
                                 case 'sejm_komisje.poslowie':
                                 {
-	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie AND _data_komisja_id:(' . $value . ')';
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie AND _multidata_komisja_id:(' . $value . ')';
 
                                     $fq_iterator++;
                                     break;

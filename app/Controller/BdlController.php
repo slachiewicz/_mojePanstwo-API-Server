@@ -80,12 +80,9 @@ class BdlController extends AppController
         
         
         $q = "SELECT `kombinacja_id` as 'dim_id', `rocznik` as 'y', `v`, `a` FROM `BDL_data_pl` WHERE (`kombinacja_id`='" . implode("' OR `kombinacja_id`='", $dim_ids) . "') AND `deleted`='0' AND `zero`='0' ORDER BY kombinacja_id ASC, rocznik ASC";
-        echo $q; die();
         $db_data = $this->DB->selectAssocs($q);
         
-        
-        var_export( $db_data ); die();
-        
+                
         $temp = array();
         foreach( $db_data as $d )
 		{

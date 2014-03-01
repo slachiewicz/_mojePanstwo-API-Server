@@ -8,6 +8,7 @@ class BdlController extends AppController
 
         $data = array();
         $dims = isset( $this->request->query['dims'] ) ? $this->request->query['dims'] : array();
+        $podgrupa_id = isset( $this->request->query['podgrupa_id'] ) ? $this->request->query['podgrupa_id'] : 0;
         
         App::import('model', 'DB');
         $this->DB = new DB();
@@ -19,8 +20,9 @@ class BdlController extends AppController
 	        for( $i=0; $i<5; $i++ )
 	        	$db_params[ $i ] = isset( $dim[ $i ] ) ? $dim[ $i ] : 0;
 	        
-	        $q = "SELECT id, jednostka, ly, lv, ply, dv FROM `BDL_wymiary_kombinacje` WHERE `w1` = '" . addslashes( $db_params[0] ) . "' AND `w2` = '" . addslashes( $db_params[1] ) . "' AND `w3` = '" . addslashes( $db_params[2] ) . "' AND `w4` = '" . addslashes( $db_params[3] ) . "' AND `w5` = '" . addslashes( $db_params[4] ) . "' LIMIT 1";
+	        $q = "SELECT id, jednostka, ly, lv, ply, dv FROM `BDL_wymiary_kombinacje` WHERE podgrupa_id='$podgrupa_id' AND `w1` = '" . addslashes( $db_params[0] ) . "' AND `w2` = '" . addslashes( $db_params[1] ) . "' AND `w3` = '" . addslashes( $db_params[2] ) . "' AND `w4` = '" . addslashes( $db_params[3] ) . "' AND `w5` = '" . addslashes( $db_params[4] ) . "' LIMIT 1";
 	        
+	        // echo "\n" . $q;
 	        $db_data = $this->DB->selectAssoc($q);
 	        
 	        

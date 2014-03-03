@@ -23,7 +23,10 @@ class DatasetsController extends AppController
 
         $datasets = $this->Dataset->find('all', array(
                 'fields' => array(
+                    'Dataset.id',
                     'Dataset.opis',
+                    'Dataset.base_alias',
+                    'Dataset.count',
                 ),
                 'conditions' => array(
                     $catalog_field => "1",
@@ -110,6 +113,17 @@ class DatasetsController extends AppController
         $alias = @addslashes($this->request->params['alias']);
         $this->set('sortings', $this->Dataset->getSortings($alias));
         $this->set('_serialize', array('sortings'));
+
+    }
+    
+    public function map()
+    {
+
+        $alias = @addslashes($this->request->params['alias']);
+        $page = @addslashes($this->request->query['page']);
+
+        $this->set('map', $this->Dataset->getMap($alias, $page));
+        $this->set('_serialize', array('map'));
 
     }
 

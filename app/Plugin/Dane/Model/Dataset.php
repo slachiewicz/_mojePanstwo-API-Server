@@ -109,6 +109,29 @@ class Dataset extends AppModel
 	    	LIMIT 100");
 
     }
+    
+    public function getMap($alias, $page)
+    {
+		
+		$dataset = $this->query("SELECT `id` FROM `datasets` WHERE `base_alias`='" . addslashes( $alias ) . "' LIMIT 1");
+		$dataset_id = $dataset[0]['datasets']['id'];
+			
+		$offset = ($page-1) * 50000;
+			
+        $items = $this->query("SELECT object_id 
+	    	FROM `objects`
+	    	WHERE `dataset_id`='" . $dataset_id . "'
+	    	AND `a`='3'
+	    	ORDER BY `object_id` DESC 
+	    	LIMIT $offset, 50000");
+	    	
+	    $output = array();
+	    foreach( $items as $item )
+	    	$output[] = $item['objects']['object_id'];
+	    
+	    return $output;
+	    
+    }
 
     public function getSortings($alias)
     {

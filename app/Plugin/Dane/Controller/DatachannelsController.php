@@ -23,16 +23,18 @@ class DatachannelsController extends AppController
     public function index()
     {
         
-        $conditions = array();
+        $datachannels_conditions = array();
         $channel_id = isset( $this->request->query['channel_id'] ) ? $this->request->query['channel_id'] : false;
         if( $channel_id )
-        	$conditions['id'] = $channel_id;
+        	$datachannels_conditions['id'] = $channel_id;
         
         $noCache = isset( $this->request->query['nocache'] ) ? (boolean) $this->request->query['nocache'] : false;
         $source = $noCache ? 'db' : 'cache';
 
-        
-       
+        $conditions = isset( $this->request->query['conditions'] ) ? $this->request->query['conditions'] : array();
+		
+		if( !empty($conditions) )
+			$source = 'db';
         
         
         
@@ -65,8 +67,8 @@ class DatachannelsController extends AppController
 	            ),
 	        );
 	        
-	        if( !empty($conditions) )
-	        	$datachannels_query['conditions'] = $conditions;	        
+	        if( !empty($datachannels_conditions) )
+	        	$datachannels_query['conditions'] = $datachannels_conditions;	        
         	
         	$datachannels = $this->Datachannel->find('all', $datachannels_query);
         	
@@ -97,9 +99,7 @@ class DatachannelsController extends AppController
 	           	
 	            if( isset($this->request->query['includeContent']) && $this->request->query['includeContent'] )
 	            {
-					
-					$conditions = isset( $this->request->query['conditions'] ) ? $this->request->query['conditions'] : array();
-									
+														
 					$queryData = array(
 						'conditions' => array(
 							'datachannel' => $datachannel['Datachannel']['slug'],

@@ -22,6 +22,14 @@ class DatachannelsController extends AppController
 
     public function index()
     {
+        
+        $conditions = array();
+        $channel_id = isset( $this->request->query['channel_id'] ) ? $this->request->query['channel_id'] : false;
+        if( $channel_id )
+        	$conditions['id'] = $channel_id;
+        
+        $fromCache = isset( $this->request->query['nocache'] ) ? (boolean) $this->request->query['nocache'] : false;
+        
         $datachannels = $this->Datachannel->find('all', array(
         	'contain' => array(
             	'Dataset' => array(
@@ -29,6 +37,7 @@ class DatachannelsController extends AppController
                 ),
                 'Dataset.Stream',
             ),
+            'conditions' => $conditions,
         ));
         
         // var_export( $datachannels ); die();

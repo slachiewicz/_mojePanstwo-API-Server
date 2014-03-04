@@ -28,69 +28,101 @@ class DatachannelsController extends AppController
         if( $channel_id )
         	$conditions['id'] = $channel_id;
         
-        $fromCache = isset( $this->request->query['nocache'] ) ? (boolean) $this->request->query['nocache'] : false;
+        $noCache = isset( $this->request->query['nocache'] ) ? (boolean) $this->request->query['nocache'] : false;
+        $source = $noCache ? 'db' : 'cache';
+        $source = 'db';
         
-        $datachannels = $this->Datachannel->find('all', array(
+        $datachannels_query = array(
         	'contain' => array(
             	'Dataset' => array(
                 	'fields' => array('id', 'alias', 'count', 'name', 'class'),
                 ),
                 'Dataset.Stream',
             ),
-            'conditions' => $conditions,
-        ));
+        );
         
-        // var_export( $datachannels ); die();
+        if( !empty($conditions) )
+        	$datachannels_query['conditions'] = $conditions;
+        	
+        if( $source=='cache' )
+        	$datachannels_query['fields'] = array('Datachannel.data');
         
-        // if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {
-
-        // }
+        $datachannels = $this->Datachannel->find('all', $datachannels_query);
         
         
-        foreach ($datachannels as $dkey => &$datachannel)
+        
+        if( $source=='cache' )
         {
-            foreach ($datachannel['Dataset'] as $key => $dataset)
-            {
-                $found = false;
-                foreach ($dataset['Stream'] as $stream) {
-                    if ($stream['id'] == $this->stream_id) {
-                        $found = true;
-                    }
-                }
-                if (!$found) {
-                    unset($datachannel['Dataset'][$key]);
-                }
-            }
-            
-            if (count($datachannel['Dataset']) < 1)
-                unset($datachannels[$dkey]);
-           	
-            if( isset($this->request->query['includeContent']) && $this->request->query['includeContent'] )
-            {
-				
-				$conditions = isset( $this->request->query['conditions'] ) ? $this->request->query['conditions'] : array();
-								
-				$queryData = array(
-					'conditions' => array(
-						'datachannel' => $datachannel['Datachannel']['slug'],
-					),
-					'facets' => true,
-					'limit' => 12,
-				);
-								
-				if( isset($conditions['q']) && $conditions['q'] )
-					$queryData['conditions']['q'] = $conditions['q'];
-				
-		        $search = $this->Dataobject->find('all', $queryData);		        
-		        
-		        $datachannel = array_merge($datachannel, array(
-		        	'dataobjects' => isset($search['dataobjects']) ? $search['dataobjects'] : array(),
-		        	'facets' => isset($search['facets']) ? $search['facets'] : array(),
-		        ));
-		        	            
-            }
-
+	        
+	        foreach( $datachannels as &$d )
+	        {
+	        	$d = unserialize( stripslashes( $d['Datachannel']['data'] ) );
+				$d = $d['datachannels'];
+	        }
+	        
+	        $datachannels = $datachannels['datachannels'];
+	        
+	        // var_export( $datachannels ); die();
+	        	        
         }
+        else
+        {
+        
+        
+	        // var_export( $datachannels ); die();
+	        
+	        // if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {
+	
+	        // }
+	        
+	        
+	        foreach ($datachannels as $dkey => &$datachannel)
+	        {
+	            foreach ($datachannel['Dataset'] as $key => $dataset)
+	            {
+	                $found = false;
+	                foreach ($dataset['Stream'] as $stream) {
+	                    if ($stream['id'] == $this->stream_id) {
+	                        $found = true;
+	                    }
+	                }
+	                if (!$found) {
+	                    unset($datachannel['Dataset'][$key]);
+	                }
+	            }
+	            
+	            if (count($datachannel['Dataset']) < 1)
+	                unset($datachannels[$dkey]);
+	           	
+	            if( isset($this->request->query['includeContent']) && $this->request->query['includeContent'] )
+	            {
+					
+					$conditions = isset( $this->request->query['conditions'] ) ? $this->request->query['conditions'] : array();
+									
+					$queryData = array(
+						'conditions' => array(
+							'datachannel' => $datachannel['Datachannel']['slug'],
+						),
+						'facets' => true,
+						'limit' => 12,
+					);
+									
+					if( isset($conditions['q']) && $conditions['q'] )
+						$queryData['conditions']['q'] = $conditions['q'];
+					
+			        $search = $this->Dataobject->find('all', $queryData);		        
+			        
+			        $datachannel = array_merge($datachannel, array(
+			        	'dataobjects' => isset($search['dataobjects']) ? $search['dataobjects'] : array(),
+			        	'facets' => isset($search['facets']) ? $search['facets'] : array(),
+			        ));
+			        	            
+	            }
+	
+	        }
+        
+        }
+        
         $this->set('datachannels', $datachannels);
         $this->set('_serialize', array('datachannels'));
     }

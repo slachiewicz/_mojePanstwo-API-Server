@@ -30,45 +30,46 @@ class DatachannelsController extends AppController
         
         $noCache = isset( $this->request->query['nocache'] ) ? (boolean) $this->request->query['nocache'] : false;
         $source = $noCache ? 'db' : 'cache';
-        $source = 'db';
+
         
-        $datachannels_query = array(
-        	'contain' => array(
-            	'Dataset' => array(
-                	'fields' => array('id', 'alias', 'count', 'name', 'class'),
-                ),
-                'Dataset.Stream',
-            ),
-        );
+       
         
-        if( !empty($conditions) )
-        	$datachannels_query['conditions'] = $conditions;
-        	
-        if( $source=='cache' )
-        	$datachannels_query['fields'] = array('Datachannel.data');
         
-        $datachannels = $this->Datachannel->find('all', $datachannels_query);
         
         
         
         if( $source=='cache' )
         {
 	        
+	        $datachannels = $this->Datachannel->query("SELECT `data` FROM `datachannels` WHERE `data`!='' ORDER BY `ord` ASC LIMIT 100");
+	        	        	        
 	        foreach( $datachannels as &$d )
-	        {
-	        	$d = unserialize( stripslashes( $d['Datachannel']['data'] ) );
-				$d = $d['datachannels'];
-	        }
-	        
-	        $datachannels = $datachannels['datachannels'];
-	        
-	        // var_export( $datachannels ); die();
+	        	$d = unserialize( stripslashes( $d['datachannels']['data'] ) );
+	        	        
 	        	        
         }
         else
         {
         
-        
+        	 $datachannels_query = array(
+	        	'contain' => array(
+	            	'Dataset' => array(
+	                	'fields' => array('id', 'alias', 'count', 'name', 'class'),
+	                ),
+	                'Dataset.Stream',
+	            ),
+                'fields' => array(
+	                'Datachannel.id',
+	                'Datachannel.name',
+	                'Datachannel.slug',
+	            ),
+	        );
+	        
+	        if( !empty($conditions) )
+	        	$datachannels_query['conditions'] = $conditions;	        
+        	
+        	$datachannels = $this->Datachannel->find('all', $datachannels_query);
+        	
 	        // var_export( $datachannels ); die();
 	        
 	        // if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {

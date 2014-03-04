@@ -23,11 +23,6 @@ class Datachannel extends AppModel
         $this->hasMany['Dataset']['conditions'][$catalog_field] = '1';
 
         $queryData = array_merge_recursive(array(
-            'fields' => array(
-                'Datachannel.id',
-                'Datachannel.name',
-                'Datachannel.slug',
-            ),
             'order' => array('Datachannel.ord' => 'asc'),
             'limit' => 100,
         ), $queryData);

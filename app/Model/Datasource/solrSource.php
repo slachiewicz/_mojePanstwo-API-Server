@@ -555,6 +555,22 @@ class solrSource extends DataSource
                                     $fq_iterator++;
                                     break;
                                 }
+                                
+                                case 'sejm_posiedzenia.wystapienia':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_wystapienia AND _data_posiedzenie_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'sejm_posiedzenia.glosowania':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_glosowania AND _data_posiedzenie_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
 
                             }
 

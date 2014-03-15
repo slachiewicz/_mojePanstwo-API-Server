@@ -45,6 +45,30 @@
         $output['groups'][] = $group;
 
     }
+    
+    
+    
+    
+    // DRUKI    
+        
+    if( $druki = $this->DB->selectValues("SELECT `druk_id` FROM `s_posiedzenia_punkty_druki` WHERE `punkt_id`='$punkt_id' AND `deleted`='0' LIMIT 100") )
+    {
+    	
+    	$group = array(
+	        'id' => 'druki',
+	        'title' => 'Powiązane druki sejmowe',
+	        'objects' => array(),
+	    );
+    	
+        foreach ($druki as $oid)
+            $group['objects'][] = array(
+                'dataset' => 'sejm_druki',
+                'object_id' => $oid,
+            );
+
+        $output['groups'][] = $group;
+
+    }
 	
 	
 	

@@ -24,9 +24,13 @@ class DatasetsController extends AppController
         $datasets = $this->Dataset->find('all', array(
                 'fields' => array(
                     'Dataset.id',
+	                'Dataset.name',
                     'Dataset.opis',
+                    'Dataset.alias',
                     'Dataset.base_alias',
                     'Dataset.count',
+	                'Dataset.class',
+	                'Dataset.channel_id',
                 ),
                 'conditions' => array(
                     $catalog_field => "1",

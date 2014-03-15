@@ -88,7 +88,8 @@ class AppController extends Controller
         }
 
 
-        
+        header('Access-Control-Allow-Origin: ' . $this->request->header('Origin'));
+        header('Access-Control-Allow-Credentials: true');
 
 
         parent::beforeFilter();

@@ -92,20 +92,26 @@ class UsersController extends PaszportAppController
             $this->UserAdditionalData->id = $user['id'];
             $data = $this->UserAdditionalData->read(null, $user['id']);
             
-            if ($data['UserAdditionalData']['group'] == '2')
+            if( !empty($data) )
             {
-                $streams = $this->UserAdditionalData->Stream->find('list', array('fields' => array('id', 'name')));
-            }
-            else
-            {
-            	$streams['1'] = '_mojePaństwo: wydanie główne';
-                foreach ($data['Stream'] as $stream) {
-                    $streams[$stream['id']] = $stream['name'];
-                }
-            }
             
-            $user['unread_count'] = $data['UserAdditionalData']['alerts_unread_count'];
-            $user['group'] = $data['UserAdditionalData']['group'];
+	            
+	            if ($data['UserAdditionalData']['group'] == '2')
+	            {
+	                $streams = $this->UserAdditionalData->Stream->find('list', array('fields' => array('id', 'name')));
+	            }
+	            else
+	            {
+	            	$streams['1'] = '_mojePaństwo: wydanie główne';
+	                foreach ($data['Stream'] as $stream) {
+	                    $streams[$stream['id']] = $stream['name'];
+	                }
+	            }
+	            
+	            $user['unread_count'] = $data['UserAdditionalData']['alerts_unread_count'];
+	            $user['group'] = $data['UserAdditionalData']['group'];
+            
+            }
         }
         
         $this->set('user', $user);

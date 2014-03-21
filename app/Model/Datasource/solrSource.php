@@ -388,6 +388,16 @@ class solrSource extends DataSource
 
                             switch ($key) {
 
+                                case 'app':
+                                {
+                                	
+                                	$_datasets = ClassRegistry::init('DB')->selectValues("SELECT base_alias FROM datasets WHERE app_id='" . addslashes($value) . "' AND `backup_catalog`='1'");
+                                	
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:(' . implode(' OR ', $_datasets) . ')';
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
                                 case 'twitter.responsesTo':
                                 {
                                     $params['fq[' . $fq_iterator . ']'] = '_data_in_reply_to_tweet_id:(' . $value . ')';

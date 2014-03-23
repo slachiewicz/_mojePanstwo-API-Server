@@ -91,6 +91,9 @@ CakePlugin::loadAll(array(
     'Prawo' => array(
         'routes' => true,
     ),
+    'Sejmometr' => array(
+        'routes' => true,
+    ),
     'PanstwoInternet' => array(
         'routes' => true,
     ),

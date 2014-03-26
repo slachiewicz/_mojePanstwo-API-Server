@@ -20,39 +20,82 @@ class UserPhrasesController extends AppController
 
     public function add()
     {
-        $user_id = $this->user_id;
-        if ($this->data) {
-            $result = $this->Phrase->query("SELECT `m_alerts`.id, `alerts-users`.user_id FROM `m_alerts` LEFT JOIN (SELECT * FROM `m_alerts-users` WHERE user_id='" . $user_id . "') as `alerts-users` ON `m_alerts`.id=`alerts-users`.alert_id WHERE `m_alerts`.q='" . addslashes($this->data['q']) . "'  LIMIT 1");
-            if ($result[0]['alerts-users']['user_id']) {
-//                $powiadomienia = array(array('Fraza' => array('id' => $result[0]['m_alerts']['id'])));
-            } else {
-                if ($result[0]['m_alerts']['id']) {
-                    $alert_id = $result[0]['m_alerts']['id'];
-                } else {
-                    $this->Phrase->save(array(
-                        'q' => $this->data['q'],
-                    ));
-                    $alert_id = $this->Phrase->id;
-                }
-                $this->UserPhrase->save(array(
-                    'user_id' => $user_id,
-                    'alert_id' => $alert_id,
-                ));
-//                $powiadomienia = array(array('Fraza' => array('id' => $alert_id)));
-            }
-        }
+    	
+    	$status = false;
+    	
+    	if( isset($this->request->data['q']) )
+    	{
+    		
+    		$q = trim( $this->request->data['q'] );
+	        $user_id = $this->user_id;
+	        $stream_id = $this->stream_id;
+
+	        if( $q )
+	        {
+	        	
+	        	$status = true;
+	        	
+	            $result = $this->Phrase->query("SELECT `m_alerts`.id, `alerts-users`.user_id FROM `m_alerts` LEFT JOIN (SELECT * FROM `m_alerts-users` WHERE user_id='" . $user_id . "') as `alerts-users` ON `m_alerts`.id=`alerts-users`.alert_id WHERE `m_alerts`.q='" . addslashes($q) . "' AND `m_alerts`.stream_id='" . $stream_id . "' LIMIT 1");
+	            
+	            
+	            if( !empty($result) && isset($result[0]['alerts-users']['user_id']) )
+	            {
+	            	
+	            	// Użytkownik ma już takie powiadomienie
+	            	
+	            	$status = true;
+					// $powiadomienia = array(array('Fraza' => array('id' => $result[0]['m_alerts']['id'])));
+	            
+	            }
+	            else
+	            {
+	            	
+	            	
+	                if( !empty($result) && isset($result[0]['m_alerts']['id']) )
+	                {
+	                	// Fraza ma już swoje id
+	                    $alert_id = $result[0]['m_alerts']['id'];
+	                
+	                }
+	                else
+	                {
+	                	// Fraza nie ma swojego id - trzeba stworzyć
+	                    $this->Phrase->save(array(
+	                        'q' => $q,
+	                        'stream_id' => $stream_id,
+	                    ));
+	                    $alert_id = $this->Phrase->id;
+	                    
+	                }
+	                
+	                $this->UserPhrase->save(array(
+	                    'user_id' => $user_id,
+	                    'alert_id' => $alert_id,
+	                ));
+					
+					// $powiadomienia = array(array('Fraza' => array('id' => $alert_id)));
+	            
+	            }
+	        }
+	    }
+	    
+	    $this->set('status', $status);
+	    $this->set('_serialize', 'status');
+	    
     }
 
     public function remove()
     {
         $user_id = $this->user_id;
         $phrase_id = $this->params->phrase_id;
+        
         $obj = $this->UserPhrase->find('first', array(
             'conditions' => array(
                 'UserPhrase.user_id' => $user_id,
                 'UserPhrase.alert_id' => $phrase_id,
             ),
         ));
+                
         if ($obj) {
             $this->UserPhrase->id = $obj['UserPhrase']['id'];
             $this->UserPhrase->delete();

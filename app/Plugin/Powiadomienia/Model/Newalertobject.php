@@ -32,7 +32,7 @@ class Newalertobject extends AppModel
         $this->DB = new DB();
 
 
-        $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`";
+        $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`,  GROUP_CONCAT( `m_alerts_groups_qs-objects`.`hl` SEPARATOR \"\n\") as 'hls' ";
         $sql_order = "`m_users-objects`.`dstamp` DESC";
 		
 				
@@ -44,8 +44,12 @@ class Newalertobject extends AppModel
             
             // USE INDEX (`user_objects`) 
             
-            $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` 
-			WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
+            $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";
+            
+	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
+	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
+            
+            $q .= "WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
 			$q .= " AND `m_alerts_groups-objects`.`group_id`='" . $group_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
             $q .= " GROUP BY `m_users-objects`.`dstamp`";
@@ -63,8 +67,12 @@ class Newalertobject extends AppModel
             
             // USE INDEX (`user_objects`) 
             
-            $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` 
-			WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
+            $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";
+            
+	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
+	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
+            
+            $q .= "WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
             $q .= " GROUP BY `m_users-objects`.`dstamp`";
             $q .= " ORDER BY $sql_order";
@@ -72,10 +80,8 @@ class Newalertobject extends AppModel
 			
         }
 		
-		
         $objects = $this->DB->query($q);
                 
-        
 
 
         $ids = array();
@@ -83,8 +89,8 @@ class Newalertobject extends AppModel
         foreach ($objects as $i => $object) {
             array_push($ids, $object['m_users-objects']['object_id']);
             
-            if( isset($object['m_alerts-objects']['hl']) )
-	            $hl_texts[$object['m_users-objects']['object_id']] = $object['m_alerts-objects']['hl'];
+            if( isset($object[0]['hls']) )
+	            $hl_texts[$object['m_users-objects']['object_id']] = $object[0]['hls'];
         }        
 		
 		

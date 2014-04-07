@@ -32,7 +32,7 @@ class Newalertobject extends AppModel
         $this->DB = new DB();
 
 
-        $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`,  GROUP_CONCAT( `m_alerts_groups_qs-objects`.`hl` SEPARATOR \"\n\") as 'hls' ";
+        $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`,  GROUP_CONCAT( `m_alerts_groups_qs-objects`.`hl` SEPARATOR \"\r\") as 'hls' ";
         $sql_order = "`m_users-objects`.`dstamp` DESC";
 		
 				

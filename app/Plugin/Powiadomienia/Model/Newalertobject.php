@@ -34,8 +34,8 @@ class Newalertobject extends AppModel
 
         $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`";
         $sql_order = "`m_users-objects`.`dstamp` DESC";
-
 		
+				
         if( $group_id )
         {
 
@@ -44,10 +44,11 @@ class Newalertobject extends AppModel
             
             // USE INDEX (`user_objects`) 
             
-            $q .= "JOIN `m_alerts-objects` ON `m_user-objects`.`dstamp`=`m_alerts-objects`.`dstamp` 
-			WHERE `m_user-objects`.`user_id`='" . $user_id . "'";
-			$q .= " AND `m_user-objects`.`visited`='" . $visited . "'";
-            $q .= " GROUP BY `m_user-objects`.`dstamp`";
+            $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` 
+			WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
+			$q .= " AND `m_alerts_groups-objects`.`group_id`='" . $group_id . "'";
+			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
+            $q .= " GROUP BY `m_users-objects`.`dstamp`";
             $q .= " ORDER BY $sql_order";
             $q .= " LIMIT $offset, $limit";
 			
@@ -88,14 +89,14 @@ class Newalertobject extends AppModel
 		
 		
         if (!empty($ids)) {
-
+						
             $data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
                 'conditions' => array(
                     'id' => $ids,
                 ),
                 'order' => 'date desc',
             ));
-
+            
             $dataobjects = $data['dataobjects'];
             foreach ($dataobjects as &$object)
             	if( array_key_exists($object['id'], $hl_texts) )

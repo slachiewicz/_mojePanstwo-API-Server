@@ -82,6 +82,28 @@ class Dataobject extends AppModel
         }
         return $output;
     }
+    
+    public function getAlertsQueries( $id, $user_id )
+    {
+	    
+	    App::import('model', 'DB');
+        $this->DB = new DB();
+	    
+	    $q = "SELECT `m_alerts_groups_qs-objects`.q_id, `m_alerts_qs`.`q` , `m_alerts_groups_qs-objects`.hl, COUNT( * ) AS `count`
+		FROM `m_alerts_groups_qs-objects`
+		JOIN `m_alerts_qs` ON `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_qs`.`id`
+		JOIN `m_alerts_groups-objects` ON `m_alerts_groups_qs-objects`.`object_id` = `m_alerts_groups-objects`.`object_id`
+		JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id` = `m_alerts_groups_qs`.`group_id`
+		WHERE `m_alerts_groups_qs-objects`.`object_id` = '" . $id . "'
+		AND `m_alerts_groups-objects`.`user_id` = '" . $user_id . "'
+		AND `m_alerts_groups_qs`.`q_id` = `m_alerts_groups_qs-objects`.q_id
+		GROUP BY `m_alerts_groups_qs-objects`.hl
+		ORDER BY `count` DESC , `m_alerts_qs`.`q` ASC
+		LIMIT 0 , 30";
+			    
+	    return $this->DB->selectAssocs($q);
+		
+    }
 
 }
 

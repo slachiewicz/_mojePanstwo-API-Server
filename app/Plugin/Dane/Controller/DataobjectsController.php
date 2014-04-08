@@ -35,5 +35,18 @@ class DataobjectsController extends AppController
             '_serialize' => 'layer',
         ));
     }
+    
+    public function alertsQueries()
+    {
+
+        $id = $this->request->params['id'];
+        $queries = $this->Dataobject->getAlertsQueries($id, $this->user_id);
+
+        $this->set(array(
+            'queries' => $queries,
+            '_serialize' => 'queries',
+        ));
+    }
+    
 
 }

@@ -131,20 +131,27 @@ class Alertobject extends AppModel
 	    
 	    if( $affected_rows_old )
 			$this->DB->query( "UPDATE `m_alerts-users` JOIN `m_alerts-objects` ON `m_alerts-users`.`alert_id` = `m_alerts-objects`.`alert_id` SET `m_alerts-users`.analiza='1', `m_alerts-users`.analiza_ts=NOW() WHERE `m_alerts-objects`.`object_id`='$object_id'" );
-			
-		if( $affected_rows_new ) {
+		
+		
+		$result = array(
+			'status' => 'OK',
+		);
+		
+		if( $affected_rows_new || true ) {
 			
 			$this->DB->query("UPDATE `m_alerts_groups-objects` JOIN `m_alerts_groups` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups`.`id` SET alerts_unread_count = alerts_unread_count-1, analiza='1', analiza_ts=NOW() WHERE `m_alerts_groups-objects`.`object_id` = '$object_id' AND `m_alerts_groups`.`user_id` = '$user_id'");
 			
 			$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0'");
 			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
 			
+			$result = array_merge($result, array(
+				'groups_alerts_counts' => $this->DB->selectAssocs("SELECT `id`, `alerts_unread_count` FROM `m_alerts_groups` WHERE `user_id`='$user_id'"),
+		    	'user_alerts_count' => $user_alerts_count,
+			));
+			
 		}
 			
 		
-		$result = array(
-	    	'status' => $user_alerts_count,
-	    );
 		
 		return $result;
 		

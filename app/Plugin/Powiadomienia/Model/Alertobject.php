@@ -119,17 +119,31 @@ class Alertobject extends AppModel
 	    $this->DB = new DB();
 	    
 	    $this->DB->query("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
+	    
+	    
 	    $this->DB->query("UPDATE `m_user-objects` SET `m_user-objects`.`visited`='1', `m_user-objects`.`visited_ts`=NOW() WHERE `m_user-objects`.`user_id`='$user_id' AND `m_user-objects`.object_id='$object_id' AND `m_user-objects`.`visited`='0'");
+	    $affected_rows_old = $this->DB->getAffectedRows();
 	    
-	    $affected_rows = $this->DB->getAffectedRows();
+	    
+	    $this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
+	    $affected_rows_new = $this->DB->getAffectedRows();
 	    
 	    
-	    if( $affected_rows|| true )
+	    if( $affected_rows_old )
 			$this->DB->query( "UPDATE `m_alerts-users` JOIN `m_alerts-objects` ON `m_alerts-users`.`alert_id` = `m_alerts-objects`.`alert_id` SET `m_alerts-users`.analiza='1', `m_alerts-users`.analiza_ts=NOW() WHERE `m_alerts-objects`.`object_id`='$object_id'" );
+			
+		if( $affected_rows_new ) {
+			
+			$this->DB->query("UPDATE `m_alerts_groups-objects` JOIN `m_alerts_groups` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups`.`id` SET alerts_unread_count = alerts_unread_count-1, analiza='1', analiza_ts=NOW() WHERE `m_alerts_groups-objects`.`object_id` = '$object_id' AND `m_alerts_groups`.`user_id` = '$user_id'");
+			
+			$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0'");
+			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
+			
+		}
 			
 		
 		$result = array(
-	    	'status' => $affected_rows,
+	    	'status' => $user_alerts_count,
 	    );
 		
 		return $result;

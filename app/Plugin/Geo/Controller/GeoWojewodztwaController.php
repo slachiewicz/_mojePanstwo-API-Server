@@ -3,7 +3,7 @@
 class GeoWojewodztwaController extends AppController
 {
 
-	public $uses = array('Model', 'Geo.GeoWojewodztwo');
+	public $uses = array('Geo.GeoWojewodztwo');
 	
     public function index()
     {

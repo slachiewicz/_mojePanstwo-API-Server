@@ -2,14 +2,20 @@
 
 class GeoPowiatyController extends AppController
 {
-    public function index($id)
+
+	public $uses = array('Geo.GeoPowiat');
+	
+    public function index()
     {
+    	
+    	$id = $this->request->params['id'];
+    	
         $powiaty = $this->GeoPowiat->find('all', array(
             'conditions' => array(
-                'Powiat.w_id' => $id,
+                'GeoPowiat.w_id' => $id,
             ),
             'order' => array(
-                'Powiat.nazwa' => 'asc'
+                'GeoPowiat.nazwa' => 'asc'
             ),
         ));
         $this->set(array(

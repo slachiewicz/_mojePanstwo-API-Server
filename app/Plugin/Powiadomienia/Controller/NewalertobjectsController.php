@@ -58,7 +58,8 @@ class NewalertobjectsController extends AppController
 
     public function flag()
     {
-        $result = $this->Newalertobject->flag($this->user_id, $this->params->object_id);
+    	$action = @$this->request->query['action'];
+        $result = $this->Newalertobject->flag($this->user_id, $this->params->object_id, $action);
         
         $this->set('result', $result);  
 	    $this->set('_serialize', array('result'));

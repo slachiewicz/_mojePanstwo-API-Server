@@ -6,7 +6,8 @@ Router::connect('/powiadomienia/phrases/:phrase_id', array('plugin' => 'Powiadom
 
 Router::connect('/powiadomienia/groups', array('plugin' => 'Powiadomienia', 'controller' => 'PowiadomieniaGroups', 'action' => 'index', '[method]' => 'GET'));
 Router::connect('/powiadomienia/groups', array('plugin' => 'Powiadomienia', 'controller' => 'PowiadomieniaGroups', 'action' => 'add', '[method]' => 'POST'));
-Router::connect('/powiadomienia/groups/:phrase_id', array('plugin' => 'Powiadomienia', 'controller' => 'PowiadomieniaGroups', 'action' => 'remove', '[method]' => 'DELETE'));
+Router::connect('/powiadomienia/groups/:group_id', array('plugin' => 'Powiadomienia', 'controller' => 'PowiadomieniaGroups', 'action' => 'remove', '[method]' => 'DELETE'));
+Router::connect('/powiadomienia/groups/:group_id/:action', array('plugin' => 'Powiadomienia', 'controller' => 'PowiadomieniaGroups',));
 
 
 Router::connect('/powiadomienia/objects', array('plugin' => 'Powiadomienia', 'controller' => 'alertobjects', 'action' => 'index'));

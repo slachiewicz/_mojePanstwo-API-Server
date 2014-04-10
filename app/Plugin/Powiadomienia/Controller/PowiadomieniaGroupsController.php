@@ -19,6 +19,15 @@ class PowiadomieniaGroupsController extends AppController
         $this->set('_serialize', 'groups');
 
     }
+    
+    public function flag()
+    {
+    	$action = @$this->request->query['action'];
+        $result = $this->PowiadomieniaGroup->flag($this->user_id, $this->params->group_id, $action);
+        
+        $this->set('result', $result);  
+	    $this->set('_serialize', array('result'));
+    }
 	
 	/*
     public function add()

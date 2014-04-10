@@ -122,27 +122,72 @@ class Newalertobject extends AppModel
 
     }
     
-    public function flag($user_id, $object_id)
+    public function flag($user_id, $object_id, $action)
     {
 	    if( !$user_id || !$object_id )
+	    	return false;
+	    	
+	    if( $action!='read' && $action!='unread' )
 	    	return false;
 	    
 	    App::import('model', 'DB');
 	    $this->DB = new DB();
 	    
+	    
 	    $this->DB->query("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
-	    $this->DB->query("UPDATE `m_user-objects` SET `m_user-objects`.`visited`='1', `m_user-objects`.`visited_ts`=NOW() WHERE `m_user-objects`.`user_id`='$user_id' AND `m_user-objects`.object_id='$object_id' AND `m_user-objects`.`visited`='0'");
+	    	    
 	    
-	    $affected_rows = $this->DB->getAffectedRows();
-	    
-	    
-	    if( $affected_rows|| true )
-			$this->DB->query( "UPDATE `m_alerts-users` JOIN `m_alerts-objects` ON `m_alerts-users`.`alert_id` = `m_alerts-objects`.`alert_id` SET `m_alerts-users`.analiza='1', `m_alerts-users`.analiza_ts=NOW() WHERE `m_alerts-objects`.`object_id`='$object_id'" );
+	    if( $action=='read' ) {
+	    	
+		    $this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
+		
+		} elseif( $action=='unread' ) {
 			
+			$this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
+		
+		}
+		
+		$affected_rows = $this->DB->getAffectedRows();
+		
 		
 		$result = array(
-	    	'status' => $affected_rows,
-	    );
+			'status' => 'OK',
+		);
+		
+		if( $affected_rows || true ) {
+			
+			
+			$groups = $this->DB->selectAssocs("SELECT `m_alerts_groups-objects`.`group_id`, COUNT(*) as 'alerts_unread_count' FROM `m_alerts_groups-objects` WHERE `m_alerts_groups-objects`.`user_id`='" . $user_id . "' AND `m_alerts_groups-objects`.`object_id`='" . $object_id . "' GROUP BY `m_alerts_groups-objects`.`group_id`");
+			
+			if( !empty($groups) ) {
+				
+				$values = array("('" . $group_id . "','0')");
+				foreach( $groups as $group )
+					$values[] = "('" . $group['group_id'] . "', '" . $group['alerts_unread_count'] . "')";
+				
+				
+				$this->DB->query("INSERT INTO `m_alerts_groups` (`id`, `alerts_unread_count`) VALUES " . implode(',', $values) . " ON DUPLICATE KEY UPDATE `alerts_unread_count`=VALUES(`alerts_unread_count`)");
+				
+			}
+			
+			$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0'");
+			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
+			
+			$groups[] = array(
+				'group_id' => $group_id,
+				'alerts_unread_count' => 0,
+			);
+			
+			$result = array_merge($result, array(
+				'groups_alerts_counts' => $groups,
+		    	'user_alerts_count' => $user_alerts_count,
+			));
+			
+			
+			
+		}
+			
+		
 		
 		return $result;
 		

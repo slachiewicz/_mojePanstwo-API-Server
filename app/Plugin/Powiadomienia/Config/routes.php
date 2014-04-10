@@ -17,5 +17,6 @@ Router::connect('/powiadomienia/objects/:object_id/:action', array('plugin' => '
 
 Router::connect('/powiadomienia/_objects', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects', 'action' => 'index'));
 Router::connect('/powiadomienia/_objects', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects', 'action' => 'flag_objects', '[method]' => 'PUT'));
+Router::connect('/powiadomienia/_objects/flag', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects', 'action' => 'flagAll'));
 Router::connect('/powiadomienia/_objects/:object_id', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects', 'action' => 'flag_object', '[method]' => 'PUT'));
 Router::connect('/powiadomienia/_objects/:object_id/:action', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects',));

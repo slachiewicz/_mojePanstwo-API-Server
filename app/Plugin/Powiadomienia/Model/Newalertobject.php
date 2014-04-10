@@ -186,4 +186,66 @@ class Newalertobject extends AppModel
 		return $result;
 		
     }
+    
+    public function flagAll($user_id, $action)
+    {
+	    	
+	    if( $action!='read' && $action!='unread' )
+	    	return false;
+	    
+	    App::import('model', 'DB');
+	    $this->DB = new DB();
+	    
+	    
+	    	    
+	    
+	    if( $action=='read' ) {
+	    	
+		    $this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.`visited`='0'");
+		
+		} elseif( $action=='unread' ) {
+			
+			$this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.`visited`='1'");
+		
+		}
+		
+		$affected_rows = $this->DB->getAffectedRows();
+		
+		
+		$result = array(
+			'status' => 'OK',
+		);
+		
+		if( $affected_rows || true ) {
+			
+			
+			$groups = $this->DB->selectAssocs("SELECT `m_alerts_groups`.`id` as 'group_id', '0' as 'alerts_unread_count' FROM `m_alerts_groups` WHERE `m_alerts_groups`.`user_id`='" . $user_id . "'");
+			
+			if( !empty($groups) ) {
+				
+				foreach( $groups as $group )
+					$values[] = "('" . $group['group_id'] . "', '" . $group['alerts_unread_count'] . "')";
+				
+				
+				$this->DB->query("INSERT INTO `m_alerts_groups` (`id`, `alerts_unread_count`) VALUES " . implode(',', $values) . " ON DUPLICATE KEY UPDATE `alerts_unread_count`=VALUES(`alerts_unread_count`)");
+				
+			}
+			
+			$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0'");
+			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
+			
+			$result = array_merge($result, array(
+				'groups_alerts_counts' => $groups,
+		    	'user_alerts_count' => $user_alerts_count,
+			));
+			
+			
+			
+		}
+			
+		
+		
+		return $result;
+		
+    }
 } 

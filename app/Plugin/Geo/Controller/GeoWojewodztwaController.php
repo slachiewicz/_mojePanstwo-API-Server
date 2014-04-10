@@ -1,12 +1,13 @@
 <?php
 
-class WojewodztwaController extends AppController
+class GeoWojewodztwaController extends AppController
 {
-    public $uses = array('Geo.Wojewodztwo');
 
+	public $uses = array('Model', 'Geo.GeoWojewodztwo');
+	
     public function index()
     {
-        $wojewodztwa = $this->Wojewodztwo->find('all', array(
+        $wojewodztwa = $this->GeoWojewodztwo->find('all', array(
             'fields' => array(
                 'id',
                 'nazwa',

@@ -1,6 +1,6 @@
 <?php
 
-class Gmina extends AppModel
+class GeoGmina extends AppModel
 {
     public $useTable = 'pl_gminy';
     public $virtualFields = array(

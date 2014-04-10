@@ -1,6 +1,6 @@
 <?php
 
-class Wojewodztwo extends AppModel
+class GeoWojewodztwo extends AppModel
 {
     public $useTable = 'wojewodztwa';
     public $virtualFields = array(

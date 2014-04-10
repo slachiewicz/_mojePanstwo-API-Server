@@ -157,11 +157,10 @@ class Newalertobject extends AppModel
 		if( $affected_rows || true ) {
 			
 			
-			$groups = $this->DB->selectAssocs("SELECT `m_alerts_groups-objects`.`group_id`, COUNT(*) as 'alerts_unread_count' FROM `m_alerts_groups-objects` WHERE `m_alerts_groups-objects`.`user_id`='" . $user_id . "' AND `m_alerts_groups-objects`.`object_id`='" . $object_id . "' GROUP BY `m_alerts_groups-objects`.`group_id`");
+			$groups = $this->DB->selectAssocs("SELECT `m_alerts_groups-objects`.`group_id`, COUNT(*) as 'alerts_unread_count' FROM `m_alerts_groups-objects` JOIN `m_users-objects` ON (`m_alerts_groups-objects`.`object_id` = `m_users-objects`.`object_id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id`) WHERE `m_alerts_groups-objects`.`user_id`='" . $user_id . "' AND `m_users-objects`.`visited`='0' AND `m_alerts_groups-objects`.`group_id` IN (SELECT DISTINCT(`group_id`) FROM `m_alerts_groups-objects` WHERE `user_id`='$user_id' AND `object_id`='$object_id') GROUP BY `m_alerts_groups-objects`.`group_id`");
 			
 			if( !empty($groups) ) {
 				
-				$values = array("('" . $group_id . "','0')");
 				foreach( $groups as $group )
 					$values[] = "('" . $group['group_id'] . "', '" . $group['alerts_unread_count'] . "')";
 				
@@ -172,11 +171,6 @@ class Newalertobject extends AppModel
 			
 			$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0'");
 			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
-			
-			$groups[] = array(
-				'group_id' => $group_id,
-				'alerts_unread_count' => 0,
-			);
 			
 			$result = array_merge($result, array(
 				'groups_alerts_counts' => $groups,

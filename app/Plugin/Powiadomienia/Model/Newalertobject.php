@@ -143,7 +143,7 @@ class Newalertobject extends AppModel
 		
 		} elseif( $action=='unread' ) {
 			
-			$this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
+			$this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='1'");
 		
 		}
 		

@@ -57,7 +57,7 @@ class PowiadomieniaGroup extends AppModel
 		} elseif( $action=='unread' ) {
 			
 			$sign = '+';
-			$this->DB->query("UPDATE `m_users-objects` JOIN `m_alerts_groups-objects` ON `m_users-objects`.`object_id` = `m_alerts_groups-objects`.`object_id` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_alerts_groups-objects`.`group_id`='$group_id' AND `m_users-objects`.`visited`='0'");
+			$this->DB->query("UPDATE `m_users-objects` JOIN `m_alerts_groups-objects` ON `m_users-objects`.`object_id` = `m_alerts_groups-objects`.`object_id` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_alerts_groups-objects`.`group_id`='$group_id' AND `m_users-objects`.`visited`='1'");
 		
 		}
 	    

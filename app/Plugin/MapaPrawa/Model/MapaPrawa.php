@@ -19,7 +19,9 @@ class MapaPrawa extends AppModel
 
     public function loadBlockRclData($id)
     {
-
+		
+		$catalog = $this->query("SELECT `rcl_katalogi_typy`.`id`, `rcl_katalogi_typy`.`opis` FROM `rcl_katalogi_typy` JOIN `rcl_katalogi` ON `rcl_katalogi_typy`.`id` = `rcl_katalogi`.`typ_id` WHERE `rcl_katalogi`.`id` = '$id' LIMIT 1");
+				
         $list = $this->query("SELECT id, tytul FROM `rcl_katalogi` WHERE katalog_id='" . addslashes($id) . "' AND docs_count>0");
         foreach ($list as &$l) {
             $l = $l['rcl_katalogi'];
@@ -27,7 +29,7 @@ class MapaPrawa extends AppModel
         }
 
         $output = array(
-            'info' => 'Tekst wyjaśniający co się dzieje na tym etapie prac',
+            'info' => @$catalog[0]['rcl_katalogi_typy']['opis'],
             'list' => $list,
         );
 

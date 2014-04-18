@@ -581,6 +581,14 @@ class solrSource extends DataSource
                                     $fq_iterator++;
                                     break;
                                 }
+                                
+                                case 'dzielnice.radni':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_dzielnic AND _data_dzielnica_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
 
                             }
 

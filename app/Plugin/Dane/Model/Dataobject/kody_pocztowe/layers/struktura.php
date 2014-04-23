@@ -19,8 +19,7 @@
 	JOIN `pl_gminy` ON `pl_miejscowosci`.`gmina_id` = `pl_gminy`.`id` 
 	JOIN `pl_gminy_typy` ON `pl_gminy`.`typ_id` = `pl_gminy_typy`.`id`	 
 	LEFT JOIN `pl_miejscowosci_rodzaje` ON `pl_miejscowosci`.`typ_id` = `pl_miejscowosci_rodzaje`.`id`	 
-	WHERE `pl_kody_pocztowe_pna`.`kod_id`='$id' AND `pl_kody_pocztowe_pna`.`akcept` = '1' AND
-	`pl_kody_pocztowe_pna`.`urzad_pocztowy`='0'
+	WHERE `pl_kody_pocztowe_pna`.`kod_id`='$id' AND `pl_kody_pocztowe_pna`.`akcept` = '1' 
 	ORDER BY `pl_gminy_typy`.`id` ASC, `pl_gminy`.`nazwa` ASC, `pl_miejscowosci`.`parent_id` ASC, `pl_miejscowosci`.`NAZWA` ASC, `pl_kody_pocztowe_pna`.`nazwa` ASC, `pl_kody_pocztowe_pna`.`ulica` ASC, `pl_kody_pocztowe_pna`.`numery` ASC";
 		
 	$data = $this->DB->selectAssocs($q);

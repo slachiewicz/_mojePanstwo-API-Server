@@ -3,6 +3,6 @@
 class Code extends AppModel
 {
 
-    public $useTable = '_kody_pocztowe';
+    public $useTable = 'pl_kody_pocztowe';
 
 } 

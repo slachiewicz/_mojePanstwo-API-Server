@@ -3,7 +3,7 @@
 class Address extends AppModel
 {
 
-    public $useTable = '_kody_pocztowe_pna';
+    public $useTable = 'pl_kody_pocztowe_pna';
 
     public function find($type = 'first', $queryData = array())
     {

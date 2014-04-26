@@ -52,6 +52,9 @@ class Dataobject extends AppModel
 
         App::import('model', 'DB');
         $this->DB = new DB();
+        
+        App::import('model', 'S3Files');
+        $this->S3Files = new S3Files();
 
         $output = include($file);
         if ($layer == 'related') {

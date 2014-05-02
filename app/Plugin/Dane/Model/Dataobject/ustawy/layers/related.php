@@ -8,10 +8,10 @@ $output = array(
 );
 
 
-$prawo_id = $object['data']['id'];
+$ustawa_id = $object['data']['id'];
 
-$ustawa_id = $this->DB->query("SELECT id FROM `prawo_ustawy_glowne` as `table` WHERE `prawo_id`='$prawo_id'");
-$ustawa_id = @$ustawa_id[0]['table']['id'];
+$prawo_id = $this->DB->query("SELECT prawo_id FROM `prawo_ustawy_glowne` as `table` WHERE `id`='$ustawa_id'");
+$prawo_id = @$prawo_id[0]['table']['prawo_id'];
 
 $projekt_id = $this->DB->query("SELECT projekt_id FROM `prawo_ustawy` as `table` WHERE `id`='$prawo_id'");
 $projekt_id = @$projekt_id[0]['table']['id'];
@@ -30,14 +30,14 @@ if ($projekt_id)
     );
 
 
-if ($ustawa_id)
+if ($prawo_id)
     $output['groups'][] = array(
         'id' => 'tekst_jednolity',
-        'title' => 'Aktualny tekst jednolity ustawy',
+        'title' => 'Pierwsza wersja ustawy opublikowana w Dzienniku Ustaw',
         'objects' => array(
             array(
                 'dataset' => 'ustawy',
-                'object_id' => $ustawa_id,
+                'object_id' => $prawo_id,
             )
         ),
     );

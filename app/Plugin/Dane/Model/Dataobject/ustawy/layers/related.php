@@ -36,7 +36,7 @@ if ($prawo_id)
         'title' => 'Pierwsza wersja ustawy opublikowana w Dzienniku Ustaw',
         'objects' => array(
             array(
-                'dataset' => 'ustawy',
+                'dataset' => 'prawo',
                 'object_id' => $prawo_id,
             )
         ),

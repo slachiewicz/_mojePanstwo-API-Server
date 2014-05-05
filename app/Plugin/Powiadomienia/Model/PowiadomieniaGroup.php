@@ -46,7 +46,8 @@ class PowiadomieniaGroup extends AppModel
 			    FROM `m_alerts_groups_datasets` 
 			    JOIN `datasets` ON `m_alerts_groups_datasets`.`dataset_id` = `datasets`.`id` 
 			    JOIN `applications` ON `datasets`.`app_id` = `applications`.`id` 
-			    WHERE `m_alerts_groups_datasets`.`group_id` = '" . addslashes( $id ) . "'");
+			    WHERE `m_alerts_groups_datasets`.`group_id` = '" . addslashes( $id ) . "' 
+			    ORDER BY `applications`.`name` ASC, `datasets`.`name` ASC");
 			    
 			    $apps = array();
 			    $temp = array();

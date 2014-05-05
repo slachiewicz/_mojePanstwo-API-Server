@@ -21,3 +21,5 @@ Router::connect('/powiadomienia/_objects', array('plugin' => 'Powiadomienia', 'c
 Router::connect('/powiadomienia/_objects/flag', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects', 'action' => 'flagAll'));
 Router::connect('/powiadomienia/_objects/:object_id', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects', 'action' => 'flag_object', '[method]' => 'PUT'));
 Router::connect('/powiadomienia/_objects/:object_id/:action', array('plugin' => 'Powiadomienia', 'controller' => 'newalertobjects',));
+
+Router::connect('/powiadomienia/apps', array('plugin' => 'Powiadomienia', 'controller' => 'PowiadomieniaApps', 'action' => 'index', '[method]' => 'GET'));

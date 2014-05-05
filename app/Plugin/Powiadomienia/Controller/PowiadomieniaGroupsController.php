@@ -20,6 +20,21 @@ class PowiadomieniaGroupsController extends AppController
 
     }
     
+    public function view()
+    {
+	    
+	    $group = $this->PowiadomieniaGroup->find('first', array(
+            'conditions' => array(
+                'id' => $this->request->params['group_id'],
+                // 'user_id' => $this->user_id,
+            ),
+        ));
+               
+        $this->set('group', $group);
+        $this->set('_serialize', 'group');
+	    
+    }
+    
     public function flag()
     {
     	$action = @$this->request->query['action'];

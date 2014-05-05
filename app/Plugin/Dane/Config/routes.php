@@ -9,3 +9,5 @@ Router::connect('/dane/dataset/:alias/:action', array('plugin' => 'Dane', 'contr
 
 Router::connect('/dane/datachannel/:alias', array('plugin' => 'Dane', 'controller' => 'datachannels', 'action' => 'info'));
 Router::connect('/dane/datachannel/:alias/:action', array('plugin' => 'Dane', 'controller' => 'datachannels'));
+
+Router::connect('/dane/:alias/:object_id', array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view'));

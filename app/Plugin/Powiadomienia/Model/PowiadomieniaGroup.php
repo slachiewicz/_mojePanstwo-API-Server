@@ -12,8 +12,6 @@ class PowiadomieniaGroup extends AppModel
 	    'id',
 	);  
     
-    // public $belongsTo = array('UserPhrase' => array('foreignKey' => 'alert_id', 'className' => 'Powiadomienia.UserPhrase'));
-    
     public $paginate = array(
         'limit' => 50,
     );
@@ -23,7 +21,69 @@ class PowiadomieniaGroup extends AppModel
 	    if( !isset($query['fields']) || empty($query['fields']) )
 	    	$query['fields'] = $this->defaultFields;
 	    
-	    return parent::find($type, $query);
+	    if( $type=='first' )
+	    {
+		    
+		    $output = parent::find($type, $query);
+		    if( $id = $output['PowiadomieniaGroup']['id'] )
+		    {
+			    
+			    App::import('model', 'DB');
+			    $this->DB = new DB();
+			    
+			    $output['phrases'] = $this->DB->selectValues("SELECT `m_alerts_qs`.`q` 
+			    FROM `m_alerts_groups_qs` 
+			    JOIN `m_alerts_qs` ON `m_alerts_groups_qs`.`q_id` = `m_alerts_qs`.`id` 
+			    WHERE `m_alerts_groups_qs`.`group_id` = '" . addslashes( $id ) . "' 
+			    ORDER BY `m_alerts_qs`.`q` ASC 
+			    LIMIT 50");
+			    
+			    $apps_data = $this->DB->selectAssocs("SELECT 
+			    `applications`.`id` AS 'app.id', 
+			    `applications`.`name` AS 'app.name', 
+			    `datasets`.`id` AS 'dataset.id', 
+			    `datasets`.`name` AS 'dataset.name' 
+			    FROM `m_alerts_groups_datasets` 
+			    JOIN `datasets` ON `m_alerts_groups_datasets`.`dataset_id` = `datasets`.`id` 
+			    JOIN `applications` ON `datasets`.`app_id` = `applications`.`id` 
+			    WHERE `m_alerts_groups_datasets`.`group_id` = '" . addslashes( $id ) . "'");
+			    
+			    $apps = array();
+			    $temp = array();
+			    foreach( $apps_data as $data )
+			    	$temp[ $data['app.id'] ][] = $data;
+			    
+			    foreach( $temp as $app_id => $datasets )
+			    {
+			    	
+			    	$app = array(
+				    	'id' => $app_id,
+				    	'name' => null,
+				    	'datasets' => array(),
+				    );
+			    	
+			    	foreach( $datasets as $dataset )
+			    	{
+			    		
+			    		if( is_null($app['name']) )
+			    			$app['name'] = $dataset['app.name'];
+			    		
+			    		$app['datasets'][] = array(
+			    			'id' => $dataset['dataset.id'],
+			    			'name' => $dataset['dataset.name'],
+			    		);
+			    	}
+			    	
+				    $apps[] = $app;
+			    }
+			    
+			    $output['apps'] = $apps;
+			    
+		    }
+		    
+		    return $output;
+		    
+	    } else return parent::find($type, $query);	    
 	    
     }
     

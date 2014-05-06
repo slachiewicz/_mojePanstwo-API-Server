@@ -77,3 +77,63 @@ function number_format_h($n, $decimals = 0, $dec_point = '.', $thousands_sep = '
 
     return number_format($n, $decimals, $dec_point, $thousands_sep);
 }
+
+function dataSlownie($data)
+{
+    $_data = $data;
+
+    $timestamp = strtotime($data);
+    if (!$timestamp)
+        return false;
+
+    $data = date('Y-m-d', $timestamp);
+
+    if ($data == date('Y-m-d', time())) // TODAY
+    {
+
+        $str = 'dzisiaj';
+
+    } else {
+
+
+        $___vars = array(
+            'miesiace' => array(
+                'celownik' => array(
+                    1 => 'stycznia',
+                    2 => 'lutego',
+                    3 => 'marca',
+                    4 => 'kwietnia',
+                    5 => 'maja',
+                    6 => 'czerwca',
+                    7 => 'lipca',
+                    8 => 'sierpnia',
+                    9 => 'września',
+                    10 => 'października',
+                    11 => 'listopada',
+                    12 => 'grudnia',
+                ),
+            ),
+        );
+
+        $parts = explode('-', substr($data, 0, 10));
+        if (count($parts) != 3) return $data;
+
+        $dzien = (int)$parts[2];
+        $miesiac = (int)$parts[1];
+        $rok = (int)$parts[0];
+
+
+        $str = $dzien . ' ' . $___vars['miesiace']['celownik'][$miesiac] . ' ' . $rok . ' r.';
+
+    }
+
+    /*
+    $time_str = @substr($_data, 11, 5);
+    if( $time_str )
+        $str .= ' ' . $time_str;
+    */
+
+
+    return $str;
+
+}

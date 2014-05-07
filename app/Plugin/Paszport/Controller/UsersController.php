@@ -73,19 +73,10 @@ class UsersController extends PaszportAppController
 
     public function info()
     {
-    
-    	$user = false;
+    	$user = $this->user;
     	$streams = array();
     	$applications = ClassRegistry::init('Application')->find('all');
-    	
-    	
-    	if( $this->user_id )
-		{
-			
-			$user = $this->User->find('first', array('conditions' => array('User.id' => $this->user_id)));
-			$user = ( $user && isset($user['User']) ) ? $user['User'] : false;
-		
-		}		        
+
 
         if( $user )
         {
@@ -94,8 +85,6 @@ class UsersController extends PaszportAppController
             
             if( !empty($data) )
             {
-            
-	            
 	            if ($data['UserAdditionalData']['group'] == '2')
 	            {
 	                $streams = $this->UserAdditionalData->Stream->find('list', array('fields' => array('id', 'name')));
@@ -118,7 +107,6 @@ class UsersController extends PaszportAppController
         $this->set('applications', $applications);
         $this->set('streams', $streams);
         $this->set('_serialize', array('user', 'applications', 'streams'));
-
     }
 
     public function index($id = null)
@@ -137,15 +125,17 @@ class UsersController extends PaszportAppController
 
     public function login()
     {
-        if ($this->data) {
+        if ($this->data && isset($this->data['User']['password']) && isset($this->data['User']['email'])) {
             $data = $this->data;
             $data['User']['password'] = $this->Auth->password($data['User']['password']);
             $user = $this->User->find('first', array('conditions' => array('User.email' => $data['User']['email'], 'User.password' => $data['User']['password'])));
+
             if ($user) {
                 $this->set(array(
                     'user' => $user['User'],
                     '_serialize' => array('user'),
                 ));
+
             } else {
                 $user = $this->User->checkAndLoginAgainstPostImport($data, $this->Auth->password($data['User']['password']));
                 if ($user) {
@@ -158,33 +148,38 @@ class UsersController extends PaszportAppController
                         'user' => null,
                         '_serialize' => array('user'),
                     ));
+                    // TODO error, passwords doesn't match
                 }
-
             }
-        }
 
+        } else {
+            throw new BadRequestException();
+        }
     }
 
     /**
      * forces password for just registered FB users
      */
-    public function setpassword($id = null)
+    public function setpassword()
     {
-        $id = $this->user_id;
+        $id = $this->authorizeUser();
         $user = $this->User->find('first', array('recursive' => -2, 'conditions' => array('User.id' => $id)));
         if ($user['User']['password_set']) {
-            $this->redirect(array('action' => 'index'));
+            $this->set('_serialize', '');
         }
         CakeLog::debug(print_r($this->data, true));
         if ($this->request->isPost()) {
             $this->User->id = $id;
             if ($this->User->save(array('password' => $this->Auth->password($this->data['User']['password']), 'password_set' => 1))) {
-                // @TODO : some kind of response
+                $this->set('_serialize', '');
+
             } else {
-                exit();
+                $this->set(array(
+                    'errors' => $this->User->validationErrors,
+                    '_serialize' => array('errors'),
+                ));
             }
         }
-        $this->set('title_for_layout', __('LC_PASZPORT_SET_PASSWORD', true));
     }
 
     /**
@@ -400,96 +395,158 @@ class UsersController extends PaszportAppController
      */
     public function add()
     {
-        if ($this->data) {
-            $to_save = $this->data;
+        $to_save = $this->data;
+        if ($to_save && array_key_exists('User', $to_save)) {
             $to_save['User']['password'] = $this->Auth->password($this->data['User']['password']);
             $to_save['User']['repassword'] = $this->Auth->password($this->data['User']['repassword']);
-            if ($this->User->save($to_save)) {
-                $this->info($this->User->id);
+
+            $saved = $this->User->save($to_save);
+            if ($saved) {
+                $this->actAsUser($saved);
+                $this->info();
+
             } else {
                 $this->set(array(
                     'errors' => $this->User->validationErrors,
                     '_serialize' => array('errors'),
                 ));
             }
+
+        } else {
+            // invalid request
+            throw new BadRequestException('Missing User data');
         }
+    }
+
+    private function authorizeUser() {
+        if (isset($this->user_id)) {
+            return $this->user_id;
+        }
+
+        if (!empty($this->passedArgs) && intval($this->passedArgs[0]) > 0) {
+            return $this->passedArgs[0];
+        }
+
+        throw new UnauthorizedException();
     }
 
     /**
      * Saves changes to one field in model
      * return json response about success or failure
      */
-    public function field($id = null)
+    public function field()
     {
-        $id = $this->user_id;
-        $forbiddenFields = array('id', 'password');
+        $id = $this->authorizeUser();
+
+        $forbiddenFields = array('id', 'password', 'pass', 'newpass', 'confirmnewpass');
         CakeLog::debug(print_r($this->data, true));
-        if ($this->data) {
+
+        if ($this->data && isset($this->data['User'])) {
             $to_save = array();
-            if (isset($this->data['User']['pass'])) {
-                if ($this->verifyPasswords()) {
-                    $to_save['User']['password'] = $this->Auth->password($this->data['User']['newpass']);
-                    $this->User->id = $id;
-                    $this->User->save($to_save);
-                    echo json_encode(array(
-                        array('status' => 200),
-                        array('alerts' => array(
-                            'success' => array(__('LC_PASZPORT_SAVED', true)),
-                        )),
-                    ));
+            $err_msg = null;
+            $this->User->id = $id;
+
+            if (isset($this->data['User']['pass']) && isset($this->data['User']['newpass']) && isset($this->data['User']['confirmnewpass'])) {
+                // authorize password again
+                $user = $this->User->find('first', array('conditions' => array('User.id' => $id)));
+
+                if ($user['User']['password'] != $this->Auth->password($this->data['User']['pass'])) {
+                    $err_msg = __('LC_PASZPORT_OLD_PASSWORD_INVALID', true);
+
                 } else {
-                    echo json_encode(array(
-                        array('status' => 500),
-                        array('alerts' => array(
-                            'error' => array(
-                                __('LC_PASZPORT_FAILED_TO_VERIFY_PASSWORDS', true)
-                            ),
-                        )),
-                    ));
+                    // verify password
+                    $this->User->set(array('User' => array(
+                        'password' => $this->data['User']['newpass'],
+                        'repassword' => $this->data['User']['confirmnewpass'],
+                    )));
+
+                    if ($this->User->validates(array('fieldList' => array('repassword', 'password')))) {
+                        $to_save['User']['password'] = $this->Auth->password($this->data['User']['newpass']);
+
+                    } else {
+                        $this->set(array(
+                            'status' => 422,
+                            'errors' => $this->User->validationErrors,
+                            '_serialize' => array('errors', 'status'),
+                        ));
+                        return;
+                    }
                 }
             } else {
                 foreach ($this->data['User'] as $field => $value) {
                     if (!in_array($field, $forbiddenFields)) {
                         $to_save['User'][$field] = $value;
-                        $this->User->id = $id;
-                        if ($this->User->save($to_save)) {
-//                            $this->_log(array('msg' => array('label' => 'LC_PASZPORT_LOG_SAVED', 'info' => $field . ':' . $value), 'ip' => $this->request->clientIp(), 'user_agent' => env('HTTP_USER_AGENT')));
-                            echo json_encode(array(
-                                array('status' => 200),
-                                array('alerts' => array(
-                                    'success' => array(__('LC_PASZPORT_SAVED', true)),
-                                )),
-                            ));
-                        } else {
-                            $error = $this->User->validationErrors;
-                            $error = array_pop($error);
-                            echo json_encode(array(
-                                array('status' => 500),
-                                array('alerts' => array(
-                                    'error' => $error,
-                                )),
-                            ));
-                        }
                     }
                 }
             }
-        } else {
-            echo json_encode(array('status' => '500', 'msg' => __('LC_PASZPORT_NO_DATA', true)));
-        }
-        exit();
 
+            if (!empty($to_save)) {
+                if ($this->User->save($to_save)) {
+                    $this->set(array(
+                        'status' => 200,
+                        'alerts' => array(
+                            'success' => array(__('LC_PASZPORT_SAVED', true)),
+                        ),
+                        '_serialize' => array('status', 'alerts'),
+                    ));
+
+                } else {
+                    $this->set(array(
+                        'status' => 422,
+                        'errors' => $this->User->validationErrors,
+                        '_serialize' => array('errors'),
+                    ));
+                }
+            } else {
+                if (is_null($err_msg)) {
+                    $this->set(array(
+                        'status' => 200,
+                        'alerts' => array(
+                            'success' => array(__('LC_PASZPORT_SAVED', true)),
+                        ),
+                        '_serialize' => array('status', 'alerts'),
+                    ));
+
+                } else {
+                    $this->set(array(
+                        'status' => 500,
+                        'alerts' => array(
+                            'error' => array($err_msg),
+                        ),
+                        '_serialize' => array('status', 'alerts'),
+                    ));
+                }
+            }
+
+        } else {
+            throw new BadRequestException(__('LC_PASZPORT_NO_DATA', true));
+        }
     }
 
     /**
      * deletes currently logged acount
      * verifies users based on password he has retyped
      */
-    public function delete($id = null)
+    public function delete()
     {
-        $id = $this->user_id;
+        $id = $this->authorizeUser();
+
+        if (!isset($this->data['User']['password'])) {
+            throw new BadRequestException();
+        }
+
         $exists = $this->User->find('count', array('conditions' => array('User.id' => $id, 'User.password' => $this->Auth->password($this->data['User']['password']))));
         if ($exists > 0) {
             $this->User->delete($id);
+            $this->set(array(
+                '_serialize' => ''
+            ));
+
+        } else {
+            $this->set(array(
+                'errors' => array('errors' => array('Password is invalid')),
+                '_serialize' => 'errors'
+            ));
         }
     }
 

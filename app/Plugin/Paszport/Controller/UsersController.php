@@ -397,6 +397,17 @@ class UsersController extends PaszportAppController
     {
         $to_save = $this->data;
         if ($to_save && array_key_exists('User', $to_save)) {
+            $this->User->set($to_save);
+
+            if (!$this->User->validates()) {
+                $this->set(array(
+                    'errors' => $this->User->validationErrors,
+                    '_serialize' => array('errors'),
+                ));
+
+                return;
+            }
+
             $to_save['User']['password'] = $this->Auth->password($this->data['User']['password']);
             $to_save['User']['repassword'] = $this->Auth->password($this->data['User']['repassword']);
 

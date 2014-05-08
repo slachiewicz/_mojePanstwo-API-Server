@@ -33,6 +33,10 @@ class PowiadomieniaGroup extends AppModel
 	    {
 		    
 		    $output = parent::find($type, $query);
+		    
+		    if( empty($output) )
+		    	return array(); // TODO: throw exception
+		    
 		    if( $id = $output['PowiadomieniaGroup']['id'] )
 		    {
 			    			    

@@ -20,13 +20,13 @@ class PowiadomieniaGroupsController extends AppController
 
     }
     
-    public function view()
+    public function view($id)
     {
-	    
+	    	    	    
 	    $group = $this->PowiadomieniaGroup->find('first', array(
             'conditions' => array(
-                'id' => $this->request->params['group_id'],
-                // 'user_id' => $this->user_id,
+                'PowiadomieniaGroup.id' => $id,
+                'PowiadomieniaGroup.user_id' => $this->Auth->user('id'),
             ),
         ));
                
@@ -36,30 +36,8 @@ class PowiadomieniaGroupsController extends AppController
     }
     
     public function add()
-    {
-    	$data = '{
-		    "group": {
-		        "PowiadomieniaGroup": {
-		        	"id": 5,
-		            "title": "Narkotyki w Sejmie"
-		        },
-		        "phrases": [
-		        	"LGBT", 
-		            "marihuana",
-		            "kokaina",
-		            "heroina",
-		            "LSD",
-		            "alkohol"
-		        ],
-		        "apps": [
-		            {
-		                "id": 3		                
-		            }
-		        ]
-		    }
-		}';
-		$this->request->data = json_decode($data, true);		
-		
+    {		
+				
 		if( isset( $this->request->data['group'] ) ) {
 	    	
 		    $this->PowiadomieniaGroup->create( $this->request->data['group'] );        	        

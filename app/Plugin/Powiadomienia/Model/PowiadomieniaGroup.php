@@ -2,10 +2,10 @@
 
 class PowiadomieniaGroup extends AppModel
 {
+
+	public $DB;
     public $useTable = 'm_alerts_groups';
-    
     public $defaultFields = array('id', 'title', 'slug', 'user_id', 'alerts_unread_count');
-    
     public $order = array("PowiadomieniaGroup.ord" => "asc");
     
     public $_schema = array(
@@ -15,6 +15,14 @@ class PowiadomieniaGroup extends AppModel
     public $paginate = array(
         'limit' => 50,
     );
+    
+    public function __construct($id = false, $table = null, $ds = null)
+    {
+    	parent::__construct($id, $table, $ds);
+    	
+        App::import('model', 'DB');
+	    $this->DB = new DB();
+    }
     
     public function find($type = 'first', $query = array())
     {
@@ -27,10 +35,7 @@ class PowiadomieniaGroup extends AppModel
 		    $output = parent::find($type, $query);
 		    if( $id = $output['PowiadomieniaGroup']['id'] )
 		    {
-			    
-			    App::import('model', 'DB');
-			    $this->DB = new DB();
-			    
+			    			    
 			    $output['phrases'] = $this->DB->selectValues("SELECT `m_alerts_qs`.`q` 
 			    FROM `m_alerts_groups_qs` 
 			    JOIN `m_alerts_qs` ON `m_alerts_groups_qs`.`q_id` = `m_alerts_qs`.`id` 
@@ -88,6 +93,121 @@ class PowiadomieniaGroup extends AppModel
 	    
     }
     
+    public function save($data = null, $validate = true, $fieldList = array())
+    {
+	    
+	    if( empty($this->data) )
+	    	return false; // TODO: throw exception
+	    	
+	    $user_id = (int) $this->getCurrentUser('id');
+	    if( !$user_id )
+	    	return false; // TODO: throw exception
+	    	    
+	    $group = array(
+	    	'title' => addslashes( $this->data['PowiadomieniaGroup']['title'] ),
+	    	'slug' => addslashes( Inflector::slug($this->data['PowiadomieniaGroup']['title']) ),
+	    	'type' => 'private',
+	    	'user_id' => addslashes( $user_id ),
+	    );
+	    
+	    	    
+	    if( $this->id ) {
+		    
+		    $this->DB->updateAssoc('m_alerts_groups', $group, $this->id);
+		    
+	    } else {
+		    
+		    $this->DB->insertIgnoreAssoc('m_alerts_groups', $group);
+		    $this->id = $this->DB->getInsertID();		    
+	    }
+	    
+	    
+	    
+	    
+	    
+	    // SAVING PHRASES
+	    
+	    if( isset($this->data['phrases']) ) {
+		   	
+		   	$phrases_ids = $this->getPhrasesIDs( $this->data['phrases'] );
+
+		   	$this->DB->autocommit( false );
+		   	$this->DB->query("DELETE FROM `m_alerts_groups_qs` WHERE `group_id`='" . addslashes( $this->id ) . "'");
+		   	
+		    
+			foreach( $phrases_ids as $phrase_id )
+				$this->DB->insertIgnoreAssoc('m_alerts_groups_qs', array(
+					'group_id' => addslashes($this->id),
+					'q_id' => addslashes($phrase_id),
+				));
+		    
+	    }
+	    
+	    // SAVING APPS
+	    
+	    if( isset($this->data['apps']) ) {
+		    
+		    $this->DB->autocommit( false );
+		   	$this->DB->query("UPDATE `m_alerts_groups_datasets` SET `deleted`='1' WHERE `group_id`='" . addslashes( $this->id ) . "' AND `filter_id`='0'");
+		   	
+		   	if( !empty($this->data['apps']) ) {
+			   	foreach( $this->data['apps'] as $app ) {
+				   	if( $app_id = $app['id'] ) {
+				   	
+				   		
+				   		$dataset_ids = $this->DB->selectValues("SELECT `id` FROM `datasets` WHERE `app_id`='" . addslashes( $app_id ) . "' AND `alerts`='1'");
+				   		
+				   		foreach( $dataset_ids as $dataset_id ) {
+					   		
+					   		$group_dataset = array(
+					   			'group_id' => addslashes( $this->id ),
+					   			'dataset_id' => addslashes( $dataset_id ),
+					   			'filter_id' => '0',
+					   			'deleted' => '0',
+					   		);
+					   		
+					   		$group_dataset_id = $this->DB->selectValue("SELECT `id` FROM `m_alerts_groups_datasets` WHERE `group_id`='" . $group_dataset['group_id'] . "' AND `dataset_id`='" . $group_dataset['dataset_id'] . "' AND `filter_id`='" . $group_dataset['filter_id'] . "'");
+					   		
+					   		if( $group_dataset_id )
+					   			$this->DB->updateAssoc('m_alerts_groups_datasets', $group_dataset, $group_dataset_id);
+					   		else
+					   			$this->DB->insertIgnoreAssoc('m_alerts_groups_datasets', $group_dataset);
+					   		
+					   		
+				   		}				   		
+				   	
+				   	}
+			   	}
+		   	}
+		    
+	    }  
+	    
+	    $this->DB->autocommit( true );
+	    
+	    return true;
+	    
+    }
+    
+    private function getPhrasesIDs($phrases){
+	    
+	    if( !is_array($phrases) || empty($phrases) )
+	    	return array();
+	    
+	    foreach( $phrases as &$_phrase ) 
+	    	$_phrase = addslashes( $_phrase );
+	    
+	    $this->DB->query('INSERT IGNORE INTO `m_alerts_qs` (`q`) VALUES ("' . implode('"), ("', $phrases) . '")');	    
+	    $qs_map = $this->DB->selectDictionary('SELECT `q`, `id` FROM `m_alerts_qs` WHERE `q`="' . implode('" OR `q`="', $phrases) . '"');
+	    
+	    $output = array();
+	    foreach( $phrases as $q )
+		    if( $id = $qs_map[$q] )
+		    	$output[] = (int) $id;
+		    
+		return $output;
+	    
+    }
+    
     public function flag($user_id, $group_id, $action)
     {
 	    if( !$user_id || !$group_id )
@@ -97,9 +217,6 @@ class PowiadomieniaGroup extends AppModel
 	    	return false;
 	    	
 	    	
-	    
-	    App::import('model', 'DB');
-	    $this->DB = new DB();
 	    
 	    
 	    

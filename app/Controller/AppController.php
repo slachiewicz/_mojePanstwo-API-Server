@@ -36,18 +36,19 @@ App::uses('Sanitize', 'Utility');
 class AppController extends Controller
 {
 
-    public $components = array('RequestHandler');
     protected $user_id = null;
-    protected $stream_id = 1;
     protected $devaccess = false;
+    
+    public $components = array('RequestHandler', 'Auth');
 
     public function  beforeFilter()
     {
+    	
+    	$this->Auth->allow();
+    	
         $this->loadModel('Paszport.UserAdditionalData');
 
-//        if(env('REMOTE_ADDR') == CLIENT_IP) {
-        
-        
+		// (env('REMOTE_ADDR') == CLIENT_IP)
         
         if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY)
         {
@@ -59,44 +60,17 @@ class AppController extends Controller
         {
             $this->user_id = Sanitize::paranoid(env('HTTP_X_USER_ID'));
             Configure::write('User.id', $this->user_id);
+            
+            $this->Auth->login(array(
+            	'id' => $this->user_id,
+            ));
         }
 				
-        // if (env('HTTP_X_USER_ID') && env('HTTP_X_STREAM_ID'))
-        if (env('HTTP_X_STREAM_ID'))
-        {
-            
-            $this->stream_id = Sanitize::paranoid(env('HTTP_X_STREAM_ID'));
-            Configure::write('Stream.id', $this->stream_id);
-            
-    		/*            
-            if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id))
-            {
-                Configure::write('Stream.id', 1);
-                $this->stream_id = 1;
-            }
-            else
-            {
-                Configure::write('Stream.id', $this->stream_id);
-            }
-            */
-
-        }
-        else
-        {
-            Configure::write('Stream.id', 1);
-            $this->stream_id = 1;
-        }
-
 
         header('Access-Control-Allow-Origin: ' . $this->request->header('Origin'));
         header('Access-Control-Allow-Credentials: true');
 
-
         parent::beforeFilter();
-//        } else { // @TU BEDZIE PELNA AUTORYZACJA DLA IP INNYCH NIZ KLIENCKIE
-//            throw new ForbiddenException();
-//            exit();
-//        }
 
     }
 }

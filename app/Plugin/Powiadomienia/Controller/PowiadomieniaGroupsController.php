@@ -35,6 +35,43 @@ class PowiadomieniaGroupsController extends AppController
 	    
     }
     
+    public function add()
+    {
+    	$data = '{
+		    "group": {
+		        "PowiadomieniaGroup": {
+		        	"id": 5,
+		            "title": "Narkotyki w Sejmie"
+		        },
+		        "phrases": [
+		        	"LGBT", 
+		            "marihuana",
+		            "kokaina",
+		            "heroina",
+		            "LSD",
+		            "alkohol"
+		        ],
+		        "apps": [
+		            {
+		                "id": 3		                
+		            }
+		        ]
+		    }
+		}';
+		$this->request->data = json_decode($data, true);		
+		
+		if( isset( $this->request->data['group'] ) ) {
+	    	
+		    $this->PowiadomieniaGroup->create( $this->request->data['group'] );        	        
+	        $this->set(array(
+	        	'status' => $this->PowiadomieniaGroup->save(),
+	        	'id' => $this->PowiadomieniaGroup->id,
+	        	'_serialize' => array('status', 'id'),
+	        ));
+        
+        }
+    }
+    
     public function flag()
     {
     	$action = @$this->request->query['action'];

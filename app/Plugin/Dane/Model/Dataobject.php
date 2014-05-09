@@ -42,9 +42,34 @@ class Dataobject extends AppModel
         return @$data['dataobjects'][0];
 
     }
+    
+    public function getRedirect($dataset, $id)
+    {
+		
+		App::import('model', 'DB');
+        $this->DB = new DB();
+		
+        switch( $dataset ) {
+	        case 'zamowienia_publiczne': {
+	        	
+	        	if( $parent_id = $this->DB->selectValue("SELECT `parent_id` FROM `uzp_dokumenty` WHERE `id`='" . addslashes( $id ) . "' LIMIT 1") )
+			        return array(
+			        	'alias' => 'zamowienia_publiczne',
+			        	'object_id' => $parent_id,
+			        );
+		        
+	        }
+        }
+        
+        return false;
+
+    }
 
     public function getObjectLayer($dataset, $id, $layer, $params = array())
     {
+    	
+    	$id = (int) $id;
+    	
         $file = ROOT . DS . APP_DIR . DS . 'Plugin' . DS . 'Dane' . DS . 'Model' . DS . 'Dataobject' . DS . $dataset . DS . 'layers' . DS . $layer . '.php';
 
         if (!file_exists($file))
@@ -52,6 +77,9 @@ class Dataobject extends AppModel
 
         App::import('model', 'DB');
         $this->DB = new DB();
+        
+        App::import('model', 'S3Files');
+        $this->S3Files = new S3Files();
 
         $output = include($file);
         if ($layer == 'related') {

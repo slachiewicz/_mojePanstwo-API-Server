@@ -20,6 +20,36 @@ class PowiadomieniaGroupsController extends AppController
 
     }
     
+    public function view($id)
+    {
+	    	    	    
+	    $group = $this->PowiadomieniaGroup->find('first', array(
+            'conditions' => array(
+                'PowiadomieniaGroup.id' => $id,
+                'PowiadomieniaGroup.user_id' => $this->Auth->user('id'),
+            ),
+        ));
+               
+        $this->set('group', $group);
+        $this->set('_serialize', 'group');
+	    
+    }
+    
+    public function add()
+    {		
+				
+		if( isset( $this->request->data['group'] ) ) {
+	    	
+		    $this->PowiadomieniaGroup->create( $this->request->data['group'] );        	        
+	        $this->set(array(
+	        	'status' => $this->PowiadomieniaGroup->save(),
+	        	'id' => $this->PowiadomieniaGroup->id,
+	        	'_serialize' => array('status', 'id'),
+	        ));
+        
+        }
+    }
+    
     public function flag()
     {
     	$action = @$this->request->query['action'];

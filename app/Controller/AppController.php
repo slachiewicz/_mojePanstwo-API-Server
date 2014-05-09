@@ -37,12 +37,11 @@ class AppController extends Controller
 {
     public $uses = array('Paszport.User');
 
-    public $components = array('RequestHandler');
     protected $user_id = null;
     protected $user = null;
-
-    protected $stream_id = 1;
     protected $devaccess = false;
+    
+    public $components = array('RequestHandler', 'Auth');
 
     protected function actAsUser($userArray) {
         if ($userArray && isset($userArray['User']) && !empty($userArray['User'])) {
@@ -50,6 +49,10 @@ class AppController extends Controller
             $this->user_id = $this->user['id'];
 
             Configure::write('User.id', $this->user_id);
+
+            $this->Auth->login(array(
+                'id' => $this->user_id,
+            ));
 
         } else {
             $this->user = null;
@@ -66,15 +69,13 @@ class AppController extends Controller
 
         if ($_SERVER['REMOTE_ADDR'] == MP_PORTAL_IP) {
             // we trust this client
-        
-            if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY)
-            {
+
+            if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY) {
                 $this->devaccess = true;
                 Configure::write('devaccess', true);
             }
 
-            if (env('HTTP_X_USER_ID'))
-            {
+            if (env('HTTP_X_USER_ID')) {
                 $user_id = Sanitize::paranoid(env('HTTP_X_USER_ID'));
 
                 $user = $this->User->find('first', array('conditions' => array('User.id' => $user_id)));
@@ -82,29 +83,9 @@ class AppController extends Controller
                 $this->actAsUser($user);
             }
 
-            if (env('HTTP_X_STREAM_ID'))
-            {
-                $this->stream_id = Sanitize::paranoid(env('HTTP_X_STREAM_ID'));
-                Configure::write('Stream.id', $this->stream_id);
+            $this->Auth->allow();
 
-                /*
-                if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id))
-                {
-                    Configure::write('Stream.id', 1);
-                    $this->stream_id = 1;
-                }
-                else
-                {
-                    Configure::write('Stream.id', $this->stream_id);
-                }
-                */
-
-            }
-            else
-            {
-                Configure::write('Stream.id', 1);
-                $this->stream_id = 1;
-            }
+            $this->loadModel('Paszport.UserAdditionalData');
 
             header('Access-Control-Allow-Origin: ' . $this->request->header('Origin'));
             header('Access-Control-Allow-Credentials: true');

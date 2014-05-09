@@ -15,7 +15,22 @@ class DataobjectsController extends AppController
 
     public function view()
     {
-
+    	
+		$object = $this->Dataobject->getObject($this->request->params['alias'], $this->request->params['object_id']);
+		$serialize = array('object');
+		
+		if( !$object && ($redirect = $this->Dataobject->getRedirect($this->request->params['alias'], $this->request->params['object_id'])) ) {
+			
+			$this->set('redirect', $redirect);
+			$serialize[] = 'redirect';
+			
+		}
+		
+		$this->set(array(
+			'object' => $object,
+			'_serialize' => $serialize,
+		));
+		
     }
 
     public function layer()

@@ -1,6 +1,10 @@
 <?php
 
-require_once 'ZamowieniaPubliczne.php';
-$obj = new ZamowieniaPubliczne();
-$obj->id = $id;
-return $obj->details();
+	$body = $this->S3Files->getBody('resources/UZP-details/' . $id . '.dat');
+	
+	if( $body && ($data = unserialize($body)) && is_array($data) ) {
+				
+		unset( $data['niepelnosprawne'] );
+		return $data;
+		
+	} return false;

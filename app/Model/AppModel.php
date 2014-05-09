@@ -33,4 +33,20 @@ App::uses('Model', 'Model');
  */
 class AppModel extends Model
 {
+	public function getCurrentUser($field = false) {
+	 	
+		App::uses('CakeSession', 'Model/Datasource');
+		$Session = new CakeSession();	
+		$user = $Session->read('Auth.User');
+				
+		if( $user && is_array($user) ) {
+						
+			if( $field===false )
+				return $user;
+			else
+				return isset( $user[$field] ) ? $user[$field] : false;
+ 			
+		} else return false;
+	
+	}
 }

@@ -2,7 +2,7 @@
 
 class DatachannelsController extends AppController
 {
-    public $uses = array('Dane.Datachannel', 'Dane.Dataset', 'Dane.Dataobject', 'Dane.Stream', 'Paszport.UserAdditionalData');
+    public $uses = array('Dane.Datachannel', 'Dane.Dataset', 'Dane.Dataobject', 'Paszport.UserAdditionalData');
 
     public function info()
     {
@@ -39,15 +39,17 @@ class DatachannelsController extends AppController
         
         
         
-        
         if( $source=='cache' )
         {
 	        
-	        $datachannels = $this->Datachannel->query("SELECT `data` FROM `datachannels` WHERE `data`!='' ORDER BY `ord` ASC LIMIT 100");
-	        	        	        
+	        $datachannels = $this->Datachannel->query("SELECT `data` 
+	        FROM `datachannels` 
+	        WHERE `data`!='' 
+	        ORDER BY `ord` ASC 
+	        LIMIT 100");
+	        	        	        	        
 	        foreach( $datachannels as &$d )
 	        	$d = unserialize( stripslashes( $d['datachannels']['data'] ) );
-	        	        
 	        	        
         }
         else
@@ -58,7 +60,6 @@ class DatachannelsController extends AppController
 	            	'Dataset' => array(
 	                	'fields' => array('id', 'alias', 'count', 'name', 'class'),
 	                ),
-	                'Dataset.Stream',
 	            ),
                 'fields' => array(
 	                'Datachannel.id',
@@ -72,27 +73,9 @@ class DatachannelsController extends AppController
         	
         	$datachannels = $this->Datachannel->find('all', $datachannels_query);
         	
-	        // var_export( $datachannels ); die();
-	        
-	        // if (!$this->UserAdditionalData->hasPermissionToStream($this->stream_id)) {
-	
-	        // }
-	        
 	        
 	        foreach ($datachannels as $dkey => &$datachannel)
 	        {
-	            foreach ($datachannel['Dataset'] as $key => $dataset)
-	            {
-	                $found = false;
-	                foreach ($dataset['Stream'] as $stream) {
-	                    if ($stream['id'] == $this->stream_id) {
-	                        $found = true;
-	                    }
-	                }
-	                if (!$found) {
-	                    unset($datachannel['Dataset'][$key]);
-	                }
-	            }
 	            
 	            if (count($datachannel['Dataset']) < 1)
 	                unset($datachannels[$dkey]);

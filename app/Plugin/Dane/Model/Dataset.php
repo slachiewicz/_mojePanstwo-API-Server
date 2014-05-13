@@ -11,14 +11,6 @@ class Dataset extends AppModel
         ),
 
     );
-    public $hasAndBelongsToMany = array(
-        'Stream' => array(
-            'className' => 'Dane.Stream',
-            'joinTable' => 'datasets-streams',
-            'foreignKey' => 'dataset_id',
-            'associationForeignKey' => 'stream_id'
-        ),
-    );
     public $actsAs = array('Containable');
     public $virtualFields = array(
         'alias' => 'base_alias',

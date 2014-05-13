@@ -65,34 +65,32 @@ class AppController extends Controller
     public function  beforeFilter()
     {
         parent::beforeFilter();
-        $this->loadModel('Paszport.UserAdditionalData');
+		
+		if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY) {
+            $this->devaccess = true;
+            Configure::write('devaccess', true);
+        }
 
+        $this->loadModel('Paszport.UserAdditionalData');        
         if ($_SERVER['REMOTE_ADDR'] == MP_PORTAL_IP) {
-            // we trust this client
-
-            if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY) {
-                $this->devaccess = true;
-                Configure::write('devaccess', true);
-            }
-
+            // we trust this client            
+			
             if (env('HTTP_X_USER_ID')) {
+
                 $user_id = Sanitize::paranoid(env('HTTP_X_USER_ID'));
-
                 $user = $this->User->find('first', array('conditions' => array('User.id' => $user_id)));
-
                 $this->actAsUser($user);
+                
             }
-
-            $this->Auth->allow();
-
-            $this->loadModel('Paszport.UserAdditionalData');
-
-            header('Access-Control-Allow-Origin: ' . $this->request->header('Origin'));
-            header('Access-Control-Allow-Credentials: true');
 
         } else {
             // @TU BEDZIE PELNA AUTORYZACJA (OAuth) DLA IP INNYCH NIZ KLIENCKIE
             // throw new ForbiddenException();
         }
+        
+        $this->Auth->allow();
+                
+        header('Access-Control-Allow-Origin: ' . $this->request->header('Origin'));
+        header('Access-Control-Allow-Credentials: true');
     }
 }

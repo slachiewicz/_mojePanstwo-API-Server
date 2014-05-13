@@ -167,16 +167,39 @@ class UsersController extends PaszportAppController
         if ($user['User']['password_set']) {
             $this->set('_serialize', '');
         }
+
+        $this->set(array(
+            'status' => 400,
+            'errors' => 'bad request',
+            '_serialize' => array('errors', 'status'),
+        ));
+
         CakeLog::debug(print_r($this->data, true));
-        if ($this->request->isPost()) {
+        if ($this->request->isPost() && isset($this->data['User']['password'])) {
             $this->User->id = $id;
-            if ($this->User->save(array('password' => $this->Auth->password($this->data['User']['password']), 'password_set' => 1))) {
-                $this->set('_serialize', '');
+
+            // verify password
+            $this->User->set(array('User' => array(
+                'password' => $this->data['User']['password'],
+            )));
+
+            if ($this->User->validates(array('fieldList' => array('password')))) {
+                if ($this->User->save(array('password' => $this->Auth->password($this->data['User']['password']), 'password_set' => 1))) {
+                    $this->set('_serialize', '');
+
+                } else {
+                    $this->set(array(
+                        'status' => 422,
+                        'errors' => $this->User->validationErrors,
+                        '_serialize' => array('errors', 'status'),
+                    ));
+                }
 
             } else {
                 $this->set(array(
+                    'status' => 422,
                     'errors' => $this->User->validationErrors,
-                    '_serialize' => array('errors'),
+                    '_serialize' => array('errors', 'status'),
                 ));
             }
         }

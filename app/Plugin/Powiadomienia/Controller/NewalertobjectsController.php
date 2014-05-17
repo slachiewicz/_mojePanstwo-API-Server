@@ -7,12 +7,13 @@ class NewalertobjectsController extends AppController
     public function index()
     {
         
-        $conditions = ( isset($this->data['conditions']) && is_array($this->data['conditions']) ) ? $this->data['conditions'] : array();
+        $conditions = ( isset($this->request->query['conditions']) && is_array($this->request->query['conditions']) ) ? $this->request->query['conditions'] : array();
         
         $page = (isset($this->data['page']) && $this->data['page']) ? $this->data['page'] : 1;
         $limit = 20;
         $offset = $limit * ($page - 1);
-
+			
+		
         $group_id = (isset($conditions['group_id'])) ? $conditions['group_id'] : false;
 
         $mode = (isset($conditions['mode'])) ? $conditions['mode'] : 0;
@@ -20,7 +21,6 @@ class NewalertobjectsController extends AppController
 
         $search = $this->Newalertobject->find('all', array(
             'conditions' => array(
-                'user_id' => $this->user_id,
                 'visited' => $visited,
                 'group_id' => $group_id,
             ),
@@ -39,7 +39,7 @@ class NewalertobjectsController extends AppController
 
     public function flagObjects()
     {
-        $stream_id = 1;
+
         $user_id = $this->user_id;
         $ids = (isset($this->data['ids'])) ? $this->data['ids'] : array();
         $q = "UPDATE `m_user-objects`
@@ -59,7 +59,7 @@ class NewalertobjectsController extends AppController
     public function flag()
     {
     	$action = @$this->request->query['action'];
-        $result = $this->Newalertobject->flag($this->user_id, $this->params->object_id, $action);
+        $result = $this->Newalertobject->flag($this->params->object_id, $action);
         
         $this->set('result', $result);  
 	    $this->set('_serialize', 'result');
@@ -68,7 +68,7 @@ class NewalertobjectsController extends AppController
     public function flagAll()
     {
     	$action = @$this->request->query['action'];
-        $result = $this->Newalertobject->flagAll($this->user_id, $action);
+        $result = $this->Newalertobject->flagAll($action);
         
         $this->set('result', $result);  
 	    $this->set('_serialize', 'result');

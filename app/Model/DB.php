@@ -17,6 +17,18 @@ class DB extends AppModel
         $this->DB->query('SET NAMES UTF8');
     }
 	
+	public function _getAffectedRows(){
+		return $this->DB->affected_rows;
+	}
+	
+	public function _getInsertId(){
+		return $this->DB->insert_id;
+	}
+	
+	public function q($q) {
+		return $this->DB->query($q);
+	}
+	
     public function queryCount($q)
     {
 

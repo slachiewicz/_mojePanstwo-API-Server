@@ -64,6 +64,7 @@ class AppController extends Controller
 
     public function  beforeFilter()
     {
+    	AuthComponent::$sessionKey = false;
         parent::beforeFilter();
 		
 		if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY) {

@@ -45,19 +45,18 @@ class Newalertobject extends AppModel
             // USE INDEX (`user_objects`) 
             
             $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";            
-	        $q .= "JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
-	        $q .= "JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
-	        $q .= "JOIN `m_alerts_groups` ON (`m_alerts_groups-objects`.`group_id`=`m_alerts_groups`.`id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id`) ";
+	        $q .= "JOIN `m_alerts_groups` ON (`m_alerts_groups-objects`.`group_id`=`m_alerts_groups`.`id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id` AND `m_alerts_groups-objects`.`group_id`='" . $group_id . "') ";	        
+	        
+	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
+	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
             
             $q .= " WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
-			$q .= " AND `m_alerts_groups-objects`.`group_id`='" . $group_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
             $q .= " GROUP BY `m_users-objects`.`dstamp`";
             $q .= " ORDER BY $sql_order";
             $q .= " LIMIT $offset, $limit";
 			
-			// echo $q; die();
-			// TODO: objects.unindex, m_alerts-users.deleted
+			// TODO: objects.unindex
 
         }
         else
@@ -69,32 +68,30 @@ class Newalertobject extends AppModel
             // USE INDEX (`user_objects`) 
             
             $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";
-            
-	        $q .= "JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
-	        $q .= "JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
 	        $q .= "JOIN `m_alerts_groups` ON (`m_alerts_groups-objects`.`group_id`=`m_alerts_groups`.`id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id`) ";
+            
+	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
+	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
 
             $q .= "WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
             $q .= " GROUP BY `m_users-objects`.`dstamp`";
             $q .= " ORDER BY $sql_order";
             $q .= " LIMIT $offset, $limit";         			 
-			
-			// echo $q; die();
-			
+						
         }
 		
-        $objects = $this->DB->q($q);
+        $objects = $this->DB->selectAssocs($q);
                 
-
 
         $ids = array();
         $hl_texts = array();
-        foreach ($objects as $i => $object) {
-            array_push($ids, $object['m_users-objects']['object_id']);
+        foreach ($objects as $object) {
             
-            if( isset($object[0]['hls']) )
-	            $hl_texts[$object['m_users-objects']['object_id']] = $object[0]['hls'];
+            $ids[] = $object['object_id'];
+            
+            if( isset($object['hls']) && ($object['hls'] = trim($object['hls'])) )
+	            $hl_texts[ $object['object_id'] ] = $object['hls'];
         }        
 		
 		
@@ -108,15 +105,22 @@ class Newalertobject extends AppModel
             ));
             
             $dataobjects = $data['dataobjects'];
-            foreach ($dataobjects as &$object)
+            
+            foreach ($dataobjects as &$object) {
+            
             	if( array_key_exists($object['id'], $hl_texts) )
 	                $object['hl_text'] = $hl_texts[$object['id']];
+	            else
+	            	$object['hl_text'] = false;
+	        
+	        }
                         
         } else {
             $dataobjects = array();
         }
 
-
+		
+		
         $this->objects = $dataobjects;
         
 
@@ -205,6 +209,7 @@ class Newalertobject extends AppModel
 			
 			if( !empty($groups) ) {
 				
+				$values = array();
 				foreach( $groups as $group )
 					$values[] = "('" . $group['group_id'] . "', '" . $group['alerts_unread_count'] . "')";
 				

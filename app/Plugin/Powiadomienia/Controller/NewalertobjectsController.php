@@ -6,7 +6,7 @@ class NewalertobjectsController extends AppController
 
     public function index()
     {
-        
+                
         $conditions = ( isset($this->request->query['conditions']) && is_array($this->request->query['conditions']) ) ? $this->request->query['conditions'] : array();
         
         $page = (isset($this->data['page']) && $this->data['page']) ? $this->data['page'] : 1;
@@ -68,7 +68,17 @@ class NewalertobjectsController extends AppController
     public function flagAll()
     {
     	$action = @$this->request->query['action'];
-        $result = $this->Newalertobject->flagAll($action);
+    	$group_id = @$this->request->query['group_id'];
+        
+        if( $group_id ) {
+        	
+        	App::import('model', 'Powiadomienia.PowiadomieniaGroup');
+        	$this->PowiadomieniaGroup = new PowiadomieniaGroup();
+	        $result = $this->PowiadomieniaGroup->flag($group_id, $action);
+	        
+        } else {
+	        $result = $this->Newalertobject->flagAll($action);
+	    }
         
         $this->set('result', $result);  
 	    $this->set('_serialize', 'result');

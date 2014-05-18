@@ -47,8 +47,8 @@ class Newalertobject extends AppModel
             $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";            
 	        $q .= "JOIN `m_alerts_groups` ON (`m_alerts_groups-objects`.`group_id`=`m_alerts_groups`.`id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id` AND `m_alerts_groups-objects`.`group_id`='" . $group_id . "') ";	        
 	        
-	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
-	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
+	        $q .= "JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
+	        $q .= "JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
             
             $q .= " WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
@@ -70,8 +70,8 @@ class Newalertobject extends AppModel
             $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";
 	        $q .= "JOIN `m_alerts_groups` ON (`m_alerts_groups-objects`.`group_id`=`m_alerts_groups`.`id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id`) ";
             
-	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
-	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
+	        $q .= "JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
+	        $q .= "JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
 
             $q .= "WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
@@ -80,6 +80,8 @@ class Newalertobject extends AppModel
             $q .= " LIMIT $offset, $limit";         			 
 						
         }
+		
+		// echo $q;
 		
         $objects = $this->DB->selectAssocs($q);
                 

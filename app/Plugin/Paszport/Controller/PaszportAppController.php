@@ -94,6 +94,10 @@ class PaszportAppController extends AppController
     {
         $this->loadModel('Paszport.Log');
         $log['user_id'] = $this->user_id;
+
+        if ($log['user_agent'] == null) {
+            $log['user_agent'] = '';
+        }
         $to_save = array();
         $to_save['Log'] = $log;
 

@@ -1,0 +1,10 @@
+{
+    "apiVersion":null,
+    "swaggerVersion":"1.2",
+    "apis":[
+        {
+            "path":"/kodyPocztowe.{format}",
+            "description":"Class AddressController"
+        }
+    ]
+}

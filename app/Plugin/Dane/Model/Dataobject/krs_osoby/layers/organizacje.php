@@ -40,6 +40,8 @@ JOIN `krs_pozycje` as `organizacja`
 ON `rola`.`pozycja_id` = `organizacja`.`id`
 WHERE `rola`.`osoba_id` = '$id' 
 AND `rola`.`deleted` = '0' 
+AND `organizacja`.`akcept` = '1' 
+AND `organizacja`.`deleted_on_request` = '0' 
 ORDER BY `rola`.`id` DESC 
 LIMIT 1000");
 
@@ -52,6 +54,8 @@ JOIN `krs_pozycje` as `organizacja`
 ON `rola`.`pozycja_id` = `organizacja`.`id`
 WHERE `rola`.`osoba_id` = '$id' 
 AND `rola`.`deleted` = '0' 
+AND `organizacja`.`akcept` = '1' 
+AND `organizacja`.`deleted_on_request` = '0' 
 ORDER BY `rola`.`id` DESC 
 LIMIT 1000");
 
@@ -64,6 +68,8 @@ JOIN `krs_pozycje` as `organizacja`
 ON `rola`.`pozycja_id` = `organizacja`.`id`
 WHERE `rola`.`osoba_id` = '$id' 
 AND `rola`.`deleted` = '0' 
+AND `organizacja`.`akcept` = '1' 
+AND `organizacja`.`deleted_on_request` = '0' 
 ORDER BY `rola`.`id` DESC 
 LIMIT 1000");
 
@@ -76,6 +82,8 @@ JOIN `krs_pozycje` as `organizacja`
 ON `rola`.`pozycja_id` = `organizacja`.`id`
 WHERE `rola`.`osoba_id` = '$id' 
 AND `rola`.`deleted` = '0' 
+AND `organizacja`.`akcept` = '1' 
+AND `organizacja`.`deleted_on_request` = '0' 
 ORDER BY `rola`.`id` DESC 
 LIMIT 1000");
 
@@ -88,6 +96,8 @@ JOIN `krs_pozycje` as `organizacja`
 ON `rola`.`pozycja_id` = `organizacja`.`id`
 WHERE `rola`.`osoba_id` = '$id' 
 AND `rola`.`deleted` = '0' 
+AND `organizacja`.`akcept` = '1' 
+AND `organizacja`.`deleted_on_request` = '0' 
 ORDER BY `rola`.`id` DESC 
 LIMIT 1000");
 
@@ -100,6 +110,8 @@ JOIN `krs_pozycje` as `organizacja`
 ON `rola`.`pozycja_id` = `organizacja`.`id`
 WHERE `rola`.`osoba_id` = '$id' 
 AND `rola`.`deleted` = '0' 
+AND `organizacja`.`akcept` = '1' 
+AND `organizacja`.`deleted_on_request` = '0' 
 ORDER BY `rola`.`id` DESC 
 LIMIT 1000");
 

@@ -1,6 +1,6 @@
 <?
 
-$data = $this->DB->query("SELECT `krs_prokurenci`.nazwa, `krs_prokurenci`.imiona, `krs_prokurenci`.rodzaj, `krs_osoby`.`id`, YEAR(CURRENT_TIMESTAMP) - YEAR(krs_osoby.data_urodzenia) - (RIGHT(CURRENT_TIMESTAMP, 5) < RIGHT(krs_osoby.data_urodzenia, 5)) as `wiek`
+$data = $this->DB->query("SELECT `krs_prokurenci`.nazwa, `krs_prokurenci`.imiona, `krs_prokurenci`.rodzaj, `krs_osoby`.`id`, `krs_osoby`.`data_urodzenia`, `krs_osoby`.`privacy_level` as `wiek`
 		FROM `krs_prokurenci` 
 		LEFT JOIN `krs_osoby` 
 		ON `krs_prokurenci`.`osoba_id` = `krs_osoby`.`id` 
@@ -13,7 +13,8 @@ foreach ($data as $d) {
     $output[] = array(
         'nazwa' => _ucfirst($d['krs_prokurenci']['nazwa'] . ' ' . $d['krs_prokurenci']['imiona']),
         'funkcja' => _ucfirst($d['krs_prokurenci']['rodzaj']),
-        'wiek' => @$d[0]['wiek'],
+        'data_urodzenia' => $d['krs_osoby']['data_urodzenia'],
+        'privacy_level' => $d['krs_osoby']['privacy_level'],
         'osoba_id' => @$d['krs_osoby']['id'],
     );
 }

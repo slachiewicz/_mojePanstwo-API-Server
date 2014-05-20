@@ -83,7 +83,7 @@ class AppController extends Controller
 	        array_pop($mp_portal_ip_parts);
         }
         
-        if ($remote_address_parts == $mp_portal_ip_parts) {
+        if (($remote_address_parts == $mp_portal_ip_parts) || $this->devaccess) {
             // we trust this client            
 			
             if (env('HTTP_X_USER_ID')) {

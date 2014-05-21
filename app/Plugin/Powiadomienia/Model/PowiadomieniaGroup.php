@@ -47,7 +47,7 @@ class PowiadomieniaGroup extends AppModel
 			    ORDER BY `m_alerts_qs`.`q` ASC 
 			    LIMIT 50");
 			    
-			    $apps_data = $this->DB->selectAssocs("SELECT 
+			    $q = "SELECT 
 			    `applications`.`id` AS 'app.id', 
 			    `applications`.`name` AS 'app.name', 
 			    `datasets`.`id` AS 'dataset.id', 
@@ -56,7 +56,9 @@ class PowiadomieniaGroup extends AppModel
 			    JOIN `datasets` ON `m_alerts_groups_datasets`.`dataset_id` = `datasets`.`id` 
 			    JOIN `applications` ON `datasets`.`app_id` = `applications`.`id` 
 			    WHERE `m_alerts_groups_datasets`.`group_id` = '" . addslashes( $id ) . "' 
-			    ORDER BY `applications`.`name` ASC, `datasets`.`name` ASC");
+			    ORDER BY `applications`.`name` ASC, `datasets`.`name` ASC";
+			    $apps_data = $this->DB->selectAssocs($q);
+			    
 			    
 			    $apps = array();
 			    $temp = array();
@@ -209,12 +211,17 @@ class PowiadomieniaGroup extends AppModel
 						   			'deleted' => '0',
 						   		);
 						   		
-						   		$group_dataset_id = $this->DB->selectValue("SELECT `id` FROM `m_alerts_groups_datasets` WHERE `group_id`='" . $group_dataset['group_id'] . "' AND `dataset_id`='" . $group_dataset['dataset_id'] . "' AND `filter_id`='" . $group_dataset['filter_id'] . "'");
+						   		$datasetHasFilters = $this->DB->selectValue("SELECT COUNT(*) FROM `m_alerts_groups_datasets` WHERE `group_id`='" . $group_dataset['group_id'] . "' AND `dataset_id`='" . $group_dataset['dataset_id'] . "' AND `filter_id`!=0");
+						   		if( !$datasetHasFilters ) {
 						   		
-						   		if( $group_dataset_id )
-						   			$this->DB->updateAssoc('m_alerts_groups_datasets', $group_dataset, $group_dataset_id);
-						   		else
-						   			$this->DB->insertIgnoreAssoc('m_alerts_groups_datasets', $group_dataset);
+							   		$group_dataset_id = $this->DB->selectValue("SELECT `id` FROM `m_alerts_groups_datasets` WHERE `group_id`='" . $group_dataset['group_id'] . "' AND `dataset_id`='" . $group_dataset['dataset_id'] . "' AND `filter_id`='" . $group_dataset['filter_id'] . "'");
+							   		
+							   		if( $group_dataset_id )
+							   			$this->DB->updateAssoc('m_alerts_groups_datasets', $group_dataset, $group_dataset_id);
+							   		else
+							   			$this->DB->insertIgnoreAssoc('m_alerts_groups_datasets', $group_dataset);
+						   			
+						   		}
 					   		
 					   		}
 				   		}				   		

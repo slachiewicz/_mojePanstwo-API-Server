@@ -31,5 +31,23 @@ class ZamowieniaPubliczne extends AppModel
         );
 
     }
+    
+    public function getNewStats($range = 'month')
+    {
+	    $_allowed_ranges = array('week', 'month', 'year', '3years', '5years');
+	    if( !in_array($range, $_allowed_ranges) )
+	    	return false;
+	    
+	    App::import('model', 'DB');
+        $this->DB = new DB();
+	    
+	    $data = $this->DB->selectValue("SELECT `data` FROM `uzp_stats` WHERE `id`='" . addslashes( $range ) . "'");
+	    if( !empty($data) && ( $data = unserialize(stripslashes($data)) ) ) {
+		    
+		    return $data;
+		    
+	    } else return false;
+	    		    
+    }
 
 } 

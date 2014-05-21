@@ -37,25 +37,6 @@ class NewalertobjectsController extends AppController
 
     }
 
-    public function flagObjects()
-    {
-
-        $user_id = $this->user_id;
-        $ids = (isset($this->data['ids'])) ? $this->data['ids'] : array();
-        $q = "UPDATE `m_user-objects`
-		  	JOIN `m_alerts-objects` ON `m_user-objects`.`object_id`=`m_alerts-objects`.`object_id`
-		  	JOIN `m_alerts-users` ON `m_alerts-users`.`alert_id`=`m_alerts-objects`.`alert_id` AND `m_user-objects`.`user_id`=`m_alerts-users`.`user_id`
-		  	JOIN `m_alerts` ON `m_alerts-objects`.`alert_id`=`m_alerts`.`id`
-		  	SET `m_alerts-users`.`analiza`='1', `m_alerts-users`.`analiza_ts`=NOW(), `m_alerts-users`.`alerts_unread_count`='0', `m_user-objects`.`visited`='1', `m_user-objects`.`visited_ts`=NOW()
-		  	WHERE `m_alerts`.`stream_id`='$stream_id' AND `m_alerts-users`.`deleted`='0' AND `m_user-objects`.`user_id`='" . $user_id . "' AND `m_user-objects`.`visited`='0' AND (`m_alerts-objects`.`alert_id`='" . implode("' OR `m_alerts-objects`.`alert_id`='", $ids) . "')";
-//                if ($action_max)
-//                    $q .= " AND `m_user-objects`.`object_id`<='$action_max'";
-
-//                $this->DB->q($q);
-//                $this->S('me/alerts/count');
-        $this->Dataobject->query($q);
-    }
-
     public function flag()
     {
     	$action = @$this->request->query['action'];

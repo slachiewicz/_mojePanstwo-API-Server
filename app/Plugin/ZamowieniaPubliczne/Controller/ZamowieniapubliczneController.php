@@ -10,5 +10,13 @@ class ZamowieniapubliczneController extends AppController
         $this->set('stats', $stats);
         $this->set('_serialize', array('stats'));
     }
+    
+    public function newstats()
+    {
+        $data = $this->Zamowieniapubliczne->getNewStats();
+
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+    }
 
 } 

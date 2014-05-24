@@ -34,7 +34,7 @@ require_once 'constants.php';
  * In production mode, flash messages redirect after a time interval.
  * In development mode, you need to click the flash message to continue.
  */
-Configure::write('debug', 0);
+// Configure::write('debug', 2);
 
 /**
  * Configure the Error handler used to handle errors for your application. By default
@@ -79,8 +79,9 @@ Configure::write('Error', array(
  */
 Configure::write('Exception', array(
     'handler' => 'ErrorHandler::handleException',
-    'renderer' => 'ExceptionRenderer',
-    'log' => true
+    'renderer' => 'AppExceptionRenderer',
+    'log' => true,
+    'skipLog' => array('MissingActionException', 'MissingControllerException')
 ));
 
 /**

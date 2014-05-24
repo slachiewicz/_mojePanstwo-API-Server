@@ -100,6 +100,9 @@ CakePlugin::loadAll(array(
     'PanstwoInternet' => array(
         'routes' => true,
     ),
+    'Media' => array(
+        'routes' => true,
+    ),
     'MapaPrawa' => array(
         'routes' => true,
     ),

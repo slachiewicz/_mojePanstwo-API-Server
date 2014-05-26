@@ -7,18 +7,14 @@ App::uses('AppController', 'Controller');
  */
 class ApiController extends AppController
 {
-    public $uses = array();
+    public $uses = array('Api');
 
     public function index() {
-        // TODO db
-        $apis = array(array(
-            'name' => 'Kody Pocztowe',
-            'version' => '1.0',
-            'slug' => 'kodyPocztowe',
-            'oneliner' => 'Mapuj kody pocztowe na adresy',
-            'description' => 'Ustal kod pocztowy adresu lub adresy jakie obejmuje kod pocztowy',
-            'swagger_url' => Router::url(array('controller' => 'swagger', 'action' => 'resource_api_docs', 'slug' => 'kodyPocztowe'), true)
-        ));
+        $apis = array();
+        foreach($this->Api->find('all') as $api) {
+            $api['Api']['swagger_url'] = Router::url(array('controller' => 'swagger', 'action' => 'resource_api_docs', 'slug' => $api['Api']['slug']), true);
+            array_push($apis, $api['Api']);
+        }
 
         $this->set(array(
             'apis' => $apis,

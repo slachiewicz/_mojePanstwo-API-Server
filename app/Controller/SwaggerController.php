@@ -9,7 +9,7 @@ class SwaggerController extends AppController
 {
     const SWAGGER_VERSION = "1.2";
 
-    public $uses = array();
+    public $uses = array('Api');
 
     public function beforeFilter() {
         parent::beforeFilter();
@@ -26,13 +26,12 @@ class SwaggerController extends AppController
         $swaggerVersion = SwaggerController::SWAGGER_VERSION;
 
         $apis = array();
-
-        // TODO foreach() {
-        array_push($apis, array(
-            "path" => "/kodyPocztowe.{format}",
-            "description" => "Mapowanie kodów pocztowych na adresy"
-        ));
-        // }
+        foreach($this->Api->find('all') as $api) {
+            array_push($apis, array(
+                "path" => "/" . $api['Api']['slug'], //.".{format}",
+                "description" => $api['Api']['oneliner']
+            ));
+        }
 
         $_serialize = array('basePath', 'swaggerVersion', 'apis');
         $this->set(compact($_serialize, '_serialize'));
@@ -46,11 +45,19 @@ class SwaggerController extends AppController
         $basePath = substr($basePath, 0, strrpos($basePath, '/'));
         $swaggerVersion = SwaggerController::SWAGGER_VERSION;
 
-        $apis = array(array(
-            // TODO
-            "path" => "/kodyPocztowe.{format}",
-            "description" => "Mapowanie kodów pocztowych na adresy"
+        $api = $this->Api->find('first', array(
+            'conditions' => array('Api.slug' => $slug)
         ));
+
+        if (empty($api)) {
+            throw new NotFoundException();
+        }
+
+        $apis = array(array(
+            "path" => "/" . $api['Api']['slug'], //.".{format}",
+            "description" => $api['Api']['oneliner']
+        ));
+
 
         $_serialize = array('basePath', 'swaggerVersion', 'apis');
         $this->set(compact($_serialize, '_serialize'));

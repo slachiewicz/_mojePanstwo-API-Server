@@ -59,6 +59,16 @@ class Dataobject extends AppModel
 			        );
 		        
 	        }
+	        
+	        case 'zamowienia_publiczne_wykonawcy': {
+	        	
+	        	if( $krs_id = $this->DB->selectValue("SELECT `krs_id` FROM `uzp_wykonawcy` WHERE `id`='" . addslashes( $id ) . "' LIMIT 1") )
+			        return array(
+			        	'alias' => 'krs_podmioty',
+			        	'object_id' => $krs_id,
+			        );
+		        
+	        }
         }
         
         return false;

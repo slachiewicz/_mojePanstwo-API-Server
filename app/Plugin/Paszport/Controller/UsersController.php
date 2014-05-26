@@ -382,19 +382,43 @@ class UsersController extends PaszportAppController
      */
     public function reset()
     {
-        if ($this->data) {
-            $to_save = $this->data;
-            $to_save['User']['reset_hash'] = ''; # clean the reset hash
-            $to_save['User']['password'] = $this->Auth->password($this->data['User']['password']); # hash the password
-            $to_save['User']['repassword'] = $this->Auth->password($this->data['User']['repassword']);
-            if ($this->User->save($to_save)) {
-                $this->_log(array('msg' => 'LC_PASZPORT_LOG_PASSWORD_RESET_SUCCESS', 'ip' => $this->request->clientIp(), 'user_agent' => env('HTTP_USER_AGENT')));
-                $this->set(array(
-                    'user' => $this->User->data,
-                    '_serialize' => array('user'),
-                ));
+        $this->set(array(
+            'status' => 400,
+            'errors' => 'bad request',
+            '_serialize' => array('errors', 'status'),
+        ));
+
+        if ($this->data['User']) {
+            // verify password
+            $to_save = array('User' => array(
+                'password' => $this->data['User']['password'],
+                'repassword' => $this->data['User']['repassword'],
+                'reset_hash' => '',
+                'id' => $this->data['User']['id']
+            ));
+            $this->actAsUser($this->data);
+
+            $this->User->set($to_save);
+            if ($this->User->validates(array('fieldList' => array('repassword', 'password', 'reset_hash')))) {
+                $to_save['User']['password'] = $to_save['User']['repassword'] = $this->Auth->password($this->data['User']['password']);
+
+                if ($this->User->save($to_save)) {
+                    $this->set('_serialize', '');
+                    $this->_log(array('msg' => 'LC_PASZPORT_LOG_PASSWORD_RESET_SUCCESS', 'ip' => $this->request->clientIp(), 'user_agent' => env('HTTP_USER_AGENT')));
+
+                } else {
+                    $this->set(array(
+                        'status' => 422,
+                        'errors' => $this->User->validationErrors,
+                        '_serialize' => array('errors', 'status'),
+                    ));
+                }
             } else {
-                exit();
+                $this->set(array(
+                    'status' => 422,
+                    'errors' => $this->User->validationErrors,
+                    '_serialize' => array('errors', 'status'),
+                ));
             }
         }
     }

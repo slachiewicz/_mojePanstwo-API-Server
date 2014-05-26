@@ -21,7 +21,7 @@ class Newalertobject extends AppModel
     public function find($type = 'first', $queryData = array())
     {
     	    	
-        $user_id = $queryData['conditions']['user_id'];
+        $user_id = $this->getCurrentUser('id');
         $visited = $queryData['conditions']['visited'] ? '1' : '0';
         $group_id = $queryData['conditions']['group_id'];
 
@@ -32,7 +32,7 @@ class Newalertobject extends AppModel
         $this->DB = new DB();
 
 
-        $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`,  GROUP_CONCAT( `m_alerts_groups_qs-objects`.`hl` SEPARATOR \"\r\") as 'hls' ";
+        $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`,  GROUP_CONCAT( DISTINCT(`m_alerts_groups_qs-objects`.`hl`) SEPARATOR \"\r\") as 'hls' ";
         $sql_order = "`m_users-objects`.`dstamp` DESC";
 		
 				
@@ -44,19 +44,27 @@ class Newalertobject extends AppModel
             
             // USE INDEX (`user_objects`) 
             
-            $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";
+            $q .= "JOIN `m_alerts_groups` 
+			ON (`m_users-objects`.`user_id`=`m_alerts_groups`.`user_id` AND `m_alerts_groups`.`id`='" . $group_id . "') 
+			
+			JOIN `m_alerts_groups-objects` 
+			ON (`m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` AND `m_alerts_groups-objects`.`group_id`='" . $group_id . "') 
+			
+			JOIN `m_alerts_groups_qs-objects` 
+			ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp`) 
+			
+			JOIN `m_alerts_groups_qs` 
+			ON (`m_alerts_groups_qs`.`q_id`=`m_alerts_groups_qs-objects`.`q_id` AND `m_alerts_groups_qs`.`group_id`='" . $group_id . "')
+			
+			";
             
-	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
-	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
-            
-            $q .= "WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
-			$q .= " AND `m_alerts_groups-objects`.`group_id`='" . $group_id . "'";
+            $q .= " WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
             $q .= " GROUP BY `m_users-objects`.`dstamp`";
             $q .= " ORDER BY $sql_order";
             $q .= " LIMIT $offset, $limit";
 			
-			// TODO: objects.unindex, m_alerts-users.deleted
+			// TODO: objects.unindex
 
         }
         else
@@ -67,30 +75,39 @@ class Newalertobject extends AppModel
             
             // USE INDEX (`user_objects`) 
             
-            $q .= "JOIN `m_alerts_groups-objects` ON `m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp` ";
-            
-	        $q .= "LEFT JOIN `m_alerts_groups_qs` ON `m_alerts_groups-objects`.`group_id`=`m_alerts_groups_qs`.`group_id` ";
-	        $q .= "LEFT JOIN `m_alerts_groups_qs-objects` ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp` AND `m_alerts_groups_qs-objects`.`q_id` = `m_alerts_groups_qs`.`q_id`) ";
-            
+            $q .= "JOIN `m_alerts_groups` 
+			ON (`m_users-objects`.`user_id`=`m_alerts_groups`.`user_id`) 
+			
+			JOIN `m_alerts_groups-objects` 
+			ON (`m_users-objects`.`dstamp`=`m_alerts_groups-objects`.`dstamp`) 
+			
+			JOIN `m_alerts_groups_qs-objects` 
+			ON (`m_users-objects`.`dstamp`=`m_alerts_groups_qs-objects`.`dstamp`) 
+			
+			JOIN `m_alerts_groups_qs` 
+			ON (`m_alerts_groups_qs`.`q_id`=`m_alerts_groups_qs-objects`.`q_id` AND `m_alerts_groups_qs`.`group_id`=`m_alerts_groups`.`id`)";
+			
+			
+
             $q .= "WHERE `m_users-objects`.`user_id`='" . $user_id . "'";
 			$q .= " AND `m_users-objects`.`visited`='" . $visited . "'";
             $q .= " GROUP BY `m_users-objects`.`dstamp`";
             $q .= " ORDER BY $sql_order";
             $q .= " LIMIT $offset, $limit";         			 
-			
+						
         }
 		
-        $objects = $this->DB->query($q);
+        $objects = $this->DB->selectAssocs($q);
                 
-
 
         $ids = array();
         $hl_texts = array();
-        foreach ($objects as $i => $object) {
-            array_push($ids, $object['m_users-objects']['object_id']);
+        foreach ($objects as $object) {
             
-            if( isset($object[0]['hls']) )
-	            $hl_texts[$object['m_users-objects']['object_id']] = $object[0]['hls'];
+            $ids[] = $object['object_id'];
+            
+            if( isset($object['hls']) && ($object['hls'] = trim($object['hls'])) )
+	            $hl_texts[ $object['object_id'] ] = $object['hls'];
         }        
 		
 		
@@ -104,15 +121,22 @@ class Newalertobject extends AppModel
             ));
             
             $dataobjects = $data['dataobjects'];
-            foreach ($dataobjects as &$object)
+            
+            foreach ($dataobjects as &$object) {
+            
             	if( array_key_exists($object['id'], $hl_texts) )
 	                $object['hl_text'] = $hl_texts[$object['id']];
+	            else
+	            	$object['hl_text'] = false;
+	        
+	        }
                         
         } else {
             $dataobjects = array();
         }
 
-
+		
+		
         $this->objects = $dataobjects;
         
 
@@ -122,8 +146,11 @@ class Newalertobject extends AppModel
 
     }
     
-    public function flag($user_id, $object_id, $action)
+    public function flag($object_id, $action)
     {
+    	    	
+    	$user_id = $this->getCurrentUser('id');
+    	
 	    if( !$user_id || !$object_id )
 	    	return false;
 	    	
@@ -134,62 +161,37 @@ class Newalertobject extends AppModel
 	    $this->DB = new DB();
 	    
 	    
-	    $this->DB->query("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
+	    $this->DB->q("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
 	    	    
 	    
 	    if( $action=='read' ) {
 	    	
-		    $this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
+		    $this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
 		
 		} elseif( $action=='unread' ) {
 			
-			$this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='1'");
+			$this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='1'");
 		
 		}
 		
-		$affected_rows = $this->DB->getAffectedRows();
-		
+		$affected_rows = $this->DB->_getAffectedRows();
 		
 		$result = array(
 			'status' => 'OK',
 		);
 		
-		if( $affected_rows || true ) {
-			
-			
-			$groups = $this->DB->selectAssocs("SELECT `m_alerts_groups-objects`.`group_id`, COUNT(*) as 'alerts_unread_count' FROM `m_alerts_groups-objects` JOIN `m_users-objects` ON (`m_alerts_groups-objects`.`object_id` = `m_users-objects`.`object_id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id`) WHERE `m_alerts_groups-objects`.`user_id`='" . $user_id . "' AND `m_users-objects`.`visited`='0' AND `m_alerts_groups-objects`.`group_id` IN (SELECT DISTINCT(`group_id`) FROM `m_alerts_groups-objects` WHERE `user_id`='$user_id' AND `object_id`='$object_id') GROUP BY `m_alerts_groups-objects`.`group_id`");
-			
-			if( !empty($groups) ) {
-				
-				foreach( $groups as $group )
-					$values[] = "('" . $group['group_id'] . "', '" . $group['alerts_unread_count'] . "')";
-				
-				
-				$this->DB->query("INSERT INTO `m_alerts_groups` (`id`, `alerts_unread_count`) VALUES " . implode(',', $values) . " ON DUPLICATE KEY UPDATE `alerts_unread_count`=VALUES(`alerts_unread_count`)");
-				
-			}
-			
-			$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0'");
-			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
-			
-			$result = array_merge($result, array(
-				'groups_alerts_counts' => $groups,
-		    	'user_alerts_count' => $user_alerts_count,
-			));
-			
-			
-			
-		}
-			
-		
+		if( $affected_rows )
+			$result = array_merge($result, $this->calculate($object_id));			
 		
 		return $result;
 		
     }
     
-    public function flagAll($user_id, $action)
+    public function flagAll($action)
     {
-	    	
+	    
+	    $user_id = $this->getCurrentUser('id');
+	    
 	    if( $action!='read' && $action!='unread' )
 	    	return false;
 	    
@@ -201,51 +203,64 @@ class Newalertobject extends AppModel
 	    
 	    if( $action=='read' ) {
 	    	
-		    $this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.`visited`='0'");
+		    $this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.`visited`='0'");
 		
 		} elseif( $action=='unread' ) {
 			
-			$this->DB->query("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.`visited`='1'");
+			$this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.`visited`='1'");
 		
 		}
 		
-		$affected_rows = $this->DB->getAffectedRows();
+		$affected_rows = $this->DB->_getAffectedRows();
 		
 		
 		$result = array(
 			'status' => 'OK',
 		);
 		
-		if( $affected_rows || true ) {
-			
-			
-			$groups = $this->DB->selectAssocs("SELECT `m_alerts_groups`.`id` as 'group_id', '0' as 'alerts_unread_count' FROM `m_alerts_groups` WHERE `m_alerts_groups`.`user_id`='" . $user_id . "'");
-			
-			if( !empty($groups) ) {
-				
-				foreach( $groups as $group )
-					$values[] = "('" . $group['group_id'] . "', '" . $group['alerts_unread_count'] . "')";
-				
-				
-				$this->DB->query("INSERT INTO `m_alerts_groups` (`id`, `alerts_unread_count`) VALUES " . implode(',', $values) . " ON DUPLICATE KEY UPDATE `alerts_unread_count`=VALUES(`alerts_unread_count`)");
-				
-			}
-			
-			$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0'");
-			$this->DB->query("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
-			
-			$result = array_merge($result, array(
-				'groups_alerts_counts' => $groups,
-		    	'user_alerts_count' => $user_alerts_count,
-			));
-			
-			
-			
-		}
-			
-		
+		if( $affected_rows || true )			
+			$result = array_merge($result, $this->calculate($group_id));			
 		
 		return $result;
 		
     }
+    
+    private function calculate( $object_id = false ) {
+						
+		$user_id = $this->getCurrentUser('id');
+		$object_id = (int) $object_id;
+		
+		if( $object_id ) {
+		
+		    $q = "SELECT `m_alerts_groups-objects`.`group_id`, COUNT(*) as 'alerts_unread_count' FROM `m_alerts_groups-objects` JOIN `m_users-objects` ON (`m_alerts_groups-objects`.`object_id` = `m_users-objects`.`object_id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id`) WHERE `m_alerts_groups-objects`.`user_id`='" . $user_id . "' AND `m_users-objects`.`visited`='0' AND `m_users-objects`.`archived`='0' AND `m_alerts_groups-objects`.`group_id` IN (SELECT DISTINCT(`group_id`) FROM `m_alerts_groups-objects` WHERE `user_id`='" . $user_id . "' AND `object_id`='" . $object_id . "') GROUP BY `m_alerts_groups-objects`.`group_id`";
+		    
+		} else {
+			
+			$q = "SELECT `m_alerts_groups-objects`.`group_id`, COUNT(*) as 'alerts_unread_count' FROM `m_alerts_groups-objects` JOIN `m_users-objects` ON (`m_alerts_groups-objects`.`object_id` = `m_users-objects`.`object_id` AND `m_alerts_groups-objects`.`user_id`=`m_users-objects`.`user_id`) WHERE `m_alerts_groups-objects`.`user_id`='" . $user_id . "' AND `m_users-objects`.`visited`='0' AND `m_users-objects`.`archived`='0' GROUP BY `m_alerts_groups-objects`.`group_id`";
+			
+		}
+	    	    
+	    $groups = $this->DB->selectAssocs($q);
+	    
+		if( !empty($groups) ) {
+			
+			foreach( $groups as $group )
+				$values[] = "('" . $group['group_id'] . "', '" . $group['alerts_unread_count'] . "')";
+			
+			$this->DB->q("INSERT INTO `m_alerts_groups` (`id`, `alerts_unread_count`) VALUES " . implode(',', $values) . " ON DUPLICATE KEY UPDATE `alerts_unread_count`=VALUES(`alerts_unread_count`)");
+			
+		}
+		
+		$user_alerts_count = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `m_users-objects` WHERE `user_id` = '$user_id' AND visited='0' AND `archived`='0'");
+		$this->DB->q("UPDATE `m_users` SET `alerts_unread_count`='$user_alerts_count' WHERE `id`='$user_id'");
+		
+		$result = array(
+			'groups_alerts_counts' => $groups,
+	    	'user_alerts_count' => $user_alerts_count,
+		);
+		
+		return $result;
+	    
+    }
+    
 } 

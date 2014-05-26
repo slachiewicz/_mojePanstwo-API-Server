@@ -9,7 +9,9 @@ class PowiadomieniaApp extends AppModel
 	    App::import('model', 'DB');
 	    $this->DB = new DB();
 	    
-	    $apps_data = $this->DB->selectAssocs("SELECT 
+	    
+	    
+	    $q = "SELECT 
 	    `applications`.`id` AS 'app.id', 
 	    `applications`.`name` AS 'app.name', 
 	    `datasets`.`id` AS 'dataset.id', 
@@ -17,7 +19,15 @@ class PowiadomieniaApp extends AppModel
 	    FROM `datasets` 
 	    JOIN `applications` ON `datasets`.`app_id` = `applications`.`id` 
 	    WHERE `datasets`.`alerts` = '1' 
-	    ORDER BY `applications`.`name` ASC, `datasets`.`name` ASC");
+	    AND ( (`applications`.`public` = '1')";
+	    
+	    if( $user_id = $this->getCurrentUser('id') ) {
+		    $q .= " OR (`applications`.`id` IN (SELECT `app_id` FROM `m_users-applications` WHERE `user_id`='" . addslashes( $user_id ) . "'))";
+	    }
+	    
+	    $q .= " ) ORDER BY `applications`.`name` ASC, `datasets`.`name` ASC";
+	    
+	    $apps_data = $this->DB->selectAssocs($q);
 	    	    
 	    $apps = array();
 	    $temp = array();

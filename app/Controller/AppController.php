@@ -67,6 +67,7 @@ class AppController extends Controller
 
     public function  beforeFilter()
     {
+    	// AuthComponent::$sessionKey = false;
         parent::beforeFilter();
 		
 		if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY) {
@@ -74,8 +75,18 @@ class AppController extends Controller
             Configure::write('devaccess', true);
         }
 
-        $this->loadModel('Paszport.UserAdditionalData');        
-        if ($_SERVER['REMOTE_ADDR'] == MP_PORTAL_IP) {
+        $this->loadModel('Paszport.UserAdditionalData');
+             
+        $remote_address_parts = explode('.', $_SERVER['REMOTE_ADDR']);
+        $mp_portal_ip_parts = explode('.', MP_PORTAL_IP);
+        
+        
+        if( $mp_portal_ip_parts[3]=='*' ) {
+	        array_pop($remote_address_parts);
+	        array_pop($mp_portal_ip_parts);
+        }
+        
+        if (($remote_address_parts == $mp_portal_ip_parts) || $this->devaccess) {
             // we trust this client            
 			
             if (env('HTTP_X_USER_ID')) {

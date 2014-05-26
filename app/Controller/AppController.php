@@ -37,6 +37,9 @@ class AppController extends Controller
 {
     public $uses = array('Paszport.User');
 
+    // serve only json
+    public $viewClass = 'Json';
+
     protected $user_id = null;
     protected $user = null;
     protected $devaccess = false;

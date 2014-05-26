@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jadell/neo4jphp.git",
-                "reference": "fe6337c41eaab981b6e874c0b1180329d91ef6f6"
+                "reference": "0b8c6b622c4885816aca06dee9ab45bcc096d827"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jadell/neo4jphp/zipball/fe6337c41eaab981b6e874c0b1180329d91ef6f6",
-                "reference": "fe6337c41eaab981b6e874c0b1180329d91ef6f6",
+                "url": "https://api.github.com/repos/jadell/neo4jphp/zipball/0b8c6b622c4885816aca06dee9ab45bcc096d827",
+                "reference": "0b8c6b622c4885816aca06dee9ab45bcc096d827",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "graph",
                 "neo4j"
             ],
-            "time": "2014-01-22 00:49:14"
+            "time": "2014-05-10 01:59:00"
         }
     ],
     "packages-dev": [

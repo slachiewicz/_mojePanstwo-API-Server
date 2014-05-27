@@ -39,7 +39,6 @@ class AppController extends Controller
 
     protected $user_id = null;
     protected $user = null;
-    protected $devaccess = false;
     
     public $components = array('RequestHandler', 'Auth');
 
@@ -66,32 +65,14 @@ class AppController extends Controller
     {
     	// AuthComponent::$sessionKey = false;
         parent::beforeFilter();
-		
-		if (env('HTTP_X_DEVKEY') && env('HTTP_X_DEVKEY') == MPAPI_DEV_KEY) {
-            $this->devaccess = true;
-            Configure::write('devaccess', true);
-        }
 
         $this->loadModel('Paszport.UserAdditionalData');
-             
-        $remote_address_parts = explode('.', $_SERVER['REMOTE_ADDR']);
-        $mp_portal_ip_parts = explode('.', MP_PORTAL_IP);
         
-        
-        if( $mp_portal_ip_parts[3]=='*' ) {
-	        array_pop($remote_address_parts);
-	        array_pop($mp_portal_ip_parts);
-        }
-        
-        if (($remote_address_parts == $mp_portal_ip_parts) || $this->devaccess) {
-            // we trust this client            
-			
+        if (MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
             if (env('HTTP_X_USER_ID')) {
-
                 $user_id = Sanitize::paranoid(env('HTTP_X_USER_ID'));
                 $user = $this->User->find('first', array('conditions' => array('User.id' => $user_id)));
                 $this->actAsUser($user);
-                
             }
 
         } else {

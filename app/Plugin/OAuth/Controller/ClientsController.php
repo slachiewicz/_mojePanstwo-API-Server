@@ -2,12 +2,16 @@
 
 class ClientsController extends OAuthAppController
 {
-    public function find($type = 'all')
+    public function find($client_id)
     {
-        $clients = $this->Client->find($type, $this->data);
+        $clients = $this->Client->find('first', array(
+            'conditions' => array('Client.client_id' => $client_id),
+            'fields' => array('Client.client_id', 'Client.redirect_uri'),
+            'recursive' => -1
+        ));
         $this->set(array(
             'clients' => $clients,
-            '_serialize' => array('clients'),
+            '_serialize' => 'clients',
         ));
     }
 } 

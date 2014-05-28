@@ -1,6 +1,5 @@
 <?php
-Router::connect('/oauth/clients/:action', array('plugin' => 'OAuth', 'controller' => 'clients'));
-Router::connect('/oauth/clients/:action/:type', array('plugin' => 'OAuth', 'controller' => 'clients'));
+Router::connect('/oauth/clients/:client_id', array('plugin' => 'OAuth', 'controller' => 'clients', 'action' => 'find'), array('pass' => array('client_id')));
 
 Router::connect('/oauth/auth_codes/:action', array('plugin' => 'OAuth', 'controller' => 'auth_codes'));
 Router::connect('/oauth/auth_codes/:action/:type', array('plugin' => 'OAuth', 'controller' => 'auth_codes'));

@@ -2,7 +2,20 @@
 
 class PanstwoInternetController extends AppController
 {
+	
+	public function getTwitterStats()
+    {
 
+        $range = $this->request->params['id'];
+
+        $data = $this->PanstwoInternet->get_twitter_stats($range);
+
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+
+
+    }
+	
     public function getAnnualTwitterStats()
     {
 
@@ -29,12 +42,13 @@ class PanstwoInternetController extends AppController
     public function getTwitterAccountsGroupByTypes()
     {
 
+        $range = @$this->request->query['range'];
         $types = @$this->request->query['types'];
         $sort = @$this->request->query['sort'];
 
         if (is_array($types) && !empty($types)) {
 
-            $accounts = $this->PanstwoInternet->twitter_accounts_group_by_types($types, $sort);
+            $accounts = $this->PanstwoInternet->twitter_accounts_group_by_types($range, $types, $sort);
 
             $this->set('accounts', $accounts);
             $this->set('_serialize', 'accounts');
@@ -47,12 +61,13 @@ class PanstwoInternetController extends AppController
     public function getTwitterTweetsGroupByTypes()
     {
 
+        $range = @$this->request->query['range'];
         $types = @$this->request->query['types'];
         $sort = @$this->request->query['sort'];
 
         if (is_array($types) && !empty($types)) {
 
-            $tweets = $this->PanstwoInternet->get_twitter_tweets_group_by_types($types, $sort);
+            $tweets = $this->PanstwoInternet->get_twitter_tweets_group_by_types($range, $types, $sort);
 
             $this->set('tweets', $tweets);
             $this->set('_serialize', 'tweets');

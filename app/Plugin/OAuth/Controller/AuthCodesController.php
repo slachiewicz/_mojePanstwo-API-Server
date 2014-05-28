@@ -15,12 +15,15 @@ class AuthCodesController extends OAuthAppController
         }
     }
 
-    public function find($type = 'all')
+    public function find($code)
     {
-        $auth_codes = $this->AuthCode->find($type, $this->request->query);
+        $auth_code = $this->AuthCode->find('first', array(
+            'conditions' => array('AuthCode.code' => $code),
+            'fields' => array('AuthCode.code','AuthCode.client_id','AuthCode.redirect_uri','AuthCode.expires','AuthCode.scope'),
+        ));
         $this->set(array(
-            'auth_codes' => $auth_codes,
-            '_serialize' => array('auth_codes'),
+            'auth_code' => $auth_code,
+            '_serialize' => 'auth_code',
         ));
     }
 } 

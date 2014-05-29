@@ -32,7 +32,7 @@ class PanstwoInternet extends AppModel
     public function twitter_accounts_types()
     {
 
-        $result = $this->query("SELECT `id`, `nazwa`, `class` FROM `twitter_accounts_types` WHERE `ranking`='1' ORDER BY `ranking_ord` ASC");
+        $result = $this->query("SELECT `id`, `nazwa`, `class` FROM `twitter_accounts_types` WHERE `ranking_new`='1' ORDER BY `ranking_ord` ASC");
         foreach ($result as &$r)
             $r = $r['twitter_accounts_types'];
 

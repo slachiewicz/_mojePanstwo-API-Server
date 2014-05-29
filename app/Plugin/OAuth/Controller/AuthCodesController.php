@@ -20,7 +20,7 @@ class AuthCodesController extends OAuthAppController
     {
         $auth_code = $this->AuthCode->find('first', array(
             'conditions' => array('AuthCode.code' => $code),
-            'fields' => array('AuthCode.code','AuthCode.client_id','AuthCode.redirect_uri','AuthCode.expires','AuthCode.scope'),
+            'fields' => array('AuthCode.code','AuthCode.client_id','AuthCode.redirect_uri','AuthCode.expires','AuthCode.scope', 'AuthCode.user_id'),
         ));
         $this->set(array(
             'auth_code' => $auth_code,

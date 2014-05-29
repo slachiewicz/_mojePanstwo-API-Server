@@ -25,7 +25,7 @@ class RefreshTokensController extends OAuthAppController
         if (isset($data['recursive'])) {
             $params['recursive'] = $data['recursive'];
         }
-        $params['conditions'] = array('refresh_token' => $data['conditions']['refresh_token']);
+        $params['conditions'] = array('RefreshToken.refresh_token' => $data['conditions']['refresh_token']);
 
         $refresh_token = $this->RefreshToken->find('first', $params);
 

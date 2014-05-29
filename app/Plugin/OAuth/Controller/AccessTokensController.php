@@ -27,7 +27,7 @@ class AccessTokensController extends OAuthAppController
         if (isset($data['recursive'])) {
             $params['recursive'] = $data['recursive'];
         }
-        $params['conditions'] = array('oauth_token' => $data['conditions']['oauth_token']);
+        $params['conditions'] = array('AccessToken.oauth_token' => $data['conditions']['oauth_token']);
 
         $access_token = $this->AccessToken->find('first', $params);
 

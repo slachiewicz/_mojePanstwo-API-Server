@@ -4,11 +4,12 @@ class AuthCodesController extends OAuthAppController
 {
     public function save()
     {
-        if (!empty($this->request->query)) {
-            $ret = $this->AuthCode->save($this->request->query);
+        $inputData = ($_SERVER['REQUEST_METHOD'] == 'POST') ? $this->request->data : $this->request->query;
+        if (!empty($inputData)) {
+            $ret = $this->AuthCode->save($inputData);
             $this->set(array(
                 'return' => $ret,
-                '_serialize' => array('return'),
+                '_serialize' => 'return',
             ));
         } else {
             throw new BadRequestException();

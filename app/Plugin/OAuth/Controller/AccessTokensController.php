@@ -4,12 +4,15 @@ class AccessTokensController extends OAuthAppController
 {
     public function save()
     {
-        if ($this->data) {
-            $ret = $this->AccessToken->save($this->data);
+        $inputData = ($_SERVER['REQUEST_METHOD'] == 'POST') ? $this->request->data : $this->request->query;
+        if (!empty($inputData)) {
+            $ret = $this->AccessToken->save($inputData);
             $this->set(array(
                 'return' => $ret,
                 '_serialize' => array('return'),
             ));
+        } else {
+            throw new BadRequestException();
         }
     }
 

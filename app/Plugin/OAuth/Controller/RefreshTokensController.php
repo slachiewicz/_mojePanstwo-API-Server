@@ -4,8 +4,9 @@ class RefreshTokensController extends OAuthAppController
 {
     public function save()
     {
-        if ($this->data) {
-            $ret = $this->RefreshToken->save($this->data);
+        $inputData = ($_SERVER['REQUEST_METHOD'] == 'POST') ? $this->request->data : $this->request->query;
+        if (!empty($inputData)) {
+            $ret = $this->RefreshToken->save($inputData);
             $this->set(array(
                 'return' => $ret,
                 '_serialize' => array('return'),

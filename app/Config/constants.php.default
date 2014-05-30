@@ -16,4 +16,4 @@ define('S3_LOGIN','s3login');
 define('S3_SECRET', 's3pass');
 define('S3_ENDPOINT', 's3endpoint');
 
-define('CLIENT_IP', '127.0.0.1');
+define('TRUSTED_CLIENTS', '127.0.0.1,37.233.98.234');

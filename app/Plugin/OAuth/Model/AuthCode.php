@@ -61,11 +61,7 @@ class AuthCode extends OAuthAppModel
         ),
     );
 
-    public $actsAs = array(
-        'OAuth.HashedField' => array(
-            'fields' => 'code',
-        ),
-    );
+    public $actsAs = array();
 
     /**
      * belongsTo associations
@@ -81,7 +77,7 @@ class AuthCode extends OAuthAppModel
             'order' => ''
         ),
         'User' => array(
-            'className' => 'User',
+            'className' => 'Paszport.User',
             'foreignKey' => 'user_id',
             'conditions' => '',
             'fields' => '',

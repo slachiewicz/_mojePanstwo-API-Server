@@ -18,7 +18,6 @@ class Datachannel extends AppModel
 
     public function find($type = 'first', $queryData = array())
     {
-        // $catalog_field = Configure::read('devaccess') ? 'backup_catalog' : 'catalog';
         $catalog_field = 'backup_catalog';
         $this->hasMany['Dataset']['conditions'][$catalog_field] = '1';
 

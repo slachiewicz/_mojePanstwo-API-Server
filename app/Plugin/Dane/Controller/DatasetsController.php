@@ -16,8 +16,6 @@ class DatasetsController extends AppController
 
     public function index()
     {
-
-        // $catalog_field = Configure::read('devaccess') ? 'backup_catalog' : 'catalog';
         $catalog_field = 'backup_catalog';
         $catalog_field = 'Dataset.' . $catalog_field;
 

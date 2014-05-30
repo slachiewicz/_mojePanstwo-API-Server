@@ -4,23 +4,27 @@ class AuthCodesController extends OAuthAppController
 {
     public function save()
     {
-        if (!empty($this->request->query)) {
-            $ret = $this->AuthCode->save($this->request->query);
+        $inputData = ($_SERVER['REQUEST_METHOD'] == 'POST') ? $this->request->data : $this->request->query;
+        if (!empty($inputData)) {
+            $ret = $this->AuthCode->save($inputData);
             $this->set(array(
                 'return' => $ret,
-                '_serialize' => array('return'),
+                '_serialize' => 'return',
             ));
         } else {
             throw new BadRequestException();
         }
     }
 
-    public function find($type = 'all')
+    public function find($code)
     {
-        $auth_codes = $this->AuthCode->find($type, $this->request->query);
+        $auth_code = $this->AuthCode->find('first', array(
+            'conditions' => array('AuthCode.code' => $code),
+            'fields' => array('AuthCode.code','AuthCode.client_id','AuthCode.redirect_uri','AuthCode.expires','AuthCode.scope', 'AuthCode.user_id'),
+        ));
         $this->set(array(
-            'auth_codes' => $auth_codes,
-            '_serialize' => array('auth_codes'),
+            'auth_code' => $auth_code,
+            '_serialize' => 'auth_code',
         ));
     }
 } 

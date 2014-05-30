@@ -57,9 +57,6 @@ class AccessToken extends OAuthAppModel
     );
 
     public $actsAs = array(
-        'OAuth.HashedField' => array(
-            'fields' => 'oauth_token',
-        ),
     );
 
     /**

@@ -180,3 +180,5 @@ CakeLog::config('error', array(
 ));
 
 CakePlugin::load('Composer', array('bootstrap' => true));
+
+App::uses('MpUtils', 'Lib');

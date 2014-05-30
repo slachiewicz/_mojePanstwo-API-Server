@@ -61,7 +61,6 @@ class Dataset extends AppModel
         FROM `datasets_filters` AS filter 
         WHERE `filter`.`dataset`='" . addslashes($alias) . "'";
 
-        // if( Configure::read('devaccess') )
         $q .= " AND `filter`.`deleted`='0'";
 
         $q .= " ORDER BY `filter`.`ord` ASC 

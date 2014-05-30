@@ -4,8 +4,9 @@ class RefreshTokensController extends OAuthAppController
 {
     public function save()
     {
-        if ($this->data) {
-            $ret = $this->RefreshToken->save($this->data);
+        $inputData = ($_SERVER['REQUEST_METHOD'] == 'POST') ? $this->request->data : $this->request->query;
+        if (!empty($inputData)) {
+            $ret = $this->RefreshToken->save($inputData);
             $this->set(array(
                 'return' => $ret,
                 '_serialize' => array('return'),
@@ -13,12 +14,24 @@ class RefreshTokensController extends OAuthAppController
         }
     }
 
-    public function find($type = 'all')
+    public function find($type = 'whatever')
     {
-        $refresh_tokens = $this->RefreshToken->find($type, $this->data);
+        $data = $this->request->query;
+        if ($type !== 'first' || !isset($data['conditions']['refresh_token'])) {
+            throw new BadRequestException();
+        }
+
+        $params = array();
+        if (isset($data['recursive'])) {
+            $params['recursive'] = $data['recursive'];
+        }
+        $params['conditions'] = array('RefreshToken.refresh_token' => $data['conditions']['refresh_token']);
+
+        $refresh_token = $this->RefreshToken->find('first', $params);
+
         $this->set(array(
-            'refresh_tokens' => $refresh_tokens,
-            '_serialize' => array('refresh_tokens'),
+            'refresh_token' => $refresh_token,
+            '_serialize' => 'refresh_token',
         ));
     }
 } 

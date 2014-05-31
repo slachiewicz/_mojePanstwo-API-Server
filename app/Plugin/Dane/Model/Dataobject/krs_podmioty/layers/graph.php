@@ -51,7 +51,7 @@
 		foreach( $relationships as $relationship )
 		{
 			
-			echo "\nrelation_id= " . $relationship->getId();
+			// echo "\nrelation_id= " . $relationship->getId();
 			
 			$output['relationships'][] = array(
 				'id' => $relationship->getId(),
@@ -61,9 +61,7 @@
 				'end' => $relationship->getEndNode()->getId(),
 			);
 		}
-		
-		die();
-		
+				
 		return $output;
 		
 	

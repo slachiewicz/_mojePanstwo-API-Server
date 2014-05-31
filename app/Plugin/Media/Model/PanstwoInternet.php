@@ -46,7 +46,7 @@ class PanstwoInternet extends AppModel
 		App::import('model', 'DB');
         $this->DB = new DB();
         
-		$ranges_keys = array('24h', '3d', '7d', '1m', '1y');
+		$range_keys = array('24h', '3d', '7d', '1m', '1y');
 		
 		
 		if( !in_array($range_id, $range_keys) )

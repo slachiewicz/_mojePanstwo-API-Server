@@ -923,7 +923,7 @@ class solrSource extends DataSource
     }
     
     private function solrDateEncode($input) {
-	    
+    	    
 	    $input = strtoupper( trim( $input ) );
 	    
 	    if( $input=='LAST_24H' ) {
@@ -947,14 +947,13 @@ class solrSource extends DataSource
 	    	return '[NOW-1YEAR+2HOUR TO *]';
 	    
 	    } elseif( preg_match('/\[(.*?)TO(.*?)\]/i', $input, $match) ) {
-		    
+		    		    
 		    $output = '[';
-		    $output .= $this->solrDateFormat($match[1], false);
+		    $output .= $this->solrDateFormat(trim($match[1]), false);
 		    $output .= ' TO ';
-		    $output .= $this->solrDateFormat($match[2], true);
+		    $output .= $this->solrDateFormat(trim($match[2]), true);
 		    $output .= ']';
 		    
-		    // return '[' . $match[1] . 'T00:00:00Z TO ' . $input . 'T23:59:59Z]';
 		    return $output;
 		    
 	    }
@@ -965,16 +964,19 @@ class solrSource extends DataSource
     
     private function solrDateFormat($input, $type = false) {
 	    
-	    if( $input=='*' )
-	    	return '*';
 	    
-	    $output = substr($input, 0, 10);
-	    if( $type )
-	    	$output .= 'T23:59:59Z';
-	    else
-	    	$output .= 'T00:00:00Z';
-	    
-	    return $output;
+	    if( preg_match('/([0-9]{4})\-([0-9]{2})\-([0-9]{2})/i', substr($input, 0, 10), $match) ) {
+		    
+		    $output = $input;
+		    
+		    if( $type )
+		    	$output .= 'T23:59:59Z';
+		    else
+		    	$output .= 'T00:00:00Z';
+		    	
+		    return $output;
+		    
+	    } else return $input;
 	    
     }
 

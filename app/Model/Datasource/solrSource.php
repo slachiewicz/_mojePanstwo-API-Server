@@ -23,6 +23,10 @@ class solrSource extends DataSource
 
         if (strpos($field, 'data') === 0)
             return 'date';
+        elseif (strpos($field, 'date') === 0)
+            return 'date';
+        elseif (strpos($field, 'czas') === 0)
+            return 'date';
         elseif (strpos($field, 'liczba') === 0)
             return 'int';
         elseif (in_array($field, array('rok', 'nr', 'numer', 'poz', 'pozycja', 'kolejnosc')))
@@ -330,7 +334,8 @@ class solrSource extends DataSource
 
 
                             $solr_field = $this->getSolrField($ckey, @$_dataset);
-
+							$solr_field_type = $this->getFieldType($ckey);
+														
                             if ($solr_field === false)
                                 continue;
 
@@ -340,15 +345,25 @@ class solrSource extends DataSource
                                 $vs = array();
                                 foreach ($cvalue as $cv) {
                                     $cv = (string)$cv;
-                                    if ($cv != '')
+                                    if ($cv != '') {
+                                        
+                                        if( $solr_field_type=='date' )
+                                        	$cv = '[' . $cv . 'T00:00:00Z TO ' . $cv . 'T23:59:59Z]';
+                                        
                                         $vs[] = $cv;
+                                    }
                                 }
 
                                 $cvalue = '';
                                 if ($vs)
                                     $cvalue = implode(" OR ", $vs);
                             } else {
-                                $cvalue = (string)$cvalue;
+                            
+                                if( $solr_field_type=='date' )
+		                        	$cvalue = '[' . $cvalue . 'T00:00:00Z TO ' . $cvalue . 'T23:59:59Z]';
+                                
+                                $cvalue = (string) $cvalue;
+                            
                             }
 
                             if ($cvalue != '')
@@ -877,6 +892,7 @@ class solrSource extends DataSource
 
             if ($dataset == 'ustawy')
                 $alternate_full_field = 'prawo' . '.' . $field;
+                
         } else {
 
             $full_field = $field;

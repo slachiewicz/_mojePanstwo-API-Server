@@ -348,7 +348,7 @@ class solrSource extends DataSource
                                     if ($cv != '') {
                                         
                                         if( $solr_field_type=='date' )
-                                        	$cv = '[' . $cv . 'T00:00:00Z TO ' . $cv . 'T23:59:59Z]';
+                                        	$cv = $this->solrDateEncode( $cv );
                                         
                                         $vs[] = $cv;
                                     }
@@ -360,7 +360,7 @@ class solrSource extends DataSource
                             } else {
                             
                                 if( $solr_field_type=='date' )
-		                        	$cvalue = '[' . $cvalue . 'T00:00:00Z TO ' . $cvalue . 'T23:59:59Z]';
+                                	$cvalue = $this->solrDateEncode( $cvalue );
                                 
                                 $cvalue = (string) $cvalue;
                             
@@ -720,6 +720,7 @@ class solrSource extends DataSource
 		echo "\n";
 		die();
         */
+        
 
 
         $transport = $this->API->search($request['q'], $request['offset'], $request['limit'], $params);
@@ -919,6 +920,62 @@ class solrSource extends DataSource
 
         return $prefix . $field;
 
+    }
+    
+    private function solrDateEncode($input) {
+	    
+	    $input = strtoupper( trim( $input ) );
+	    
+	    if( $input=='LAST_24H' ) {
+	    
+	    	return '[NOW-1DAY+2HOUR TO *]';
+	    
+	    } elseif( $input=='LAST_3D' ) {
+	    
+	    	return '[NOW-3DAY+2HOUR TO *]';
+	    
+	    } elseif( $input=='LAST_7D' ) {
+	    
+	    	return '[NOW-7DAY+2HOUR TO *]';
+	    	
+	    } elseif( $input=='LAST_1M' ) {
+	    
+	    	return '[NOW-1MONTH+2HOUR TO *]';
+	    	
+	    } elseif( $input=='LAST_1Y' ) {
+	    
+	    	return '[NOW-1YEAR+2HOUR TO *]';
+	    
+	    } elseif( preg_match('/\[(.*?)TO(.*?)\]/i', $input, $match) ) {
+		    
+		    $output = '[';
+		    $output .= $this->solrDateFormat($match[1], false);
+		    $output .= ' TO ';
+		    $output .= $this->solrDateFormat($match[2], true);
+		    $output .= ']';
+		    
+		    // return '[' . $match[1] . 'T00:00:00Z TO ' . $input . 'T23:59:59Z]';
+		    return $output;
+		    
+	    }
+	    
+	    return '[' . $this->solrDateFormat($input, false) . ' TO ' . $this->solrDateFormat($input, true) . ']';
+	    
+    }
+    
+    private function solrDateFormat($input, $type = false) {
+	    
+	    if( $input=='*' )
+	    	return '*';
+	    
+	    $output = substr($input, 0, 10);
+	    if( $type )
+	    	$output .= 'T23:59:59Z';
+	    else
+	    	$output .= 'T00:00:00Z';
+	    
+	    return $output;
+	    
     }
 
 }

@@ -46,15 +46,8 @@ class PanstwoInternet extends AppModel
 		App::import('model', 'DB');
         $this->DB = new DB();
         
-		$ranges = array(
-			'24h' => '[NOW-1DAY+2HOUR TO *]',
-			'3d' => '[NOW-3DAY+2HOUR TO *]',
-			'7d' => '[NOW-7DAY+2HOUR TO *]',
-			'1m' => '[NOW-1MONTH+2HOUR TO *]',
-			'1y' => '[NOW-1YEAR+2HOUR TO *]',
-		);
+		$range_keys = array('24h', '3d', '7d', '1m', '1y');
 		
-		$range_keys = array_keys($ranges);
 		
 		if( !in_array($range_id, $range_keys) )
 			$range_id = $range_keys[0];
@@ -113,16 +106,8 @@ class PanstwoInternet extends AppModel
     public function get_twitter_tweets_group_by_types($range, $types, $order)
     {
 		
-		$ranges = array(
-			'24h' => '[NOW-1DAY+2HOUR TO *]',
-			'3d' => '[NOW-3DAY+2HOUR TO *]',
-			'7d' => '[NOW-7DAY+2HOUR TO *]',
-			'1m' => '[NOW-1MONTH+2HOUR TO *]',
-			'1y' => '[NOW-1YEAR+2HOUR TO *]',
-		);
-		
-		$range_keys = array_keys($ranges);
-		
+		$range_keys = array('24h', '3d', '7d', '1m', '1y');
+				
 		if( !in_array($range, $range_keys) )
 			$range = $range_keys[0];
 			
@@ -137,7 +122,7 @@ class PanstwoInternet extends AppModel
                             'dataset' => 'twitter',
                             'twitter_accounts.typ_id' => $t,
                             '!bez_retweetow' => '1',
-                            'date' => $ranges[ $range ],
+                            'date' => 'LAST_' . $range,
                         ),
                         'order' => $order,
                         'limit' => 3,

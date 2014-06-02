@@ -23,6 +23,10 @@ class solrSource extends DataSource
 
         if (strpos($field, 'data') === 0)
             return 'date';
+        elseif (strpos($field, 'date') === 0)
+            return 'date';
+        elseif (strpos($field, 'czas') === 0)
+            return 'date';
         elseif (strpos($field, 'liczba') === 0)
             return 'int';
         elseif (in_array($field, array('rok', 'nr', 'numer', 'poz', 'pozycja', 'kolejnosc')))
@@ -330,7 +334,8 @@ class solrSource extends DataSource
 
 
                             $solr_field = $this->getSolrField($ckey, @$_dataset);
-
+							$solr_field_type = $this->getFieldType($ckey);
+														
                             if ($solr_field === false)
                                 continue;
 
@@ -340,15 +345,25 @@ class solrSource extends DataSource
                                 $vs = array();
                                 foreach ($cvalue as $cv) {
                                     $cv = (string)$cv;
-                                    if ($cv != '')
+                                    if ($cv != '') {
+                                        
+                                        if( $solr_field_type=='date' )
+                                        	$cv = $this->solrDateEncode( $cv );
+                                        
                                         $vs[] = $cv;
+                                    }
                                 }
 
                                 $cvalue = '';
                                 if ($vs)
                                     $cvalue = implode(" OR ", $vs);
                             } else {
-                                $cvalue = (string)$cvalue;
+                            
+                                if( $solr_field_type=='date' )
+                                	$cvalue = $this->solrDateEncode( $cvalue );
+                                
+                                $cvalue = (string) $cvalue;
+                            
                             }
 
                             if ($cvalue != '')
@@ -705,6 +720,7 @@ class solrSource extends DataSource
 		echo "\n";
 		die();
         */
+        
 
 
         $transport = $this->API->search($request['q'], $request['offset'], $request['limit'], $params);
@@ -877,6 +893,7 @@ class solrSource extends DataSource
 
             if ($dataset == 'ustawy')
                 $alternate_full_field = 'prawo' . '.' . $field;
+                
         } else {
 
             $full_field = $field;
@@ -903,6 +920,64 @@ class solrSource extends DataSource
 
         return $prefix . $field;
 
+    }
+    
+    private function solrDateEncode($input) {
+    	    
+	    $input = strtoupper( trim( $input ) );
+	    
+	    if( $input=='LAST_24H' ) {
+	    
+	    	return '[NOW-1DAY+2HOUR TO *]';
+	    
+	    } elseif( $input=='LAST_3D' ) {
+	    
+	    	return '[NOW-3DAY+2HOUR TO *]';
+	    
+	    } elseif( $input=='LAST_7D' ) {
+	    
+	    	return '[NOW-7DAY+2HOUR TO *]';
+	    	
+	    } elseif( $input=='LAST_1M' ) {
+	    
+	    	return '[NOW-1MONTH+2HOUR TO *]';
+	    	
+	    } elseif( $input=='LAST_1Y' ) {
+	    
+	    	return '[NOW-1YEAR+2HOUR TO *]';
+	    
+	    } elseif( preg_match('/\[(.*?)TO(.*?)\]/i', $input, $match) ) {
+		    		    
+		    $output = '[';
+		    $output .= $this->solrDateFormat(trim($match[1]), false);
+		    $output .= ' TO ';
+		    $output .= $this->solrDateFormat(trim($match[2]), true);
+		    $output .= ']';
+		    
+		    return $output;
+		    
+	    }
+	    
+	    return '[' . $this->solrDateFormat($input, false) . ' TO ' . $this->solrDateFormat($input, true) . ']';
+	    
+    }
+    
+    private function solrDateFormat($input, $type = false) {
+	    
+	    
+	    if( preg_match('/([0-9]{4})\-([0-9]{2})\-([0-9]{2})/i', substr($input, 0, 10), $match) ) {
+		    
+		    $output = $input;
+		    
+		    if( $type )
+		    	$output .= 'T23:59:59Z';
+		    else
+		    	$output .= 'T00:00:00Z';
+		    	
+		    return $output;
+		    
+	    } else return $input;
+	    
     }
 
 }

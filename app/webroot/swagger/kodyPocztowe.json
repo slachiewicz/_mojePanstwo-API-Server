@@ -1,10 +1,8 @@
 {
-    "basePath":"http://api.mojepanstwo.pl",
+    "basePath":"http://mojepanstwo.pl/api1",
     "swaggerVersion":"1.2",
     "apiVersion":"1.0",
     "resourcePath":"/kodyPocztowe",
-    "_name": "Kody pocztowe",
-    "_long_description": "Mapowanie kodów pocztowych na adresy oraz adresów na kody pocztowe",
     "apis":[
         {
             "path":"/kodyPocztowe/cities/{city_id}/addresses/",

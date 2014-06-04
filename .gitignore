@@ -31,7 +31,11 @@ Thumbs.db
 # PHP Storm generated files #
 #############################
 .idea
-app/tmp
-app/Plugin/Composer/
 
+# Temp Data
+app/tmp
+
+# Composer and modules installed from external sources
+app/Plugin/Composer/
+app/Vendor/composer
 app/Vendor/everyman/neo4jphp/

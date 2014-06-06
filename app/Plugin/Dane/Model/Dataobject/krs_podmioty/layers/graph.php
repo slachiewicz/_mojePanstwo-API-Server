@@ -5,7 +5,7 @@
 	Everyman\Neo4j\Traversal;
 	
 	if(
-		( $client = new Everyman\Neo4j\Client('neo.epf.p2.tiktalik.io', 7474) ) &&
+		( $client = new Everyman\Neo4j\Client('neo.epf.p3.tiktalik.io', 7474) ) &&
 		( $neo_id = $this->DB->selectValue("SELECT neo_id FROM krs_pozycje WHERE id='$id'") ) &&
 		( $node = $client->getNode($neo_id) ) && 
 		( $traversal = new Everyman\Neo4j\Traversal($client) )

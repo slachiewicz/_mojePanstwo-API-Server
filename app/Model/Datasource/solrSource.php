@@ -384,9 +384,10 @@ class solrSource extends DataSource
                 // SOURCES
 
                 if ($request['source']) {
-
+					
                     $source_params = array();
                     $source_parts = explode(' ', $request['source']);
+                                        
                     foreach ($source_parts as $part) {
 
                         $p = strpos($part, ':');
@@ -620,8 +621,12 @@ class solrSource extends DataSource
                                 	
                                 	$wykonawcy_ids = ClassRegistry::init('DB')->selectValues("SELECT id FROM uzp_wykonawcy WHERE krs_id='" . addslashes($value) . "'");
                                 	
+                                	if( !$wykonawcy_ids )
+                                		$wykonawcy_ids = array('false');
+                                	
                                     $params['fq[' . $fq_iterator . ']'] = 'dataset:zamowienia_publiczne AND _multidata_wykonawca_id:(' . implode(' OR ', $wykonawcy_ids) . ')';
                                     $fq_iterator++;
+                                    
                                     break;
                                 }
 
@@ -880,7 +885,6 @@ class solrSource extends DataSource
             $resultSet['facets'] = $facets;
         }
         return $resultSet;
-
     }
 
     private function getSolrField($field, $dataset = false)

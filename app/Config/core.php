@@ -57,6 +57,7 @@ Configure::write('Error', array(
     'trace' => true
 ));
 
+
 /**
  * Configure the Exception handler used for uncaught exceptions. By default,
  * ErrorHandler::handleException() is used. It will display a HTML page for the exception, and
@@ -159,7 +160,7 @@ Configure::write('App.encoding', 'UTF-8');
  * Turn off all caching application-wide.
  *
  */
-Configure::write('Cache.disable', false);
+Configure::write('Cache.disable', true);
 
 /**
  * Enable cache checking.

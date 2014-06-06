@@ -38,7 +38,9 @@ class solrSource extends DataSource
 
     public function read(Model $model, $queryData = array())
     {
-
+		
+		// debug( $queryData ); die();
+		
         $__debug = false;
         $params = array();
         $mode = false;
@@ -95,7 +97,7 @@ class solrSource extends DataSource
             'source' => false,
         );
 
-        // var_export( $request ); die();
+        // debug( $request ); die();
 
         // FIXING REQUEST
 
@@ -609,6 +611,16 @@ class solrSource extends DataSource
                                 {
 	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_dzielnic AND _data_gminy.id:(' . $value . ')';
 
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'krs_podmioty.zamowienia':
+                                {
+                                	
+                                	$wykonawcy_ids = ClassRegistry::init('DB')->selectValues("SELECT id FROM uzp_wykonawcy WHERE krs_id='" . addslashes($value) . "'");
+                                	
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:zamowienia_publiczne AND _multidata_wykonawca_id:(' . implode(' OR ', $wykonawcy_ids) . ')';
                                     $fq_iterator++;
                                     break;
                                 }

@@ -73,7 +73,9 @@ class SwaggerController extends AppController
         if ($api == false) {
             throw new NotFoundException();
         }
+        $api = json_decode($api);
 
-        $this->set('api', $api);
+        $_serialize = array('api');
+        $this->set(compact($_serialize, '_serialize'));
     }
 }

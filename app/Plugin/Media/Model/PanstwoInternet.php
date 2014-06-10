@@ -43,18 +43,20 @@ class PanstwoInternet extends AppModel
     public function twitter_accounts_group_by_types($range_id, $types, $order)
     {
 		
+		$hour = (int) date('G');
+		
+		if( $hour<7 )
+			$date = date('Y-m-d', strtotime('-1 day', time()));
+		else
+			$date = date('Y-m-d');
+			
+		
+		
 		App::import('model', 'DB');
         $this->DB = new DB();
         
-		$ranges = array(
-			'24h' => '[NOW-1DAY+2HOUR TO *]',
-			'3d' => '[NOW-3DAY+2HOUR TO *]',
-			'7d' => '[NOW-7DAY+2HOUR TO *]',
-			'1m' => '[NOW-1MONTH+2HOUR TO *]',
-			'1y' => '[NOW-1YEAR+2HOUR TO *]',
-		);
+		$range_keys = array('24h', '3d', '7d', '1m', '1y');
 		
-		$range_keys = array_keys($ranges);
 		
 		if( !in_array($range_id, $range_keys) )
 			$range_id = $range_keys[0];
@@ -67,15 +69,22 @@ class PanstwoInternet extends AppModel
 				
 				
 				
-				$fields = array('id', 'name', 'followers_date', 'profile_image_url', 'followers_count');
-				$fields[] = 'followers_delta_' . $range_id;
-				$fields[] = 'followers_add_' . $range_id;
-				$fields[] = 'followers_diff_' . $range_id;
-				$fields[] = 'followers_' . $range_id;
+				$fields = array('twitter_accounts`.`id', 'twitter_accounts`.`name', 'twitter_accounts`.`profile_image_url', 'twitter_accounts`.`followers_count');
+				$fields[] = 'twitter_accounts_followers_counts`.`followers_delta_' . $range_id;
+				$fields[] = 'twitter_accounts_followers_counts`.`followers_add_' . $range_id;
+				$fields[] = 'twitter_accounts_followers_counts`.`followers_diff_' . $range_id;
 				
-				$_order = 'followers_delta_' . $range_id;
+				$_order = 'twitter_accounts_followers_counts`.`followers_delta_' . $range_id;
 				
-				$q = "SELECT `" . implode("`, `", $fields) ."` FROM `twitter_accounts` WHERE `typ_id`='" . addslashes( $t ) . "' ORDER BY `" . $_order . "` DESC LIMIT 3";
+				$q = "SELECT `" . implode("`, `", $fields) ."` 
+				FROM `twitter_accounts_followers_counts` 
+				JOIN `twitter_accounts` ON `twitter_accounts_followers_counts`.`account_id` = `twitter_accounts`.`id` 
+				WHERE `twitter_accounts`.`typ_id`='" . addslashes( $t ) . "' AND 
+				`twitter_accounts_followers_counts`.`date` = '" . $date . "' AND 
+				`twitter_accounts_followers_counts`.`followers_" . $range_id ."` = '1' 
+				ORDER BY `" . $_order . "` DESC 
+				LIMIT 3";
+								
 				$data = $this->DB->selectAssocs($q);
 				
 				
@@ -99,30 +108,27 @@ class PanstwoInternet extends AppModel
 				
 			}
 			
+			
             $t = array(
                 'id' => $t,
                 'search' => $data,
             );
 
         }
-
-        return $types;
+		
+		
+        return array(
+        	'date' => date('Y-m-d', strtotime('-1 day', strtotime($date))),
+        	'types' => $types,
+        );
 
     }
 
     public function get_twitter_tweets_group_by_types($range, $types, $order)
     {
 		
-		$ranges = array(
-			'24h' => '[NOW-1DAY+2HOUR TO *]',
-			'3d' => '[NOW-3DAY+2HOUR TO *]',
-			'7d' => '[NOW-7DAY+2HOUR TO *]',
-			'1m' => '[NOW-1MONTH+2HOUR TO *]',
-			'1y' => '[NOW-1YEAR+2HOUR TO *]',
-		);
-		
-		$range_keys = array_keys($ranges);
-		
+		$range_keys = array('24h', '3d', '7d', '1m', '1y');
+				
 		if( !in_array($range, $range_keys) )
 			$range = $range_keys[0];
 			
@@ -137,7 +143,7 @@ class PanstwoInternet extends AppModel
                             'dataset' => 'twitter',
                             'twitter_accounts.typ_id' => $t,
                             '!bez_retweetow' => '1',
-                            'date' => $ranges[ $range ],
+                            'date' => 'LAST_' . $range,
                         ),
                         'order' => $order,
                         'limit' => 3,

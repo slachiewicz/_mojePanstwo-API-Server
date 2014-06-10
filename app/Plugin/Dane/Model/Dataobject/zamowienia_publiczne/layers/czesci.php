@@ -69,10 +69,12 @@
 			}
 		
 		}
+		
+		$zamowienie_czesci = $czesci;
 				
 	}
 	
-	$zamowienie_czesci = $czesci;
+	
 	
 	
 	
@@ -82,11 +84,13 @@
 		
 		$udzielenia_ids = $this->DB->selectValues("SELECT `id` FROM `uzp_dokumenty` WHERE `parent_id`='$id' AND `typ_id`='3' AND `liczba_czesci`>0");
 				
+	} elseif($zamowienie['typ_id']=='3') {
+		
+		$udzielenia_ids = array( $id );
+		
 	}
 	
-	
-	
-	
+		
 	
 	
 		
@@ -152,25 +156,26 @@
 				$czesc['wykonawcy'] = $wykonawcy;
 				
 				$czesci[ $czesc['numer'] ] = $czesc;
+				$numery[] = $czesc['numer'];
 				
 			}
 		
 		}
-			
+		
+		$udzielenie_czesci = $czesci;
+				
 	}
 	
-	$udzielenie_czesci = $czesci;
 	
-	
-	
+		
 	$output = array();
 	
 	foreach( $numery as $numer ) {
 		
 		$czesc = array();
 		
-		$zamowienie_czesc = $zamowienie_czesci[ $numer ];
-		$udzielenie_czesc = $udzielenie_czesci[ $numer ];
+		$zamowienie_czesc = @$zamowienie_czesci[ $numer ];
+		$udzielenie_czesc = @$udzielenie_czesci[ $numer ];
 		
 		if( $zamowienie_czesc && $udzielenie_czesc )
 			$czesc = array_merge($zamowienie_czesc, $udzielenie_czesc);

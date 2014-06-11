@@ -979,11 +979,10 @@ class solrSource extends DataSource
     }
     
     private function solrDateFormat($input, $type = false) {
-	    
-	    
+	    	    
 	    if( preg_match('/([0-9]{4})\-([0-9]{2})\-([0-9]{2})/i', substr($input, 0, 10), $match) ) {
 		    
-		    $output = $input;
+		    $output = substr($input, 0, 10);
 		    
 		    if( $type )
 		    	$output .= 'T23:59:59Z';

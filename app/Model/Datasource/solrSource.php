@@ -897,6 +897,12 @@ class solrSource extends DataSource
 
         if (in_array($field, array('dataset', 'date', 'score')))
             return $field;
+            
+        if (
+        	(stripos($field, 'data')===0) ||
+        	(stripos($field, 'czas')===0)
+        )
+        	return 'date';
 
         $p = strpos($field, '.');
 

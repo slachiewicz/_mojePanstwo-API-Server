@@ -117,7 +117,7 @@
 		JOIN `uzp_wykonawcy` ON `uzp_wykonawcy`.`id` = `uzp_czesci-wykonawcy`.`wykonawca_id` 
 		WHERE `uzp_czesci`.`dokument_id` = '" . implode("' OR `uzp_czesci`.`dokument_id`='", $udzielenia_ids) . "' AND `uzp_czesci`.`deleted` = '0' 
 		ORDER BY `uzp_czesci`.`id` ASC, `uzp_czesci-wykonawcy`.`wykonawca_id` ASC 
-		LIMIT 100
+		LIMIT 1000
 		";
 		
 		$temp = array();

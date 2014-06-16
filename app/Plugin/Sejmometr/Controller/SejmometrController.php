@@ -18,5 +18,14 @@ class SejmometrController extends AppController
 	    $this->set('_serialize', 'data');
 	    
     }
+    
+    public function stats()
+    {
+	    
+	    $this->set('data', $this->Sejmometr->stats());
+	    $this->set('_serialize', 'data');
+	    
+    }
+    
 
 }

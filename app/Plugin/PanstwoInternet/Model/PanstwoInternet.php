@@ -50,7 +50,7 @@ class PanstwoInternet extends AppModel
 
     public function get_twitter_tweets_group_by_types($types, $order)
     {
-
+				
         foreach ($types as &$t) {
 
             $t = array(
@@ -68,7 +68,7 @@ class PanstwoInternet extends AppModel
             );
 
         }
-
+				
         return $types;
 
     }

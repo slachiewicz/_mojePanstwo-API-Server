@@ -96,6 +96,7 @@ class solrSource extends DataSource
 
             'source' => false,
         );
+        
 
         // debug( $request ); die();
 
@@ -115,7 +116,10 @@ class solrSource extends DataSource
         // PROCESSING REQUEST
 
         $user = ClassRegistry::init('Paszport.UserAdditionalData');
-        $available_datasets = $userObject->getAvailableDatasets(Configure::read('Stream.id'));
+        $available_datasets = $userObject->getAvailableDatasets();
+        
+        // debug( $available_datasets ); die();
+        
         $dataset_switchers_exp_dict = array();
         $fields = array();
         $filters = array();
@@ -224,7 +228,7 @@ class solrSource extends DataSource
 
         }
 
-
+				
         // PREPARING FIELDS DICTIONARY
 
         if (!empty($fields))
@@ -945,7 +949,8 @@ class solrSource extends DataSource
     }
     
     private function solrDateEncode($input) {
-    	    
+    	
+    	
 	    $input = strtoupper( trim( $input ) );
 	    
 	    if( $input=='LAST_24H' ) {
@@ -978,9 +983,13 @@ class solrSource extends DataSource
 		    
 		    return $output;
 		    
-	    }
+	    } elseif( preg_match('/([0-9]{4})\-([0-9]{2})\-([0-9]{2})/i', $input, $match) ) {
+		    
+		    return '[' . $this->solrDateFormat($input, false) . ' TO ' . $this->solrDateFormat($input, true) . ']';
+		    
+	    } else return $input;
 	    
-	    return '[' . $this->solrDateFormat($input, false) . ' TO ' . $this->solrDateFormat($input, true) . ']';
+	    
 	    
     }
     

@@ -1,6 +1,6 @@
 <?
 
-	$data = $this->DB->selectAssocs("SELECT `s_projekty`.`id`,  `s_projekty`.`tytul`, `s_projekty`.`opis`, `s_projekty`.`autorzy_html`, `s_posiedzenia_punkty_druki`.`wynik_id`
+	$data = $this->DB->selectAssocs("SELECT `s_projekty`.`id`,  `s_projekty`.`tytul`, `s_projekty`.`opis`, `s_projekty`.`autorzy_html`, `s_posiedzenia_punkty_druki`.`wynik_id`, `s_posiedzenia_punkty_druki`.`punkt_id`
 	FROM `s_posiedzenia_punkty`  
 	JOIN `s_posiedzenia_punkty_druki` ON `s_posiedzenia_punkty`.`id` = `s_posiedzenia_punkty_druki`.`punkt_id` 
 	JOIN `s_projekty_druki` ON `s_posiedzenia_punkty_druki`.`druk_id` = `s_projekty_druki`.`druk_id` 

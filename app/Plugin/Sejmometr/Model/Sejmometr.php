@@ -27,54 +27,32 @@ class Sejmometr extends AppModel
 
     }
     
-    public function zawody()
+    public function zawody($limit = null)
     {
-		
 		App::import('model','DB');
 		$this->DB = new DB();
-		
+
+        // TODO nieznany tez?
 		$count = $this->DB->selectValue("SELECT COUNT(*) FROM s_poslowie_kadencje WHERE pkw_zawod!=''");
-		
-        $data = $this->DB->selectAssocs("SELECT COUNT( * ) AS  'count' ,  `pkw_zawod` as 'job' 
+
+        $sql = "SELECT COUNT( * ) AS  'count' ,  `pkw_zawod` as 'job'
 			FROM  `s_poslowie_kadencje` 
 			WHERE  `pkw_zawod` !=  ''
 			GROUP BY  `pkw_zawod` 
-			ORDER BY  `count` DESC 
-			LIMIT 5");
+			ORDER BY  `count` DESC";
+
+        if ($limit != null) {
+            $sql .= " LIMIT $limit";
+        }
+
+        $data = $this->DB->selectAssocs($sql);
 		
 		foreach( $data as &$d ) {
 			$d['count'] = (int) $d['count'];
 			$d['percent'] = round( 1000 * $d['count'] / $count ) / 10;
-			$d['more_link'] = '#';
 		}
 		
 		return $data;
 
     }
-	
-	public function stats()
-    {
-		
-		App::import('model','DB');
-		$this->DB = new DB();
-		
-		$count = $this->DB->selectValue("SELECT COUNT(*) FROM s_poslowie_kadencje WHERE pkw_zawod!=''");
-		
-        $data = $this->DB->selectAssocs("SELECT COUNT( * ) AS  'count' ,  `pkw_zawod` as 'job' 
-			FROM  `s_poslowie_kadencje` 
-			WHERE  `pkw_zawod` !=  ''
-			GROUP BY  `pkw_zawod` 
-			ORDER BY  `count` DESC 
-			LIMIT 5");
-		
-		foreach( $data as &$d ) {
-			$d['count'] = (int) $d['count'];
-			$d['percent'] = round( 1000 * $d['count'] / $count ) / 10;
-			$d['more_link'] = '#';
-		}
-		
-		return $data;
-
-    }
-	
 } 

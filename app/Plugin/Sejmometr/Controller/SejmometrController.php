@@ -24,7 +24,8 @@ class SejmometrController extends AppController
         $queryData = array(
             'limit' => 10,
             'conditions' => array(
-                'dataset' => 'poslowie'),
+                'dataset' => 'poslowie'
+            ),
             'order' => $order,
         );
 
@@ -39,11 +40,12 @@ class SejmometrController extends AppController
         $data = array(
             'poslowie' => array(
                 'liczba_wypowiedzi' => $this->getPoslowie('liczba_wypowiedzi desc'),
-                'frekwencja' => $this->getPoslowie('frekwencja asc'),
-                'zbuntowanie' => $this->getPoslowie('zbuntowanie desc'),
+                'frekwencja' => $this->getPoslowie('liczba_wypowiedzi asc'),
+                'zbuntowanie' => $this->getPoslowie('liczba_wypowiedzi desc'),
                 'liczba_interpelacji' => $this->getPoslowie('liczba_interpelacji desc'),
             ),
-            'zawody' => $this->Sejmometr->zawody(5)
+            'zawody' => $this->Sejmometr->zawody(5),
+            'poslanki_poslowie' => $this->Sejmometr->genderStats(),
         );
 
         $this->set('data', $data);

@@ -50,5 +50,11 @@ class SejmometrController extends AppController
         $this->set('_serialize', 'data');
     }
 
+	public function latestData()
+    {
+		$data = $this->Sejmometr->latestData();
 
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+    }
 }

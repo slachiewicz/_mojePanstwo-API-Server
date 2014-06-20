@@ -5,8 +5,10 @@
 	JOIN `s_posiedzenia_punkty_druki` ON `s_posiedzenia_punkty`.`id` = `s_posiedzenia_punkty_druki`.`punkt_id` 
 	JOIN `s_projekty_druki` ON `s_posiedzenia_punkty_druki`.`druk_id` = `s_projekty_druki`.`druk_id` 
 	JOIN `s_projekty` ON `s_projekty_druki`.`projekt_id` = `s_projekty`.`id` 
-	WHERE `s_posiedzenia_punkty`.`posiedzenie_id` = '" . addslashes( $id ) . "' AND `s_posiedzenia_punkty_druki`.`wynik_id` != 0 AND `s_projekty`.`akcept`='1'
-	GROUP BY `s_projekty`.`id`");
+	WHERE `s_posiedzenia_punkty`.`posiedzenie_id` = '" . addslashes( $id ) . "' AND `s_posiedzenia_punkty_druki`.`wynik_id` != 0 AND `s_projekty`.`akcept`='1' 
+	GROUP BY `s_projekty`.`id` 
+	ORDER BY `s_posiedzenia_punkty`.`ilosc_wystapien` DESC 
+	");
 	
 	$grupy = array(
 		'przyjete' => array(),

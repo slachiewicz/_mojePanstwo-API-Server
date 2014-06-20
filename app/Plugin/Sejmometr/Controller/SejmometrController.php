@@ -40,8 +40,8 @@ class SejmometrController extends AppController
         $data = array(
             'poslowie' => array(
                 'liczba_wypowiedzi' => $this->getPoslowie('liczba_wypowiedzi desc'),
-                'frekwencja' => $this->getPoslowie('liczba_wypowiedzi asc'),
-                'zbuntowanie' => $this->getPoslowie('liczba_wypowiedzi desc'),
+                'frekwencja' => $this->getPoslowie('frekwencja asc'),
+                'zbuntowanie' => $this->getPoslowie('zbuntowanie desc'),
                 'liczba_interpelacji' => $this->getPoslowie('liczba_interpelacji desc'),
             ),
             'zawody' => $this->Sejmometr->zawody(5),

@@ -184,6 +184,7 @@ class Sejmometr extends AppModel
 		    } elseif( is_null($d['plec']) && !is_null($d['klub_id']) ) {
 		    	
 			    $temp['kluby'][ $d['klub_id'] ]['total'] = $d['count'];
+                $temp['kluby'][ $d['klub_id'] ]['klub_id'] = $d['klub_id']; // jak indeksy sa numeryczne to json ich nie przechowuje
 		    	
 		    } else {
 		    	

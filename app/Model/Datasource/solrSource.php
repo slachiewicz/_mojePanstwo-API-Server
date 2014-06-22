@@ -493,7 +493,67 @@ class solrSource extends DataSource
                                     break;
 
                                 }
+                                
+                                case 'poslowie.prawo_projekty':
+                                {
 
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_za':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_za:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_przeciw':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_przeciw:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_wstrzymanie':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_wstrzymali:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_nieobecnosc':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_nieobecni:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.komisja_etyki_uchwaly':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_komisje_uchwaly AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
                                 case 'bdl_wskazniki_grupy.bdl_wskazniki':
                                 {
 

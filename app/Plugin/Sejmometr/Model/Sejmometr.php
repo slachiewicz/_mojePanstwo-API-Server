@@ -163,8 +163,8 @@ class Sejmometr extends AppModel
 				ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id` 
 		WHERE 
 			`s_poslowie_kadencje`.`deleted` = '0' AND 
-			`s_poslowie_kadencje`.`klub_id` != '7' AND 
-			`s_poslowie_kadencje`.`klub_id` != '6' 
+			`s_poslowie_kadencje`.`klub_id` != '6' AND 
+			`s_poslowie_kadencje`.`klub_id` != '7' 
 		GROUP BY 
 			`s_poslowie_kadencje`.`klub_id`, `s_poslowie_kadencje`.`pkw_plec`
 		WITH ROLLUP");

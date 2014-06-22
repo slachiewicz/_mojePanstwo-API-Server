@@ -554,6 +554,36 @@ class solrSource extends DataSource
 
                                 }
                                 
+                                case 'poslowie.oswiadczenia_majatkowe':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_oswiadczenia_majatkowe AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.rejestr_korzysci':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_rejestr_korzysci AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.wspolpracownicy':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_wspolpracownicy AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                                                
                                 case 'bdl_wskazniki_grupy.bdl_wskazniki':
                                 {
 

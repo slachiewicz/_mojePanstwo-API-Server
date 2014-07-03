@@ -638,6 +638,14 @@ class solrSource extends DataSource
                                     break;
                                 }
                                 
+                                case 'gminy.okregi_wyborcze':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:gminy_okregi_wyborcze AND _data_gmina_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
                                 case 'gminy.zamowienia_publiczne':
                                 {
 	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:zamowienia_publiczne AND _data_gmina_id:(' . $value . ')';
@@ -654,9 +662,49 @@ class solrSource extends DataSource
                                     break;
                                 }
                                 
+                                case 'gminy.biznes':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:krs_podmioty AND _data_gmina_id:(' . $value . ') AND _data_forma_prawna_typ_id:1';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.ngo':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:krs_podmioty AND _data_gmina_id:(' . $value . ') AND _data_forma_prawna_typ_id:2';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.spzoz':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:krs_podmioty AND _data_gmina_id:(' . $value . ') AND _data_forma_prawna_typ_id:3';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
                                 case 'gminy.radni':
                                 {
-	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin AND _data_gmina_id:(' . $value . ')';
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin AND _data_gmina_id:(' . $value . ') AND _data_aktywny:1';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.byli_radni':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin AND _data_gmina_id:(' . $value . ') AND _data_aktywny:0';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.interpelacje':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_interpelacje AND _data_radni_gmin.gmina_id:(' . $value . ')';
 
                                     $fq_iterator++;
                                     break;
@@ -670,6 +718,30 @@ class solrSource extends DataSource
                                     break;
                                 }
                                 
+                                case 'radni_gmin.wystapienia':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_wystapienia AND _data_radny_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'radni_gmin.oswiadczenia_majatkowe':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin_oswiadczenia_majatkowe AND _data_radny_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'radni_gmin.interpelacje':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_interpelacje AND _data_radny_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                                                                                                                
                                 case 'sejm_posiedzenia.punkty':
                                 {
 	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_posiedzenia_punkty AND _data_posiedzenie_id:(' . $value . ')';
@@ -822,7 +894,6 @@ class solrSource extends DataSource
                 
         $params['sort'] = implode(', ', $solr_order_parts);
 
-
 		/*
 		echo "\n";
 		echo $request['q'];
@@ -831,7 +902,6 @@ class solrSource extends DataSource
 		echo "\n";
 		die();
         */
-        
 
 
         $transport = $this->API->search($request['q'], $request['offset'], $request['limit'], $params);

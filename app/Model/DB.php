@@ -54,6 +54,9 @@ class DB extends AppModel
         	foreach( $rows as $row )
         		$output[] = @$row[0];
 		
+		if( !empty($output) )
+			$output = array_filter($output, 'istripslashes');
+		
 		return $output;
 		
     }
@@ -66,7 +69,7 @@ class DB extends AppModel
         if( empty($output) )
 			return false;
 		else
-	        return @$output[0];
+	        return istripslashes( @$output[0] );
 
     }
 
@@ -77,8 +80,14 @@ class DB extends AppModel
         $output = array();
         $result = $this->DB->query($q);
 		
-		while ($row = $result->fetch_row())
+		while ($row = $result->fetch_row()) {
+	        
+	        if( !empty($row) )
+				$row = array_filter($row, 'istripslashes');
+	        
 	        $output[] = $row;
+	        
+	    }
 	    
 	    $result->free();
         return $output;
@@ -92,6 +101,10 @@ class DB extends AppModel
         $result = $this->DB->query($q);
 		
 		while ($row = $result->fetch_row()) {
+	        
+	        if( !empty($row) )
+				$row = array_filter($row, 'istripslashes');
+	        
 	        $output = $row;
 	        break;
 	    }
@@ -107,8 +120,14 @@ class DB extends AppModel
         $output = array();
         $result = $this->DB->query($q);
 		
-		while ($row = $result->fetch_assoc())
+		while ($row = $result->fetch_assoc()) {
+	        
+	        if( !empty($row) )
+	        	foreach( $row as $key => &$value )
+	        		$value = istripslashes( $value );
+	        
 	        $output[] = $row;
+	    }
 	    
 	    $result->free();
         return $output;
@@ -122,6 +141,11 @@ class DB extends AppModel
         $result = $this->DB->query($q);
 		
 		while ($row = $result->fetch_assoc()) {
+	        
+	        if( !empty($row) )
+	        	foreach( $row as $key => &$value )
+	        		$value = istripslashes( $value );
+	        
 	        $output = $row;
 	        break;
 	    }
@@ -138,7 +162,7 @@ class DB extends AppModel
         $result = $this->DB->query($q);
 		
 		while ($row = $result->fetch_row())
-	        $output[ $row[0] ] = $row[1];
+	        $output[ istripslashes( $row[0] ) ] = istripslashes( $row[1] );
 	    
 	    $result->free();
         return $output;

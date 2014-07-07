@@ -172,8 +172,7 @@ class Sejmometr extends AppModel
 	    $stats = $this->DB->selectDictionary("SELECT `pkw_plec` as 'plec', COUNT(*) as 'count' FROM `s_poslowie_kadencje` WHERE `s_poslowie_kadencje`.`deleted` = '0' GROUP BY `pkw_plec` ORDER BY `pkw_plec` DESC");
 	    	        
 	    $temp = array();
-	    
-	    
+	    	    
 	    foreach( $data as $d ) {
 		    if( is_null($d['plec']) && is_null($d['klub_id']) ) {
 			    

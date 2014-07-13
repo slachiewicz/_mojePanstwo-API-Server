@@ -12,7 +12,7 @@
 	)
 	{
 		
-		$depth = isset( $_REQUEST['depth'] ) ? (int) $_REQUEST['depth'] : 3;
+		$depth = isset( $_REQUEST['depth'] ) ? (int) $_REQUEST['depth'] : 2;
 		$depth = min($depth, 5);
 		$depth = max($depth, 1);
 

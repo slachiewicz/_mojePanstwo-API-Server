@@ -49,9 +49,14 @@
 			$labels = $node->getLabels();
 			$label = array_shift($labels);
 			
+			$data = $node->getProperties();
+			if( !empty($data) )
+				foreach( $data as $key => &$value )
+					$value = stripslashes(htmlspecialchars_decode($value));
+			
 			$output['nodes'][] = array(
 				'id' => $node->getId(),
-				'data' => $node->getProperties(),
+				'data' => $data,
 				'label' => $label->getName(),
 			);
 		}

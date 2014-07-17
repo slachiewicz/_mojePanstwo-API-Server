@@ -1,6 +1,6 @@
 <?	
 	
-	require(APP . '/Vendor/autoload.php');
+	require_once(APP . '/Vendor/autoload.php');
 	use Everyman\Neo4j\Relationship,
 	Everyman\Neo4j\Traversal;
 	

@@ -5,6 +5,7 @@ class Dataobject extends AppModel
 
     public $useDbConfig = 'solr';
     public $id;
+    public $data;
 
     public function setId($id)
     {
@@ -28,7 +29,7 @@ class Dataobject extends AppModel
 
     }
 
-    public function getObject($dataset, $id)
+    public function getObject($dataset, $id, $params = array())
     {
 
         $data = $this->find('all', array(
@@ -38,8 +39,40 @@ class Dataobject extends AppModel
             ),
             'limit' => 1,
         ));
-
-        return @$data['dataobjects'][0];
+		
+		$this->data = @$data['dataobjects'][0];
+		$layers = array();
+		
+		if( isset($params['dataset']) && $params['dataset'] ) {
+			
+			App::import('model','Dane.Dataset');
+			$datasetModel = new Dataset();
+			
+			$layers[] = array(
+				'name' => 'dataset',
+				'data' => $datasetModel->find('first', array(
+	                'conditions' => array(
+	                    'Dataset.alias' => $dataset,
+	                ),
+	            )),
+			);
+            			
+		}
+		
+		if( isset($params['layers']) && !empty($params['layers']) ) {
+		
+			foreach( $params['layers'] as $layer )
+				$layers[] = array(
+					'name' => $layer,
+					'data' => $this->getObjectLayer($dataset, $id, $layer),
+				);
+				
+		}
+		
+        return array(
+        	'object' => $this->data,
+        	'layers' => $layers,
+        );
 
     }
     

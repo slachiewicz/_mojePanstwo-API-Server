@@ -58,24 +58,22 @@ class SwaggerController extends AppController
             "description" => $api['Api']['oneliner']
         ));
 
-
-        $_serialize = array('basePath', 'swaggerVersion', 'apis');
-        $this->set(compact($_serialize, '_serialize'));
+        $this->setSerialized(compact('basePath', 'swaggerVersion', 'apis'));
     }
 
     /**
      * Servers swagger API-Declaration for specific API
      */
     public function resource($slug) {
-        $filename = WWW_ROOT . "swagger" . DS . $slug . ".json";
+        $filename = WWW_ROOT . "swagger-docs" . DS . $slug . ".json";
         $api = file_get_contents($filename);
 
         if ($api == false) {
             throw new NotFoundException();
         }
         $api = json_decode($api);
+        $api->basePath = API_DOMAIN;
 
-        $_serialize = array('api');
-        $this->set(compact($_serialize, '_serialize'));
+        $this->setSerialized('api', $api);
     }
 }

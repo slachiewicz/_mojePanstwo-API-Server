@@ -14,6 +14,12 @@ class Dataset extends AppModel
             'foreignKey' => 'app_id',
         ),
     );
+    public $hasMany = array(
+        'Layer' => array(
+            'className' => 'Dane.Layer',
+        )
+    );
+
     public $actsAs = array('Containable');
     public $virtualFields = array(
         'alias' => 'base_alias',

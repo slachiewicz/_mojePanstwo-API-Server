@@ -1,8 +1,10 @@
 <?
 
+App::uses('Dataset', 'Dane.Model');
+App::uses('Layer', 'Dane.Model');
+
 class Dataobject extends AppModel
 {
-
     public $useDbConfig = 'solr';
     public $id;
     public $data;
@@ -41,39 +43,47 @@ class Dataobject extends AppModel
         ));
 		
 		$this->data = @$data['dataobjects'][0];
-		$layers = array();
-		
-		if( isset($params['dataset']) && $params['dataset'] ) {
-			
-			App::import('model','Dane.Dataset');
-			$datasetModel = new Dataset();
-			
-			$layers[] = array(
-				'name' => 'dataset',
-				'data' => $datasetModel->find('first', array(
-	                'conditions' => array(
-	                    'Dataset.alias' => $dataset,
-	                ),
-	            )),
-			);
-            			
-		}
-		
-		if( isset($params['layers']) && !empty($params['layers']) ) {
-		
-			foreach( $params['layers'] as $layer )
-				$layers[] = array(
-					'name' => $layer,
-					'data' => $this->getObjectLayer($dataset, $id, $layer),
-				);
-				
-		}
-		
-        return array(
-        	'object' => $this->data,
-        	'layers' => $layers,
-        );
 
+        // query dataset and its layers
+        $mdataset = new Dataset();
+        $ds= $mdataset->find('first', array(
+            'conditions' => array(
+                'Dataset.alias' => $dataset,
+            ),
+        ));
+
+        $layers = array();
+        foreach($ds['Layer'] as $layer) {
+            $layers[$layer['layer']] = null;
+        }
+        $layers['dataset'] = null;
+
+        // load queried layers
+		if( isset($params['layers']) && !empty($params['layers']) ) {
+            if ($params['layers'] == '*') {
+                $params['layers'] = array_keys($layers);
+            }
+            if (!is_array($params['layers'])) {
+                throw new BadRequestException("Invalid layers parameter: " . $params['layers']); // TODO unparse
+            }
+
+            foreach( $params['layers'] as $layer ) {
+                if (!array_key_exists($layer, $layers)) {
+                    // TODO dedicated 422 error
+                    throw new BadRequestException("Layer doesn't exist: " . $layer);
+                }
+
+                if ($layer == 'dataset') {
+                    $layers['dataset'] = $ds;
+                } else {
+                    $layers[$layer] = $this->getObjectLayer($dataset, $id, $layer);
+                }
+            }
+        }
+
+        $this->data['layers'] = $layers;
+
+        return $this->data;
     }
     
     public function getRedirect($dataset, $id)

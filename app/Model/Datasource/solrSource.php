@@ -96,6 +96,7 @@ class solrSource extends DataSource
 
             'source' => false,
         );
+        
 
         // debug( $request ); die();
 
@@ -115,7 +116,10 @@ class solrSource extends DataSource
         // PROCESSING REQUEST
 
         $user = ClassRegistry::init('Paszport.UserAdditionalData');
-        $available_datasets = $userObject->getAvailableDatasets(Configure::read('Stream.id'));
+        $available_datasets = $userObject->getAvailableDatasets();
+        
+        // debug( $available_datasets ); die();
+        
         $dataset_switchers_exp_dict = array();
         $fields = array();
         $filters = array();
@@ -224,7 +228,7 @@ class solrSource extends DataSource
 
         }
 
-
+				
         // PREPARING FIELDS DICTIONARY
 
         if (!empty($fields))
@@ -489,7 +493,97 @@ class solrSource extends DataSource
                                     break;
 
                                 }
+                                
+                                case 'poslowie.prawo_projekty':
+                                {
 
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_za':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_za:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_przeciw':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_przeciw:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_wstrzymanie':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_wstrzymali:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.prawo_projekty_nieobecnosc':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_nieobecni:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.komisja_etyki_uchwaly':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_komisje_uchwaly AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.oswiadczenia_majatkowe':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_oswiadczenia_majatkowe AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.rejestr_korzysci':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_rejestr_korzysci AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                
+                                case 'poslowie.wspolpracownicy':
+                                {
+
+                                    $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_wspolpracownicy AND _data_posel_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+
+                                }
+                                                                
                                 case 'bdl_wskazniki_grupy.bdl_wskazniki':
                                 {
 
@@ -544,6 +638,14 @@ class solrSource extends DataSource
                                     break;
                                 }
                                 
+                                case 'gminy.okregi_wyborcze':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:gminy_okregi_wyborcze AND _data_gmina_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
                                 case 'gminy.zamowienia_publiczne':
                                 {
 	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:zamowienia_publiczne AND _data_gmina_id:(' . $value . ')';
@@ -560,9 +662,49 @@ class solrSource extends DataSource
                                     break;
                                 }
                                 
+                                case 'gminy.biznes':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:krs_podmioty AND _data_gmina_id:(' . $value . ') AND _data_forma_prawna_typ_id:1';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.ngo':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:krs_podmioty AND _data_gmina_id:(' . $value . ') AND _data_forma_prawna_typ_id:2';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.spzoz':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:krs_podmioty AND _data_gmina_id:(' . $value . ') AND _data_forma_prawna_typ_id:3';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
                                 case 'gminy.radni':
                                 {
-	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin AND _data_gmina_id:(' . $value . ')';
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin AND _data_gmina_id:(' . $value . ') AND _data_aktywny:1';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.byli_radni':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin AND _data_gmina_id:(' . $value . ') AND _data_aktywny:0';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'gminy.interpelacje':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_interpelacje AND _data_radni_gmin.gmina_id:(' . $value . ')';
 
                                     $fq_iterator++;
                                     break;
@@ -576,6 +718,30 @@ class solrSource extends DataSource
                                     break;
                                 }
                                 
+                                case 'radni_gmin.wystapienia':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_wystapienia AND _data_radny_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'radni_gmin.oswiadczenia_majatkowe':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin_oswiadczenia_majatkowe AND _data_radny_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                
+                                case 'radni_gmin.interpelacje':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_interpelacje AND _data_radny_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
+                                                                                                                                
                                 case 'sejm_posiedzenia.punkty':
                                 {
 	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_posiedzenia_punkty AND _data_posiedzenie_id:(' . $value . ')';
@@ -728,7 +894,6 @@ class solrSource extends DataSource
                 
         $params['sort'] = implode(', ', $solr_order_parts);
 
-
 		/*
 		echo "\n";
 		echo $request['q'];
@@ -737,7 +902,6 @@ class solrSource extends DataSource
 		echo "\n";
 		die();
         */
-        
 
 
         $transport = $this->API->search($request['q'], $request['offset'], $request['limit'], $params);
@@ -897,6 +1061,12 @@ class solrSource extends DataSource
 
         if (in_array($field, array('dataset', 'date', 'score')))
             return $field;
+            
+        if (
+        	(stripos($field, 'data')===0) ||
+        	(stripos($field, 'czas')===0)
+        )
+        	return 'date';
 
         $p = strpos($field, '.');
 
@@ -939,7 +1109,8 @@ class solrSource extends DataSource
     }
     
     private function solrDateEncode($input) {
-    	    
+    	
+    	
 	    $input = strtoupper( trim( $input ) );
 	    
 	    if( $input=='LAST_24H' ) {
@@ -972,18 +1143,21 @@ class solrSource extends DataSource
 		    
 		    return $output;
 		    
-	    }
+	    } elseif( preg_match('/([0-9]{4})\-([0-9]{2})\-([0-9]{2})/i', $input, $match) ) {
+		    
+		    return '[' . $this->solrDateFormat($input, false) . ' TO ' . $this->solrDateFormat($input, true) . ']';
+		    
+	    } else return $input;
 	    
-	    return '[' . $this->solrDateFormat($input, false) . ' TO ' . $this->solrDateFormat($input, true) . ']';
+	    
 	    
     }
     
     private function solrDateFormat($input, $type = false) {
-	    
-	    
+	    	    
 	    if( preg_match('/([0-9]{4})\-([0-9]{2})\-([0-9]{2})/i', substr($input, 0, 10), $match) ) {
 		    
-		    $output = $input;
+		    $output = substr($input, 0, 10);
 		    
 		    if( $type )
 		    	$output .= 'T23:59:59Z';

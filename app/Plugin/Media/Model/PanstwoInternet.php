@@ -21,7 +21,7 @@ class PanstwoInternet extends AppModel
         $this->DB = new DB();
         
         $data = $this->DB->selectValue("SELECT `data` FROM `twitter_stats` WHERE `id`='" . addslashes( $range ) . "'");
-        if( $data && ($data = unserialize(stripslashes($data))) ) {
+        if( $data && ($data = unserialize($data)) ) {
 
 	        return $data;	        
 	        

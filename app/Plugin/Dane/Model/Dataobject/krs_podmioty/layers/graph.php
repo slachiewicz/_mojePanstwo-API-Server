@@ -1,6 +1,6 @@
 <?	
 	
-	require(APP . '/Vendor/autoload.php');
+	require_once(APP . '/Vendor/autoload.php');
 	use Everyman\Neo4j\Relationship,
 	Everyman\Neo4j\Traversal;
 	
@@ -12,9 +12,13 @@
 	)
 	{
 		
-		$depth = isset( $_REQUEST['depth'] ) ? (int) $_REQUEST['depth'] : 3;
+		$depth = isset( $_REQUEST['depth'] ) ? (int) $_REQUEST['depth'] : 2;
 		$depth = min($depth, 5);
 		$depth = max($depth, 1);
+
+//        $queryString = "START n=node({nodeId}) MATCH (n)-[r*1..3]-(nodes) RETURN r, nodes";
+//        $query = new Everyman\Neo4j\Cypher\Query($client, $queryString, array('nodeId' => intval($neo_id)));
+//        $result = $query->getResultSet();
 		
 		/*
 		echo "<br/>";
@@ -25,6 +29,7 @@
 		
 		$traversal->setPruneEvaluator(Traversal::PruneNone)
 		    ->setReturnFilter(Traversal::ReturnAll)
+            ->setOrder(Traversal::OrderBreadthFirst)
 		    ->setMaxDepth( $depth );
 		
 		
@@ -32,8 +37,11 @@
 			'nodes' => array(),
 			'relationships' => array(),
 		);
-		
+
+        $traversal->setUniqueness(Traversal::UniquenessNodeGlobal);
 		$nodes = $traversal->getResults($node, Traversal::ReturnTypeNode);
+
+        $traversal->setUniqueness(Traversal::UniquenessRelationshipGlobal);
 		$relationships = $traversal->getResults($node, Traversal::ReturnTypeRelationship);
 		
 		foreach( $nodes as $node )
@@ -41,9 +49,14 @@
 			$labels = $node->getLabels();
 			$label = array_shift($labels);
 			
+			$data = $node->getProperties();
+			if( !empty($data) )
+				foreach( $data as $key => &$value )
+					$value = stripslashes(htmlspecialchars_decode($value));
+			
 			$output['nodes'][] = array(
 				'id' => $node->getId(),
-				'data' => $node->getProperties(),
+				'data' => $data,
 				'label' => $label->getName(),
 			);
 		}

@@ -9,7 +9,10 @@ class Dataset extends AppModel
             'className' => 'Dane.Datachannel',
             'foreignKey' => 'channel_id',
         ),
-
+		'App' => array(
+            'className' => 'Application',
+            'foreignKey' => 'app_id',
+        ),
     );
     public $actsAs = array('Containable');
     public $virtualFields = array(
@@ -35,6 +38,10 @@ class Dataset extends AppModel
                 'Datachannel.id',
                 'Datachannel.nazwa',
                 'Datachannel.slug',
+                'App.id',
+                'App.name',
+                'App.plugin',
+                'App.slug',
             );
         }
 

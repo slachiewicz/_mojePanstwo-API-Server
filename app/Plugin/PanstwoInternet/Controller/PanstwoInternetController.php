@@ -51,7 +51,7 @@ class PanstwoInternetController extends AppController
 
         $types = @$this->request->query['types'];
         $sort = @$this->request->query['sort'];
-
+				
         if (is_array($types) && !empty($types)) {
 
             $tweets = $this->PanstwoInternet->get_twitter_tweets_group_by_types($types, $sort);

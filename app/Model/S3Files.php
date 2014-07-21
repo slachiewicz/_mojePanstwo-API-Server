@@ -24,7 +24,7 @@ class S3Files extends AppModel {
 
 		list($bucket, $file) = $this->resolveFile( $file );
 		
-		$res = $this->find('first', array(
+		$res = @$this->find('first', array(
 			'conditions' => array(
 				'bucket' => $bucket,
 				'file' => $file,

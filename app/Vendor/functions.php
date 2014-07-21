@@ -137,3 +137,10 @@ function dataSlownie($data)
     return $str;
 
 }
+
+function istripslashes($input) {
+	if( is_string($input) )
+		return stripslashes( $input );
+	else
+		return $input;
+}

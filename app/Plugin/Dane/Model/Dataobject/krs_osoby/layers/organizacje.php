@@ -34,7 +34,7 @@ $data = array();
 
 if ((int)$osoba['liczba_reprezentanci'])
     $data['reprezentanci'] = $this->DB->query("SELECT SQL_CALC_FOUND_ROWS `rola`.`id`, `rola`.`funkcja`, `rola`.`funkcja_id`,
-`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`
+`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`, `organizacja`.`wykreslony` 
 FROM `krs_reprezentanci` as `rola` 
 JOIN `krs_pozycje` as `organizacja` 
 ON `rola`.`pozycja_id` = `organizacja`.`id`
@@ -48,7 +48,7 @@ LIMIT 1000");
 
 if ((int)$osoba['liczba_wspolnicy'])
     $data['wspolnicy'] = $this->DB->query("SELECT SQL_CALC_FOUND_ROWS `rola`.`id`, `rola`.`udzialy_str` as 'subtitle',
-`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`
+`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`, `organizacja`.`wykreslony` 
 FROM `krs_wspolnicy` as `rola` 
 JOIN `krs_pozycje` as `organizacja` 
 ON `rola`.`pozycja_id` = `organizacja`.`id`
@@ -62,7 +62,7 @@ LIMIT 1000");
 
 if ((int)$osoba['liczba_nadzorcow'])
     $data['nadzorcy'] = $this->DB->query("SELECT SQL_CALC_FOUND_ROWS `rola`.`id`,
-`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`
+`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`, `organizacja`.`wykreslony` 
 FROM `krs_nadzorcy` as `rola` 
 JOIN `krs_pozycje` as `organizacja` 
 ON `rola`.`pozycja_id` = `organizacja`.`id`
@@ -76,7 +76,7 @@ LIMIT 1000");
 
 if ((int)$osoba['liczba_akcjonariusze'])
     $data['akcjonariusze'] = $this->DB->query("SELECT SQL_CALC_FOUND_ROWS `rola`.`id`,
-`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`
+`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`, `organizacja`.`wykreslony` 
 FROM `krs_jedyni_akcjonariusze` as `rola` 
 JOIN `krs_pozycje` as `organizacja` 
 ON `rola`.`pozycja_id` = `organizacja`.`id`
@@ -90,7 +90,7 @@ LIMIT 1000");
 
 if ((int)$osoba['liczba_zalozyciele'])
     $data['zalozyciele'] = $this->DB->query("SELECT SQL_CALC_FOUND_ROWS `rola`.`id`,
-`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`
+`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`, `organizacja`.`wykreslony` 
 FROM `krs_komitety_zal` as `rola` 
 JOIN `krs_pozycje` as `organizacja` 
 ON `rola`.`pozycja_id` = `organizacja`.`id`
@@ -104,7 +104,7 @@ LIMIT 1000");
 
 if ((int)$osoba['liczba_prokurenci'])
     $data['prokurenci'] = $this->DB->query("SELECT SQL_CALC_FOUND_ROWS `rola`.`id`, `rola`.`rodzaj`,
-`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`
+`organizacja`.`id`, `organizacja`.`nazwa`, `organizacja`.`forma_prawna_str`, `organizacja`.`data_rejestracji`, `organizacja`.`kapital_zakladowy`, `organizacja`.`wykreslony` 
 FROM `krs_prokurenci` as `rola` 
 JOIN `krs_pozycje` as `organizacja` 
 ON `rola`.`pozycja_id` = `organizacja`.`id`

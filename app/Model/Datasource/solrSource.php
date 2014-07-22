@@ -41,6 +41,15 @@ class solrSource extends DataSource
 		
 		// debug( $queryData ); die();
 		
+		$__timer = array(
+			'start' => getmicrotime(),
+			'phases' => array(
+				array(
+					'id' => 'init',
+					'tic' => getmicrotime(),
+				),
+			),
+		);
         $__debug = false;
         $params = array();
         $mode = false;
@@ -114,7 +123,7 @@ class solrSource extends DataSource
 
 
         // PROCESSING REQUEST
-
+		
         $user = ClassRegistry::init('Paszport.UserAdditionalData');
         $available_datasets = $userObject->getAvailableDatasets();
         
@@ -385,6 +394,11 @@ class solrSource extends DataSource
                 }
 
 
+
+
+
+
+				
                 // SOURCES
 
                 if ($request['source']) {
@@ -795,6 +809,14 @@ class solrSource extends DataSource
                                     
                                     break;
                                 }
+                                
+                                case 'krs_podmioty.umowy':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:umowy AND _data_krs_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
 
                             }
 
@@ -903,8 +925,20 @@ class solrSource extends DataSource
 		die();
         */
 
-
+		
+		$__timer['phases'][] = array(
+        	'id' => 'preprocessing',
+        	'tic' => getmicrotime(),
+        );	
+		
         $transport = $this->API->search($request['q'], $request['offset'], $request['limit'], $params);
+        
+        
+        $__timer['phases'][] = array(
+        	'id' => 'query',
+        	'tic' => getmicrotime(),
+        );
+        
         $raw_response = $transport->getRawResponse();
 
         $responseHeader = @get_object_vars($transport->responseHeader);
@@ -1048,6 +1082,27 @@ class solrSource extends DataSource
             // var_export( $facets ); die();
             $resultSet['facets'] = $facets;
         }
+		
+		$__timer['phases'][] = array(
+        	'id' => 'postprocessing',
+        	'tic' => getmicrotime(),
+        );
+		$__timer['stop'] = getmicrotime();
+		
+		$phases = $__timer['phases'];
+		$ref = $__timer['start'];
+		foreach( $phases as &$p ) {
+			$p['duration'] = $p['tic'] - $ref;
+			$ref = $p['tic'];
+		}
+		
+		$__timer = array(
+			'duration' => $__timer['stop'] - $__timer['start'],
+			'phases' => $phases,
+		);
+		
+		// var_export( $__timer );
+        
         return $resultSet;
     }
 

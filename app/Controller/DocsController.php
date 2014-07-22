@@ -13,7 +13,7 @@ class DocsController extends AppController
     {
         $document_id = $this->request->params['id'];
         $document = $this->Doc->find('first', array(
-            'fields' => array('id', 'url', 'filename', 'fileextension', 'pages_count', 'packages_count', 'filesize', 'status'),
+            'fields' => array('id', 'url', 'filename', 'fileextension', 'pages_count', 'packages_count', 'filesize', 'status', 'version'),
             'conditions' => array('id' => $document_id),
         ));
 
@@ -32,7 +32,7 @@ class DocsController extends AppController
     {
         $document_id = $this->request->params['id'];
         $package = $this->request->params['package'];
-        $html = $this->S3->getObject('docs.sejmometr.pl', preg_replace('/{id}/', $document_id, '/htmlex/{id}/{id}_' . $package . '.html'));
+        $html = @$this->S3->getObject('docs.sejmometr.pl', preg_replace('/{id}/', $document_id, '/htmlex/{id}/{id}_' . $package . '.html'));
         $this->set(array(
             'html' => $html->body,
             '_serialize' => array('html'),

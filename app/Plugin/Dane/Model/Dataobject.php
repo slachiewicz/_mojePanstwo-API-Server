@@ -5,7 +5,7 @@ class Dataobject extends AppModel
 
     public $useDbConfig = 'solr';
     public $id;
-    public $data;
+    public $data = array();
 
     public function setId($id)
     {
@@ -174,6 +174,18 @@ class Dataobject extends AppModel
 			    
 	    return $this->DB->selectAssocs($q);
 		
+    }
+    
+    private function getData( $key = '*' )
+    {
+	    	    
+	    if( $key == '*' )
+	    	return $this->data['data'];
+	    elseif( array_key_exists($key, $this->data['data']) )
+		    return $this->data['data'][ $key ];
+		else
+			return false;
+	    
     }
 
 }

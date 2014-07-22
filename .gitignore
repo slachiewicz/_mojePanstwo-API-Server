@@ -40,3 +40,9 @@ app/Plugin/Composer/
 app/Vendor/composer
 app/Vendor/autoload.php
 app/Vendor/everyman/neo4jphp/
+app/Vendor/doctrine/annotations
+app/Vendor/doctrine/lexer
+app/Vendor/zircote/swagger-php
+app/Vendor/bin/swagger
+app/webroot/swagger/api-docs.json
+app/webroot/swagger/index.php

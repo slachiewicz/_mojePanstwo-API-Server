@@ -41,7 +41,13 @@ Configure::write(
  * its action called 'display', and we pass a param to select the view file
  * to use (in this case, /app/View/Pages/home.ctp)...
  */
-Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
+Router::connect('/', array('controller' => 'api'));
+
+// Swagger specs
+Router::connect('/swagger/api-docs', array('controller' => 'swagger', 'action' => 'api_docs'));
+Router::connect('/swagger/api-docs/:slug', array('controller' => 'swagger', 'action' => 'resource_api_docs'), array('pass' => array('slug'), 'slug' => '[0-9a-zA-Z]+'));
+Router::connect('/swagger/:slug', array('controller' => 'swagger', 'action' => 'resource'), array('pass' => array('slug'), 'slug' => '[0-9a-zA-Z]+'));
+
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */

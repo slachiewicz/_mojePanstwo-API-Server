@@ -11,11 +11,11 @@
  */
 class KodyPocztoweController extends AppController
 {
-    public $uses = array('KodyPocztowe.Code');
+    public $uses = array('Dane.Dataobject');
 
     /**
      * @SWG\Api(
-     *   path="[KodyPocztoweController/view]/{postal_code}",
+     *   path="[KodyPocztowe/KodyPocztowe/view/id:{postal_code}]",
      *   description="Kody pocztowe",
      *   @SWG\Operation(
      *      method = "GET",
@@ -30,9 +30,18 @@ class KodyPocztoweController extends AppController
      *           required=true,
      *           type="string"
      *         ),
-     *      @SWG\ResponseMessage(code=404, message="Nie znaleziono kodu"),
+     *      @SWG\Parameter(
+     *           name="layers",
+     *           description="Warstwy, które mają być załadowane dla obiektu. Można użyć żądania layers=*, aby załadować wszystkie warstwy",
+     *           paramType="query",
+     *           required=false,
+     *           type="string", // TODO array
+     *           allowMultiple="true"
+     *         ),
+     *      @SWG\ResponseMessage(code=400, message="Niepoprawne żądanie"),
+     *      @SWG\ResponseMessage(code=404, message="Nie znaleziono kodu")
      *   )
-     * ))
+     * )
      *
      */
     public function view()
@@ -40,16 +49,46 @@ class KodyPocztoweController extends AppController
         $id = @$this->request->params['id'];
         $id = (int)str_replace('-', '', $id);
 
-        $this->request->query['layers'];
+        $object = $this->Dataobject->getObject('kody_pocztowe', $id, $this->request->query, true);
 
-        $code = $this->Code->find('first', array(
-            'conditions' => array(
-                'kod_int' => $id,
-            ),
-        ));
+        $this->setSerialized('code', $object);
+    }
 
-        $layer = $this->Dataobject->getObjectLayer($alias, $id, $layer, $params);
-
-        $this->setSerialized('code', $code['Code']);
+    /**
+     * @SWG\Api(
+     *   path="[KodyPocztowe.KodyPocztowe/address2code]",
+     *   description="Kody pocztowe",
+     *   @SWG\Operation(
+     *      method = "GET",
+     *      summary = "Znajdź kod pocztowy dla danego adresu",
+     *      type = "",
+     *      nickname = "address2code",
+     *
+     *      @SWG\Parameter(
+     *           name="q",
+     *           description="Adres pełnym tekstem",
+     *           paramType="query",
+     *           required=false,
+     *           type="string"
+     *         ),
+     *      @SWG\ResponseMessage(code=400, message="Niepoprawne żądanie"),
+     *      @SWG\ResponseMessage(code=404, message="Nie znaleziono adresu")
+     *   )
+     * )
+     *
+     */
+    public function address2code() {
+        // pl_kody_pocztowe_pna
+//        'fields' => array(
+//            'Address.id',
+//            'Address.nazwa',
+//            'Address.ulica',
+//            'Address.numery',
+//            'Address.kod_id',
+//            'Address.kod',
+//        ),
+//            'order' => array('ulica ASC', 'numery ASC')
+        // TODO
+        return false;
     }
 }

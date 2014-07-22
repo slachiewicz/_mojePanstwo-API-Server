@@ -72,7 +72,31 @@ class SwaggerController extends AppController
             throw new NotFoundException();
         }
         $api = json_decode($api);
-        $api->basePath = API_DOMAIN;
+
+        // process resource description
+        $api->basePath = Router::fullBaseUrl();
+        foreach($api->apis as $a) {
+            if (preg_match('/^\[(.+)\]/', $a->path, $matches) !== false) {
+                $parts = preg_split('~\\\\.(*SKIP)(*FAIL)|/~s', $matches[1]);
+
+                $routeElements = array();
+                if (isset($parts[3])) {
+                    foreach(preg_split('~\\\\.(*SKIP)(*FAIL)|,~s', $parts[3]) as $routeEl) {
+                        list($k,$v) = preg_split('~\\\\.(*SKIP)(*FAIL)|:~s', $routeEl);
+                        $routeElements[$k] = $v;
+                    }
+                }
+
+                $url_prefix = Router::url(array_merge(array(
+                    'plugin' => $parts[0],
+                    'controller' => $parts[1],
+                    'action' => $parts[2],
+                    'skipPatterns' => true
+                ), $routeElements));
+
+                $a->path = preg_replace('/\[.+\]/', $url_prefix, $a->path);
+            }
+        }
 
         $this->setSerialized('api', $api);
     }

@@ -31,9 +31,8 @@ class Dataobject extends AppModel
 
     }
 
-    public function getObject($dataset, $id, $params = array())
+    public function getObject($dataset, $id, $params = array(), $throw_not_found = false)
     {
-
         $data = $this->find('all', array(
             'conditions' => array(
                 'dataset' => $dataset,
@@ -41,6 +40,13 @@ class Dataobject extends AppModel
             ),
             'limit' => 1,
         ));
+
+        if (empty($data['dataobjects'])) {
+            if ($throw_not_found) {
+                throw new NotFoundException($dataset . ":" . $id);
+            }
+            return false;
+        }
 		
 		$this->data = @$data['dataobjects'][0];
 

@@ -25,7 +25,10 @@ class DataobjectsController extends AppController
 			
 		}
 		
-		$this->setSerialized('object', $object);
+		$this->set(array(
+			'object' => $object,
+			'_serialize' => $serialize,
+		));
     }
 
     public function layer()

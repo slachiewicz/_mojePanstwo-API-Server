@@ -795,6 +795,14 @@ class solrSource extends DataSource
                                     
                                     break;
                                 }
+                                
+                                case 'krs_podmioty.umowy':
+                                {
+	                                $params['fq[' . $fq_iterator . ']'] = 'dataset:umowy AND _data_krs_id:(' . $value . ')';
+
+                                    $fq_iterator++;
+                                    break;
+                                }
 
                             }
 

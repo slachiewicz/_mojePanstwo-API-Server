@@ -76,6 +76,8 @@ class SwaggerController extends AppController
         // process resource description
         $api->basePath = Router::fullBaseUrl();
         foreach($api->apis as $a) {
+
+            // reverse-map urls
             if (preg_match('/^\[(.+)\]/', $a->path, $matches) !== false) {
                 $parts = preg_split('~\\\\.(*SKIP)(*FAIL)|/~s', $matches[1]);
 

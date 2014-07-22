@@ -20,7 +20,7 @@ class KodyPocztoweController extends AppController
      *   @SWG\Operation(
      *      method = "GET",
      *      summary = "Znajdź adresy objęte kodem pocztowym",
-     *      type = "",
+     *      type = "PostalCode",
      *      nickname = "code2address",
      *
      *      @SWG\Parameter(
@@ -35,7 +35,8 @@ class KodyPocztoweController extends AppController
      *           description="Warstwy, które mają być załadowane dla obiektu. Można użyć żądania layers=*, aby załadować wszystkie warstwy",
      *           paramType="query",
      *           required=false,
-     *           type="string", // TODO array
+     *           type="array",
+     *           @SWG\Items("string"),
      *           allowMultiple="true"
      *         ),
      *      @SWG\ResponseMessage(code=400, message="Niepoprawne żądanie"),

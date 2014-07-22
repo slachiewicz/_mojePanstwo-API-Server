@@ -4,7 +4,7 @@
     "resourcePath":"/kodyPocztowe",
     "apis":[
         {
-            "path":"[KodyPocztowe/KodyPocztowe/address2code]",
+            "path":"[KodyPocztowe.KodyPocztowe/address2code]",
             "description":"Kody pocztowe",
             "operations":[
                 {
@@ -42,7 +42,7 @@
                     "method":"GET",
                     "summary":"Znajd\u017a adresy obj\u0119te kodem pocztowym",
                     "nickname":"code2address",
-                    "type":"",
+                    "type":"PostalCode",
                     "parameters":[
                         {
                             "paramType":"path",
@@ -54,9 +54,12 @@
                         {
                             "paramType":"query",
                             "name":"layers",
-                            "type":"string",
+                            "type":"array",
                             "required":false,
-                            "description":"Warstwy, kt\u00f3re maj\u0105 by\u0107 za\u0142adowane dla obiektu. Mo\u017cna u\u017cy\u0107 \u017c\u0105dania layers=*, aby za\u0142adowa\u0107 wszystkie warstwy"
+                            "description":"Warstwy, kt\u00f3re maj\u0105 by\u0107 za\u0142adowane dla obiektu. Mo\u017cna u\u017cy\u0107 \u017c\u0105dania layers=*, aby za\u0142adowa\u0107 wszystkie warstwy",
+                            "items":{
+                                "type":"string"
+                            }
                         }
                     ],
                     "responseMessages":[

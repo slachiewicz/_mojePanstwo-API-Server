@@ -17,7 +17,8 @@ class DataobjectsController extends AppController
     {
    		$object = $this->Dataobject->getObject($this->request->params['alias'], $this->request->params['object_id'], $this->request->query);
 		$serialize = array('object');
-		
+
+        // TODO co to za dziwny redirect?
 		if( !$object && ($redirect = $this->Dataobject->getRedirect($this->request->params['alias'], $this->request->params['object_id'])) ) {
 			
 			$this->set('redirect', $redirect);

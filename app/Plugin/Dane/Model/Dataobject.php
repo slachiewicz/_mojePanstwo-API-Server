@@ -74,6 +74,10 @@ class Dataobject extends AppModel
             }
 
             foreach( $params['layers'] as $layer ) {
+                if (empty($layer)) {
+                    continue;
+                }
+
                 if (!array_key_exists($layer, $layers)) {
                     // TODO dedicated 422 error
                     throw new BadRequestException("Layer doesn't exist: " . $layer);

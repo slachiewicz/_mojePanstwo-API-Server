@@ -41,16 +41,23 @@ class DatasetsController extends AppController
 
     public function info()
     {
-
+				
         $alias = @addslashes($this->request->params['alias']);
-
+        
         $dataset = $this->Dataset->find('first', array(
                 'conditions' => array(
                     'Dataset.alias' => $alias,
                 ),
             )
         );
-
+        
+        if( isset($this->request->query['full']) && $this->request->query['full'] ) 
+	        $dataset = array_merge($dataset, array(
+	        	'switchers' => $this->Dataset->getSwitchers($alias, true),
+	        	'filters' => $this->Dataset->getFilters($alias, true),
+	        	'orders' => $this->Dataset->getSortings($alias),
+	        ));
+	        
         $this->set('dataset', $dataset);
         $this->set('_serialize', array('dataset'));
     }

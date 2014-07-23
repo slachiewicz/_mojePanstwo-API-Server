@@ -1079,7 +1079,7 @@ class Apache_Solr_Service
      * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
      * @throws Apache_Solr_InvalidArgumentException If an invalid HTTP method is used
      */
-    public function search($query, $offset = 0, $limit = 10, $params = array(), $method = self::METHOD_GET)
+    public function search($query, $offset = 0, $limit = 10, $params = array(), $method = self::METHOD_POST)
     {
         // ensure params is an array
         if (!is_null($params)) {

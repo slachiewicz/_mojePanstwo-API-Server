@@ -9,7 +9,6 @@ class Doc extends AppModel
         'filename' => 'plik',
         'fileextension' => 'plik_rozszerzenie',
         'filesize' => 'size',
-        'status' => 'htmlex',
     );
 
 } 

@@ -57,7 +57,7 @@ class KodyPocztoweController extends AppController
 
     /**
      * @SWG\Api(
-     *   path="[KodyPocztowe.KodyPocztowe/address2code]",
+     *   path="[KodyPocztowe/KodyPocztowe/address2code]",
      *   description="Kody pocztowe",
      *   @SWG\Operation(
      *      method = "GET",
@@ -90,6 +90,7 @@ class KodyPocztoweController extends AppController
 //        ),
 //            'order' => array('ulica ASC', 'numery ASC')
         // TODO
-        return false;
+
+        $this->setSerialized('code', false);
     }
 }

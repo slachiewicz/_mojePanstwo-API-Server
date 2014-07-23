@@ -100,6 +100,57 @@ class SwaggerController extends AppController
             }
         }
 
+        // TODO if search
+        // add sortings, filters, switchers
+        $api->apis[] = array(
+            'path' => "/$slug/sortings",
+            'operations' => array(array(
+                'method' => 'GET',
+                'summary' => 'Sortowania jakich można użyć podczas wyszukiwania',
+                'nickname' => 'sortings',
+                'parameters' => array(),
+                'type' => 'array'
+                ,'items' => array('$ref' => 'Sorting')
+            )
+            )
+        );
+
+        $api->apis[] = array(
+            'path' => "/$slug",
+            'operations' => array(array(
+                'method' => 'GET',
+                'summary' => 'Wyszukuj obiekty',
+                'nickname' => 'search',
+                'parameters' => array(),
+                'type' => 'array'
+                ,'items' => array('$ref' => 'PostalCode')
+            )
+            )
+        );
+
+        if (!isset($api->models))
+            $api->models = array();
+
+        $api->models['Sorting'] = array(
+            'id' => 'Sorting',
+            'description' => 'Sortowanie',
+            'properties' => array(
+                "field" => array(
+                    'type' => 'string',
+                    'desciption' => 'Klucz sortowania'
+                ),
+                'label' => array(
+                    'type' => 'string',
+                    'description' => 'Etykieta sortowania'
+                ),
+                'direction' => array(
+                    'type' => 'string',
+                    'description' => 'Kierunek sortowania',
+                    'enum' => array('asc', 'desc')
+                )
+            )
+        );
+
         $this->setSerialized('api', $api);
     }
 }

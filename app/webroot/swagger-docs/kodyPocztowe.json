@@ -4,7 +4,7 @@
     "resourcePath":"/kodyPocztowe",
     "apis":[
         {
-            "path":"[KodyPocztowe.KodyPocztowe/address2code]",
+            "path":"[KodyPocztowe/KodyPocztowe/address2code]",
             "description":"Kody pocztowe",
             "operations":[
                 {

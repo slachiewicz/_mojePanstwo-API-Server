@@ -124,13 +124,14 @@ class SwaggerController extends AppController
                 'parameters' => array(
                     array(
                         "name" => "conditions",
-                        "paramType" => "query",
                         "description" => "Filtrowanie po wartościach. Dostępne filtry można obejrzeć w /sortings i /switchers",
+                        "paramType" => "query",
                         "type" => "array",
                         "items" => array('type' => 'string')
                     ),
                     array(
                         "name" => "fields",
+                        "description" => "Lista pól, która ma być zwrócona",
                         "paramType" => "query",
                         "type" => "array",
                         "items" => array('type' => 'string')

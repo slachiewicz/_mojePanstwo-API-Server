@@ -30,15 +30,6 @@ class KodyPocztoweController extends AppController
      *           required=true,
      *           type="string"
      *         ),
-     *      @SWG\Parameter(
-     *           name="layers",
-     *           description="Warstwy, które mają być załadowane dla obiektu. Można użyć żądania layers=*, aby załadować wszystkie warstwy",
-     *           paramType="query",
-     *           required=false,
-     *           type="array",
-     *           @SWG\Items("string"),
-     *           allowMultiple="true"
-     *         ),
      *      @SWG\ResponseMessage(code=400, message="Niepoprawne żądanie"),
      *      @SWG\ResponseMessage(code=404, message="Nie znaleziono kodu")
      *   )
@@ -50,9 +41,18 @@ class KodyPocztoweController extends AppController
         $id = @$this->request->params['id'];
         $id = (int)str_replace('-', '', $id);
 
-        $object = $this->Dataobject->getObject('kody_pocztowe', $id, $this->request->query, true);
+        $response = $this->Dataobject->find('all', array(
+            'conditions' => array(
+                'dataset' => 'kody_pocztowe',
+                'kod_int' => $id
+            )
+        ));
 
-        $this->setSerialized('code', $object);
+        if (!isset($response['dataobjects']) && empty($response['dataobjects'])) {
+            throw new NotFoundException();
+        }
+
+        $this->setSerialized('code', $response['dataobjects'][0]);
     }
 
     /**

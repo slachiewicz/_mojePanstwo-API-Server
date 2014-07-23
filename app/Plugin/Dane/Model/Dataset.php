@@ -14,6 +14,12 @@ class Dataset extends AppModel
             'foreignKey' => 'app_id',
         ),
     );
+    public $hasMany = array(
+        'Layer' => array(
+            'className' => 'Dane.Layer',
+        )
+    );
+
     public $actsAs = array('Containable');
     public $virtualFields = array(
         'alias' => 'base_alias',
@@ -113,7 +119,14 @@ class Dataset extends AppModel
 		
 		$dataset = $this->query("SELECT `id` FROM `datasets` WHERE `base_alias`='" . addslashes( $alias ) . "' LIMIT 1");
 		$dataset_id = $dataset[0]['datasets']['id'];
-			
+
+        if (empty($page)) {
+            $page = 1;
+        }
+        $page = (int) $page;
+        if ($page < 1) {
+            $page = 1;
+        }
 		$offset = ($page-1) * 50000;
 			
         $items = $this->query("SELECT object_id 

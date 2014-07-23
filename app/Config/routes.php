@@ -60,6 +60,10 @@ Router::connect('/docs/:id/html/:package', array('controller' => 'docs', 'action
  * Load all plugin routes. See the CakePlugin documentation on
  * how to customize the loading of plugin routes.
  */
+// load plugin routes using ApiRoute routing
+App::uses('ApiRoute', 'Routing/Route');
+Router::defaultRouteClass('ApiRoute');
+
 CakePlugin::routes();
 
 /**

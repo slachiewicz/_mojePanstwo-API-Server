@@ -58,16 +58,14 @@ class SwaggerController extends AppController
             "description" => $api['Api']['oneliner']
         ));
 
-
-        $_serialize = array('basePath', 'swaggerVersion', 'apis');
-        $this->set(compact($_serialize, '_serialize'));
+        $this->setSerialized(compact('basePath', 'swaggerVersion', 'apis'));
     }
 
     /**
      * Servers swagger API-Declaration for specific API
      */
     public function resource($slug) {
-        $filename = WWW_ROOT . "swagger" . DS . $slug . ".json";
+        $filename = WWW_ROOT . "swagger-docs" . DS . $slug . ".json";
         $api = file_get_contents($filename);
 
         if ($api == false) {
@@ -75,7 +73,33 @@ class SwaggerController extends AppController
         }
         $api = json_decode($api);
 
-        $_serialize = array('api');
-        $this->set(compact($_serialize, '_serialize'));
+        // process resource description
+        $api->basePath = Router::fullBaseUrl();
+        foreach($api->apis as $a) {
+
+            // reverse-map urls
+            if (preg_match('/^\[(.+)\]/', $a->path, $matches) !== false) {
+                $parts = preg_split('~\\\\.(*SKIP)(*FAIL)|/~s', $matches[1]);
+
+                $routeElements = array();
+                if (isset($parts[3])) {
+                    foreach(preg_split('~\\\\.(*SKIP)(*FAIL)|,~s', $parts[3]) as $routeEl) {
+                        list($k,$v) = preg_split('~\\\\.(*SKIP)(*FAIL)|:~s', $routeEl);
+                        $routeElements[$k] = $v;
+                    }
+                }
+
+                $url_prefix = Router::url(array_merge(array(
+                    'plugin' => $parts[0],
+                    'controller' => $parts[1],
+                    'action' => $parts[2],
+                    'skipPatterns' => true
+                ), $routeElements));
+
+                $a->path = preg_replace('/\[.+\]/', $url_prefix, $a->path);
+            }
+        }
+
+        $this->setSerialized('api', $api);
     }
 }

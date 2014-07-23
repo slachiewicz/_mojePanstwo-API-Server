@@ -15,12 +15,11 @@ class DataobjectsController extends AppController
 
     public function view()
     {
-    			
-		$response = $this->Dataobject->getObject($this->request->params['alias'], $this->request->params['object_id'], $this->request->query);
-				
-		$serialize = array('object', 'layers');
-		
-		if( !$response['object'] && ($redirect = $this->Dataobject->getRedirect($this->request->params['alias'], $this->request->params['object_id'])) ) {
+   		$object = $this->Dataobject->getObject($this->request->params['alias'], $this->request->params['object_id'], $this->request->query);
+		$serialize = array('object');
+
+        // TODO co to za dziwny redirect?
+		if( !$object && ($redirect = $this->Dataobject->getRedirect($this->request->params['alias'], $this->request->params['object_id'])) ) {
 			
 			$this->set('redirect', $redirect);
 			$serialize[] = 'redirect';
@@ -28,11 +27,9 @@ class DataobjectsController extends AppController
 		}
 		
 		$this->set(array(
-			'object' => $response['object'],
-			'layers' => $response['layers'],
+			'object' => $object,
 			'_serialize' => $serialize,
 		));
-		
     }
 
     public function layer()

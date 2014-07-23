@@ -2,17 +2,7 @@
 
 class DatasetsController extends AppController
 {
-    public $uses = array('Dane.Dataset', 'Dane.DatasetsGroup');
-
-    public function catalog()
-    {
-        $datasets = $this->Dataset->DatasetsGroup->find('all', array(
-                'order' => array('DatasetsGroup.ord' => 'asc'),
-            )
-        );
-        $this->set('datasets', $datasets);
-        $this->set('_serialize', array('datasets'));
-    }
+    public $uses = array('Dane.Dataset');
 
     public function index()
     {

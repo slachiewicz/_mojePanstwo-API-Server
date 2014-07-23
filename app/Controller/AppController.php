@@ -88,4 +88,16 @@ class AppController extends Controller
         header('Access-Control-Allow-Origin: ' . $this->request->header('Origin'));
         header('Access-Control-Allow-Credentials: true');
     }
+
+    public function setSerialized($data, $val = null) {
+        if (is_array($data)) {
+            $this->set($data);
+            $this->set('_serialize', array_keys($data));
+
+        } else {
+            // one value
+            $this->set($data, $val);
+            $this->set('_serialize', $data);
+        }
+    }
 }

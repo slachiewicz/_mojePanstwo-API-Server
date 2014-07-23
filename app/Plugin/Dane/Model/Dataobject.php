@@ -79,8 +79,9 @@ class Dataobject extends AppModel
                 }
 
                 if (!array_key_exists($layer, $layers)) {
+                    continue;
                     // TODO dedicated 422 error
-                    throw new BadRequestException("Layer doesn't exist: " . $layer);
+                    //throw new BadRequestException("Layer doesn't exist: " . $layer);
                 }
 
                 if ($layer == 'dataset') {

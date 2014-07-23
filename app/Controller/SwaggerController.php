@@ -121,9 +121,38 @@ class SwaggerController extends AppController
                 'method' => 'GET',
                 'summary' => 'Wyszukuj obiekty',
                 'nickname' => 'search',
-                'parameters' => array(),
+                'parameters' => array(
+                    array(
+                        "name" => "conditions",
+                        "paramType" => "query",
+                        "description" => "Filtrowanie po wartościach. Dostępne filtry można obejrzeć w /sortings i /switchers",
+                        "type" => "array",
+                        "items" => array('type' => 'string')
+                    ),
+                    array(
+                        "name" => "fields",
+                        "paramType" => "query",
+                        "type" => "array",
+                        "items" => array('type' => 'string')
+                    ),
+                    array(
+                        "name" => "offset",
+                        "paramType" => "query",
+                        "type" => "integer",
+                    ),
+                    array(
+                        "name" => "limit",
+                        "paramType" => "query",
+                        "type" => "integer"
+                    ),
+                    array(
+                        "name" => "order",
+                        "paramType" => "query",
+                        "type" => "string",
+                    )
+                ),
                 'type' => 'array'
-                ,'items' => array('$ref' => 'PostalCode')
+            , 'items' => array('$ref' => 'PostalCode')
             )
             )
         );

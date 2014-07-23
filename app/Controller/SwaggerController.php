@@ -5,13 +5,15 @@ App::uses('AppController', 'Controller');
 /*
  * Serves /swagger - Swagger specification of mojepanstwo API
  */
+
 class SwaggerController extends AppController
 {
     const SWAGGER_VERSION = "1.2";
 
     public $uses = array('Api');
 
-    public function beforeFilter() {
+    public function beforeFilter()
+    {
         parent::beforeFilter();
 
         $this->root_url = Router::url('/', true);
@@ -20,13 +22,14 @@ class SwaggerController extends AppController
     /**
      * Serves swagger Resource-Listing for all mP APIs
      */
-    public function api_docs() {
+    public function api_docs()
+    {
         $basePath = Router::url(array('action' => 'resource'), true);
         $basePath = substr($basePath, 0, strrpos($basePath, '/'));
         $swaggerVersion = SwaggerController::SWAGGER_VERSION;
 
         $apis = array();
-        foreach($this->Api->find('all') as $api) {
+        foreach ($this->Api->find('all') as $api) {
             array_push($apis, array(
                 "path" => "/" . $api['Api']['slug'], //.".{format}",
                 "description" => $api['Api']['oneliner']
@@ -40,7 +43,8 @@ class SwaggerController extends AppController
     /**
      * Serves swagger Resource-Listing for specific API
      */
-    public function resource_api_docs($slug) {
+    public function resource_api_docs($slug)
+    {
         $basePath = Router::url(array('action' => 'resource'), true);
         $basePath = substr($basePath, 0, strrpos($basePath, '/'));
         $swaggerVersion = SwaggerController::SWAGGER_VERSION;
@@ -64,27 +68,31 @@ class SwaggerController extends AppController
     /**
      * Servers swagger API-Declaration for specific API
      */
-    public function resource($slug) {
-        $filename = WWW_ROOT . "swagger-docs" . DS . $slug . ".json";
-        $api = file_get_contents($filename);
-
-        if ($api == false) {
+    public function resource($slug)
+    {
+        // we assume that slug is connected 1:1 to Cake Plugin
+        $swagger_spec = ROOT . DS . implode(DS, array('app', 'Plugin', ucwords(preg_replace('/(?:^|_)(.?)/e',"strtoupper('$1')",$slug)), 'Config', 'swagger.php'));
+        if (!file_exists($swagger_spec))
             throw new NotFoundException();
+
+        require_once($swagger_spec);
+
+        // $api should be loaded
+        if (!isset($api)) {
+            throw new InternalErrorException('$api definition is missing in ' . $swagger_spec);
         }
-        $api = json_decode($api);
 
         // process resource description
-        $api->basePath = Router::fullBaseUrl();
-        foreach($api->apis as $a) {
-
+        $api['basePath'] = Router::fullBaseUrl();
+        foreach ($api['apis'] as &$a) {
             // reverse-map urls
-            if (preg_match('/^\[(.+)\]/', $a->path, $matches) !== false) {
+            if (preg_match('/^\[(.+)\]/', $a['path'], $matches) !== false) {
                 $parts = preg_split('~\\\\.(*SKIP)(*FAIL)|/~s', $matches[1]);
 
                 $routeElements = array();
                 if (isset($parts[3])) {
-                    foreach(preg_split('~\\\\.(*SKIP)(*FAIL)|,~s', $parts[3]) as $routeEl) {
-                        list($k,$v) = preg_split('~\\\\.(*SKIP)(*FAIL)|:~s', $routeEl);
+                    foreach (preg_split('~\\\\.(*SKIP)(*FAIL)|,~s', $parts[3]) as $routeEl) {
+                        list($k, $v) = preg_split('~\\\\.(*SKIP)(*FAIL)|:~s', $routeEl);
                         $routeElements[$k] = $v;
                     }
                 }
@@ -96,61 +104,48 @@ class SwaggerController extends AppController
                     'skipPatterns' => true
                 ), $routeElements));
 
-                $a->path = preg_replace('/\[.+\]/', $url_prefix, $a->path);
+                $a['path'] = preg_replace('/\[.+\]/', $url_prefix, $a['path']);
             }
         }
 
         // TODO if search
-        // add sortings, filters, switchers
-        $api->apis[] = array(
-            'path' => "/$slug/sortings",
-            'operations' => array(array(
-                'method' => 'GET',
-                'summary' => 'Sortowania jakich można użyć podczas wyszukiwania',
-                'nickname' => 'sortings',
-                'parameters' => array(),
-                'type' => 'array'
-                ,'items' => array('$ref' => 'Sorting')
-            )
-            )
-        );
-
-        $api->apis[] = array(
+        // add search endpoint
+        $api['apis'][] = array(
             'path' => "/$slug",
             'operations' => array(array(
                 'method' => 'GET',
                 'summary' => 'Wyszukuj obiekty',
                 'nickname' => 'search',
                 'parameters' => array(
-                    array(
-                        "name" => "conditions",
-                        "description" => "Filtrowanie po wartościach. Dostępne filtry można obejrzeć w /sortings i /switchers",
-                        "paramType" => "query",
-                        "type" => "array",
-                        "items" => array('type' => 'string')
-                    ),
-                    array(
-                        "name" => "fields",
-                        "description" => "Lista pól, która ma być zwrócona",
-                        "paramType" => "query",
-                        "type" => "array",
-                        "items" => array('type' => 'string')
-                    ),
-                    array(
-                        "name" => "offset",
-                        "paramType" => "query",
-                        "type" => "integer",
-                    ),
-                    array(
-                        "name" => "limit",
-                        "paramType" => "query",
-                        "type" => "integer"
-                    ),
-                    array(
-                        "name" => "order",
-                        "paramType" => "query",
-                        "type" => "string",
-                    )
+//                    array(
+//                        "name" => "conditions",
+//                        "description" => "Filtrowanie po wartościach. Dostępne filtry można obejrzeć w /sortings i /switchers",
+//                        "paramType" => "query",
+//                        "type" => "array",
+//                        "items" => array('type' => 'string')
+//                    ),
+//                    array(
+//                        "name" => "fields",
+//                        "description" => "Lista pól, która ma być zwrócona",
+//                        "paramType" => "query",
+//                        "type" => "array",
+//                        "items" => array('type' => 'string')
+//                    ),
+//                    array(
+//                        "name" => "offset",
+//                        "paramType" => "query",
+//                        "type" => "integer",
+//                    ),
+//                    array(
+//                        "name" => "limit",
+//                        "paramType" => "query",
+//                        "type" => "integer"
+//                    ),
+//                    array(
+//                        "name" => "order",
+//                        "paramType" => "query",
+//                        "type" => "string",
+//                    )
                 ),
                 'type' => 'array'
             , 'items' => array('$ref' => 'PostalCode')
@@ -158,10 +153,49 @@ class SwaggerController extends AppController
             )
         );
 
-        if (!isset($api->models))
-            $api->models = array();
+        // TODO we need fields, filters are just a subset of it
+        // add sortings, filters, switchers
+        $api['apis'][] = array(
+            'path' => "/$slug/sortings",
+            'operations' => array(array(
+                'method' => 'GET',
+                'summary' => 'Sortowania jakich można użyć podczas wyszukiwania',
+                'nickname' => 'sortings',
+                'parameters' => array(),
+                'type' => 'array'
+            , 'items' => array('$ref' => 'Sorting')
+            )
+            )
+        );
+        $api['apis'][] = array(
+            'path' => "/$slug/filters",
+            'operations' => array(array(
+                'method' => 'GET',
+                'summary' => 'Filtry, jakich można użyć podczas wyszukiwania',
+                'nickname' => 'filters',
+                'parameters' => array(),
+                'type' => 'array'
+            , 'items' => array('$ref' => 'Filter')
+            )
+            )
+        );
+        $api['apis'][] = array(
+            'path' => "/$slug/switchers",
+            'operations' => array(array(
+                'method' => 'GET',
+                'summary' => 'Zagregowane filtry',
+                'nickname' => 'switchers',
+                'parameters' => array(),
+                'type' => 'array'
+            , 'items' => array('$ref' => 'Switcher')
+            )
+            )
+        );
 
-        $api->models['Sorting'] = array(
+        if (!isset($api['models']))
+            $api['models'] = array();
+
+        $api['models']['Sorting'] = array(
             'id' => 'Sorting',
             'description' => 'Sortowanie',
             'properties' => array(
@@ -177,6 +211,51 @@ class SwaggerController extends AppController
                     'type' => 'string',
                     'description' => 'Kierunek sortowania',
                     'enum' => array('asc', 'desc')
+                )
+            )
+        );
+        $api['models']['Filter'] = array(
+            'id' => 'Filter',
+            'description' => 'Filtry, wyświetlające się na stronie MP',
+            'properties' => array(
+                "field" => array(
+                    'type' => 'string',
+                    'desciption' => 'Pole filtru'
+                ),
+                'label' => array(
+                    'type' => 'string',
+                    'description' => 'Etykieta filtru'
+                ),
+                'typ_id' => array(
+                    'type' => 'string',
+                    'description' => 'TODO'
+                ),
+                'parent_field' => array(
+                    'type' => 'string',
+                    'description' => 'TODO',
+                ),
+                'desc' => array(
+                    'type' => 'string',
+                    'description' => 'Opis filtru',
+                )
+            )
+        );
+        $api['models']['Switcher'] = array(
+            'id' => 'Switcher',
+            'description' => 'Zagregowane filtry w postaci flag',
+            'properties' => array(
+                "name" => array(
+                    'type' => 'string',
+                    'desciption' => 'Nazwa'
+                ),
+                'label' => array(
+                    'type' => 'string',
+                    'description' => 'Etykieta filtru'
+                ),
+                'dataset_search_default' => array(
+                    'type' => 'string',
+                    'description' => 'Domyślna wartość',
+                    'enum' => array('0', '1')
                 )
             )
         );

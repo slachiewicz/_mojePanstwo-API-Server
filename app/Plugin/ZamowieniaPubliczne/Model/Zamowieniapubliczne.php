@@ -43,7 +43,7 @@ class ZamowieniaPubliczne extends AppModel
         $this->DB = new DB();
 	    
 	    $data = $this->DB->selectValue("SELECT `data` FROM `uzp_stats` WHERE `id`='" . addslashes( $range ) . "'");
-	    if( !empty($data) && ( $data = unserialize(($data)) ) ) {
+	    if( !empty($data) && ( $data = unserialize(preg_replace('!s:(\d+):"(.*?)";!se', "'s:'.strlen('$2').':\"$2\";'", $data)) )) {
 		    
 		    return $data;
 		    

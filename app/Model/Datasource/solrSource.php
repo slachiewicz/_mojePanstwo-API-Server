@@ -77,7 +77,7 @@ class solrSource extends DataSource
 
             'fields' => (isset($queryData['fields']) && is_array($queryData['fields'])) ?
                     $queryData['fields'] :
-                    array('id', 'dataset', 'object_id', 'score', '_data_*', '_multidata_*'),
+                    array('id', 'dataset', 'object_id', 'score', '_data_*'),
 
             'filters' => isset($queryData['conditions']) ?
                     $queryData['conditions'] :
@@ -95,17 +95,16 @@ class solrSource extends DataSource
                     $queryData['limit'] :
                     10,
 
-            'offset' => (isset($queryData['offset']) && $queryData['offset']) ?
-                    $queryData['offset'] :
-                    0,
-
             'facet' => (boolean)@$queryData['facets'],
 
             'switchers' => array(),
 
             'source' => false,
         );
-        
+
+        $request['offset'] = (isset($queryData['offset']) && $queryData['offset']) ?
+            $queryData['offset'] :
+            (isset($queryData['page']) && is_numeric($queryData['page']) && intval($queryData['page']) >= 1 ? (intval($queryData['page']) - 1) * $request['limit'] : 0);
 
         // debug( $request ); die();
 

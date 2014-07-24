@@ -77,7 +77,7 @@ class solrSource extends DataSource
 
             'fields' => (isset($queryData['fields']) && is_array($queryData['fields'])) ?
                     $queryData['fields'] :
-                    array('id', 'dataset', 'object_id', 'score', '_data_*', '_multidata_*'),
+                    array('id', 'dataset', 'object_id', 'score', '_data_*'),
 
             'filters' => isset($queryData['conditions']) ?
                     $queryData['conditions'] :

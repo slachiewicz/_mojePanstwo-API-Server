@@ -5,7 +5,6 @@ class KrsAppController extends AppController
 
 	public function search()
 	{
-	
 		$search = array();
 		
 		$q = @$this->request->query['q'];
@@ -53,10 +52,12 @@ class KrsAppController extends AppController
 					
 				}
 			}
-		
-		}
-		
-		$this->set('search', $search);
+
+        } else {
+            throw new BadRequestException('Query parameter is required: q');
+        }
+
+        $this->set('search', $search);
 		$this->set('_serialize', array('search'));
 	
 	}

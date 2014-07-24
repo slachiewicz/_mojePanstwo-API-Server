@@ -6,43 +6,12 @@ $api = array(
     "resourcePath" => "/kodyPocztowe",
     "apis" => array(
         array(
-            "path" => "[KodyPocztowe/KodyPocztowe/address2code]",
-            "description" => "Kody pocztowe",
-            "operations" => array(
-                array(
-                    "method" => "GET",
-                    "summary" => "Znajd\u017a kod pocztowy dla danego adresu",
-                    "nickname" => "address2code",
-                    "type" => "",
-                    "parameters" => array(
-                        array(
-                            "paramType" => "query",
-                            "name" => "q",
-                            "type" => "string",
-                            "required" => false,
-                            "description" => "Adres pe\u0142nym tekstem"
-                        )
-                    ),
-                    "responseMessages" => array(
-                        array(
-                            "code" => 400,
-                            "message" => "Niepoprawne \u017c\u0105danie"
-                        ),
-                        array(
-                            "code" => 404,
-                            "message" => "Nie znaleziono adresu"
-                        )
-                    )
-                )
-            )
-        ),
-        array(
             "path" => "[KodyPocztowe/KodyPocztowe/view/id:{postal_code}]",
             "description" => "Kody pocztowe",
             "operations" => array(
                 array(
                     "method" => "GET",
-                    "summary" => "Znajd\u017a adresy obj\u0119te kodem pocztowym",
+                    "summary" => "Znajdź adresy objęte kodem pocztowym",
                     "nickname" => "code2address",
                     "type" => "PostalCode",
                     "parameters" => array(
@@ -58,7 +27,7 @@ $api = array(
                             "name" => "layers",
                             "type" => "array",
                             "required" => false,
-                            "description" => "Warstwy, kt\u00f3re maj\u0105 by\u0107 za\u0142adowane dla obiektu. Mo\u017cna u\u017cy\u0107 \u017c\u0105dania layers=*, aby za\u0142adowa\u0107 wszystkie warstwy",
+                            "description" => "Warstwy, które mają być załadowane dla obiektu. Można użyć żądania layers=*, aby załadować wszystkie warstwy",
                             "items" => array(
                                 "type" => "string"
                             )
@@ -67,11 +36,42 @@ $api = array(
                     "responseMessages" => array(
                         array(
                             "code" => 400,
-                            "message" => "Niepoprawne \u017c\u0105danie"
+                            "message" => "Niepoprawne żądanie"
                         ),
                         array(
                             "code" => 404,
                             "message" => "Nie znaleziono kodu"
+                        )
+                    )
+                )
+            )
+        ),
+        array(
+            "path" => "[KodyPocztowe/KodyPocztowe/address2code]",
+            "description" => "Kody pocztowe",
+            "operations" => array(
+                array(
+                    "method" => "GET",
+                    "summary" => "Znajdź kod pocztowy dla danego adresu",
+                    "nickname" => "address2code",
+                    "type" => "",
+                    "parameters" => array(
+                        array(
+                            "paramType" => "query",
+                            "name" => "q",
+                            "type" => "string",
+                            "required" => false,
+                            "description" => "Adres pełnym tekstem"
+                        )
+                    ),
+                    "responseMessages" => array(
+                        array(
+                            "code" => 400,
+                            "message" => "Niepoprawne żądanie"
+                        ),
+                        array(
+                            "code" => 404,
+                            "message" => "Nie znaleziono adresu"
                         )
                     )
                 )

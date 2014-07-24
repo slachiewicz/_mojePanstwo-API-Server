@@ -11,9 +11,10 @@ class DocsController extends AppController
      */
     public function info()
     {
+    
         $document_id = $this->request->params['id'];
         $document = $this->Doc->find('first', array(
-            'fields' => array('id', 'url', 'filename', 'fileextension', 'pages_count', 'packages_count', 'filesize', 'status', 'version'),
+            'fields' => array('id', 'url', 'filename', 'fileextension', 'pages_count', 'packages_count', 'filesize', 'version'),
             'conditions' => array('id' => $document_id),
         ));
 

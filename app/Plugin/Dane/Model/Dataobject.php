@@ -33,6 +33,7 @@ class Dataobject extends AppModel
 
     public function getObject($dataset, $id, $params = array(), $throw_not_found = false)
     {
+        	
         $data = $this->find('all', array(
             'conditions' => array(
                 'dataset' => $dataset,
@@ -62,6 +63,7 @@ class Dataobject extends AppModel
         foreach($ds['Layer'] as $layer) {
             $layers[$layer['layer']] = null;
         }
+        unset( $ds['Layer'] );
         $layers['dataset'] = null;
 
         // load queried layers
@@ -91,7 +93,10 @@ class Dataobject extends AppModel
                 }
             }
         }
-
+		
+		if( isset($params['dataset']) && $params['dataset'] )
+			$layers['dataset'] = $ds;
+		
         $this->data['layers'] = $layers;
 
         return $this->data;

@@ -14,9 +14,7 @@ class Dataobject extends AppModel
      */
     private function fillIDs(&$o) {
         $o['_id'] = Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['object_id']), true);
-
-        // we assume that mojepanstwo.pl has the same routes for Dane as api-server
-        $o['_mpurl'] = 'http://mojepanstwo.pl' . Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['object_id']), false);
+        $o['_mpurl'] = 'http://mojepanstwo.pl/dane/' . $o['dataset'] .'/' . $o['object_id'];
 
         if ($o['dataset'] == 'kody_pocztowe') {
             $o['_id'] = Router::url(array('plugin' => 'KodyPocztowe', 'controller' => 'KodyPocztowe', 'action' => 'view', 'id' => $o['data']['kod']), true);

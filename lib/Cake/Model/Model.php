@@ -2982,6 +2982,7 @@ class Model extends Object implements CakeEventListener
         if (!is_numeric($query['page']) || intval($query['page']) < 1) {
             $query['page'] = 1;
         }
+        $query['page'] = intval($query['page']);
 
         if ($query['page'] > 1 && !empty($query['limit'])) {
             $query['offset'] = ($query['page'] - 1) * $query['limit'];

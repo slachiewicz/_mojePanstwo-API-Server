@@ -5,12 +5,12 @@ $api = array(
     "apiVersion" => "1.0",
     "apis" => array(
         array(
-            "path" => "[KRS/KrsApp/search]",
+            "path" => "[KRS/KrsApp/search_api]",
             "description" => "Podmioty w Krajowym Rejestrze Sądowym",
             "operations" => array(
                 array(
                     "method" => "GET",
-                    "summary" => "Znajdź podmiot",
+                    "summary" => "Znajdź osobę lub  podmiot",
                     "nickname" => "search",
                     "type" => "array[KrsOsoba|KrsPodmiot]",
                     "parameters" => array(
@@ -31,5 +31,9 @@ $api = array(
                 )
             )
         ),
+    ),
+    '_search_endpoints' => array(// TODO _search_baseurl zamienić na Router::url
+        array('_search_dataset' => 'krs_osoby', '_search_baseurl' => '/krs','_search_subpath' => '/osoby', '_search_model' => 'KrsOsoba'),
+        array('_search_dataset' => 'krs_podmioty', '_search_baseurl' => '/krs','_search_subpath' => '/podmioty', '_search_model' => 'KrsPodmiot')
     )
 );

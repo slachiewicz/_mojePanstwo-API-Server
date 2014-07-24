@@ -70,8 +70,16 @@ class SwaggerController extends AppController
      */
     public function resource($slug)
     {
+        $api = $this->Api->find('first', array(
+            'conditions' => array('Api.slug' => $slug)
+        ));
+
+        if (empty($api)) {
+            throw new NotFoundException();
+        }
+
         // we assume that slug is connected 1:1 to Cake Plugin
-        $swagger_spec = ROOT . DS . implode(DS, array('app', 'Plugin', ucwords(preg_replace('/(?:^|_)(.?)/e',"strtoupper('$1')",$slug)), 'Config', 'swagger.php'));
+        $swagger_spec = ROOT . DS . implode(DS, array('app', 'Plugin', $api['Api']['plugin'], 'Config', 'swagger.php'));
         if (!file_exists($swagger_spec))
             throw new NotFoundException();
 
@@ -108,10 +116,29 @@ class SwaggerController extends AppController
             }
         }
 
+        if (isset($api['_search_endpoints'])) {
+            foreach ($api['_search_endpoints'] as $e) {
+                // add search endpoint
+                $this->add_search_endpoint($api, $slug, $e);
+            }
+            unset($api['_search_endpoints']);
+        }
+
+        $this->setSerialized('api', $api);
+    }
+
+    private function add_search_endpoint(&$api, $slug, $res) {
+        if (isset($res['_search_baseurl'])) {
+            $base_url = $res['_search_baseurl'];
+        } else {
+            $base_url = "/$slug";
+        }
+        $base_url = $base_url . $res['_search_subpath'];
+
         // TODO if search
         // add search endpoint
         $api['apis'][] = array(
-            'path' => "/$slug",
+            'path' => $base_url,
             'operations' => array(array(
                 'method' => 'GET',
                 'summary' => 'Wyszukuj obiekty',
@@ -148,7 +175,7 @@ class SwaggerController extends AppController
 //                    )
                 ),
                 'type' => 'array'
-            , 'items' => array('$ref' => 'PostalCode')
+            , 'items' => array('$ref' => $res['_search_model'])
             )
             )
         );
@@ -156,7 +183,7 @@ class SwaggerController extends AppController
         // TODO we need fields, filters are just a subset of it
         // add sortings, filters, switchers
         $api['apis'][] = array(
-            'path' => "/$slug/sortings",
+            'path' => "$base_url/sortings",
             'operations' => array(array(
                 'method' => 'GET',
                 'summary' => 'Sortowania jakich można użyć podczas wyszukiwania',
@@ -168,7 +195,7 @@ class SwaggerController extends AppController
             )
         );
         $api['apis'][] = array(
-            'path' => "/$slug/filters",
+            'path' => "$base_url/filters",
             'operations' => array(array(
                 'method' => 'GET',
                 'summary' => 'Filtry, jakich można użyć podczas wyszukiwania',
@@ -180,7 +207,7 @@ class SwaggerController extends AppController
             )
         );
         $api['apis'][] = array(
-            'path' => "/$slug/switchers",
+            'path' => "$base_url/switchers",
             'operations' => array(array(
                 'method' => 'GET',
                 'summary' => 'Zagregowane filtry',
@@ -259,7 +286,5 @@ class SwaggerController extends AppController
                 )
             )
         );
-
-        $this->setSerialized('api', $api);
     }
 }

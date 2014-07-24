@@ -73,9 +73,6 @@ Cache::config('default', array('engine' => 'File'));
  */
 
 CakePlugin::loadAll(array(
-    'Dane' => array(
-        'routes' => true,
-    ),
     'Powiadomienia' => array(
         'routes' => true,
     ),
@@ -117,7 +114,10 @@ CakePlugin::loadAll(array(
     ),
     'Obszary' => array(
         'routes' => true, 'bootstrap' => false,
-    )
+    ),
+    'Dane' => array(
+        'routes' => true,
+    ),
 ));
 
 /**

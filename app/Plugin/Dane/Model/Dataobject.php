@@ -9,6 +9,20 @@ class Dataobject extends AppModel
     public $id;
     public $data = array();
 
+    /**
+     * Reverse mapping url for API server and MP.
+     */
+    private function fillIDs(&$o) {
+        $o['_id'] = Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['object_id']), true);
+
+        // we assume that mojepanstwo.pl has the same routes for Dane as api-server
+        $o['_mpurl'] = 'http://mojepanstwo.pl' . Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['object_id']), false);
+
+        if ($o['dataset'] == 'kody_pocztowe') {
+            $o['_id'] = Router::url(array('plugin' => 'KodyPocztowe', 'controller' => 'KodyPocztowe', 'action' => 'view', 'id' => $o['data']['kod']), true);
+        }
+    }
+
     public function setId($id)
     {
 
@@ -27,8 +41,13 @@ class Dataobject extends AppModel
         ), $queryData);
         */
 
-        return parent::find($type, $queryData);
+        $objects = parent::find($type, $queryData);
 
+        foreach($objects['dataobjects'] as &$o) {
+            $this->fillIDs($o);
+        }
+
+        return $objects;
     }
 
     public function getObject($dataset, $id, $params = array(), $throw_not_found = false)

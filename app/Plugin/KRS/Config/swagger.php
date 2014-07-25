@@ -2,7 +2,7 @@
 
 $api = array(
     "swaggerVersion" => "1.2",
-    "apiVersion" => "1.0",
+    "apiVersion" => "0.1",
     "apis" => array(
         array(
             "path" => "[KRS/KrsApp/search_api]",

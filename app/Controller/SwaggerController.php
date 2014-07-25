@@ -112,6 +112,9 @@ class SwaggerController extends AppController
                     'skipPatterns' => true
                 ), $routeElements));
 
+                // remove version
+                $url_prefix = preg_replace('~^(\/[a-zA-Z0-9_]+)_v\d~', '$1', $url_prefix);
+
                 $a['path'] = preg_replace('/\[.+\]/', $url_prefix, $a['path']);
             }
         }

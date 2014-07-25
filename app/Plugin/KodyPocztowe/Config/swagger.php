@@ -2,7 +2,7 @@
 
 $api = array(
     "swaggerVersion" => "1.2",
-    "apiVersion" => "1.0",
+    "apiVersion" => "0.1",
     "apis" => array(
         array(
             // In path one can use [plugin/controller/action/param1:val1,param2:val2]/pathparam1 that will be reverse-mapped by Router::url

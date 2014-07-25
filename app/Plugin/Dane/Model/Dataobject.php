@@ -89,7 +89,8 @@ class Dataobject extends AppModel
                 $params['layers'] = array_keys($layers);
             }
             if (!is_array($params['layers'])) {
-                throw new BadRequestException("Invalid layers parameter: " . $params['layers']); // TODO unparse
+                // throw new BadRequestException("Invalid layers parameter: " . $params['layers']); // TODO unparse
+                $params['layers'] = explode(',', $params['layers']);                
             }
 
             foreach( $params['layers'] as $layer ) {

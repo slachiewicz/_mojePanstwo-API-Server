@@ -1,7 +1,6 @@
 {
     "require": {
-        "everyman\/neo4jphp": "dev-master",
-        "zircote/swagger-php": "0.9.*@dev"
+        "everyman\/neo4jphp": "dev-master"
     },
     "config": {
         "vendor-dir": "Vendor"

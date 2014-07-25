@@ -128,14 +128,13 @@ class SwaggerController extends AppController
     }
 
     private function add_search_endpoint(&$api, $slug, $res) {
-        if (isset($res['_search_baseurl'])) {
-            $base_url = $res['_search_baseurl'];
+        if (isset($res['baseurl'])) {
+            $base_url = $res['baseurl'];
         } else {
             $base_url = "/$slug";
         }
-        $base_url = $base_url . $res['_search_subpath'];
+        $base_url = $base_url . $res['subpath'];
 
-        // TODO if search
         // add search endpoint
         $api['apis'][] = array(
             'path' => $base_url,
@@ -175,7 +174,7 @@ class SwaggerController extends AppController
 //                    )
                 ),
                 'type' => 'array'
-            , 'items' => array('$ref' => $res['_search_model'])
+            , 'items' => array('$ref' => $res['model'])
             )
             )
         );

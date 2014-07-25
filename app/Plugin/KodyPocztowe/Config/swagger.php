@@ -80,6 +80,6 @@ $api = array(
 //        )
     ),
     '_search_endpoints' => array(// TODO _search_baseurl zamienić na Router::url
-        array('_search_dataset' => 'kody_pocztowe', '_search_baseurl' => '/kodyPocztowe','_search_subpath' => '', '_search_model' => 'PostalCode')
+        array('dataset' => 'kody_pocztowe', 'baseurl' => '/kodyPocztowe','subpath' => '', 'model' => 'PostalCode', 'description' => 'Wyszukuj kody pocztowe')
     )
 );

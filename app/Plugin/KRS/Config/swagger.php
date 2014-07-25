@@ -33,7 +33,7 @@ $api = array(
         ),
     ),
     '_search_endpoints' => array(// TODO _search_baseurl zamienić na Router::url
-        array('_search_dataset' => 'krs_osoby', '_search_baseurl' => '/krs','_search_subpath' => '/osoby', '_search_model' => 'KrsOsoba'),
-        array('_search_dataset' => 'krs_podmioty', '_search_baseurl' => '/krs','_search_subpath' => '/podmioty', '_search_model' => 'KrsPodmiot')
+        array('dataset' => 'krs_osoby', 'baseurl' => '/krs','subpath' => '/osoby', 'model' => 'KrsOsoba', 'description' => 'Wyszukuj osoby w KRS'),
+        array('dataset' => 'krs_podmioty', 'baseurl' => '/krs','subpath' => '/podmioty', 'model' => 'KrsPodmiot', 'description' => 'Wyszukuj podmioty w KRS')
     )
 );

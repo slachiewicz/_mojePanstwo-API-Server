@@ -5,5 +5,6 @@
         Router::connect("/krs/$slug/:action", array('plugin' => 'Dane', 'controller' => 'datasets', 'alias' => $ds), array('action' => 'filters|switchers|sortings'));
     }
 
-	Router::connect('/krs/search', array('plugin' => 'KRS', 'controller' => 'KrsApp', 'action' => 'search'));
+    Router::connect('/krs', array('plugin' => 'KRS', 'controller' => 'KrsApp', 'action' => 'search_api'));
+	Router::connect('/krs/search', array('plugin' => 'KRS', 'controller' => 'KrsApp', 'action' => 'search')); // endpoint for portal // TODO del
 	Router::connect('/krs/:controller/:action', array('plugin' => 'KRS'));

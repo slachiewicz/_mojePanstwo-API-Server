@@ -64,8 +64,6 @@ class KrsAppController extends AppController
 
     public function search_api()
     {
-        $search = array();
-
         $q = @$this->request->query['q'];
         if(empty($q)) {
             throw new BadRequestException('Query parameter is required: q');

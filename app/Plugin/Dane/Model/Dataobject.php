@@ -85,30 +85,35 @@ class Dataobject extends AppModel
 
         // load queried layers
 		if( isset($params['layers']) && !empty($params['layers']) ) {
+            
+            if (!is_array($params['layers'])) {
+                $params['layers'] = explode(',', $params['layers']);                
+            }
+            
             if ($params['layers'] == '*') {
                 $params['layers'] = array_keys($layers);
             }
-            if (!is_array($params['layers'])) {
-                // throw new BadRequestException("Invalid layers parameter: " . $params['layers']); // TODO unparse
-                $params['layers'] = explode(',', $params['layers']);                
-            }
 
-            foreach( $params['layers'] as $layer ) {
-                if (empty($layer)) {
-                    continue;
-                }
-
-                if (!array_key_exists($layer, $layers)) {
-                    continue;
-                    // TODO dedicated 422 error
-                    //throw new BadRequestException("Layer doesn't exist: " . $layer);
-                }
-
-                if ($layer == 'dataset') {
-                    $layers['dataset'] = $ds;
-                } else {
-                    $layers[$layer] = $this->getObjectLayer($dataset, $id, $layer);
-                }
+            if( !empty($params['layers']) ) {
+			
+	            foreach( $params['layers'] as $layer ) {
+	                if (empty($layer)) {
+	                    continue;
+	                }
+	
+	                if (!array_key_exists($layer, $layers)) {
+	                    continue;
+	                    // TODO dedicated 422 error
+	                    //throw new BadRequestException("Layer doesn't exist: " . $layer);
+	                }
+	
+	                if ($layer == 'dataset') {
+	                    $layers['dataset'] = $ds;
+	                } else {
+	                    $layers[$layer] = $this->getObjectLayer($dataset, $id, $layer);
+	                }
+	            }
+            
             }
         }
 		

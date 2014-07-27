@@ -44,5 +44,8 @@ app/Vendor/doctrine/annotations
 app/Vendor/doctrine/lexer
 app/Vendor/zircote/swagger-php
 app/Vendor/bin/swagger
+app/Vendor/predis
 app/webroot/swagger/api-docs.json
 app/webroot/swagger/index.php
+
+app/composer.lock

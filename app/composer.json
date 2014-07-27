@@ -2,7 +2,7 @@
     "require": {
         "everyman\/neo4jphp": "dev-master",
         "zircote/swagger-php": "0.9.*@dev",
-        "predis/predis": "1.0.*@dev"
+        "predis/predis": "1.0.*@dev",
     },
     "config": {
         "vendor-dir": "Vendor"

@@ -37,6 +37,7 @@
  Configure::write('debug', 0);
  require_once 'constants.php';
 
+
 /**
  * Configure the Error handler used to handle errors for your application. By default
  * ErrorHandler::handleError() is used. It will display errors using Debugger, when debug > 0

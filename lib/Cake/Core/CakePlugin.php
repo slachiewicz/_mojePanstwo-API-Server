@@ -125,11 +125,33 @@ class CakePlugin
     public static function loadAll($options = array())
     {
         $plugins = App::objects('plugins');
-        foreach ($plugins as $p) {
-            $opts = isset($options[$p]) ? $options[$p] : null;
-            if ($opts === null && isset($options[0])) {
-                $opts = $options[0];
+        $loaded = array();
+
+        $defaults = null;
+        if (isset($options[0])) {
+            $defaults = $options[0];
+            unset($options[0]);
+        }
+
+        // load in order specified by options first
+        if (!empty($options)) {
+            foreach(array_keys($options) as $p) {
+                if (!in_array($p, $plugins)) {
+                    throw new Exception("Plugin doesn't exist: $p");
+                }
+                $opts = isset($options[$p]) ? $options[$p] : $defaults;
+                self::load($p, (array)$opts);
+
+                $loaded[] = $p;
             }
+        }
+
+        // load others
+        foreach ($plugins as $p) {
+            if (in_array($p, $loaded))
+                continue;
+
+            $opts = isset($options[$p]) ? $options[$p] : $defaults;
             self::load($p, (array)$opts);
         }
     }
@@ -224,7 +246,7 @@ class CakePlugin
             return isset(self::$_plugins[$plugin]);
         }
         $return = array_keys(self::$_plugins);
-        sort($return);
+        //sort($return);
         return $return;
     }
 

@@ -2,10 +2,10 @@
 
 $api = array(
     "swaggerVersion" => "1.2",
-    "apiVersion" => "1.0",
-    "resourcePath" => "/kodyPocztowe",
+    "apiVersion" => "0.1",
     "apis" => array(
         array(
+            // In path one can use [plugin/controller/action/param1:val1,param2:val2]/pathparam1 that will be reverse-mapped by Router::url
             "path" => "[KodyPocztowe/KodyPocztowe/view/id:{postal_code}]",
             "description" => "Kody pocztowe",
             "operations" => array(
@@ -46,36 +46,40 @@ $api = array(
                 )
             )
         ),
-        array(
-            "path" => "[KodyPocztowe/KodyPocztowe/address2code]",
-            "description" => "Kody pocztowe",
-            "operations" => array(
-                array(
-                    "method" => "GET",
-                    "summary" => "Znajdź kod pocztowy dla danego adresu",
-                    "nickname" => "address2code",
-                    "type" => "",
-                    "parameters" => array(
-                        array(
-                            "paramType" => "query",
-                            "name" => "q",
-                            "type" => "string",
-                            "required" => false,
-                            "description" => "Adres pełnym tekstem"
-                        )
-                    ),
-                    "responseMessages" => array(
-                        array(
-                            "code" => 400,
-                            "message" => "Niepoprawne żądanie"
-                        ),
-                        array(
-                            "code" => 404,
-                            "message" => "Nie znaleziono adresu"
-                        )
-                    )
-                )
-            )
-        )
+        // TODO implement
+//        array(
+//            "path" => "[KodyPocztowe/KodyPocztowe/address2code]",
+//            "description" => "Kody pocztowe",
+//            "operations" => array(
+//                array(
+//                    "method" => "GET",
+//                    "summary" => "Znajdź kod pocztowy dla danego adresu",
+//                    "nickname" => "address2code",
+//                    "type" => "",
+//                    "parameters" => array(
+//                        array(
+//                            "paramType" => "query",
+//                            "name" => "q",
+//                            "type" => "string",
+//                            "required" => false,
+//                            "description" => "Adres pełnym tekstem"
+//                        )
+//                    ),
+//                    "responseMessages" => array(
+//                        array(
+//                            "code" => 400,
+//                            "message" => "Niepoprawne żądanie"
+//                        ),
+//                        array(
+//                            "code" => 404,
+//                            "message" => "Nie znaleziono adresu"
+//                        )
+//                    )
+//                )
+//            )
+//        )
+    ),
+    '_search_endpoints' => array(// TODO _search_baseurl zamienić na Router::url
+        array('dataset' => 'kody_pocztowe', 'baseurl' => '/kody_pocztowe','subpath' => '', 'model' => 'PostalCode', 'description' => 'Wyszukuj kody pocztowe')
     )
 );

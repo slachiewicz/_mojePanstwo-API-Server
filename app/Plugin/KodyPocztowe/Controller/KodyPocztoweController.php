@@ -41,6 +41,7 @@ class KodyPocztoweController extends AppController
         $id = @$this->request->params['id'];
         $id = (int)str_replace('-', '', $id);
 
+        // TODO $this->Dataobject->find('first' nie działa, bo Cake::Modle dostaje coś innego niż oczekuje
         $response = $this->Dataobject->find('all', array(
             'conditions' => array(
                 'dataset' => 'kody_pocztowe',
@@ -48,16 +49,18 @@ class KodyPocztoweController extends AppController
             )
         ));
 
-        if (!isset($response['dataobjects']) && empty($response['dataobjects'])) {
+        if (!isset($response['dataobjects']) || empty($response['dataobjects'])) {
             throw new NotFoundException();
         }
 
-        $this->setSerialized('code', $response['dataobjects'][0]);
+        $object = $this->Dataobject->getObject('kody_pocztowe', (int) $response['dataobjects'][0]['object_id'], $this->request->query, true);
+
+        $this->setSerialized('code', $object);
     }
 
     /**
      * @SWG\Api(
-     *   path="[KodyPocztowe.KodyPocztowe/address2code]",
+     *   path="[KodyPocztowe/KodyPocztowe/address2code]",
      *   description="Kody pocztowe",
      *   @SWG\Operation(
      *      method = "GET",
@@ -90,6 +93,7 @@ class KodyPocztoweController extends AppController
 //        ),
 //            'order' => array('ulica ASC', 'numery ASC')
         // TODO
-        return false;
+
+        $this->setSerialized('code', false);
     }
 }

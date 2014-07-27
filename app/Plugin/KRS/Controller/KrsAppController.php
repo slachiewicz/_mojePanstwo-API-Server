@@ -5,7 +5,6 @@ class KrsAppController extends AppController
 
 	public function search()
 	{
-	
 		$search = array();
 		
 		$q = @$this->request->query['q'];
@@ -53,12 +52,32 @@ class KrsAppController extends AppController
 					
 				}
 			}
-		
-		}
-		
-		$this->set('search', $search);
+
+        } else {
+            throw new BadRequestException('Query parameter is required: q');
+        }
+
+        $this->set('search', $search);
 		$this->set('_serialize', array('search'));
 	
 	}
 
+    public function search_api()
+    {
+        $q = @$this->request->query['q'];
+        if(empty($q)) {
+            throw new BadRequestException('Query parameter is required: q');
+        }
+
+        $data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
+            'conditions' => array(
+                'dataset' => array('krs_podmioty', 'krs_osoby'),
+                'q' => $q . '* OR ' . $q,
+            ),
+            'limit' => 10,
+        ));
+
+        $this->set('search', $data);
+        $this->set('_serialize', array('search'));
+    }
 }

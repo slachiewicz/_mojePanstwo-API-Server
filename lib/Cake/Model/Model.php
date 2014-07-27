@@ -2984,7 +2984,7 @@ class Model extends Object implements CakeEventListener
         }
         $query['page'] = intval($query['page']);
 
-        if ($query['page'] > 1 && !empty($query['limit'])) {
+        if (empty($query['offset']) && $query['page'] > 1 && !empty($query['limit'])) {
             $query['offset'] = ($query['page'] - 1) * $query['limit'];
         }
 

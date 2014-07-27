@@ -45,8 +45,8 @@ Router::connect('/', array('controller' => 'api'));
 
 // Swagger specs
 Router::connect('/swagger/api-docs', array('controller' => 'swagger', 'action' => 'api_docs'));
-Router::connect('/swagger/api-docs/:slug', array('controller' => 'swagger', 'action' => 'resource_api_docs'), array('pass' => array('slug'), 'slug' => '[0-9a-zA-Z]+'));
-Router::connect('/swagger/:slug', array('controller' => 'swagger', 'action' => 'resource'), array('pass' => array('slug'), 'slug' => '[0-9a-zA-Z]+'));
+Router::connect('/swagger/api-docs/:slug', array('controller' => 'swagger', 'action' => 'resource_api_docs'), array('pass' => array('slug'), 'slug' => '[0-9a-zA-Z_]+'));
+Router::connect('/swagger/:slug', array('controller' => 'swagger', 'action' => 'resource'), array('pass' => array('slug'), 'slug' => '[0-9a-zA-Z_]+'));
 
 /**
  * ...and connect the rest of 'Pages' controller's URLs.

@@ -21,4 +21,20 @@ class ApiController extends AppController
             '_serialize' => 'apis'
         ));
     }
+
+    /**
+     * Example of validation error
+     * @throws ValidationException
+     */
+    public function validationException422() {
+        throw new ValidationException(array("fld1" => array('error1', 'error2')));
+    }
+
+    /**
+     * Example of custom API error
+     * @throws ApiException
+     */
+    public function apiException418() {
+        throw new ApiException("Missing-Query", array("q"), "Missing parameter: q");
+    }
 }

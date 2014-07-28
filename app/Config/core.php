@@ -80,7 +80,7 @@ Configure::write('Error', array(
  */
 Configure::write('Exception', array(
     'handler' => 'ErrorHandler::handleException',
-    'renderer' => 'ExceptionRenderer',
+    'renderer' => 'MPExceptionRenderer',
     'log' => true,
     'skipLog' => array('MissingActionException', 'MissingControllerException')
 ));

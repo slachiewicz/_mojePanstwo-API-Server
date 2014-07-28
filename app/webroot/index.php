@@ -102,9 +102,10 @@ if (!empty($failed)) {
 }
 
 App::uses('Dispatcher', 'Routing');
+App::uses('MPResponse', 'Lib');
 
 $Dispatcher = new Dispatcher();
 $Dispatcher->dispatch(
     new CakeRequest(),
-    new CakeResponse()
+    new MPResponse()
 );

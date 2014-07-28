@@ -23,6 +23,8 @@
 App::uses('Controller', 'Controller');
 App::import('Vendor', 'functions');
 App::uses('Sanitize', 'Utility');
+App::uses('ApiException', 'Error');
+App::uses('ValidationException', 'Error');
 
 /**
  * Application Controller
@@ -68,6 +70,7 @@ class AppController extends Controller
     {
     	// AuthComponent::$sessionKey = false;
         parent::beforeFilter();
+        $this->response = new MPResponse();
 
         $this->loadModel('Paszport.UserAdditionalData');
         

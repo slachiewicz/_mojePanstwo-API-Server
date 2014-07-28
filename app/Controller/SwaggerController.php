@@ -185,26 +185,15 @@ class SwaggerController extends AppController
         // TODO we need fields, filters are just a subset of it
         // add sortings, filters, switchers
         $api['apis'][] = array(
-            'path' => "$base_url/sortings",
+            'path' => "$base_url/fields",
             'operations' => array(array(
                 'method' => 'GET',
-                'summary' => 'Sortowania jakich można użyć podczas wyszukiwania',
-                'nickname' => 'sortings',
+                'summary' => 'Lista wszystkich dostępnych pól',
+                'notes' => 'Po każdym polu można wyszukiwać oraz sortować',
+                'nickname' => 'fields',
                 'parameters' => array(),
                 'type' => 'array'
-            , 'items' => array('$ref' => 'Sorting')
-            )
-            )
-        );
-        $api['apis'][] = array(
-            'path' => "$base_url/filters",
-            'operations' => array(array(
-                'method' => 'GET',
-                'summary' => 'Filtry, jakich można użyć podczas wyszukiwania',
-                'nickname' => 'filters',
-                'parameters' => array(),
-                'type' => 'array'
-            , 'items' => array('$ref' => 'Filter')
+            , 'items' => array('$ref' => 'Field')
             )
             )
         );
@@ -220,6 +209,19 @@ class SwaggerController extends AppController
             )
             )
         );
+        $api['apis'][] = array(
+            'path' => "$base_url/sortings",
+            'operations' => array(array(
+                'method' => 'GET',
+                'summary' => 'Nazwane sortowania',
+                'nickname' => 'sortings',
+                'parameters' => array(),
+                'type' => 'array'
+            , 'items' => array('$ref' => 'Sorting')
+            )
+            )
+        );
+
 
         if (!isset($api['models']))
             $api['models'] = array();
@@ -243,29 +245,21 @@ class SwaggerController extends AppController
                 )
             )
         );
-        $api['models']['Filter'] = array(
-            'id' => 'Filter',
-            'description' => 'Filtry, wyświetlające się na stronie MP',
+        $api['models']['Field'] = array(
+            'id' => 'Field',
+            'description' => 'Pole obiektu zwracanego',
             'properties' => array(
                 "field" => array(
                     'type' => 'string',
-                    'desciption' => 'Pole filtru'
+                    'desciption' => 'Nazwa pola'
                 ),
-                'label' => array(
+                'alias' => array(
                     'type' => 'string',
-                    'description' => 'Etykieta filtru'
+                    'description' => 'Nazwa zbioru danych'
                 ),
-                'typ_id' => array(
-                    'type' => 'string',
-                    'description' => 'TODO'
-                ),
-                'parent_field' => array(
-                    'type' => 'string',
-                    'description' => 'TODO',
-                ),
-                'desc' => array(
-                    'type' => 'string',
-                    'description' => 'Opis filtru',
+                'multivalue' => array(
+                    'type' => 'boolean',
+                    'description' => 'Czy wielowartościowa?'
                 )
             )
         );

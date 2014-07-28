@@ -64,19 +64,30 @@ class DatasetsController extends AppController
     {
 
         $alias = @addslashes($this->request->params['alias']);
-        if (isset($this->data['full'])) {
-            $full = $this->data['full'];
+        if (isset($this->request->query['full'])) {
+            $full = $this->request->query['full'];
         } else {
             $full = true;
         }
-        if (isset($this->data['exclude'])) {
-            $exclude = $this->data['exclude'];
+        if (isset($this->request->query['exclude'])) {
+            $exclude = $this->request->query['exclude'];
         } else {
             $exclude = null;
         }
         $this->set('filters', $this->Dataset->getFilters($alias, $full, $exclude));
         $this->set('_serialize', array('filters'));
 
+    }
+
+    public function fields()
+    {
+        $alias = @addslashes($this->request->params['alias']);
+
+        $response = $this->Dataset->getFields($alias, false);
+
+        $fields = array_map(function($el) { return $el['fields']; }, $response);
+
+        $this->setSerialized('fields', $fields);
     }
 
     public function switchers()

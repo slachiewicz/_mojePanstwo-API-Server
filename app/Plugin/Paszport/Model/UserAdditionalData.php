@@ -39,13 +39,12 @@ class UserAdditionalData extends PaszportAppModel
 
     public function getAvailableDatasets($stream_id = null)
     {
-        if (is_null($stream_id)) {
-            $stream_id = 1;
-        }
-        $datasets = $this->Stream->find('first', array('conditions' => array('Stream.id' => $stream_id), 'contain' => array('Dataset.base_alias')));
-        $this->normalizeDatasetsArray($datasets['Dataset']);
-//        debug($datasets);
-        return $datasets['Dataset'];
+    
+    	App::import('model', 'MPCache');
+        $this->MPCache = new MPCache();
+    	
+    	return $this->MPCache->getAvailableDatasets();
+        
     }
 
     protected function normalizeDatasetsArray(&$input = array())

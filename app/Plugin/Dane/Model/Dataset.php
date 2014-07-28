@@ -28,7 +28,19 @@ class Dataset extends AppModel
 
     public function find($type = 'first', $queryData = array())
     {
-
+				
+		if( 
+			( $type == 'first' ) && 
+			( ($alias = @$queryData['conditions']['Dataset.alias']) || ($alias = @$queryData['conditions']['Dataset.base_alias']) ) 
+		) {
+			
+			App::import('model', 'MPCache');
+	        $this->MPCache = new MPCache();
+	        	        
+			return $this->MPCache->getDataset( $alias, @$queryData['full'] );
+			
+		}
+		
         $fields = array();
         if (isset($queryData['fields']))
             $fields = $queryData['fields'];

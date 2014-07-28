@@ -185,12 +185,13 @@ class solrSource extends DataSource
 	            	'conditions' => array(
 	            		'Dataset.base_alias' => $_dataset,
 	            	),
+	            	'full' => true,
 	            ));
-	                     
-	            $fields = ClassRegistry::init('Dane.Dataset')->getFields($_dataset, false);
-	            $filters = ClassRegistry::init('Dane.Dataset')->getFilters($_dataset, false);
-	            $switchers = ClassRegistry::init('Dane.Dataset')->getSwitchers($_dataset, true);
-	            $orders = ClassRegistry::init('Dane.Dataset')->getSortings($_dataset, false);
+	            	                     
+	            $fields = $datasetOptions['fields'];
+	            $filters = $datasetOptions['filters'];
+	            $switchers = $datasetOptions['switchers'];
+	            $orders = $datasetOptions['orders'];
             
             }
 

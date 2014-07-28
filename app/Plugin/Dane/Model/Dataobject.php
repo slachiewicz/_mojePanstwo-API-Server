@@ -50,32 +50,43 @@ class Dataobject extends AppModel
 
     public function getObject($dataset, $id, $params = array(), $throw_not_found = false)
     {
-        	
-        $data = $this->find('all', array(
-            'conditions' => array(
-                'dataset' => $dataset,
-                'object_id' => $id,
-            ),
-            'limit' => 1,
-        ));
-
-        if (empty($data['dataobjects'])) {
-            if ($throw_not_found) {
-                throw new NotFoundException($dataset . ":" . $id);
-            }
-            return false;
-        }
+        
+        App::import('model', 'MPCache');
+        $this->MPCache = new MPCache();
+        
+        if( $data = $this->MPCache->getObjectByDataset($dataset, $id) ) {	        
+	        
+	        $this->data = $data;
+	        
+        } else {
+	        $data = $this->find('all', array(
+	            'conditions' => array(
+	                'dataset' => $dataset,
+	                'object_id' => $id,
+	            ),
+	            'limit' => 1,
+	        ));
+	
+	        if (empty($data['dataobjects'])) {
+	            if ($throw_not_found) {
+	                throw new NotFoundException($dataset . ":" . $id);
+	            }
+	            return false;
+	        }
+			
+			$this->data = @$data['dataobjects'][0];
 		
-		$this->data = @$data['dataobjects'][0];
+		}
+		
 
         // query dataset and its layers
         $mdataset = new Dataset();
-        $ds= $mdataset->find('first', array(
+        $ds = $mdataset->find('first', array(
             'conditions' => array(
                 'Dataset.alias' => $dataset,
             ),
         ));
-
+        
         $layers = array();
         foreach($ds['Layer'] as $layer) {
             $layers[$layer['layer']] = null;
@@ -165,7 +176,10 @@ class Dataobject extends AppModel
 
         if (!file_exists($file))
             return false;
-
+		
+		if( empty($this->data) )
+			$this->getObject($dataset, $id);
+		
         App::import('model', 'DB');
         $this->DB = new DB();
         

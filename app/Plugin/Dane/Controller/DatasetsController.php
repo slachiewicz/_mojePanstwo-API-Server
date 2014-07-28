@@ -6,7 +6,7 @@ class DatasetsController extends AppController
 
     public function index()
     {
-        $catalog_field = 'backup_catalog';
+        $catalog_field = 'main_search';
         $catalog_field = 'Dataset.' . $catalog_field;
 
         $datasets = $this->Dataset->find('all', array(
@@ -38,15 +38,9 @@ class DatasetsController extends AppController
                 'conditions' => array(
                     'Dataset.alias' => $alias,
                 ),
+                'full' => (boolean) ( isset($this->request->query['full']) && $this->request->query['full'] ),
             )
         );
-        
-        if( isset($this->request->query['full']) && $this->request->query['full'] ) 
-	        $dataset = array_merge($dataset, array(
-	        	'switchers' => $this->Dataset->getSwitchers($alias, true),
-	        	'filters' => $this->Dataset->getFilters($alias, true),
-	        	'orders' => $this->Dataset->getSortings($alias),
-	        ));
 	        
         $this->set('dataset', $dataset);
         $this->set('_serialize', array('dataset'));

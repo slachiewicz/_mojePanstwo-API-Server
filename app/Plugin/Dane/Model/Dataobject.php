@@ -176,7 +176,10 @@ class Dataobject extends AppModel
 
         if (!file_exists($file))
             return false;
-
+		
+		if( empty($this->data) )
+			$this->getObject($dataset, $id);
+		
         App::import('model', 'DB');
         $this->DB = new DB();
         

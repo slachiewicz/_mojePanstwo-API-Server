@@ -36,15 +36,7 @@ class DocumentsController extends AppController
     }
 
     public function view() {
-        $object = $this->Document->read(null, $this->request->params['id']); //$this->Dataobject->getObject('pisma_documents', $this->request->params['id']);
-
-        if (!isset($object['Document']) || empty($object['Document'])) {
-            throw new NotFoundException();
-        }
-
-        if ($object['Document']['from_user_id'] != $this->user_id) {
-            throw new ForbiddenException();
-        }
+        $object = $this->readOrThrow($this->request->params['id']);
 
         $this->setSerialized('object', $object['Document']);
     }
@@ -87,7 +79,7 @@ class DocumentsController extends AppController
     }
 
     private function readOrThrow($id) {
-        $object = $this->Document->read(null, $id); //$this->Dataobject->getObject('pisma_documents', $this->request->params['id']);
+        $object = $this->Document->findById($id); //$this->Dataobject->getObject('pisma_documents', $this->request->params['id']);
 
         if (!isset($object['Document']) || empty($object['Document'])) {
             throw new NotFoundException();
@@ -95,5 +87,7 @@ class DocumentsController extends AppController
         if ($object['Document']['from_user_id'] != $this->user_id) {
             throw new ForbiddenException();
         }
+
+        return $object;
     }
 }

@@ -33,6 +33,9 @@ App::uses('Model', 'Model');
  */
 class AppModel extends Model
 {
+    // TODO sprawdzoc gdzie wykorzystywany AppModel, lepiej zeby recursive był domyślnie ustawiony na niepobieranie zależnych modeli
+    //public $recursive = -1;
+
 	public function getCurrentUser($field = false) {
 	 	
 		App::uses('CakeSession', 'Model/Datasource');

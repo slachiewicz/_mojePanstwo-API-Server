@@ -115,6 +115,9 @@ CakePlugin::loadAll(array(
     'Obszary' => array(
         'routes' => true, 'bootstrap' => false,
     ),
+    'Pisma' => array(
+        'routes' => true
+    ),
     'Dane' => array(
         'routes' => true,
     ),

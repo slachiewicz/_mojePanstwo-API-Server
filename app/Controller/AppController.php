@@ -92,6 +92,14 @@ class AppController extends Controller
         header('Access-Control-Allow-Credentials: true');
     }
 
+    protected function flatResponseArray($objects, $model_name) {
+        $ret = array();
+        foreach((array) $objects as $obj) {
+            $ret[] = $obj[$model_name];
+        }
+        return $ret;
+    }
+
     public function setSerialized($data, $val = null) {
         if (is_array($data)) {
             $this->set($data);

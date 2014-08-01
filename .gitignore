@@ -37,6 +37,7 @@ app/tmp
 
 # Composer and modules installed from external sources
 app/Plugin/Composer/
+app/Vendor/*
 app/Vendor/composer
 app/Vendor/autoload.php
 app/Vendor/everyman/neo4jphp/

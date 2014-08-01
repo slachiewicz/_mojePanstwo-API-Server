@@ -5,7 +5,7 @@ App::uses('Layer', 'Dane.Model');
 
 class Dataobject extends AppModel
 {
-    public $useDbConfig = 'solr';
+    public $useDbConfig = 'MPSearch';
     public $id;
     public $data = array();
 
@@ -51,33 +51,12 @@ class Dataobject extends AppModel
     public function getObject($dataset, $id, $params = array(), $throw_not_found = false)
     {
         
-        App::import('model', 'MPCache');
-        $this->MPCache = new MPCache();
         
-        if( $data = $this->MPCache->getObjectByDataset($dataset, $id) ) {	        
-	        
-	        $this->data = $data;
-	        
-        } else {
-	        $data = $this->find('all', array(
-	            'conditions' => array(
-	                'dataset' => $dataset,
-	                'object_id' => $id,
-	            ),
-	            'limit' => 1,
-	        ));
-	
-	        if (empty($data['dataobjects'])) {
-	            if ($throw_not_found) {
-	                throw new NotFoundException($dataset . ":" . $id);
-	            }
-	            return false;
-	        }
-			
-			$this->data = @$data['dataobjects'][0];
-		
-		}
-		
+		if( $object = $this->getDataSource()->getObject($dataset, $id) )
+			$this->data =$object;
+		else
+			return false;      
+        
 
         // query dataset and its layers
         $mdataset = new Dataset();

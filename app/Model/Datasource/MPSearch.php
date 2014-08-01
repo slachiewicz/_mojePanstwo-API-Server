@@ -1,21 +1,97 @@
 <?
+class MPSearch {
 
-class solrSource extends DataSource
-{
-
-    public $API = false;
-    public $description = 'Serwer SOLR platformy _mojePaństwo';
+    public $cacheSources = true;
+    public $description = 'Serwer szukania platformy mojePaństwo';
 
     private $_excluded_fields = array('datachannel', 'dataset', 'search', 'q');
     private $_fields_multi_dict = array();
-
+    
+    public function query(){
+	    return null;
+    }
+    
+    public function getSchemaName()
+    {
+        return null;
+    }
+	
     public function __construct($config)
     {
 
-        require_once(APP . 'Vendor' . DS . 'Solr' . DS . 'Service.php');
-        $this->API = new Apache_Solr_Service($config['host'], $config['port'], $config['core']);
-        parent::__construct($config);
+        require_once(APP . 'Vendor' . DS . 'autoload.php');
+        $this->API = new Elasticsearch\Client(array(
+	    	'hosts' => array(
+	    		$config['host'] . ':' . $config['port'],
+	    	),
+	    ));
+        // parent::__construct($config);
 
+    }
+    
+    public function getObject($dataset, $id) {
+	    
+	    $params = array(
+			'index' => 'objects',
+			'body' => array(
+				'from' => 0, 
+				'size' => 1,
+				'query' => array(
+					'filtered' => array(
+				        /*
+				        'query' => array(
+				            'term' => array(
+				            	'name.first' => 'shay'
+				            )
+				        ),
+				        */
+				        'filter' => array(
+				            'and' => array(
+				                'filters' => array(
+				                    array(
+				                        'term' => array(
+				                        	'_type' => $dataset,
+				                        ),
+				                    ),
+				                    array(
+				                    	'term' => array(
+				                        	'id' => $id,
+				                        ),
+				                    ),
+				                ),
+				                '_cache' => true,
+				            ),
+				        ),
+				    ),
+				),
+			),
+		);
+
+		
+		// echo "\n\n"; var_export( $params );
+	    $es_result = $this->API->search($params);
+	    // echo "\n\n"; var_export( $es_result ); die();
+	    
+	    
+	    $object = false;
+	    if( $es_result && $es_result['hits']['total'] )
+		    return $this->doc2object( $es_result['hits']['hits'][0] );
+	    else 
+	    	return false;
+	    
+	    
+    }
+    
+    public function doc2object($doc) {
+	    
+	    return array(
+    		'id' => $doc['_id'],
+            'dataset' => $doc['_type'],
+            'object_id' => $doc['_source']['id'],
+            'data' => $doc['_source']['data'],
+            'score' => $doc['_score'],
+    	);
+	    
     }
 
     private function getFieldType($field)
@@ -35,7 +111,8 @@ class solrSource extends DataSource
         return 'string';
 
     }
-
+	
+	
     public function read(Model $model, $queryData = array())
     {
 		
@@ -931,96 +1008,73 @@ class solrSource extends DataSource
         	'tic' => getmicrotime(),
         );	
 		
-        $transport = $this->API->search($request['q'], $request['offset'], $request['limit'], $params);
-        
+		
+	
+		
+		var_export( $params ); die();
+		
+		
+		$es_results = $this->API->search(array(
+			'index' => 'objects',
+			'body' => array(
+				'query' => array(
+					'match_all' => array(),
+					/*
+					'match' => array(
+						'text' => '',
+					),
+					*/
+				),
+			),
+		));
+		
+
+				
+		
+		
+		
         
         $__timer['phases'][] = array(
         	'id' => 'query',
         	'tic' => getmicrotime(),
         );
         
-        $raw_response = $transport->getRawResponse();
-
-        $responseHeader = @get_object_vars($transport->responseHeader);
-        $qParams = @get_object_vars($responseHeader['params']);
-
-        $docs = $transport->response->docs;
-        $hls = @get_object_vars($transport->highlighting);
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
 
         // Formatujemy wynik
         $resultSet = array(
             'pagination' => array(
-                'total' => $transport->response->numFound,
+                'total' => $es_results['hits']['total'],
             ),
+            'dataobjects' => array(),
         );
 
-        $objects = array();
-        foreach ($docs as $doc) {
-            $id = $doc->getField('id');
-            $dataset = $doc->getField('dataset');
-            $object_id = $doc->getField('object_id');
-            $score = $doc->getField('score');
-            // $class = $_datasets_data[ $dataset['value'] ][0];
-            if ($dataset && $object_id) {
-                $data = array();
-                foreach ($doc->getFieldNames() as $name) {
-                    if (strpos($name, '_data_') === 0) {
-                        $field_name = substr($name, 6);
-                        $field_type = $this->getFieldType($field_name);
-
-                        $field = $doc->getField($name);
-                        $value = $field['value'];
-
-                        if ($field_type == 'date') {
-
-                            $ts = strtotime($value);
-                            $value = date('Y-m-d', $ts);
-
-                            $time = date('G:i:s', $ts);
-                            if ($time != '0:00:00')
-                                $value .= ' ' . $time;
-                        }
-                        $data[$field_name] = $value;
-
-                    } elseif (strpos($name, '_multidata_') === 0) {
-                        $field_name = substr($name, 11);
-                        $field_type = $this->getFieldType($field_name);
-
-                        $field = $doc->getField($name);
-                        $value = $field['value'];
-
-                        if (!is_array($value))
-                            $value = array($value);
-                        $data[$field_name] = $value;
-                    }
-
-                }
-
-                // TEMP (SOLR ERROR):
-                if (isset($data['data']) && stripos($data['data'], 'ERROR') === 0 && preg_match('/([0-9]{4})\-([0-9]{2})\-([0-9]{2})/', $data['data'], $match))
-                    $data['data'] = $match[0];
-
-                $object = array(
-                    'id' => $id['value'],
-                    // 'class' => $class,
-                    'dataset' => $dataset['value'],
-                    'object_id' => $object_id['value'],
-                    'data' => $data,
-                    'score' => $score,
-                );
-
-                if (isset($hls[$object['id']]->hl_text)) {
-                    $object['hl'] = array_pop($hls[$object['id']]->hl_text);
-                }
-
-                $objects[] = $object;
-            }
-
+        foreach( $es_results['hits']['hits'] as $doc ) {
+        
+        	$resultSet['dataobjects'][] = array(
+        		'id' => $doc['_id'],
+                'dataset' => $doc['_type'],
+                'object_id' => $doc['_source']['id'],
+                'data' => $doc['_source']['data'],
+                'score' => $doc['_score'],
+        	);
+        	
         }
 
-        $resultSet['dataobjects'] = $objects;
 
 
+		/*
         if ($request['facet']) {
 
             // var_export( $transport->facet_counts->facet_fields ); die();
@@ -1082,6 +1136,7 @@ class solrSource extends DataSource
             // var_export( $facets ); die();
             $resultSet['facets'] = $facets;
         }
+		*/
 		
 		$__timer['phases'][] = array(
         	'id' => 'postprocessing',

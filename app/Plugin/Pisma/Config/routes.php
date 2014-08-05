@@ -10,7 +10,9 @@ foreach(array('', '_v0') as $version) {
 
     Router::connect("$base_slug$version/documents", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'index', '[method]' => 'GET'));
     Router::connect("$base_slug$version/documents", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'save', '[method]' => 'POST'));
-    Router::connect("$base_slug$version/documents/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'view'), array('id' => '[0-9]+'));
+    Router::connect("$base_slug$version/documents/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'view', '[method]' => 'GET'), array('id' => '[0-9]+'));
+    Router::connect("$base_slug$version/documents/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'save', '[method]' => 'POST'), array('id' => '[0-9]+'));
+    Router::connect("$base_slug$version/documents/:id/send", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'send'), array('id' => '[0-9]+'));
     Router::connect("$base_slug$version/documents/:id/delete", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'delete'), array('id' => '[0-9]+'));
 }
 

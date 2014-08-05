@@ -38,21 +38,27 @@ class DocumentsController extends AppController
     public function view() {
         $object = $this->readOrThrow($this->request->params['id']);
 
-        $this->setSerialized('object', $object['Document']);
+        $this->setSerialized('object', $object);
     }
 
-    public function save() {
+    public function save($id = null) {
+        // edit & create in one func, path param has precedence
+        if ($id != null) {
+            $data['id'] = $id;
+        }
+
         $data = $this->request->data;
         if (empty($data)) {
             $data = array();
         }
 
         if (isset($data['id']) && $data['id']) {
-            $this->readOrThrow($data['id']);
+            $data = array_merge($this->readOrThrow($data['id']), $data);
 
         } else {
             $this->Document->create();
             $data['created_at'] = date('Y-m-d H:i:s');
+            $data['hash'] = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
         }
 
         $data['from_user_id'] = $this->user_id;
@@ -69,7 +75,12 @@ class DocumentsController extends AppController
         }
     }
 
+    public function send() {
+        //  TODO
+    }
+
     public function delete() {
+        // TODO test
         $this->readOrThrow($this->request->params['id']);
 
         $this->Document->delete();
@@ -88,6 +99,6 @@ class DocumentsController extends AppController
             throw new ForbiddenException();
         }
 
-        return $object;
+        return $object['Document'];
     }
 }

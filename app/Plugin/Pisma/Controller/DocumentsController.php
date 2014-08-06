@@ -80,12 +80,11 @@ class DocumentsController extends AppController
     }
 
     public function delete() {
-        // TODO test
         $this->readOrThrow($this->request->params['id']);
 
-        $this->Document->delete();
+        $this->Document->delete($this->request->params['id']);
 
-        $this->response->statusCode(204);  // 201 No content
+        $this->response->statusCode(204);  // 204 No content
         $this->setSerialized(array());
     }
 

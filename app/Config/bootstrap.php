@@ -153,6 +153,13 @@ Cache::config('short', array(
     'prefix' => 'cake_short_'
 ));
 
+Cache::config('medium', array(
+    'engine' => 'File',
+    'duration' => '+1 day',
+    'path' => CACHE,
+    'prefix' => 'cake_short_'
+));
+
 // long
 Cache::config('long', array(
     'engine' => 'File',

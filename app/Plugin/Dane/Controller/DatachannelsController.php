@@ -113,20 +113,11 @@ class DatachannelsController extends AppController
 
     public function search()
     {
-
-        $alias = @addslashes($this->request->params['alias']);
-
-        $queryData = $this->request->query;
-        $queryData['conditions']['datachannel'] = $alias;
-
-        if (isset($queryData['q'])) {
-            $queryData['conditions']['q'] = $queryData['q'];
-        }
-
-        $search = $this->Dataobject->find('all', $queryData);
-
-        $this->set('search', $search);
+          
+        $alias = @addslashes($this->request->params['alias']);                
+        $this->set('search', $this->Datachannel->search($alias, $this->request->query));
         $this->set('_serialize', array('search'));
+        
     }
 
 }

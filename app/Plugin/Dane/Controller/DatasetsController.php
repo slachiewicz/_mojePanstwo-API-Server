@@ -33,7 +33,6 @@ class DatasetsController extends AppController
     {
 				
         $alias = @addslashes($this->request->params['alias']);
-        
         $dataset = $this->Dataset->find('first', array(
                 'conditions' => array(
                     'Dataset.alias' => $alias,
@@ -48,15 +47,9 @@ class DatasetsController extends AppController
 
     public function search()
     {
-        $alias = @addslashes($this->request->params['alias']);
-
-        $this->loadModel('Dane.Dataobject');
-
-        $queryData = $this->request->query;
-        $queryData['conditions']['dataset'] = $alias;
-
-        $search = $this->Dataobject->find('all', $queryData);
-        $this->set('search', $search);
+          
+        $alias = @addslashes($this->request->params['alias']);                
+        $this->set('search', $this->Dataset->search($alias, $this->request->query));
         $this->set('_serialize', array('search'));
     }
 

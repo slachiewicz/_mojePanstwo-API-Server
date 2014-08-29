@@ -3,7 +3,7 @@
 	$_deep = 1;
 	
 	$_fields = array(
-		'id', 'nazwa', 'file', 'childsCount', 'childsDirectCount'
+		'id', 'nazwa', 'file', 'folder', 'childsCount', 'childsDirectCount'
 	);
 	
 	$select_parts = array();
@@ -14,7 +14,7 @@
 	$q = "
 	SELECT " . implode(', ', $select_parts) . " 
 	FROM `administracja_publiczna` AS t1 
-	WHERE t1.parent_id = '" . addslashes( $id ) . "'";
+	WHERE t1.parent_id = '" . addslashes( $id ) . "' AND akcept='1'";
 	
 	// LEFT JOIN administracja_publiczna AS t2 ON t2.parent_id = t1.id 
 

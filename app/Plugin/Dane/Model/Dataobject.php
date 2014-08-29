@@ -173,9 +173,7 @@ class Dataobject extends AppModel
 
                     $objects = $group['objects'];
                     $search = $this->find('all', array(
-                        'conditions' => array(
-                            'objects' => $objects,
-                        ),
+                        'objects' => $objects,
                     ));
 
                     $search_objects = $search['dataobjects'];

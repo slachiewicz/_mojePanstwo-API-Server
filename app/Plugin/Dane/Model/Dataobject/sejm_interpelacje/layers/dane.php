@@ -1,8 +1,9 @@
 <?
-	
-	$wydarzenia = $this->DB->selectAssocs("SELECT id, typ_id, nazwa, autor_str, adresaci_str, data, data_ogloszenia, dokument_id FROM s_interpelacje_tablice WHERE interpelacja_id='$id' AND akcept='1'");
 		
-	$wydarzenie_id = (isset($params) && isset($params['t']) && is_numeric($params['t'] && $params['t'])) ? $params['t'] : $wydarzenia[ 0 ]['id'];
+	$wydarzenia = $this->DB->selectAssocs("SELECT id, typ_id, nazwa, autor_str, adresaci_str, data, data_ogloszenia, dokument_id FROM s_interpelacje_tablice WHERE interpelacja_id='$id' AND akcept='1'");
+	
+	$wydarzenie_id = (isset($params) && isset($params['t']) && is_numeric($params['t']) && $params['t']) ? $params['t'] : $wydarzenia[ 0 ]['id'];
+
 	$wydarzenie = array();
 	
 	foreach( $wydarzenia as $w )

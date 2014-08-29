@@ -48,6 +48,8 @@ class Datachannel extends AppModel
 		$facets = array('dataset');
 		$order = array();
 		$q = false;
+		$limit = (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20;
+		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
 		
 		
 		$facets_dict = array();
@@ -61,7 +63,10 @@ class Datachannel extends AppModel
 		
 		if( isset($queryData['conditions']) && is_array($queryData['conditions']) ) {
 			foreach( $queryData['conditions'] as $key => $value ) {
-			
+				
+				if( in_array($key, array('page', 'limit')) )
+					continue;
+				
 				if( $key[0]=='!' )
 					$switchers[ substr($key, 1) ] = $value;
 				elseif( $key=='q' )
@@ -92,6 +97,8 @@ class Datachannel extends AppModel
         	'filters' => $filters,
         	'facets' => $facets,
         	'order' => $order,
+        	'limit' => $limit,
+        	'page' => $page,
         ));
 		
 		

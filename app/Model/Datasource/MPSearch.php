@@ -3,7 +3,8 @@ class MPSearch {
 
     public $cacheSources = true;
     public $description = 'Serwer szukania platformy mojePaństwo';
-
+	
+	private $_index = 'objects_v1_01';
     private $_excluded_fields = array('datachannel', 'dataset', 'search', 'q');
     private $_fields_multi_dict = array();
     
@@ -32,7 +33,7 @@ class MPSearch {
     public function getObject($dataset, $id) {
 	    
 	    $params = array(
-			'index' => 'objects*',
+			'index' => $this->_index,
 			'body' => array(
 				'from' => 0, 
 				'size' => 1,
@@ -85,8 +86,8 @@ class MPSearch {
             'score' => $doc['_score'],
     	);
     	    	
-    	if( isset($doc['highlight']['text']) && is_array($doc['highlight']['text']) && isset($doc['highlight']['text'][0]) )
-    		$output['hl'] = $doc['highlight']['text'][0];
+    	if( isset($doc['highlight']['text_pl']) && is_array($doc['highlight']['text_pl']) && isset($doc['highlight']['text_pl'][0]) )
+    		$output['hl'] = $doc['highlight']['text_pl'][0];
     	
     	return $output;
 	    
@@ -113,7 +114,7 @@ class MPSearch {
 	
     public function read(Model $model, $queryData = array())
     {
-		
+		        
         $params = array();
    
         App::import('model', 'MPCache');
@@ -127,6 +128,10 @@ class MPSearch {
                     20;
                     
         $queryLimit = max( min( $queryLimit, 100 ), 0 );
+    	
+    	$queryPage = (isset($queryData['page']) && is_numeric($queryData['page'])) ?
+                    $queryData['page'] :
+                    1;
     	
     	$queryQ = (isset($queryData['q']) && $queryData['q']) ?
                     $queryData['q'] :
@@ -143,14 +148,24 @@ class MPSearch {
 		$queryOrder = ( isset( $queryData['order'] ) && is_array( $queryData['order'] ) && isset($queryData['order'][0]) && is_array($queryData['order'][0]) ) ? 
 			$queryData['order'][0] : 
 			array();
-			
+		
+		$queryObjects = ( isset( $queryData['objects'] ) && is_array( $queryData['objects'] ) ) ? 
+			$queryData['objects'] : 
+			array();
+		
+		if( empty($queryObjects) )
+			$queryObjects = ( isset( $queryData['conditions']['objects'] ) && is_array( $queryData['conditions']['objects'] ) ) ? 
+				$queryData['conditions']['objects'] : 
+				array();
+		
+		
 			
         
         
         $and_filters = array();
         foreach( $queryFilters as $key => $value ) {
         	
-        	$term = array();
+        	
         	
         	if( $key == 'dataset' ) {
         		
@@ -170,24 +185,87 @@ class MPSearch {
 	        		
         		}
         		
+			} elseif( $key == 'page' ) {
+			
+				// ignore this key
+        	
+        	} elseif( $key == 'limit' ) {
+
+				// ignore this key
+        		
         	} else {
         		
-        		$_key = is_array($value[0]) ? 'terms' : 'term';
         		$prefix = 'data';
         		if( $value[1] )
         			$prefix = 'data_virtual';
 	        	
-	        	$term[ $prefix . '.' . $key ] = $value[0];
+	        	$key = $prefix . '.' . $key;
+        		
+
+				if( is_string($value[0]) && preg_match('^\[(.*?) TO (.*?)\]^i', $value[0], $match) ) {
+					
+					$range = array();
+					
+					if( $gte = $this->formatDate( $match[1] ) )
+						$range['gte'] = $gte;
+					if( $lte = $this->formatDate( $match[2] ) )
+						$range['lte'] = $lte;
+
+					
+					$and_filters[] = array(
+						'range' => array(
+							$key => $range,
+						),
+					);
+					
+					
+				} else {
+					
+					$_key = is_array($value[0]) ? 'terms' : 'term';
+		        	
+		        	$and_filters[] = array(
+		        		$_key => array(
+		        			$key => $value[0],
+		        		),
+		        	);
 	        	
-	        	$and_filters[] = array(
-	        		$_key => $term,
-	        	);
+	        	}
 	        	        	
         	}
         	
         	
         
         }
+        
+        if( !empty( $queryObjects ) ) {
+        	
+        	$ors = array();
+        	
+	        foreach( $queryObjects as $obj ) {
+		        
+		        $ors[] = array(
+        			'and' => array(
+        				array(
+        					'term' => array(
+				        		'_type' => $obj['dataset'],
+		        			),
+        				),
+        				array(
+        					'term' => array(
+				        		'id' => $obj['object_id'],
+		        			),
+        				),
+        			),
+        		);
+		        
+	        }
+	        
+	        $and_filters[] = array(
+	        	'or' => $ors,
+	        );
+        
+        }
+        
         
         $filtered = array(
 	        'filter' => array(
@@ -200,12 +278,12 @@ class MPSearch {
 	    
 	    
 	    
+	    $_from = ( $queryPage - 1 ) * $queryLimit;
 	    
-        
         $params = array(
-			'index' => 'objects*',
+			'index' => $this->_index,
 			'body' => array(
-				'from' => 0, 
+				'from' => $_from, 
 				'size' => $queryLimit,
 				'query' => array(
 					'filtered' => $filtered,
@@ -219,8 +297,12 @@ class MPSearch {
 		
 		if( $queryQ ) {
 			
-			$params['body']['query']['filtered']['query']['match'] = array(
-				'text' => $queryQ,
+			$params['body']['query']['filtered']['query']['match_phrase'] = array(
+				'text_pl' => array(
+					'query' => $queryQ,
+					'analyzer' => 'morfologik',
+					'slop' => 10,
+				),
 	    	);
 			
 			$sort[] = array(
@@ -229,12 +311,38 @@ class MPSearch {
 			
 			$params['body']['highlight'] = array(
 	    		'fields' => array(
-	    			'text' => array(
+	    			'text_pl' => array(
 	    				'index_options' => 'offsets',
 	    				'number_of_fragments' => 1,
 	    			),
 	    		),
-	    	);	    	
+	    		
+	    	);
+	    	
+	    	$params['body']['suggest'] = array(
+			    "text" => $queryQ,
+			    "didyoumean" => array(
+			      "phrase" => array(
+			        "analyzer" => "simple",
+			        "field" => "text_pl",
+			        "size" => 1,
+			        "real_word_error_likelihood" => 0.95,
+			        "max_errors" => 0.5,
+			        "gram_size" => 2,
+			        "direct_generator" => array(
+			        	array(
+				          "field" => "text_pl",
+				          "suggest_mode" => "always",
+				          "min_word_length" => 1
+				        ),
+				    ),
+			        "highlight" => array(
+			          "pre_tag" => "<em>",
+			          "post_tag" => "</em>"
+			        )
+			      )
+			    )
+			); 	
 	    		
 	    }
 	    
@@ -249,10 +357,10 @@ class MPSearch {
 				
 				$direction = ( isset($parts[1]) && in_array($parts[1], array('asc', 'desc')) ) ? $parts[1] : 'asc';
 				
-				if( $field == '_title' ) {
+				if( $field == '_title_pl' ) {
 					
 					$sort[] = array(
-						'title.raw' => $direction,
+						'title_pl.raw' => $direction,
 					);
 				
 				} elseif( $field == 'score' ) {
@@ -331,28 +439,56 @@ class MPSearch {
         
         
         
+        
+        
 
         
         
         $output = array(
         	'pagination' => array(
+        		'count' => null,
         		'total' => null,
+        		'from' => null,
+        		'to' => null,
+        	),
+        	'performance' => array(
+        		'took' => null,
         	),
         	'dataobjects' => array(),
+        	'didyoumean' => false,
         );
         
         
-	    if( $es_result && $es_result['hits']['total'] ) {
+        if( $es_result ) {
+        	
+        	$_count = count( $es_result['hits']['hits'] );
+        	$output['performance']['took'] = $es_result['took'];
+        	
+        	$output['pagination'] = array_merge($output['pagination'], array(
+        		'count' => $_count,
+        		'total' => $es_result['hits']['total'],
+        		'from' => $_from + 1,
+        		'to' => $_from + $_count,
+        	));
+        	
+		    if( $_count ) {
+			    
+			    foreach( $es_result['hits']['hits'] as $doc )
+			    	$output['dataobjects'][] = $this->doc2object( $doc );
+			    
+		    } else {
 		    
-		    $output['took'] = $es_result['took'];
+			    if( isset($es_result['suggest']) && isset($es_result['suggest']['didyoumean']) && !empty($es_result['suggest']['didyoumean']) ) {
+				    
+				    $didyoumean = @array_shift( $es_result['suggest']['didyoumean'] );
+				    
+				    if( isset($didyoumean['options']) && !empty($didyoumean['options']) )
+				    	$output['didyoumean'] = $didyoumean['options'][0]['highlighted'];
+				    
+			    }
 		    
-		    $output['pagination'] = array(
-		    	'total' => $es_result['hits']['total'],
-		    );
-		    
-		    foreach( $es_result['hits']['hits'] as $doc )
-		    	$output['dataobjects'][] = $this->doc2object( $doc );
-		    
+		    }
+	    
 	    }
 	    
 	    
@@ -372,6 +508,16 @@ class MPSearch {
 
     }
 
-
+	private function formatDate( $inp ) {
+		
+		if( $inp == '*' ) {
+			return false;
+		} elseif( in_array($inp, array('NOW/DAY')) ) {
+			return 'now';
+		} else {
+			return $inp;
+		}
+		
+	}
 
 }

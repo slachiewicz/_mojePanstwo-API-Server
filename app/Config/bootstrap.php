@@ -118,6 +118,9 @@ CakePlugin::loadAll(array(
     'Dane' => array(
         'routes' => true,
     ),
+    'Kultura' => array(
+        'routes' => true,
+    ),
 ));
 
 /**

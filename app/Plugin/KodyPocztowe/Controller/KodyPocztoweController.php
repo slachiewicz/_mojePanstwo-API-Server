@@ -40,12 +40,12 @@ class KodyPocztoweController extends AppController
     {
         $id = @$this->request->params['id'];
         $id = (int)str_replace('-', '', $id);
-
+				
         // TODO $this->Dataobject->find('first' nie działa, bo Cake::Modle dostaje coś innego niż oczekuje
         $response = $this->Dataobject->find('all', array(
-            'conditions' => array(
+            'filters' => array(
                 'dataset' => 'kody_pocztowe',
-                'kod_int' => $id
+                'kod_int' => array($id, false),
             )
         ));
 

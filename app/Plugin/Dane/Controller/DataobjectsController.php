@@ -37,8 +37,9 @@ class DataobjectsController extends AppController
 
         $alias = $this->request->params['alias'];
         $id = $this->request->params['object_id'];
-        $layer = $this->request->params['layer'];
-        $params = $this->data;
+        $layer = $this->request->params['layer'];        
+        $params = array_merge($this->request->query, $this->data);
+                
         if (!$alias || !$id || !$layer)
             return false;
 

@@ -479,25 +479,46 @@
 	                                                                                                            
 	            case 'sejm_posiedzenia.punkty':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_posiedzenia_punkty AND _data_posiedzenie_id:(' . $value . ')';
-	
-	                
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'sejm_posiedzenia_punkty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.posiedzenie_id' => $value,
+		        		),
+		        	);	                
 	                break;
 	            }
 	            
 	            case 'sejm_posiedzenia.wystapienia':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_wystapienia AND _data_posiedzenie_id:(' . $value . ')';
-	
-	                
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'sejm_wystapienia',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.posiedzenie_id' => $value,
+		        		),
+		        	);	                
 	                break;
 	            }
 	            
 	            case 'sejm_posiedzenia.glosowania':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_glosowania AND _data_posiedzenie_id:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'sejm_glosowania',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.posiedzenie_id' => $value,
+		        		),
+		        	);	                
 	                break;
 	            }
 	            

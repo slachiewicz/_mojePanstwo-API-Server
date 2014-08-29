@@ -198,10 +198,16 @@ class Dataset extends AppModel
 		$facets = array();
 		$order = array();
 		$q = false;
-					
+		$limit = (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20;
+		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
+			
+		
 		if( isset($queryData['conditions']) && is_array($queryData['conditions']) ) {
 			foreach( $queryData['conditions'] as $key => $value ) {
-			
+				
+				if( in_array($key, array('page', 'limit')) )
+					continue;
+					
 				if( $key[0]=='!' )
 					$switchers[ substr($key, 1) ] = $value;
 				elseif( $key=='q' )
@@ -222,16 +228,20 @@ class Dataset extends AppModel
 		
 		
 		if (!empty($switchers)) {
-                        
+                               
             $dataset_switchers_exp_dict = array_column($dataset['switchers'], 'switcher');
             $dataset_switchers_exp_dict = array_column($dataset_switchers_exp_dict, 'expression', 'name');
 						
 			foreach( $switchers as $key => $value ) {
                 if( $exp = $dataset_switchers_exp_dict[ $key ] ) {
-					
-					// debug( $dataset_switchers_exp_dict ); die();
-                    // $filters[] = $exp;
-
+					if( $parts = explode(':', $exp) ) {
+						
+						if( stripos($parts[0], '_data_') === 0 )
+							$parts[0] = substr($parts[0] , 6);
+							
+						$filters[ $parts[0] ] = array($parts[1], false);
+						
+					}
                 }
             }
 						
@@ -254,9 +264,7 @@ class Dataset extends AppModel
 		
 		if( isset($queryData['order']) && $queryData['order'] )
 			$order = $queryData['order'];	
-		
 				
-		
 		App::import('model','Dane.Dataobject');
 		$this->Dataobject = new Dataobject();
         $search = $this->Dataobject->find('all', array(
@@ -264,7 +272,8 @@ class Dataset extends AppModel
         	'filters' => $filters,
         	'facets' => $facets,
         	'order' => $order,
-        	'limit' => (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20,
+        	'limit' => $limit,
+        	'page' => $page,
         ));
 		
 		

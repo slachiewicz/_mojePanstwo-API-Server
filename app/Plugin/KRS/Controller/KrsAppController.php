@@ -12,10 +12,10 @@ class KrsAppController extends AppController
 		{
 		
 			$data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
-				'conditions' => array(
+				'filters' => array(
 					'dataset' => array('krs_podmioty', 'krs_osoby'),
-					'q' => $q . '* OR ' . $q,
 				),
+				'q' => $q . '* OR ' . $q,
 				'limit' => 10,
 			));
 			if( isset($data['dataobjects']) && !empty($data['dataobjects']) )

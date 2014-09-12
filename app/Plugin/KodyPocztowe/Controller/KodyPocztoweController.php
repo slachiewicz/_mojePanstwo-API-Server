@@ -1,41 +1,9 @@
 <?php
 
-/**
- * Mapowanie kodów pocztowych na adresy
- *
- * @SWG\Resource(
- *      resourcePath="/kodyPocztowe",
- *      apiVersion="1.0"
- * )
- *
- */
 class KodyPocztoweController extends AppController
 {
     public $uses = array('Dane.Dataobject');
 
-    /**
-     * @SWG\Api(
-     *   path="[KodyPocztowe/KodyPocztowe/view/id:{postal_code}]",
-     *   description="Kody pocztowe",
-     *   @SWG\Operation(
-     *      method = "GET",
-     *      summary = "Znajdź adresy objęte kodem pocztowym",
-     *      type = "PostalCode",
-     *      nickname = "code2address",
-     *
-     *      @SWG\Parameter(
-     *           name="postal_code",
-     *           description="Kod pocztowy w formacie [0-9]{2}-?[0-9]{3}",
-     *           paramType="path",
-     *           required=true,
-     *           type="string"
-     *         ),
-     *      @SWG\ResponseMessage(code=400, message="Niepoprawne żądanie"),
-     *      @SWG\ResponseMessage(code=404, message="Nie znaleziono kodu")
-     *   )
-     * )
-     *
-     */
     public function view()
     {
         $id = @$this->request->params['id'];
@@ -58,30 +26,63 @@ class KodyPocztoweController extends AppController
         $this->setSerialized('code', $object);
     }
 
-    /**
-     * @SWG\Api(
-     *   path="[KodyPocztowe/KodyPocztowe/address2code]",
-     *   description="Kody pocztowe",
-     *   @SWG\Operation(
-     *      method = "GET",
-     *      summary = "Znajdź kod pocztowy dla danego adresu",
-     *      type = "",
-     *      nickname = "address2code",
-     *
-     *      @SWG\Parameter(
-     *           name="q",
-     *           description="Adres pełnym tekstem",
-     *           paramType="query",
-     *           required=false,
-     *           type="string"
-     *         ),
-     *      @SWG\ResponseMessage(code=400, message="Niepoprawne żądanie"),
-     *      @SWG\ResponseMessage(code=404, message="Nie znaleziono adresu")
-     *   )
-     * )
-     *
-     */
     public function address2code() {
+
+        $q = @$this->request->query['q'];
+        if( $q )
+        {
+            $result = array();
+
+            $this->loadModel('Dane.Dataobject');
+            $data = $this->Dataobject->find('all', array(
+                'conditions' => array(
+                    'dataset' => 'kody_pocztowe_ulice',
+                    'q' => $q
+                ),
+                'limit' => 10,
+            ));
+
+            if( isset($data['dataobjects']) && !empty($data['dataobjects']) )
+            {
+                foreach( $data['dataobjects'] as $object )
+                {
+                    $search_item = array(
+                        'id' => $object['data']['id'],
+                    );
+
+                    if( $object['dataset']=='krs_osoby' )
+                    {
+                        $search_item = array_merge($search_item, array(
+                            'type' => 'person',
+                            'id' => $object['data']['id'],
+                            'nazwa' => $object['data']['imiona'] . ' ' . $object['data']['nazwisko'],
+                            'wiek' => pl_wiek( $object['data']['data_urodzenia'] ),
+                        ));
+                    }
+                    elseif( $object['dataset']=='krs_podmioty' )
+                    {
+                        $search_item = array(
+                            'type' => 'organization',
+                            'id' => $object['data']['id'],
+                            'nazwa' => $object['data']['nazwa'],
+                            'data_rejestracji' => $object['data']['data_rejestracji'],
+                            'kapital_zakladowy' => $object['data']['wartosc_kapital_zakladowy'],
+                            'miejscowosc' => $object['data']['adres_miejscowosc'],
+                        );
+                    }
+
+                    $result[] = $search_item;
+                }
+            }
+
+        } else {
+            throw new BadRequestException('Query parameter is required: q');
+        }
+
+        $this->set('result', $result);
+        $this->set('_serialize', 'result');
+
+
         // pl_kody_pocztowe_pna
 //        'fields' => array(
 //            'Address.id',
@@ -93,7 +94,5 @@ class KodyPocztoweController extends AppController
 //        ),
 //            'order' => array('ulica ASC', 'numery ASC')
         // TODO
-
-        $this->setSerialized('code', false);
     }
 }

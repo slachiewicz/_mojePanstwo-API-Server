@@ -118,6 +118,9 @@ CakePlugin::loadAll(array(
     'Pisma' => array(
         'routes' => true
     ),
+    'BDL' => array(
+        'routes' => true,
+    ),
     'Dane' => array(
         'routes' => true,
     ),

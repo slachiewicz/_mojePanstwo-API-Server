@@ -19,17 +19,14 @@ class SejmometrController extends AppController
 
     private function getPoslowie($order, $limit = 10)
     {
-        $this->loadModel('Dane.Dataobject');
+        $this->loadModel('Dane.Dataset');
 
         $queryData = array(
             'limit' => 10,
-            'conditions' => array(
-                'dataset' => 'poslowie'
-            ),
             'order' => $order,
         );
-
-        $search = $this->Dataobject->find('all', $queryData);
+				
+        $search = $this->Dataset->search('poslowie', $queryData);
         $search['order'] = $order;
 
         return $search;

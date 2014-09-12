@@ -2,27 +2,27 @@
 
 class KodyPocztoweController extends AppController
 {
-    public $uses = array('Dane.Dataobject');
+    public $uses = array('Dane.Dataset');
 
     public function view()
     {
+        	
         $id = @$this->request->params['id'];
         $id = (int)str_replace('-', '', $id);
-
+		
+				
         // TODO $this->Dataobject->find('first' nie działa, bo Cake::Modle dostaje coś innego niż oczekuje
-        $response = $this->Dataobject->find('all', array(
+        $response = $this->Dataset->search('kody_pocztowe', array(
             'conditions' => array(
-                'dataset' => 'kody_pocztowe',
-                'kod_int' => $id
+                'kod_int' => $id,
             )
         ));
 
         if (!isset($response['dataobjects']) || empty($response['dataobjects'])) {
-            throw new NotFoundException();
+            $response['dataobjects'] = array();
         }
-
-        $object = $this->Dataobject->getObject('kody_pocztowe', (int) $response['dataobjects'][0]['object_id'], $this->request->query, true);
-
+		
+        $object = $response['dataobjects'][0];
         $this->setSerialized('code', $object);
     }
 

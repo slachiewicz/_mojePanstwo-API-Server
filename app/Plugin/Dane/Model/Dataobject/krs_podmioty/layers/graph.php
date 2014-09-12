@@ -50,7 +50,7 @@
 				'id' => 'podmiot' . $d['organizacja_id'],
 				'data' => array(
 					'krs' => $d['krs'],
-					'kapital_zakladowy' => $d['kapital_zakladowy'],
+					// 'kapital_zakladowy' => $d['kapital_zakladowy'],
 					'miejscowosc' => $d['miejscowosc'],
 					'data_rejestracji' => $d['data_rejestracji'],
 					'forma' => $d['forma'],

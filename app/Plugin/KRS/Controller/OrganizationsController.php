@@ -7,7 +7,7 @@ class OrganizationsController extends AppController
 	   	// NAJNOWSZE ORGANIZACJE
 	   	
 	   	$data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
-	   		'conditions' => array(
+	   		'filters' => array(
 	   			'dataset' => 'krs_podmioty',
 	   		),
 	   		'order' => 'data_rejestracji desc',
@@ -19,13 +19,14 @@ class OrganizationsController extends AppController
 	   	{
 		    foreach( $data['dataobjects'] as $object )
 		    {
+		    			    	
 			    $najnowsze_organizacje[] = array(
 			    	'type' => 'organization',
 			    	'id' => $object['data']['id'],
 			    	'nazwa' => $object['data']['nazwa'],
-			    	'data_rejestracji' => $object['data']['data_rejestracji'],
-			    	'kapital_zakladowy' => $object['data']['wartosc_kapital_zakladowy'],
-			    	'miejscowosc' => $object['data']['adres_miejscowosc'],
+			    	'data_rejestracji' => @$object['data']['data_rejestracji'],
+			    	'kapital_zakladowy' => @$object['data']['wartosc_kapital_zakladowy'],
+			    	'miejscowosc' => @$object['data']['adres_miejscowosc'],
 			    );
 		    }
 	   	}

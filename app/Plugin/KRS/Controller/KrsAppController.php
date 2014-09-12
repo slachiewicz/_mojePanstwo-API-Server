@@ -11,11 +11,11 @@ class KrsAppController extends AppController
 		if( $q )
 		{
 		
-			$data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
+			$data = ClassRegistry::init('Dane.Dataobject')->search(array('krs_podmioty', 'krs_osoby'), array(
 				'conditions' => array(
-					'dataset' => array('krs_podmioty', 'krs_osoby'),
-					'q' => $q . '* OR ' . $q,
+					'q' => $q,
 				),
+				'mode' => 'title_prefix',
 				'limit' => 10,
 			));
 			if( isset($data['dataobjects']) && !empty($data['dataobjects']) )

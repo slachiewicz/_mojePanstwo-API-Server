@@ -124,6 +124,9 @@ CakePlugin::loadAll(array(
     'Dane' => array(
         'routes' => true,
     ),
+    'Kultura' => array(
+        'routes' => true,
+    ),
 ));
 
 /**
@@ -155,6 +158,13 @@ Cache::config('ultrashort', array(
 Cache::config('short', array(
     'engine' => 'File',
     'duration' => '+1 hours',
+    'path' => CACHE,
+    'prefix' => 'cake_short_'
+));
+
+Cache::config('medium', array(
+    'engine' => 'File',
+    'duration' => '+1 day',
     'path' => CACHE,
     'prefix' => 'cake_short_'
 ));

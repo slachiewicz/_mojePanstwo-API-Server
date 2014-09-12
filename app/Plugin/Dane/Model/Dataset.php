@@ -36,8 +36,11 @@ class Dataset extends AppModel
 			
 			App::import('model', 'MPCache');
 	        $this->MPCache = new MPCache();
-	        	        
-			return $this->MPCache->getDataset( $alias, @$queryData['full'] );
+	 	    
+	 	    $output = $this->MPCache->getDataset( $alias, @$queryData['full'] );
+	 	    $output['orders'] = isset($output['orders_es']) ? $output['orders_es'] : array();
+	 	    	        	        
+			return $output;
 			
 		}
 		
@@ -65,7 +68,7 @@ class Dataset extends AppModel
 
         $queryData = array_merge_recursive(array(
             'fields' => $fields,
-            'order' => array('Dataset.ord' => 'asc'),
+            // 'order' => array('Dataset.ord' => 'asc'),
             'limit' => 100,
         ), $queryData);
 
@@ -177,84 +180,207 @@ class Dataset extends AppModel
 
     }
 
-    public function getFilterParams($alias, $field, $counts)
-    {
 
-        if (empty($counts))
-            return false;
+    
+    public function search($alias, $queryData = array()) {
+	    
+	    
+		$dataset = $this->find('first', array(
+			'conditions' => array(
+			    'Dataset.alias' => $alias,
+			),
+			'full' => 1,
+		));
+				
+		$_fields = array();
+		foreach( array_column($dataset['fields'], 'fields') as $field ) {
+			
+			$_field = $field['field'];
+			if( $field['alias']==$alias )				
+				$_fields[] = $_field;
+				
+			$_fields[] = $field['alias'] . '.' . $_field;
+			
+		}
+		
+		$virtual_fields = $dataset['virtual_fields'];		
+		$filters = array(
+			'dataset' => $alias,
+		);
+		$switchers = array();
+		$facets = array();
+		$order = array();
+		$q = false;
+		$mode = (isset($queryData['mode']) && $queryData['mode']) ? $queryData['mode'] : null;
+		$do_facets = (isset($queryData['facets']) && $queryData['facets']) ? true : false;
+		$limit = (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20;
+		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
+		$version = (isset($dataset['Dataset']['version']) && $dataset['Dataset']['version']) ? $dataset['Dataset']['version'] : false;
+		
 
-        $field = str_replace('_multidata_', '', $field);
-        $filter = $this->query("SELECT `typ_id`, `params` FROM `datasets_filters` WHERE `dataset`='" . addslashes($alias) . "' AND `field`='" . addslashes($field) . "' LIMIT 1");
-        if (!$filter)
-            return false;
-
-        $filter = $filter[0]['datasets_filters'];
-        if (!$filter['typ_id'])
-            return false;
-
-        $params = @json_decode($filter['params'], 1);
-        if (!$params)
-            return false;
 
 
-        if ($filter['typ_id'] == '1') {
-
-            $ids = array();
-            foreach ($counts as $id => $count)
-                if ($id && $count)
-                    $ids[] = $id;
-
-
-            if (isset($params['table'])) {
-
-                $id_field = isset($params['id_field']) ? $params['id_field'] : 'id';
-                $title_field = isset($params['title_field']) ? $params['title_field'] : 'nazwa';
-                $table = $params['table'];
-
-                $data = $this->query("SELECT `$id_field` as 'id', `$title_field` as 'label' FROM `$table` WHERE `$id_field`='" . implode("' OR `$id_field`='", $ids) . "'");
-
-                $dictionary = @array_column(array_column($data, $table), 'label', 'id');
-
-                $options = array();
-                foreach ($counts as $id => $count)
-                    if ($id && $id != '_empty_' && $count)
-                        $options[] = array(
-                            'id' => $id,
-                            'label' => array_key_exists($id, $dictionary) ? $dictionary[$id] : ' - ',
-                            'count' => $count,
-                        );
-
-                $params['options'] = $options;
-
+		if( isset($queryData['conditions']) && is_array($queryData['conditions']) ) {
+			foreach( $queryData['conditions'] as $key => $value ) {
+				
+				if( in_array($key, array('page', 'limit')) )
+					continue;
+					
+				if( $key[0]=='!' )
+					$switchers[ substr($key, 1) ] = $value;
+				elseif( $key=='q' )
+					$q = $value;
+				elseif( in_array($key, $_fields) )
+					$filters[ $key ] = array($value, in_array($key, $virtual_fields));
+				elseif( $key=='_source' )
+					$filters[ $key ] = $value;
+			
+			}
+		}
+		
+		
+		
+		
+		if( isset($queryData['q']) )
+			$q = $queryData['q'];
+			
+		
+		
+		
+		if (!empty($switchers)) {
+                               
+            $dataset_switchers_exp_dict = array_column($dataset['switchers'], 'switcher');
+            $dataset_switchers_exp_dict = array_column($dataset_switchers_exp_dict, 'expression', 'name');
+						
+			foreach( $switchers as $key => $value ) {
+                if( $exp = $dataset_switchers_exp_dict[ $key ] ) {
+					if( $parts = explode(':', $exp) ) {
+						
+						if( stripos($parts[0], '_data_') === 0 )
+							$parts[0] = substr($parts[0] , 6);
+							
+						$filters[ $parts[0] ] = array($parts[1], false);
+						
+					}
+                }
             }
+						
+        }		
+		
+		
+		if( $do_facets ) {
+		
+			$facets_dict = array();
+			if( isset($dataset['filters']) ) {
+					
+				foreach( $dataset['filters'] as $filter ) 
+					if( ( $filter = $filter['filter'] ) && in_array($filter['typ_id'], array(1, 2)) ) {
+											
+						$facets[] = array($filter['field'], in_array($filter['field'], $virtual_fields));
+						$facets_dict[ $filter['field'] ] = $filter;
+					
+					}
+			
+			}
+		
+		}
+		
+		
+		$_order = array();
+		if( isset($queryData['order']) && $queryData['order'] )
+			$order = $queryData['order'];
+		
+		if( is_string($order) )
+			$order = array( $order );
+		
+		foreach( $order as $o ) {
+			
+			$_field = $o;
+			if( $p = strpos($o, ' ') )
+				$_field = substr($o, 0, $p);
+			
+			if( in_array($_field, $_fields) )
+				$_order[] = $o;
+			
+		}
 
-        } elseif ($filter['typ_id'] == '2') {
+				
+		App::import('model','Dane.Dataobject');
+		$this->Dataobject = new Dataobject();
+        $search = $this->Dataobject->find('all', array(
+        	'q' => $q,
+        	'mode' => $mode,
+        	'filters' => $filters,
+        	'facets' => $facets,
+        	'order' => $_order,
+        	'limit' => $limit,
+        	'page' => $page,
+        	'version' => $version,
+        ));
+		
+		
+		if( isset($search['facets']) ) {
+						
+			App::import('model', 'DB');
+	        $this->DB = new DB();
+			
+			$facets = array();
+			foreach( $search['facets'] as $field => $buckets ) {
+				
+				$filter = $facets_dict[ $field ];
+				$buckets = $buckets[ 0 ];
+				$options = array();
+				
+				if ($filter['typ_id'] == '1') {
 
-            for ($i = 0; $i < count($params['options']); $i++)
-                $params['options'][$i]['count'] = @$counts[$params['options'][$i]['id']];
-
-        } elseif ($filter['typ_id'] == '5') {
-
-            $ids = array();
-            foreach ($counts as $id => $count)
-                if ($id)
-                    $ids[] = $id;
-
-
-            $options = array();
-            foreach ($counts as $id => $count)
-                if ($id && $count)
-                    $options[] = array(
-                        'id' => $id,
-                        'label' => $id,
-                        'count' => $count,
-                    );
-
-            $params['options'] = $options;
-
-        } else return false;
-
-        return $params;
+		            $ids = array();
+		            foreach ($buckets as $b)
+		                if( $b['key'] && $b['doc_count'] )
+		                    $ids[] = $b['key'];
+		
+		
+		            if (isset($filter['params']['table'])) {
+		
+		                $id_field = isset($filter['params']['id_field']) ? $filter['params']['id_field'] : 'id';
+		                $title_field = isset($filter['params']['title_field']) ? $filter['params']['title_field'] : 'nazwa';
+		                $table = $filter['params']['table'];
+		
+		                $data = $this->DB->selectAssocs("SELECT `$id_field` as 'id', `$title_field` as 'label' FROM `$table` WHERE `$id_field`='" . implode("' OR `$id_field`='", $ids) . "'");
+						$data = array_column( $data, 'label', 'id' );
+						
+						
+						foreach( $buckets as $b )
+							$options[] = array(
+								'id' => $b['key'],
+								'count' => $b['doc_count'],
+								'label' => array_key_exists($b['key'], $data) ? $data[ $b['key'] ] : ' - ',
+							);
+							
+		                $filter['params'] = array(
+		                	'options' => $options,
+		                );
+		
+		            }
+		
+		        } elseif ($filter['typ_id'] == '2') {
+					
+					$data = array_column($buckets, 'doc_count', 'key');
+					
+		            for ($i = 0; $i < count($filter['params']['options']); $i++)
+		                $filter['params']['options'][$i]['count'] = @$data[ strtolower( $filter['params']['options'][$i]['id'] ) ];
+		
+		        }
+		        
+		        $facets[] = $filter;
+				
+			}
+			
+			$search['facets'] = $facets;
+			
+		}
+				
+		return $search;
+	    
     }
 
 }

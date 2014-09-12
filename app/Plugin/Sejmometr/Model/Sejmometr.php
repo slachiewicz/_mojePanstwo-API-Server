@@ -3,7 +3,7 @@
 class Sejmometr extends AppModel
 {
     
-    public $useDbConfig = 'solr';
+    public $useDbConfig = 'MPSearch';
     public $useTable = false;
 
     public function autorzy_projektow()
@@ -64,71 +64,66 @@ class Sejmometr extends AppModel
 	    	array(
 	    		'id' => 'projekty_ustaw',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '1',
 	    		),
 	    	),
 	    	array(
 	    		'id' => 'projekty_uchwal',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '2',
 	    		),
 	    	),
 	    	array(
 	    		'id' => 'sprawozdania_kontrolne',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '11',
 	    		),
 	    	),
 	    	array(
 	    		'id' => 'umowy',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '6',
 	    		),
 	    	),
 	    	array(
 	    		'id' => 'powolania_odwolania',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '5',
 	    		),
 	    	),	    	
 	    	array(
 	    		'id' => 'sklady_komisji',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '100',
 	    		),
 	    	),
 	    	array(
 	    		'id' => 'referenda',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '103',
 	    		),
 	    	),
 	    	array(
 	    		'id' => 'inne',
 	    		'conditions' => array(
-	    			'dataset' => 'prawo_projekty',
 	    			'typ_id' => '12',
 	    		),
 	    	),
 	    );
 	    
+	    
+	    App::import('model','Dane.Dataset');
+		$this->Dataset = new Dataset();
 	    $output = array();
 	    
 	    foreach( $chapters as $chapter ) {
 	    	
-	    	$data = $this->find('all', array(
+	    	$data = $this->Dataset->search('prawo_projekty', array(
 	            'conditions' => $chapter['conditions'],
 	            'limit' => 9,
 	        ));
 	        
-	        $href = '/dane/' . $chapter['conditions']['dataset'];
+	        $href = '/dane/prawo_projekty';
 	        $conditions = $chapter['conditions'];
 	        unset( $conditions['dataset'] );
 	        

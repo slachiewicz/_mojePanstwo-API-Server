@@ -2,12 +2,16 @@
 
 	$object = $this->getObject($dataset, $id);
 	
+	
+	
 	$output = array(
 	    'groups' => array(),
 	);
 	
 	
 	$punkt_id = $object['data']['id'];
+
+
 	
 	/*
     $output['groups'][] = array(
@@ -26,10 +30,11 @@
 	
 	
 	// DEBATY    
-        
-    if( $debaty = $this->DB->selectValues("SELECT `subpunkt_id` FROM `stenogramy_subpunkty-punkty` WHERE `punkt_id`='$punkt_id' AND `deleted`='0' LIMIT 100") )
+    
+    $q = "SELECT `subpunkt_id` FROM `stenogramy_subpunkty-punkty` WHERE `punkt_id`='$punkt_id' AND `deleted`='0' LIMIT 100";
+    if( $debaty = $this->DB->selectValues($q) )
     {
-    	
+    	    	
     	$group = array(
 	        'id' => 'debaty',
 	        'title' => 'Debaty',
@@ -69,8 +74,6 @@
         $output['groups'][] = $group;
 
     }
-	
-	
-	
+		
 	return $output;
 	

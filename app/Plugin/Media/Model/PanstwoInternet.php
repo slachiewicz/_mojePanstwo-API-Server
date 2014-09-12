@@ -20,9 +20,9 @@ class PanstwoInternet extends AppModel
 		App::import('model', 'DB');
         $this->DB = new DB();
         
-        $data = $this->DB->selectValue("SELECT `data` FROM `twitter_stats` WHERE `id`='" . addslashes( $range ) . "'");
+        $data = $this->DB->selectValue("SELECT `data` FROM `twitter_stats_es` WHERE `id`='" . addslashes( $range ) . "'");
         if( $data && ($data = unserialize($data)) ) {
-
+						
 	        return $data;	        
 	        
         } return false;
@@ -126,7 +126,7 @@ class PanstwoInternet extends AppModel
 
     public function get_twitter_tweets_group_by_types($range, $types, $order)
     {
-		
+				
 		$range_keys = array('24h', '3d', '7d', '1m', '1y');
 				
 		if( !in_array($range, $range_keys) )
@@ -138,12 +138,11 @@ class PanstwoInternet extends AppModel
 
             $t = array(
                 'id' => $t,
-                'search' => ClassRegistry::init('Dane.Dataobject')->find('all', array(
+                'search' => ClassRegistry::init('Dane.Dataset')->search('twitter', array(
                         'conditions' => array(
-                            'dataset' => 'twitter',
                             'twitter_accounts.typ_id' => $t,
                             '!bez_retweetow' => '1',
-                            'date' => 'LAST_' . $range,
+                            '_date' => 'LAST_' . $range,
                         ),
                         'order' => $order,
                         'limit' => 3,

@@ -77,7 +77,7 @@ class AppController extends Controller
         if (MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
             if (env('HTTP_X_USER_ID')) {
                 $user_id = Sanitize::paranoid(env('HTTP_X_USER_ID'));
-                $user = $this->User->find('first', array('conditions' => array('User.id' => $user_id)));
+                $user = $this->User->find('first', array('conditions' => array('User.id' => $user_id)));                
                 $this->actAsUser($user);
             }
 

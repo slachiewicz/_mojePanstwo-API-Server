@@ -74,9 +74,6 @@ class UsersController extends PaszportAppController
     public function info()
     {
     	$user = $this->user;
-    	$streams = array();
-    	$applications = ClassRegistry::init('Application')->find('all');
-
 
         if( $user )
         {
@@ -84,28 +81,13 @@ class UsersController extends PaszportAppController
             $data = $this->UserAdditionalData->read(null, $user['id']);
             
             if( !empty($data) )
-            {
-	            if ($data['UserAdditionalData']['group'] == '2')
-	            {
-	                $streams = $this->UserAdditionalData->Stream->find('list', array('fields' => array('id', 'name')));
-	            }
-	            else
-	            {
-	            	$streams['1'] = '_mojePaństwo: wydanie główne';
-	                foreach ($data['Stream'] as $stream) {
-	                    $streams[$stream['id']] = $stream['name'];
-	                }
-	            }
-	            
+            { 
 	            $user['unread_count'] = $data['UserAdditionalData']['alerts_unread_count'];
 	            $user['group'] = $data['UserAdditionalData']['group'];
-            
             }
         }
         
         $this->set('user', $user);
-        $this->set('applications', $applications);
-        $this->set('streams', $streams);
         $this->set('_serialize', array('user', 'applications', 'streams'));
     }
 

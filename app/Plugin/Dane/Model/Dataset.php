@@ -36,9 +36,11 @@ class Dataset extends AppModel
 			
 			App::import('model', 'MPCache');
 	        $this->MPCache = new MPCache();
-	 	        
-	        	        
-			return $this->MPCache->getDataset( $alias, @$queryData['full'] );
+	 	    
+	 	    $output = $this->MPCache->getDataset( $alias, @$queryData['full'] );
+	 	    $output['orders'] = isset($output['orders_es']) ? $output['orders_es'] : array();
+	 	    	        	        
+			return $output;
 			
 		}
 		
@@ -66,7 +68,7 @@ class Dataset extends AppModel
 
         $queryData = array_merge_recursive(array(
             'fields' => $fields,
-            'order' => array('Dataset.ord' => 'asc'),
+            // 'order' => array('Dataset.ord' => 'asc'),
             'limit' => 100,
         ), $queryData);
 
@@ -189,6 +191,17 @@ class Dataset extends AppModel
 			),
 			'full' => 1,
 		));
+				
+		$_fields = array();
+		foreach( array_column($dataset['fields'], 'fields') as $field ) {
+			
+			$_field = $field['field'];
+			if( $field['alias']==$alias )				
+				$_fields[] = $_field;
+				
+			$_fields[] = $field['alias'] . '.' . $_field;
+			
+		}
 		
 		$virtual_fields = $dataset['virtual_fields'];		
 		$filters = array(
@@ -198,10 +211,15 @@ class Dataset extends AppModel
 		$facets = array();
 		$order = array();
 		$q = false;
+		$mode = (isset($queryData['mode']) && $queryData['mode']) ? $queryData['mode'] : null;
+		$do_facets = (isset($queryData['facets']) && $queryData['facets']) ? true : false;
 		$limit = (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20;
 		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
-			
+		$version = (isset($dataset['Dataset']['version']) && $dataset['Dataset']['version']) ? $dataset['Dataset']['version'] : false;
 		
+
+
+
 		if( isset($queryData['conditions']) && is_array($queryData['conditions']) ) {
 			foreach( $queryData['conditions'] as $key => $value ) {
 				
@@ -212,18 +230,20 @@ class Dataset extends AppModel
 					$switchers[ substr($key, 1) ] = $value;
 				elseif( $key=='q' )
 					$q = $value;
-				else {
+				elseif( in_array($key, $_fields) )
 					$filters[ $key ] = array($value, in_array($key, $virtual_fields));
-				}
+				elseif( $key=='_source' )
+					$filters[ $key ] = $value;
 			
 			}
 		}
 		
 		
 		
+		
 		if( isset($queryData['q']) )
 			$q = $queryData['q'];
-		
+			
 		
 		
 		
@@ -248,32 +268,54 @@ class Dataset extends AppModel
         }		
 		
 		
-		$facets_dict = array();
-		if( isset($dataset['filters']) ) {
-				
-			foreach( $dataset['filters'] as $filter ) 
-				if( ( $filter = $filter['filter'] ) && in_array($filter['typ_id'], array(1, 2)) ) {
-										
-					$facets[] = array($filter['field'], in_array($filter['field'], $virtual_fields));
-					$facets_dict[ $filter['field'] ] = $filter;
-				
-				}
+		if( $do_facets ) {
+		
+			$facets_dict = array();
+			if( isset($dataset['filters']) ) {
+					
+				foreach( $dataset['filters'] as $filter ) 
+					if( ( $filter = $filter['filter'] ) && in_array($filter['typ_id'], array(1, 2)) ) {
+											
+						$facets[] = array($filter['field'], in_array($filter['field'], $virtual_fields));
+						$facets_dict[ $filter['field'] ] = $filter;
+					
+					}
+			
+			}
 		
 		}
 		
 		
+		$_order = array();
 		if( isset($queryData['order']) && $queryData['order'] )
-			$order = $queryData['order'];	
+			$order = $queryData['order'];
+		
+		if( is_string($order) )
+			$order = array( $order );
+		
+		foreach( $order as $o ) {
+			
+			$_field = $o;
+			if( $p = strpos($o, ' ') )
+				$_field = substr($o, 0, $p);
+			
+			if( in_array($_field, $_fields) )
+				$_order[] = $o;
+			
+		}
+
 				
 		App::import('model','Dane.Dataobject');
 		$this->Dataobject = new Dataobject();
         $search = $this->Dataobject->find('all', array(
         	'q' => $q,
+        	'mode' => $mode,
         	'filters' => $filters,
         	'facets' => $facets,
-        	'order' => $order,
+        	'order' => $_order,
         	'limit' => $limit,
         	'page' => $page,
+        	'version' => $version,
         ));
 		
 		

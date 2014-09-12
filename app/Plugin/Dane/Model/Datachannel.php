@@ -48,6 +48,7 @@ class Datachannel extends AppModel
 		$facets = array('dataset');
 		$order = array();
 		$q = false;
+		$mode = (isset($queryData['mode']) && $queryData['mode']) ? $queryData['mode'] : null;
 		$limit = (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20;
 		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
 		
@@ -94,6 +95,7 @@ class Datachannel extends AppModel
 		$this->Dataobject = new Dataobject();
         $search = $this->Dataobject->find('all', array(
         	'q' => $q,
+        	'mode' => $mode,
         	'filters' => $filters,
         	'facets' => $facets,
         	'order' => $order,

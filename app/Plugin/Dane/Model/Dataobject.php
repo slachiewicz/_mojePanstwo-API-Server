@@ -226,6 +226,133 @@ class Dataobject extends AppModel
 			return false;
 	    
     }
+    
+    public function search($aliases, $queryData = array()) {
+	    
+	   	$filters = array();
+	   	
+	   	if( !( is_string($aliases) && $aliases=='*' ) )
+		    $filters = array(
+		    	'dataset' => $aliases,
+		    );
+		    
+		$switchers = array();
+		$facets = array();
+		$order = array();
+		$q = false;
+		$mode = 'search_main';
+		$do_facets = (isset($queryData['facets']) && $queryData['facets']) ? true : false;
+		$limit = (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20;
+		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
+		$version = (isset($dataset['Dataset']['version']) && $dataset['Dataset']['version']) ? $dataset['Dataset']['version'] : false;
+		
+		if( isset($queryData['conditions']) && is_array($queryData['conditions']) ) {
+			foreach( $queryData['conditions'] as $key => $value ) {
+				
+				if( in_array($key, array('page', 'limit')) )
+					continue;
+					
+				if( $key=='q' )
+					$q = $value;
+				elseif( $key=='_source' )
+					$filters[ $key ] = $value;
+			
+			}
+		}
+		
+		
+		if( $do_facets ) {
+			
+			$facets[] = 'dataset';
+			
+			/*
+			$facets_dict = array();
+			if( isset($dataset['filters']) ) {
+					
+				foreach( $dataset['filters'] as $filter ) 
+					if( ( $filter = $filter['filter'] ) && in_array($filter['typ_id'], array(1, 2)) ) {
+											
+						$facets[] = array($filter['field'], in_array($filter['field'], $virtual_fields));
+						$facets_dict[ $filter['field'] ] = $filter;
+					
+					}
+			
+			}
+			*/
+		
+		}
+		
+		if( isset($queryData['q']) )
+			$q = $queryData['q'];
+
+						
+        $search = $this->find('all', array(
+        	'q' => $q,
+        	'mode' => $mode,
+        	'filters' => $filters,
+        	'facets' => $facets,
+        	'order' => $order,
+        	'limit' => $limit,
+        	'page' => $page,
+        	'version' => $version,
+        ));
+		
+		
+		if( isset($search['facets']) ) {
+						
+			App::import('model', 'DB');
+	        $this->DB = new DB();
+			
+			$facets = array();
+			foreach( $search['facets'] as $field => $buckets ) {
+				
+				
+				if( $field == 'dataset' ) {
+					
+					$buckets = $buckets[ 0 ];
+					$options = array();
+					
+					
+					$ids = array();
+		            foreach ($buckets as $b)
+		                if( $b['key'] && $b['doc_count'] )
+		                    $ids[] = $b['key'];
+					
+					$data = $this->DB->selectAssocs("SELECT `base_alias` as 'id', `name` as 'label' FROM `datasets` WHERE `base_alias`='" . implode("' OR `base_alias`='", $ids) . "'");
+					$data = array_column( $data, 'label', 'id' );
+					
+					
+					foreach( $buckets as $b )
+						$options[] = array(
+							'id' => $b['key'],
+							'count' => $b['doc_count'],
+							'label' => array_key_exists($b['key'], $data) ? $data[ $b['key'] ] : ' - ',
+						);
+											
+		
+			        
+			        $facets[] = array(
+			        	'field' => 'dataset',
+			        	'typ_id' => '5',
+			        	'parent_field' => '',
+			        	'label' => 'Zbiory danych',
+			        	'desc' => '',
+			        	'params' => array(
+			        		'options' => $options,
+			        	),
+			        );
+		        
+		        }
+				
+			}
+			
+			$search['facets'] = $facets;
+			
+		}
+				
+		return $search;
+	    
+    }
 
 }
 

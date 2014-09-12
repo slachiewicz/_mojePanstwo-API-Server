@@ -8,7 +8,7 @@ class ZamowieniapubliczneController extends AppController
         $stats = $this->Zamowieniapubliczne->getStats();
 
         $this->set('stats', $stats);
-        $this->set('_serialize', array('stats'));
+        $this->set('_serialize', 'stats');
     }
     
     public function newstats()

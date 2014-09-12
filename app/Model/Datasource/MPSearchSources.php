@@ -36,7 +36,7 @@
 	                
 	                $and_filters[] = array(
 		        		'term' => array(
-		        			'data.in_reply_to_tweet_id' => $value,
+		        			'data_v3.in_reply_to_tweet_id' => $value,
 		        		),
 		        	);
 		        	*/
@@ -47,7 +47,7 @@
 	            {
 	            	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.in_reply_to_tweet_id' => $value,
+		        			'data_v3.in_reply_to_tweet_id' => $value,
 		        		),
 		        	);
 	                break;
@@ -55,87 +55,177 @@
 	
 	            case 'twitterAccounts.relatedTweets':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = '_data_twitter_account_id:(' . $value . ') OR _data_in_reply_to_account_id:(' . $value . ')';
-	
 	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'twitter',
+		        		),
+		        	);
+	                
+	                $and_filters[] = array(
+			        	'or' => array(
+			        		array(
+								'term' => array(
+					        		'data_v3.twitter_account_id' => $value,
+			        			),
+		        			),
+		        			array(
+								'term' => array(
+					        		'data_v3.in_reply_to_account_id' => $value,
+			        			),
+		        			),
+						),
+			        );	
 	                break;
+	                
 	            }
 	
 	            case 'poslowie.aktywnosci':
 	            {
 	
 	                $mowca_id = ClassRegistry::init('DB')->selectValue("SELECT mowca_id FROM mowcy_poslowie WHERE posel_id='" . addslashes($value) . "'");
-	
-	                $fqs = array(
-	                    '(dataset:sejm_wystapienia AND _data_ludzie.id:(' . $mowca_id . '))',
-	                    '(dataset:legislacja_projekty_ustaw AND _multidata_posel_id:(' . $value . '))',
-	                    '(dataset:legislacja_projekty_uchwal AND _multidata_posel_id:(' . $value . '))',
-	                    '(dataset:sejm_interpelacje AND _multidata_posel_id:(' . $value . '))',
-	                );
-	
-	                $params['fq[' . $fq_iterator . ']'] = implode(' OR ', $fqs);
-	
-	
+								       
+			        
+			        $and_filters[] = array(
+			        	'or' => array(
+			        		array(
+								'and' => array(
+			        				array(
+			        					'term' => array(
+							        		'_type' => 'sejm_wystapienia',
+					        			),
+			        				),
+			        				array(
+			        					'term' => array(
+							        		'data_v3.ludzie.id' => $mowca_id,
+					        			),
+			        				),
+			        			),
+		        			),
+		        			array(
+								'and' => array(
+			        				array(
+			        					'term' => array(
+							        		'_type' => 'prawo_projekty',
+					        			),
+			        				),
+			        				array(
+			        					'term' => array(
+							        		'data_virtual.posel_id' => $value,
+					        			),
+			        				),
+			        			),
+		        			),
+		        			array(
+								'and' => array(
+			        				array(
+			        					'term' => array(
+							        		'_type' => 'sejm_interpelacje',
+					        			),
+			        				),
+			        				array(
+			        					'term' => array(
+							        		'data_virtual.posel_id' => $value,
+					        			),
+			        				),
+			        			),
+		        			),
+						),
+			        );
+	                break;	
 	                
-	                break;
 	            }
 	
 	            case 'poslowie.wystapienia':
 	            {
-	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_wystapienia AND _data_ludzie.posel_id:(' . $value . ')';
-	
-	                
+					
+	                $mowca_id = ClassRegistry::init('DB')->selectValue("SELECT mowca_id FROM mowcy_poslowie WHERE posel_id='" . addslashes($value) . "'");
+
+
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'sejm_wystapienia',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.ludzie.id' => $mowca_id,
+		        		),
+		        	);
+		        		                
 	                break;
 	
 	            }
 	            
 	            case 'poslowie.interpelacje':
 	            {
-	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_interpelacje AND _multidata_posel_id:(' . $value . ')';
-	
-	                
-	                break;
-	
-	            }
-	            
-	            case 'poslowie.projekty_ustaw':
-	            {
-	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:legislacja_projekty_ustaw AND _multidata_posel_id:(' . $value . ')';
-	
-	                
-	                break;
-	
-	            }
-	            
-	            case 'poslowie.glosowania':
-	            {
-	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_glosy AND _data_posel_id:(' . $value . ')';
-	
-	                
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'sejm_interpelacje',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.posel_id' => $value,
+		        		),
+		        	);
+	             	                
 	                break;
 	
 	            }
 	            
 	            case 'poslowie.prawo_projekty':
 	            {
-	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_posel_id:(' . $value . ')';
-	
-	                
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo_projekty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.posel_id' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
+	
+	            }
+	            
+	            case 'poslowie.glosowania':
+	            {
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'poslowie_glosy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.posel_id' => $value,
+		        		),
+		        	);
+		        		                
+	                break;	
+	                
 	
 	            }
 	            
 	            case 'poslowie.prawo_projekty_za':
 	            {
 	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_za:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo_projekty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.poslowie_za' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
 	
 	            }
@@ -143,9 +233,17 @@
 	            case 'poslowie.prawo_projekty_przeciw':
 	            {
 	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_przeciw:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo_projekty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.poslowie_przeciw' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
 	
 	            }
@@ -153,9 +251,17 @@
 	            case 'poslowie.prawo_projekty_wstrzymanie':
 	            {
 	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_wstrzymali:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo_projekty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.poslowie_wstrzymali' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
 	
 	            }
@@ -163,9 +269,17 @@
 	            case 'poslowie.prawo_projekty_nieobecnosc':
 	            {
 	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:prawo_projekty AND _multidata_poslowie_nieobecni:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo_projekty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.poslowie_nieobecni' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
 	
 	            }
@@ -173,39 +287,71 @@
 	            case 'poslowie.komisja_etyki_uchwaly':
 	            {
 	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:sejm_komisje_uchwaly AND _data_posel_id:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'sejm_komisje_uchwaly',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.posel_id' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
 	
 	            }
 	            
 	            case 'poslowie.oswiadczenia_majatkowe':
 	            {
-	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_oswiadczenia_majatkowe AND _data_posel_id:(' . $value . ')';
-	
-	                
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'poslowie_oswiadczenia_majatkowe',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.posel_id' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
 	
 	            }
 	            
 	            case 'poslowie.rejestr_korzysci':
 	            {
-	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_rejestr_korzysci AND _data_posel_id:(' . $value . ')';
-	
-	                
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'poslowie_rejestr_korzysci',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.posel_id' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
-	
+	                	
 	            }
 	            
 	            case 'poslowie.wspolpracownicy':
 	            {
 	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie_wspolpracownicy AND _data_posel_id:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'poslowie_wspolpracownicy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.posel_id' => $value,
+		        		),
+		        	);
+	             	               	                	                
 	                break;
 	
 	            }
@@ -220,7 +366,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.grupa_id' => $value,
+		        			'data_v3.grupa_id' => $value,
 		        		),
 		        	);
 	                break;
@@ -237,19 +383,26 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.kategoria_id' => $value,
+		        			'data_v3.kategoria_id' => $value,
 		        		),
 		        	);
 	                break;
 	
 	            }
 	            
-	            case 'rady_gmin_debaty.posiedzenie_id':
+	            case 'krakow_posiedzenia.punkty':
 	            {
 					
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_debaty AND _data_posiedzenie_id:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'krakow_posiedzenia_punkty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.posiedzenie_id' => $value,
+		        		),
+		        	);
 	                break;
 	
 	            }
@@ -264,18 +417,66 @@
 	            
 	            case 'sejm_kluby.poslowie':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie AND _data_klub_id:(' . $value . ')';
-	
 	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'poslowie',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.klub_id' => $value,
+		        		),
+		        	);
 	                break;
+
 	            }
 	            
 	            case 'sejm_komisje.poslowie':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:poslowie AND _multidata_komisja_id:(' . $value . ')';
-	
-	                
+	            
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'poslowie',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.komisja_id' => $value,
+		        		),
+		        	);
 	                break;
+
+	            }
+	            
+	            case 'wojewodztwa.gminy':
+	            {
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'gminy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.wojewodztwo_id' => $value,
+		        		),
+		        	);	                
+	                break;	                	                
+	            }
+	            
+	            case 'wojewodztwa.powiaty':
+	            {
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'powiaty',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.wojewodztwa.id' => $value,
+		        		),
+		        	);	                
+	                break;	                	                
 	            }
 	            
 	            case 'gminy.okregi_wyborcze':
@@ -287,7 +488,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);	                
 	                break;	                	                
@@ -302,7 +503,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);	                
 	                break;
@@ -317,7 +518,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);	                
 	                break;
@@ -332,12 +533,12 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.forma_prawna_typ_id' => '1',
+		        			'data_v3.forma_prawna_typ_id' => '1',
 		        		),
 		        	);	
 	                break;
@@ -352,12 +553,12 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.forma_prawna_typ_id' => '2',
+		        			'data_v3.forma_prawna_typ_id' => '2',
 		        		),
 		        	);	
 	                break;
@@ -372,12 +573,12 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.forma_prawna_typ_id' => '3',
+		        			'data_v3.forma_prawna_typ_id' => '3',
 		        		),
 		        	);	
 	                break;
@@ -392,12 +593,12 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.aktywny' => '1',
+		        			'data_v3.aktywny' => '1',
 		        		),
 		        	);	                
 	                break;
@@ -412,12 +613,12 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.gmina_id' => $value,
+		        			'data_v3.gmina_id' => $value,
 		        		),
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.aktywny' => '1',
+		        			'data_v3.aktywny' => '0',
 		        		),
 		        	);	
 	                break;
@@ -432,7 +633,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.radni_gmin.gmina_id' => $value,
+		        			'data_v3.radni_gmin.gmina_id' => $value,
 		        		),
 		        	);
 	                break;
@@ -455,26 +656,70 @@
 	            
 	            case 'radni_gmin.wystapienia':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_wystapienia AND _data_radny_id:(' . $value . ')';
-	
 	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'rady_gmin_wystapienia',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.radny_id' => $value,
+		        		),
+		        	);
 	                break;
+
+	            }
+	            
+	            case 'radni_gmin.glosy':
+	            {
+	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'krakow_glosowania_glosy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.radny_id' => $value,
+		        		),
+		        	);
+	                break;
+
 	            }
 	            
 	            case 'radni_gmin.oswiadczenia_majatkowe':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_gmin_oswiadczenia_majatkowe AND _data_radny_id:(' . $value . ')';
-	
 	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'radni_gmin_oswiadczenia_majatkowe',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.radny_id' => $value,
+		        		),
+		        	);	
 	                break;
+	                
 	            }
 	            
 	            case 'radni_gmin.interpelacje':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:rady_gmin_interpelacje AND _data_radny_id:(' . $value . ')';
-	
 	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'rady_gmin_interpelacje',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.radny_id' => $value,
+		        		),
+		        	);
 	                break;
+	                
 	            }
 	                                                                                                            
 	            case 'sejm_posiedzenia.punkty':
@@ -486,7 +731,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.posiedzenie_id' => $value,
+		        			'data_v3.posiedzenie_id' => $value,
 		        		),
 		        	);	                
 	                break;
@@ -501,7 +746,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.posiedzenie_id' => $value,
+		        			'data_v3.posiedzenie_id' => $value,
 		        		),
 		        	);	                
 	                break;
@@ -516,7 +761,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.posiedzenie_id' => $value,
+		        			'data_v3.posiedzenie_id' => $value,
 		        		),
 		        	);	                
 	                break;
@@ -538,18 +783,111 @@
 	                break;
 	            }
 	            
+	            case 'gminy.szukaj':
+	            {
+	            
+	            	$and_filters[] = array(
+	            		'or' => array(
+	            			array(
+	            				'and' => array(
+	            					array(
+	            						'term' => array(
+						        			'_type' => 'zamowienia_publiczne',
+						        		),
+	            					),
+	            					array(
+	            						'term' => array(
+						        			'data_v3.gmina_id' => $value,
+						        		),
+	            					),
+	            				),
+	            			),
+	            			array(
+	            				'and' => array(
+	            					array(
+	            						'term' => array(
+						        			'_type' => 'radni_gmin',
+						        		),
+	            					),
+	            					array(
+	            						'term' => array(
+						        			'data_v3.gmina_id' => $value,
+						        		),
+	            					),
+	            				),
+	            			),
+	            			array(
+	            				'and' => array(
+	            					array(
+	            						'term' => array(
+						        			'_type' => 'dotacje_ue',
+						        		),
+	            					),
+	            					array(
+	            						'term' => array(
+						        			'data_v3.gmina_id' => $value,
+						        		),
+	            					),
+	            				),
+	            			),
+	            			array(
+	            				'and' => array(
+	            					array(
+	            						'term' => array(
+						        			'_type' => 'krs_podmioty',
+						        		),
+	            					),
+	            					array(
+	            						'term' => array(
+						        			'data_v3.gmina_id' => $value,
+						        		),
+	            					),
+	            				),
+	            			),
+	            			array(
+	            				'term' => array(
+	            					'_type' => 'krakow_posiedzenia',
+	            				),
+	            			),
+	            			array(
+	            				'term' => array(
+	            					'_type' => 'krakow_posiedzenia_punkty',
+	            				),
+	            			),
+	            			array(
+	            				'term' => array(
+	            					'_type' => 'rady_druki',
+	            				),
+	            			),
+	            			array(
+	            				'term' => array(
+	            					'_type' => 'rady_gmin_interpelacje',
+	            				),
+	            			),
+	            		),
+	            	);
+
+	                break;
+
+	            }
+	            
 	            case 'krs_podmioty.zamowienia':
 	            {
 	            	
 	            	$wykonawcy_ids = ClassRegistry::init('DB')->selectValues("SELECT id FROM uzp_wykonawcy WHERE krs_id='" . addslashes($value) . "'");
 	            	
-	            	if( !$wykonawcy_ids )
-	            		$wykonawcy_ids = array('false');
-	            	
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:zamowienia_publiczne AND _multidata_wykonawca_id:(' . implode(' OR ', $wykonawcy_ids) . ')';
-	                
-	                
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'zamowienia_publiczne',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'terms' => array(
+		        			'data_virtual.wykonawca_id' => $wykonawcy_ids,
+		        		),
+		        	);	                
 	                break;
+	   
 	            }
 	            
 	            case 'krs_podmioty.umowy':
@@ -562,7 +900,22 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.krs_id' => $value,
+		        			'data_v3.krs_id' => $value,
+		        		),
+		        	);	                
+	                break;
+	            }
+	            
+	            case 'sa_sedziowie.orzeczenia':
+	            {
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'sa_orzeczenia',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.sedzia_id' => $value,
 		        		),
 		        	);	                
 	                break;

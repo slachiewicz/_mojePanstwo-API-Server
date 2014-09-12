@@ -6,25 +6,28 @@ class DatasetsController extends AppController
 
     public function index()
     {
-        $catalog_field = 'main_search';
-        $catalog_field = 'Dataset.' . $catalog_field;
 
         $datasets = $this->Dataset->find('all', array(
-                'fields' => array(
-                    'Dataset.id',
-	                'Dataset.name',
-                    'Dataset.opis',
-                    'Dataset.alias',
-                    'Dataset.base_alias',
-                    'Dataset.count',
-	                'Dataset.class',
-	                'Dataset.channel_id',
-                ),
-                'conditions' => array(
-                    $catalog_field => "1",
-                ),
-            )
-        );
+            'fields' => array(
+                'Dataset.id',
+                'Dataset.name',
+                'Dataset.opis',
+                'Dataset.alias',
+                'Dataset.base_alias',
+                'Dataset.count',
+                'Dataset.class',
+                'Dataset.channel_id',
+            ),
+            'conditions' => array(
+                'Dataset.es_public' => "1",
+                'Dataset.es_catalog' => "1",
+                'Dataset.es_deleted' => "0",
+            ),
+            'order' => array(
+            	array('Dataset.name' => 'ASC')
+            ),
+        ));
+                
         $this->set('datasets', $datasets);
         $this->set('_serialize', array('datasets'));
     }

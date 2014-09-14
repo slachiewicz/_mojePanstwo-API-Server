@@ -223,6 +223,8 @@ class MPSearch {
         			$key = 'date';
         			if( $this->_version )
 				   		$key .= '_' . $this->_version;
+				   		
+				   	// debug( $value );
         			
         		} else {
         		
@@ -513,7 +515,7 @@ class MPSearch {
 				
 				
 				
-				if( strpos($src, 'gminy.szukaj')!==0 ) {
+				if( !$src ) {
     	
 			    	$and_filters[] = array(
 		    			'range' => array(
@@ -693,7 +695,7 @@ class MPSearch {
         
         
         
-        if( (strpos($src, 'gminy.szukaj')!==0) && ( ($queryMode == 'suggester_main') || ($queryMode == 'search_main') ) ) {
+        if( !$src && ( ($queryMode == 'suggester_main') || ($queryMode == 'search_main') ) ) {
 	        
 	        $params['body']['query'] = array(
 	        	'function_score' => array(

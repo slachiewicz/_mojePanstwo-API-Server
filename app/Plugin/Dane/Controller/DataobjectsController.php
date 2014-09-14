@@ -23,14 +23,15 @@ class DataobjectsController extends AppController
         	'bdl_wskazniki' => 'Wskaźniki',
         	'bdl_wskazniki_grupy' => 'Wskaźniki',
         	'bdl_wskazniki_kategorie' => 'Wskaźniki',
-        	'ustawy' => 'Ustawa',
+        	'gminy' => 'Gmina',	
         	'krs_podmioty' => 'Organizacja',
         	'krs_osoby' => 'Osoba',
         	'twitter' => 'Tweet', 
         	'twitter_accounts' => 'Twitter',     
         	'poslowie' => 'Poseł',
+        	'sejm_wystapienia' => 'Występienie',
+        	'ustawy' => 'Ustawa',
         	'zamowienia_publiczne' => 'Zamówienie',  
-        	'gminy' => 'Gmina',	
         );
         
         if( isset($objects['dataobjects']) && !empty($objects['dataobjects']) )

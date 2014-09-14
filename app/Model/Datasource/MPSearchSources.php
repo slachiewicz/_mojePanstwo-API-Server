@@ -479,11 +479,41 @@
 	                break;	                	                
 	            }
 	            
+	            case 'powiaty.gminy':
+	            {
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'gminy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.powiat_id' => $value,
+		        		),
+		        	);	                
+	                break;	                	                
+	            }
+	            
 	            case 'gminy.okregi_wyborcze':
 	            {
 	            	$and_filters[] = array(
 		        		'term' => array(
 		        			'_type' => 'gminy_okregi_wyborcze',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.gmina_id' => $value,
+		        		),
+		        	);	                
+	                break;	                	                
+	            }
+	            
+	            case 'gminy.miejscowosci':
+	            {
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'miejscowosci',
 		        		),
 		        	);
 		        	$and_filters[] = array(

@@ -70,16 +70,16 @@ class SwaggerController extends AppController
      */
     public function resource($slug)
     {
-        $api = $this->Api->find('first', array(
+        $dbapi = $this->Api->find('first', array(
             'conditions' => array('Api.slug' => $slug)
         ));
 
-        if (empty($api)) {
+        if (empty($dbapi)) {
             throw new NotFoundException();
         }
 
         // we assume that slug is connected 1:1 to Cake Plugin
-        $swagger_spec = ROOT . DS . implode(DS, array('app', 'Plugin', $api['Api']['plugin'], 'Config', 'swagger.php'));
+        $swagger_spec = ROOT . DS . implode(DS, array('app', 'Plugin', $dbapi['Api']['plugin'], 'Config', 'swagger.php'));
         if (!file_exists($swagger_spec))
             throw new NotFoundException();
 
@@ -92,6 +92,7 @@ class SwaggerController extends AppController
 
         // process resource description
         $api['basePath'] = Router::fullBaseUrl();
+        $api['apiVersion'] = $dbapi['Api']['version'];
         foreach ($api['apis'] as &$a) {
             // reverse-map urls
             if (preg_match('/^\[(.+)\]/', $a['path'], $matches) !== false) {

@@ -12,7 +12,7 @@ class ApiException extends HttpException
      */
     protected $params = null;
 
-    public function __construct($apiCode, $params, $message = null)
+    public function __construct($apiCode, $params = array(), $message = null)
     {
         $this->apiCode = $apiCode;
         $this->params = $params;

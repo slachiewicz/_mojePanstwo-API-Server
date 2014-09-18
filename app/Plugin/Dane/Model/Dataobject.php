@@ -13,13 +13,28 @@ class Dataobject extends AppModel
      * Reverse mapping url for API server and MP.
      */
     private function fillIDs(&$o) {
-        $o['_id'] = Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['object_id']), true);
-        $o['_mpurl'] = 'http://mojepanstwo.pl/dane/' . $o['dataset'] .'/' . $o['object_id'];
+        $o['_id'] = self::apiUrl($o);
+        $o['_mpurl'] = self::mpUrl($o);
 
-        if ($o['dataset'] == 'kody_pocztowe') {
-            $o['_id'] = Router::url(array('plugin' => 'KodyPocztowe', 'controller' => 'KodyPocztowe', 'action' => 'view', 'id' => $o['data']['kod']), true);
-        }
+
     }
+
+    public static function apiUrl(&$o) {
+        if ($o['dataset'] == 'kody_pocztowe') {
+            return Router::url(array('plugin' => 'KodyPocztowe', 'controller' => 'KodyPocztowe', 'action' => 'view', 'id' => $o['data']['kod']), true);
+        }
+
+        return Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['object_id']), true);
+    }
+
+    public static function apiUrlStd($dataset, $object_id) {
+        return Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $dataset, 'object_id' => $object_id), true);
+    }
+
+    public static function mpUrl(&$o) {
+        return 'http://mojepanstwo.pl/dane/' . $o['dataset'] .'/' . $o['object_id'];
+    }
+
 
     public function setId($id)
     {

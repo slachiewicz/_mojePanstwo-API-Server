@@ -109,6 +109,9 @@ CakePlugin::loadAll(array(
     'ZamowieniaPubliczne' => array(
         'routes' => true,
     ),
+    'Finanse' => array(
+        'routes' => true,
+    ),
     'OAuth' => array(
         'routes' => true, 'bootstrap' => false,
     ),

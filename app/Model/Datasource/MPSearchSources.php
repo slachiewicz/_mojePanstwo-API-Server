@@ -135,7 +135,47 @@
 	                break;	
 	                
 	            }
+				
+	            case 'administracja_publiczna.prawo':
+	            {
+					
+	                $podmiot_id = ClassRegistry::init('DB')->selectValue("SELECT id FROM s_podmioty WHERE instytucja_id='" . addslashes($value) . "'");
+
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.autor_id' => $podmiot_id,
+		        		),
+		        	);
+		        		                
+	                break;
 	
+	            }
+	            
+	            case 'administracja_publiczna.zamowienia_udzielone':
+	            {
+					
+	                $podmiot_ids = ClassRegistry::init('DB')->selectValues("SELECT id FROM uzp_zamawiajacy WHERE instytucja_id='" . addslashes($value) . "'");
+
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'zamowienia_publiczne',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'terms' => array(
+		        			'data_v3.zamawiajacy_id' => $podmiot_ids,
+		        		),
+		        	);
+		        		                
+	                break;
+	
+	            }
+	            
 	            case 'poslowie.wystapienia':
 	            {
 					
@@ -479,11 +519,41 @@
 	                break;	                	                
 	            }
 	            
+	            case 'powiaty.gminy':
+	            {
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'gminy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.powiat_id' => $value,
+		        		),
+		        	);	                
+	                break;	                	                
+	            }
+	            
 	            case 'gminy.okregi_wyborcze':
 	            {
 	            	$and_filters[] = array(
 		        		'term' => array(
 		        			'_type' => 'gminy_okregi_wyborcze',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.gmina_id' => $value,
+		        		),
+		        	);	                
+	                break;	                	                
+	            }
+	            
+	            case 'gminy.miejscowosci':
+	            {
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'miejscowosci',
 		        		),
 		        	);
 		        	$and_filters[] = array(

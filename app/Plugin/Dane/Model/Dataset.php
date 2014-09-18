@@ -192,7 +192,7 @@ class Dataset extends AppModel
 			'full' => 1,
 		));
 				
-		$_fields = array();
+		$_fields = array('_date');
 		foreach( array_column($dataset['fields'], 'fields') as $field ) {
 			
 			$_field = $field['field'];

@@ -5,7 +5,7 @@ class MPSearch {
     public $description = 'Serwer szukania platformy mojePaństwo';
 	
 	private $_index = 'objects_v2_01';
-	private $_version = false;
+	private $_version = 'v3';
     private $_excluded_fields = array('datachannel', 'dataset', 'search', 'q');
     private $_fields_multi_dict = array();
     

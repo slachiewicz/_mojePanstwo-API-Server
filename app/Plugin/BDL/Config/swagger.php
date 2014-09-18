@@ -77,7 +77,7 @@ $api = array(
                             "name" => "slice",
                             "type" => "string",
                             "required" => false,
-                            "description" => "Tablica id wymiarów, dla których przecięcia zostaną zwrócone dane. Format: [1,34,*]. Uzyj gwiazdki, aby zwrócić serie dla wszystkich punktów wymiaru."
+                            "description" => "Tablica id wymiarów, dla których przecięcia zostaną zwrócone dane. Format: [1,34,*]. Uzyj gwiazdki, aby zwrócić serie dla wszystkich punktów wymiaru. Brak argumentów oznacza wszystkie możliwe przecięcia."
                         ),
                         array(
                             "paramType" => "query",
@@ -106,6 +106,13 @@ $api = array(
                             "type" => "integer",
                             "required" => false,
                             "description" => "Id gminy, dla którego zostaną zwrócone dane lub * dla wszystkich"
+                        ),
+                        array(
+                            "paramType" => "query",
+                            "name" => "meta",
+                            "type" => "integer",
+                            "required" => false,
+                            "description" => "Czy zwrać metadane odpowiedzi? Wartości: 0/1-domyślne"
                         )
                     ),
                     "responseMessages" => array(

@@ -88,7 +88,7 @@ class AppController extends Controller
         
         $this->Auth->allow();
                 
-        header('Access-Control-Allow-Origin: ' . $this->request->header('Origin'));
+        header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Credentials: true');
     }
 

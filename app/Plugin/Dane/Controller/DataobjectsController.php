@@ -19,7 +19,7 @@ class DataobjectsController extends AppController
         ));
         
         $_dict = array(
-        	'administracja_publiczna' => 'Instytucja',
+        	'instytucje' => 'Instytucja',
         	'bdl_wskazniki' => 'Wskaźniki',
         	'bdl_wskazniki_grupy' => 'Wskaźniki',
         	'bdl_wskazniki_kategorie' => 'Wskaźniki',
@@ -32,6 +32,7 @@ class DataobjectsController extends AppController
         	'sejm_wystapienia' => 'Występienie',
         	'ustawy' => 'Ustawa',
         	'zamowienia_publiczne' => 'Zamówienie',  
+        	'prawo' => 'Prawo',  
         );
         
         if( isset($objects['dataobjects']) && !empty($objects['dataobjects']) )

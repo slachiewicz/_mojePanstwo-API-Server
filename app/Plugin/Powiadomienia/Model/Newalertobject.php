@@ -7,7 +7,6 @@ class Newalertobject extends AppModel
     public $objects = array();
     public $pagination = array();
 
-
     public function getObjects()
     {
         return $this->objects;
@@ -21,17 +20,78 @@ class Newalertobject extends AppModel
     public function find($type = 'first', $queryData = array())
     {
     	    	
-        $user_id = $this->getCurrentUser('id');
-        $visited = $queryData['conditions']['visited'] ? '1' : '0';
-        $group_id = $queryData['conditions']['group_id'];
+        if( $user_id = $this->getCurrentUser('id') ) {
+        	        	
+	    	// Configure::write('debug', 2);
 
-        $offset = $queryData['offset'];
-        $limit = $queryData['limit'];
+	        $visited = ( isset($queryData['conditions']['visited']) && $queryData['conditions']['visited'] ) ? '1' : '0';
+	        $group_id = isset( $queryData['conditions']['group_id'] ) ? $queryData['conditions']['group_id'] : false;
+	
+	        $offset = isset( $queryData['offset'] ) ? $queryData['offset'] : 0;
+	        $limit = isset( $queryData['limit'] ) ? $queryData['limit'] : 20;
+	        $page = isset( $queryData['page'] ) ? $queryData['page'] : 1;
+	
+	        
+			App::import('model', 'DB');
+	        $this->DB = new DB();
+			
+			/*			
+			$q = "SELECT `id` FROM `m_alerts_groups` WHERE `user_id`='" . $this->getCurrentUser('id') . "'";
+			if( $group_id )
+				$q .= " AND ``='" . addslashes( $group_id ) . "'";
+			*/
+			
+			
+			
+			
+			$alerts_groups = $this->DB->selectAssocs("SELECT `id`, `title` FROM `m_alerts_groups` WHERE `user_id`='" . $this->getCurrentUser('id') . "' ORDER BY `title` ASC");
+        	$alerts_gropu_ids = array_column($alerts_groups, 'id');
+			
+			if( $group_id && !in_array($group_id, $alerts_gropu_ids) )
+				$group_id = false;
+			
+			
+			App::import('model', 'Dane.Dataobject');
+	        $this->Dataobject = new Dataobject();
+			// ,
+			
+			$search = $this->Dataobject->find('all', array(
+	        	// 'q' => $q,
+	        	'mode' => 'search_main',
+	        	'filters' => array(
+	        		'_source' => 'alerts:' . $this->getCurrentUser('id') . '|' . $group_id . '|' . $visited,
+	        	),
+	        	'facets' => array(
+	    			array('alerts', '(' . implode('|', $alerts_gropu_ids) . ')'),
+	        	),
+	        	// 'order' => $order,
+	        	'limit' => $limit,
+	        	'page' => $page,
+	        	'version' => 'v3',
+	        ));
+			
 
-        App::import('model', 'DB');
-        $this->DB = new DB();
-
-
+			
+			foreach( $alerts_groups as &$group ) {
+				
+				$group['alerts_unread_count'] = 0;
+				
+				for( $_i=0; $_i<count($search['facets']['alerts'][0]); $_i++ ) {
+					if( $search['facets']['alerts'][0][$_i]['key'] == $group['id'] ) {
+						$group['alerts_unread_count'] = $search['facets']['alerts'][0][$_i]['doc_count'];
+						break;
+					}
+				}
+				
+			}
+			
+			
+			$search['facets']['alerts'] = $alerts_groups;	
+			return $search;		
+		
+		}
+		
+		/*
         $sql_fields = "`m_users-objects`.`object_id`, `m_users-objects`.`cts`,  GROUP_CONCAT( DISTINCT(`m_alerts_groups_qs-objects`.`hl`) SEPARATOR \"\r\") as 'hls' ";
         $sql_order = "`m_users-objects`.`dstamp` DESC";
 		
@@ -143,12 +203,15 @@ class Newalertobject extends AppModel
         return array(
             'objects' => $this->getObjects(),
         );
+        
+        */
 
     }
     
     public function flag($object_id, $action)
     {
-    	    	
+    	
+    		
     	$user_id = $this->getCurrentUser('id');
     	
 	    if( !$user_id || !$object_id )
@@ -160,17 +223,63 @@ class Newalertobject extends AppModel
 	    App::import('model', 'DB');
 	    $this->DB = new DB();
 	    
+	    App::Import('ConnectionManager');
+		$MPSearch = ConnectionManager::getDataSource('MPSearch');
 	    
-	    $this->DB->q("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
+	    // $this->DB->q("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
+	    
+	    
+	    $dataset = $this->DB->selectValue("SELECT dataset FROM objects WHERE id='$object_id'");	    
 	    	    
-	    
 	    if( $action=='read' ) {
 	    	
-		    $this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
+	    	$this->DB->insertUpdateAssoc('m_users-objects', array(
+	    		'user_id' => $user_id,
+	    		'object_id' => $object_id,
+	    		'visited' => '1',
+	    		'visited_ts' => 'NOW()',
+	    	));
+	    	
+	    	$ret = $MPSearch->API->update(array(
+	    		'index' => 'objects_v2_01',
+			  	'type' => 'alerts_' . $dataset,
+			  	'id' => $object_id . '-' . $user_id,
+			  	'parent' => $object_id,
+			  	'body' => array(
+				  	'script' => 'ctx._source.read = status',
+				    'params' => array(
+				        'status' => true,
+				    ),
+				),
+	    	));
+	    	
+	    	// debug( $ret );
+	    	
+		    // $this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='1', `m_users-objects`.`visited_ts`=NOW() WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='0'");
 		
 		} elseif( $action=='unread' ) {
+						
+			// $this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='1'");
 			
-			$this->DB->q("UPDATE `m_users-objects` SET `m_users-objects`.`visited`='0' WHERE `m_users-objects`.`user_id`='$user_id' AND `m_users-objects`.object_id='$object_id' AND `m_users-objects`.`visited`='1'");
+			$this->DB->insertUpdateAssoc('m_users-objects', array(
+	    		'user_id' => $user_id,
+	    		'object_id' => $object_id,
+	    		'visited' => '0',
+	    		'visited_ts' => 'NOW()',
+	    	));
+	    	
+	    	$ret = $MPSearch->API->update(array(
+	    		'index' => 'objects_v2_01',
+			  	'type' => 'alerts_' . $dataset,
+			  	'id' => $object_id . '-' . $user_id,
+			  	'parent' => $object_id,
+			  	'body' => array(
+				  	'script' => 'ctx._source.read = status',
+				    'params' => array(
+				        'status' => false,
+				    ),
+				),
+	    	));
 		
 		}
 		
@@ -180,8 +289,10 @@ class Newalertobject extends AppModel
 			'status' => 'OK',
 		);
 		
+		/*
 		if( $affected_rows )
 			$result = array_merge($result, $this->calculate($object_id));			
+		*/
 		
 		return $result;
 		
@@ -218,8 +329,10 @@ class Newalertobject extends AppModel
 			'status' => 'OK',
 		);
 		
+		/*
 		if( $affected_rows || true )			
 			$result = array_merge($result, $this->calculate($group_id));			
+		*/
 		
 		return $result;
 		

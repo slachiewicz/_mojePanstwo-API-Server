@@ -1,6 +1,6 @@
 <?
 
-	$ids = $this->DB->selectValues("SELECT `id` FROM `krs_files` WHERE `krs_pozycje_id`='". addslashes($id) ."' AND (`complete`='1' OR `downloader_id`='0') ORDER BY `id` DESC LIMIT 3");
+	$ids = $this->DB->selectValues("SELECT `id` FROM `krs_files` WHERE `krs_pozycje_id`='". addslashes($id) ."' AND `complete`='1' ORDER BY `id` DESC LIMIT 3");
 	
 	$success = false;
 	$result = array(

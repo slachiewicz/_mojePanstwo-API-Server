@@ -12,7 +12,7 @@ class Administracja extends AppModel
         $this->DB = new DB();
         
         $output = array(
-        	'files' => $this->DB->selectAssocs("SELECT `id`, `nazwa`, `childsCount`, `width`, `opis_html`, `budzet_plan` FROM `administracja_publiczna` WHERE `akcept`='1' AND `parent_id`='0' AND `id`!=2127 AND `id`!=578 AND `id`!=569 AND `id`!=3221 ORDER BY `nazwa` ASC"),        
+        	'files' => $this->DB->selectAssocs("SELECT `id`, `nazwa`, `childsCount`, `width`, `opis_html`, `budzet_plan` FROM `administracja_publiczna` WHERE `src_type_id`='1' AND `akcept`='1' AND `parent_id`='0' AND `id`!=2127 AND `id`!=578 AND `id`!=569 AND `id`!=3221 ORDER BY `nazwa` ASC"),        
         );
         
         /*

@@ -9,7 +9,7 @@ class NewalertobjectsController extends AppController
                 
         $conditions = ( isset($this->request->query['conditions']) && is_array($this->request->query['conditions']) ) ? $this->request->query['conditions'] : array();
         
-        $page = (isset($this->data['page']) && $this->data['page']) ? $this->data['page'] : 1;
+        $page = (isset($this->request->query['page']) && $this->request->query['page']) ? $this->request->query['page'] : 1;
         $limit = 20;
         $offset = $limit * ($page - 1);
 			
@@ -18,15 +18,21 @@ class NewalertobjectsController extends AppController
 
         $mode = (isset($conditions['mode'])) ? $conditions['mode'] : 0;
 		$visited = ($mode=='2') ? true : false;
-
+		
+		// var_export( $page ); die();
+		
         $search = $this->Newalertobject->find('all', array(
             'conditions' => array(
                 'visited' => $visited,
                 'group_id' => $group_id,
             ),
+            'page' => $page,
             'offset' => $offset,
             'limit' => $limit,
         ));
+        
+        $search['objects'] = $search['dataobjects'];
+        unset( $search['dataobjects'] );
 
         $this->set(array(
                 'search' => $search,

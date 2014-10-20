@@ -253,11 +253,11 @@ class Dataobject extends AppModel
 		    
 		$switchers = array();
 		$facets = array();
-		$order = array();
 		$q = false;
 		$mode = 'search_main';
 		$do_facets = (isset($queryData['facets']) && $queryData['facets']) ? true : false;
 		$limit = (isset($queryData['limit']) && $queryData['limit']) ? $queryData['limit'] : 20;
+		$order = (isset($queryData['order']) && $queryData['order']) ? $queryData['order'] : array();
 		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
 		$version = (isset($dataset['Dataset']['version']) && $dataset['Dataset']['version']) ? $dataset['Dataset']['version'] : false;
 		

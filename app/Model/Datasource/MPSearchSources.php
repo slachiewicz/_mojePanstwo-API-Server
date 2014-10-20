@@ -10,9 +10,16 @@
 	        $key = substr($part, 0, $p);
 	        $value = substr($part, $p + 1);
 	
-	        if (($key != 'dataset') && ($key != 'datachannel'))
-	            $source_params[$key] = $value;
+	        
+	    } else {
+	    
+		    $key = $part;
+		    $value = null;
+		    
 	    }
+	    
+	    if (($key != 'dataset') && ($key != 'datachannel'))
+            $source_params[$key] = $value;
 	
 	}
 	
@@ -41,6 +48,103 @@
 		        	);
 		        	*/
 	                break;
+	            }
+	            
+	            case 'prawo.weszly': {
+		            
+		            $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo',
+		        		),
+		        	);
+		        	
+		        	$and_filters[] = array(
+		        		'range' => array(
+		        			'data_v3.data_wejscia_w_zycie' => array(
+		        				'lte' => 'now',
+		        			),
+		        		),
+		        	);
+		        	
+		        	break;
+		            
+	            }
+	            
+	            case 'prawo.haslo': {
+		            
+		            $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo',
+		        		),
+		        	);
+		        	
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_virtual.haslo_id' => $value,
+		        		),
+		        	);
+		        	
+		        	break;
+		            
+	            }
+	            
+	            case 'alerts': {
+		            
+	    			list($user_id, $group_id, $visited) = explode('|', $value);
+										
+					$_or_filters = array();
+					$_filter = array(
+						"and" => array(
+							array(
+								"term" =>array(
+					                "user_id" => $user_id,
+					            ),
+							),
+							array(
+								"term" =>array(
+					                "read" => (boolean) $visited,
+					            ),
+							),
+			            ),
+					);
+					
+
+					
+					
+					foreach( ClassRegistry::init('DB')->selectValues("SELECT base_alias FROM datasets WHERE alerts='1'") as $_dataset ) {
+						$_or_filters[] = array(
+							"has_child" => array(
+						        "type" => "alerts_" . $_dataset ,
+						        "filter" => $_filter,
+						    ),
+						);
+					
+					}
+					
+		                       
+		            $and_filters[] = array(
+		        		'or' => $_or_filters,
+		        	);	
+		        	
+		        	
+		        	if( $group_id ) {
+			        	
+			        	$and_filters[] = array(
+			        		'nested' => array(
+			        			'path' => '__alerts',
+			        			'filter' => array(
+			        				'term' => array(
+			        					'group_id' => $group_id,
+			        				),
+			        			),
+			        		),
+			        	);
+			        	
+		        	}
+		        		        	
+		        	
+		        	break;
+		            
 	            }
 	            
 	            case 'twitter.responsesTo':
@@ -136,7 +240,48 @@
 	                
 	            }
 				
-	            case 'administracja_publiczna.prawo':
+				case 'prawo.historia': {
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'prawo',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'or' => array(
+		        			array(
+		        				'term' => array(
+				        			'data_virtual.orzeczenie_do_aktu' => $value,
+				        		),
+		        			),
+		        			array(
+		        				'term' => array(
+				        			'data_virtual.tekst_jednolity_do_aktu' => $value,
+				        		),
+		        			),
+		        			array(
+		        				'term' => array(
+				        			'data_virtual.orzeczenie_tk' => $value,
+				        		),
+		        			),
+		        			array(
+		        				'term' => array(
+				        			'data_virtual.akty_zmieniajace' => $value,
+				        		),
+		        			),
+		        			array(
+		        				'term' => array(
+				        			'data_virtual.akty_uchylajace' => $value,
+				        		),
+		        			),
+		        		),		        		
+		        	);
+					
+					break;
+					
+				}
+				
+	            case 'instytucje.prawo':
 	            {
 					
 	                $podmiot_id = ClassRegistry::init('DB')->selectValue("SELECT id FROM s_podmioty WHERE instytucja_id='" . addslashes($value) . "'");
@@ -156,7 +301,7 @@
 	
 	            }
 	            
-	            case 'administracja_publiczna.zamowienia_udzielone':
+	            case 'instytucje.zamowienia_udzielone':
 	            {
 					
 	                $podmiot_ids = ClassRegistry::init('DB')->selectValues("SELECT id FROM uzp_zamawiajacy WHERE instytucja_id='" . addslashes($value) . "'");
@@ -534,6 +679,21 @@
 	                break;	                	                
 	            }
 	            
+	            case 'krakow_komisje.posiedzenia':
+	            {
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'krakow_komisje_posiedzenia',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.komisja_id' => $value,
+		        		),
+		        	);	                
+	                break;	                	                
+	            }
+	            
 	            case 'gminy.okregi_wyborcze':
 	            {
 	            	$and_filters[] = array(
@@ -839,17 +999,32 @@
 	            
 	            case 'dzielnice.radni':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_dzielnic AND _data_dzielnica_id:(' . $value . ')';
-	
 	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'radni_dzielnic',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.dzielnica_id' => $value,
+		        		),
+		        	);	                
 	                break;
 	            }
 	            
 	            case 'gminy.radni_dzielnic':
 	            {
-	                $params['fq[' . $fq_iterator . ']'] = 'dataset:radni_dzielnic AND _data_gminy.id:(' . $value . ')';
-	
-	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'radni_dzielnic',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.gminy.id' => $value,
+		        		),
+		        	);	                
 	                break;
 	            }
 	            
@@ -966,6 +1141,22 @@
 	                $and_filters[] = array(
 		        		'term' => array(
 		        			'_type' => 'umowy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data_v3.krs_id' => $value,
+		        		),
+		        	);	                
+	                break;
+	            }
+	            
+	            case 'krs_podmioty.faktury':
+	            {
+	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'_type' => 'faktury',
 		        		),
 		        	);
 		        	$and_filters[] = array(

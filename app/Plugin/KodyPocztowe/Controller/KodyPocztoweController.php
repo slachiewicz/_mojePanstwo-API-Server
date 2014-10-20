@@ -23,6 +23,19 @@ class KodyPocztoweController extends AppController
         }
 		
         $object = $response['dataobjects'][0];
+        
+        
+        $layers = @explode(',',  $this->request->query['layers']);
+        
+        if( !empty($layers) ) {
+	        
+	        $this->loadModel('Dane.Dataobject');
+	        
+	        foreach( $layers as $layer )	        
+	        	$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer('kody_pocztowe', $object['data']['id'], $layer);
+	        
+	    }
+        
         $this->setSerialized('code', $object);
     }
 

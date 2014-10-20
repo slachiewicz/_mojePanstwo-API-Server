@@ -31,6 +31,23 @@ class MPSearch {
 
     }
     
+    public function getCurrentUser($field = false) {
+	 	
+		App::uses('CakeSession', 'Model/Datasource');
+		$Session = new CakeSession();	
+		$user = $Session->read('Auth.User');
+				
+		if( $user && is_array($user) ) {
+						
+			if( $field===false )
+				return $user;
+			else
+				return isset( $user[$field] ) ? $user[$field] : false;
+ 			
+		} else return false;
+	
+	}
+    
     public function search($body) {
 	    
 	    $params = array(
@@ -121,6 +138,9 @@ class MPSearch {
 	
     public function read(Model $model, $queryData = array())
     {
+		
+		// Configure::write('debug', 2);
+        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( 'asd' ); }
 			
         $params = array();
 		$src = false;
@@ -142,7 +162,7 @@ class MPSearch {
                     1;
     	
     	$queryQ = (isset($queryData['q']) && $queryData['q']) ?
-                    $queryData['q'] :
+                    mb_convert_encoding($queryData['q'], 'UTF-8', 'UTF-8') :
                     false;
         
         $queryMode = (isset($queryData['mode']) && $queryData['mode']) ?
@@ -158,7 +178,8 @@ class MPSearch {
 		$queryFacets = ( isset( $queryData['facets'] ) && is_array( $queryData['facets'] ) ) ? 
 			$queryData['facets'] : 
 			array();
-			
+		
+		
 		$queryOrder = ( isset( $queryData['order'] ) && is_array( $queryData['order'] ) ) ? 
 			$queryData['order'] : 
 			array();
@@ -181,10 +202,12 @@ class MPSearch {
 				array();
 		
 		
-			
-        
+		
+        $alerts_groups_data = array();
         $and_filters = array();
-                
+        
+        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( $queryFilters ); die(); }
+        
         foreach( $queryFilters as $key => $value ) {
         	
         	
@@ -214,7 +237,7 @@ class MPSearch {
         	} elseif( $key == 'limit' ) {
 
 				// ignore this key
-        		
+        	
         	} else {
         		
         		
@@ -325,10 +348,10 @@ class MPSearch {
 						
 						$range = array();
 						
-						if( $gte = $this->formatDate( $match[1] ) )
-							$range['gte'] = $gte;
-						if( $lte = $this->formatDate( $match[2] ) )
-							$range['lte'] = $lte;
+						if( ($gte = $this->formatDate( $match[1] )) && ($gte != '*') )
+							$range['gte'] = strtolower( $gte );
+						if( ($lte = $this->formatDate( $match[2] )) && ($lte != '*') )
+							$range['lte'] = strtolower( $lte );
 	
 						
 						$and_filters[] = array(
@@ -597,6 +620,8 @@ class MPSearch {
 		$params['body']['query']['filtered'] = $filtered;	    
 	    	    
 	    
+	 
+	    
 	    foreach( $queryOrder as $order ) {
 		    
 		    $parts = explode(' ', $order);
@@ -610,6 +635,12 @@ class MPSearch {
 					
 					$sort[] = array(
 						'title_pl.raw' => $direction,
+					);
+				
+				} elseif( $field == '_date' ) {
+					
+					$sort[] = array(
+						'date_v3' => $direction,
 					);
 				
 				} elseif( $field == 'score' ) {
@@ -657,24 +688,45 @@ class MPSearch {
 	        foreach( $queryFacets as $facet ) {
 	        	
 	        	if( is_array($facet) ) {
-	        	
-		        	if( $facet[1] ) {
-		        		$prefix = 'data_virtual';
-		        	} else {
-			        	
-			        	$prefix = 'data';
-			        	if( $this->_version )
-			        		$prefix .= '_' . $this->_version;			        	
-			        	
-		        	}
+	        		
+	        		if( $facet[0]=='alerts' ) {
 		        	
-		        	$aggs[ $facet[0] ] = array(
-		        		'terms' => array(
-		        			'field' => $prefix . '.' . $facet[0],
-		        			'exclude' => '0',
-		        			'size' => 20,
-		        		),
-		        	);
+			        	
+			        	$aggs['alerts'] = array(
+	        				'nested' => array(
+				                "path" => "__alerts",
+				            ),
+				            'aggs' => array(
+				                'groups' => array(
+					                'terms' => array(
+				                		'field' => '__alerts.group_id',
+				                		'include' => $facet[1],
+				                	),
+			                	),
+				            ),
+			        	);
+			        			        				        		        			        	
+		        	} else {
+	        		
+			        	if( $facet[1] ) {
+			        		$prefix = 'data_virtual';
+			        	} else {
+				        	
+				        	$prefix = 'data';
+				        	if( $this->_version )
+				        		$prefix .= '_' . $this->_version;			        	
+				        	
+			        	}
+			        	
+			        	$aggs[ $facet[0] ] = array(
+			        		'terms' => array(
+			        			'field' => $prefix . '.' . $facet[0],
+			        			'exclude' => '0',
+			        			'size' => 20,
+			        		),
+			        	);
+		        	
+		        	}
 	        	
 	        	} elseif( $facet == 'dataset' ) {
 		        	
@@ -685,12 +737,14 @@ class MPSearch {
 		        		),
 		        	);
 		        	
-	        	}
+	        	} 
 	        }
 	        
-	        $params['body']['aggs'] = $aggs;
+	        if( !empty($aggs) )
+		        $params['body']['aggs'] = $aggs;
 	        
         }
+        
         
         
         
@@ -720,12 +774,10 @@ class MPSearch {
         
         
         
-        
-        
-        
-        // echo "\n\n"; debug( $params );
+        // Configure::write('debug', 2);
+        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( $params ); }
 	    $es_result = $this->API->search( $params );
-	    // echo "\n\n"; debug( $es_result ); die();
+        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( $es_result ); }
         
         
         
@@ -797,7 +849,9 @@ class MPSearch {
 		    	if( is_array($field) )
 		    		$field = $field[0];
 		    	
-			    if( isset( $es_result['aggregations'][$field] ) ) 
+		    	if( $field=='alerts' )
+		    		$output['facets'][$field][] = $es_result['aggregations'][$field]['groups']['buckets'];
+			    elseif( isset( $es_result['aggregations'][$field] ) ) 
 				    $output['facets'][$field][] = $es_result['aggregations'][$field]['buckets'];
 				    
 			}

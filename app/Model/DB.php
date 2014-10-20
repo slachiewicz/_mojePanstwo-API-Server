@@ -231,6 +231,38 @@ class DB extends AppModel
 		return $this->DB->query($q);
 		
     }
-
+	
+	function insertUpdateAssoc($table, $data){
+		
+		if( empty($table) || empty($data) ) 
+			return false;
+		
+		$keys = array_keys($data);
+		$values = array_values($data);
+		
+		foreach( $values as &$v )
+			if( !in_array($v, $this->reserved_words) )
+				$v = "'" . $v . "'";
+		
+		$q = "INSERT INTO `$table` (`".implode("`, `", $keys)."`) VALUES (".implode(", ", $values).") ON DUPLICATE KEY UPDATE ";
+		
+		
+		$sets = array();
+		foreach( $data as $k=>$v ) {
+		
+			if( in_array($v, $this->reserved_words) ) {
+				$sets[] = "`$k`=$v";
+			} else {
+				$sets[] = "`$k`='$v'";
+			}
+		
+		}
+		
+		$q .= implode(", ", $sets);
+		
+		$this->DB->query( $q );
+		
+    }
+	
 
 }

@@ -84,6 +84,32 @@
 		        		),
 		        	);
 		        	
+		        	$and_filters[] = array(
+		        		'or' => array(
+				        	array(
+				        		'and' => array(
+					        		array(
+						        		'term' => array(
+							        		'data_v3.typ_id' => '1',
+						        		),
+					        		),
+					        		array(
+						        		'term' => array(
+						        			'data_v3.pierwotny' => '1',
+						        		),
+						        	),
+						        ),
+				        	),
+				        	array(
+					        	'not' => array(
+						        	'term' => array(
+						        		'data_v3.typ_id' => '1',
+					        		),
+					        	),
+				        	),
+		        		),
+		        	);
+		        	
 		        	break;
 		            
 	            }

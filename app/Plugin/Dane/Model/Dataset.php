@@ -192,7 +192,7 @@ class Dataset extends AppModel
 			'full' => 1,
 		));
 				
-		$_fields = array('_date');
+		$_fields = array('_date', '_title', '_weight');
 		foreach( array_column($dataset['fields'], 'fields') as $field ) {
 			
 			$_field = $field['field'];
@@ -285,7 +285,7 @@ class Dataset extends AppModel
 		
 		}
 		
-		
+				
 		$_order = array();
 		if( isset($queryData['order']) && $queryData['order'] )
 			$order = $queryData['order'];

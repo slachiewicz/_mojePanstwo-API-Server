@@ -9,11 +9,17 @@ class DataobjectsController extends AppController
     {
     	
     	$q = (string) @$this->request->query['q'];
+    	$app = (string) @$this->request->query['app'];
     	
+    	$conditions = array(
+    		'q' => $q,
+    	);
+		
+		if( $app )
+			$conditions['_source'] = 'app:' . $app;
+		    	
         $objects = $this->Dataobject->search('*', array(
-        	'conditions' => array(
-        		'q' => $q,
-        	),
+        	'conditions' => $conditions,
         	'mode' => 'suggester_main',
         	'limit' => 5,
         ));
@@ -33,6 +39,7 @@ class DataobjectsController extends AppController
         	'ustawy' => 'Ustawa',
         	'zamowienia_publiczne' => 'Zamówienie',  
         	'prawo' => 'Prawo',  
+        	'prawo_hasla' => 'Temat w prawie',  
         );
         
         if( isset($objects['dataobjects']) && !empty($objects['dataobjects']) )

@@ -618,10 +618,7 @@ class MPSearch {
 	    );
 
 		$params['body']['query']['filtered'] = $filtered;	    
-	    	    
-	    
-	 
-	    
+	    	    	    
 	    foreach( $queryOrder as $order ) {
 		    
 		    $parts = explode(' ', $order);
@@ -635,6 +632,12 @@ class MPSearch {
 					
 					$sort[] = array(
 						'title_pl.raw' => $direction,
+					);
+				
+				} elseif( $field == '_weight' ) {
+					
+					$sort[] = array(
+						'weights.suggester_main' => $direction,
 					);
 				
 				} elseif( $field == '_date' ) {
@@ -775,9 +778,9 @@ class MPSearch {
         
         
         // Configure::write('debug', 2);
-        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( $params ); }
+        // echo "\n\n"; debug( $params );
 	    $es_result = $this->API->search( $params );
-        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( $es_result ); }
+        // echo "\n\n"; debug( $es_result );
         
         
         

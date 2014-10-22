@@ -141,7 +141,10 @@ class MPSearch {
 		
 		// Configure::write('debug', 2);
         // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( 'asd' ); }
-			
+		
+		// debug( $queryData ); die();
+		
+		
         $params = array();
 		$src = false;
 		
@@ -207,7 +210,7 @@ class MPSearch {
         $and_filters = array();
         
         // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( $queryFilters ); die(); }
-        
+                
         foreach( $queryFilters as $key => $value ) {
         	
         	

@@ -9,6 +9,7 @@ class PrawoController extends AppController
 		$data = array(
 			'keywords' => $this->Prawo->keywords(),
 			'popular' => $this->Prawo->popular(),
+			'types' => $this->Prawo->types(),
 		);
 		
         $this->set(array(

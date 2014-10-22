@@ -36,5 +36,18 @@ class Prawo extends AppModel
 	    return $data;
 	    
     }
+	
+	public function types()
+	{
+		
+			App::import('model', 'MPCache');
+		    $MPCache = new MPCache();
+		    
+		    $data = $MPCache->getDataSource()->get('prawo/stats.json');
+		    
+			return json_decode($data, true);    
 
+		
+	}
+	
 } 

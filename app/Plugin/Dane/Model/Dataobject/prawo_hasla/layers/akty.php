@@ -1,5 +1,63 @@
 <?
-
+	
+	$transport = $this->ES->search(array(
+		'query' => array(
+			'filtered' => array(
+				'filter' => array(
+					'and' => array(
+						array(
+							'term' => array(
+								'_type' => 'prawo',
+							),
+						),
+						array(
+							'term' => array(
+								'data_v3.pierwotny' => '1',
+							),
+						),
+						array(
+							'term' => array(
+								'data_virtual.haslo_id' => $id,
+							),
+						),
+					),
+				),
+			),
+		),
+		'aggregations' => array(
+			'hasla' => array(
+				'terms' => array(
+					'field' => 'data_virtual.haslo_id',
+					'exclude' => '(' . $id . ')',
+					'size' => 20,
+				),
+			),
+		),
+	));
+	
+	
+	$keywords = $transport['aggregations']['hasla']['buckets'];
+	$keywords_ids = array_column($keywords, 'key');
+	$keywords_dict = $this->DB->selectDictionary("SELECT id, q FROM ISAP_hasla WHERE `id`='" . implode("' OR `id`='", $keywords_ids) . "'");
+	
+	foreach( $keywords as &$keyword )
+		$keyword = array_merge($keyword, array(
+			'q' => trim( $keywords_dict[ $keyword['key'] ] ),
+		));
+		
+	$acts = array_column($transport['hits']['hits'], '_source');
+	$acts = array_column($acts, 'data_v3');
+	
+	return array(
+		'acts' => $acts,
+		'keywords' => $keywords,
+	);
+	
+	
+	
+	
+	
+	
 	$items = $this->DB->selectAssocs("
 		SELECT
 			`child`.`id` as 'child.id', 

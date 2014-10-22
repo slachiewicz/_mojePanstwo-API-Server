@@ -179,6 +179,9 @@ class Dataobject extends AppModel
         
         App::import('model', 'S3Files');
         $this->S3Files = new S3Files();
+        
+        App::Import('ConnectionManager');
+		$this->ES = ConnectionManager::getDataSource('MPSearch');
 
         $output = include($file);
         if ($layer == 'related') {

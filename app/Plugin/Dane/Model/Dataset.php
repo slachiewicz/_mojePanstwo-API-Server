@@ -246,14 +246,21 @@ class Dataset extends AppModel
 			
 		
 		
-		
 		if (!empty($switchers)) {
                                
             $dataset_switchers_exp_dict = array_column($dataset['switchers'], 'switcher');
-            $dataset_switchers_exp_dict = array_column($dataset_switchers_exp_dict, 'expression', 'name');
-						
+            $dataset_switchers_exp_dict = array_column($dataset_switchers_exp_dict, 'filters', 'name');
+			
 			foreach( $switchers as $key => $value ) {
-                if( $exp = $dataset_switchers_exp_dict[ $key ] ) {
+                if( $_filters = $dataset_switchers_exp_dict[ $key ] ) {
+	                	                
+					if( !empty($_filters[0]) ) {
+						foreach( $_filters[0] as $_k => $_v ) {
+							$filters[ $_k ] = $_v;							
+						}
+					}
+					
+					/*
 					if( $parts = explode(':', $exp) ) {
 						
 						if( stripos($parts[0], '_data_') === 0 )
@@ -262,11 +269,13 @@ class Dataset extends AppModel
 						$filters[ $parts[0] ] = array($parts[1], false);
 						
 					}
+					*/
+					
                 }
             }
 						
         }		
-		
+				
 		
 		if( $do_facets ) {
 		

@@ -205,6 +205,7 @@ class MPSearch {
 				array();
 		
 		
+		$force_main_weights = false;
 		
         $alerts_groups_data = array();
         $and_filters = array();
@@ -755,7 +756,10 @@ class MPSearch {
         
         
         
-        if( !$src && ( ($queryMode == 'suggester_main') || ($queryMode == 'search_main') ) ) {
+        if( 
+        	$force_main_weights || 
+        	( !$src && ( ($queryMode == 'suggester_main') || ($queryMode == 'search_main') ) )
+        ) {
 	        
 	        $params['body']['query'] = array(
 	        	'function_score' => array(

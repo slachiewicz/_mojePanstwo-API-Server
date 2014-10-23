@@ -31,6 +31,19 @@
 	            case 'app':
 	            {
 	            	
+	            	
+	            	if( $value == 'prawo' ) {
+		            	
+		            	$force_main_weights = true;
+		            	
+		            	$and_filters[] = array(
+			            	'terms' => array(
+				            	'_type' => array('prawo', 'prawo_hasla'),
+			            	),
+		            	);
+		            	
+	            	}
+	            	
 	            	/*
 	            	$_datasets = ClassRegistry::init('DB')->selectValues("SELECT base_alias FROM datasets WHERE app_id='" . addslashes($value) . "' AND `backup_catalog`='1'");
 	            	

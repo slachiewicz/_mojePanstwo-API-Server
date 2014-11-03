@@ -230,9 +230,14 @@ class Dataset extends AppModel
 					$switchers[ substr($key, 1) ] = $value;
 				elseif( $key=='q' )
 					$q = $value;
-				elseif( in_array($key, $_fields) )
-					$filters[ $key ] = array($value, in_array($key, $virtual_fields));
-				elseif( $key=='_source' )
+				elseif( in_array($key, $_fields) ) {
+				
+					if( strpos($_k, '.')===false )
+						$_k = $alias . '.' . $_k;
+					
+					$filters[ $key ] = $value;
+				
+				} elseif( $key=='_source' )
 					$filters[ $key ] = $value;
 			
 			}
@@ -256,6 +261,10 @@ class Dataset extends AppModel
 	                	                
 					if( !empty($_filters[0]) ) {
 						foreach( $_filters[0] as $_k => $_v ) {
+														
+							if( strpos($_k, '.')===false )
+								$_k = $alias . '.' . $_k;
+							
 							$filters[ $_k ] = $_v;							
 						}
 					}
@@ -284,8 +293,11 @@ class Dataset extends AppModel
 					
 				foreach( $dataset['filters'] as $filter ) 
 					if( ( $filter = $filter['filter'] ) && in_array($filter['typ_id'], array(1, 2)) ) {
-											
-						$facets[] = array($filter['field'], in_array($filter['field'], $virtual_fields));
+						
+						if( strpos($filter['field'], '.')===false )
+							$filter['field'] = $alias . '.' . $filter['field'];
+							
+						$facets[] = $filter['field'];
 						$facets_dict[ $filter['field'] ] = $filter;
 					
 					}
@@ -303,16 +315,25 @@ class Dataset extends AppModel
 			$order = array( $order );
 		
 		foreach( $order as $o ) {
-			
+						
 			$_field = $o;
 			if( $p = strpos($o, ' ') )
 				$_field = substr($o, 0, $p);
+				
 			
-			if( in_array($_field, $_fields) )
+			
+			if( in_array($_field, $_fields) ) {
+				
+				if( strpos($_field, '.')===false )
+					$o = $alias . '.' . $o;
+				
 				$_order[] = $o;
+				
+			}
 			
 		}
 
+				
 				
 		App::import('model','Dane.Dataobject');
 		$this->Dataobject = new Dataobject();

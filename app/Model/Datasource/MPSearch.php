@@ -4,8 +4,8 @@ class MPSearch {
     public $cacheSources = true;
     public $description = 'Serwer szukania platformy mojePaństwo';
 	
-	private $_index = 'objects_v2_01';
-	private $_version = 'v3';
+	private $_index = 'mojepanstwo_v1';
+	private $_data_prefix = 'data';
     private $_excluded_fields = array('datachannel', 'dataset', 'search', 'q');
     private $_fields_multi_dict = array();
     
@@ -73,7 +73,7 @@ class MPSearch {
 				                'filters' => array(
 				                    array(
 				                        'term' => array(
-				                        	'_type' => $dataset,
+				                        	'dataset' => $dataset,
 				                        ),
 				                    ),
 				                    array(
@@ -87,6 +87,7 @@ class MPSearch {
 				        ),
 				    ),
 				),
+				'fields' => array('_source', 'dataset', 'id', 'slug'),
 			),
 		);
 
@@ -122,15 +123,16 @@ class MPSearch {
 	   		$data_field = 'data';
 	   	
 	    $output = array(
-    		'id' => $doc['_id'],
-            'dataset' => $doc['_type'],
-            'object_id' => $doc['_source']['id'],
-            'data' => $doc['_source'][ $data_field ],
+            'global_id' => $doc['_id'],
+            'dataset' => $doc['fields']['dataset'][0],
+    		'id' => $doc['fields']['id'][0],
+    		'slug' => $doc['fields']['slug'][0],
             'score' => $doc['_score'],
+            'data' => $doc['_source']['data'],
     	);
     	    	
-    	if( isset($doc['highlight']['text_pl']) && is_array($doc['highlight']['text_pl']) && isset($doc['highlight']['text_pl'][0]) )
-    		$output['hl'] = $doc['highlight']['text_pl'][0];
+    	if( isset($doc['highlight']['text']) && is_array($doc['highlight']['text']) && isset($doc['highlight']['text'][0]) )
+    		$output['hl'] = $doc['highlight']['text'][0];
     	
     	return $output;
 	    
@@ -190,9 +192,6 @@ class MPSearch {
 		if ( isset( $queryData['order'] ) && is_array( $queryData['order'] ) && isset($queryData['order'][0]) && is_array($queryData['order'][0]) )
 			$queryOrder = $queryData['order'][0];
 		
-		$queryVersion = ( isset( $queryData['version'] ) ) ? $queryData['version'] : false;
-		if( $queryVersion )
-			$this->_version = $queryVersion;
 			
 					 		
 		$queryObjects = ( isset( $queryData['objects'] ) && is_array( $queryData['objects'] ) ) ? 
@@ -221,7 +220,7 @@ class MPSearch {
         		$_key = is_array($value) ? 'terms' : 'term';
         		$and_filters[] = array(
 	        		$_key => array(
-	        			'_type' => $value,
+	        			'dataset' => $value,
 	        		),
 	        	);
         		
@@ -248,26 +247,13 @@ class MPSearch {
         		if( $key == '_date' ) {
         			
         			$key = 'date';
-        			if( $this->_version )
-				   		$key .= '_' . $this->_version;
+    
 				   		
 				   	// debug( $value );
         			
         		} else {
-        		
-	        		if( $value[1] )
-	        			$prefix = 'data_virtual';
-	        		else {
-		        		
-		        		
-		        		
-		        		$prefix = 'data';
-					   	if( $this->_version )
-					   		$prefix .= '_' . $this->_version;
-		        		
-	        		}
 		        	
-		        	$key = $prefix . '.' . $key;
+		        	$key = $this->_data_prefix . '.' . $key;
 	        	
 	        	}
         		
@@ -400,7 +386,7 @@ class MPSearch {
         			'and' => array(
         				array(
         					'term' => array(
-				        		'_type' => $obj['dataset'],
+				        		'dataset' => $obj['dataset'],
 		        			),
         				),
         				array(
@@ -437,6 +423,7 @@ class MPSearch {
 				'from' => $_from, 
 				'size' => $queryLimit,
 				'query' => array(),
+				'fields' => array('_source', 'dataset', 'id', 'slug'),
 			),
 		);
 		
@@ -451,9 +438,9 @@ class MPSearch {
 	    	if( $queryMode == 'full' ) {
 		    	
 		    	$filtered['query']['match_phrase'] = array(
-					"text_pl" => array(
+					"text" => array(
 						"query" => $queryQ,
-						'analyzer' => 'morfologik',
+						'analyzer' => 'pl',
 						'slop' => 10,
 					),
 		    	);
@@ -475,8 +462,8 @@ class MPSearch {
 		    	$filtered['query']['multi_match'] = array(
 					"query" => $queryQ,
 				    "type" => "phrase",
-				    "fields" => array("title_pl.suggest", "text_pl"),
-					'analyzer' => 'morfologik',
+				    "fields" => array("title.suggest", "text"),
+					'analyzer' => 'pl',
 					'slop' => 10,
 		    	);
 		    	
@@ -496,9 +483,9 @@ class MPSearch {
 	    	} elseif( $queryMode == 'title' ) {
 		    	
 		    	$filtered['query']['match_phrase'] = array(
-					"title_pl" => array(
+					"title" => array(
 						"query" => $queryQ,
-						'analyzer' => 'morfologik',
+						'analyzer' => 'pl',
 						'slop' => 10,
 					),
 		    	);
@@ -506,7 +493,7 @@ class MPSearch {
 	    	} elseif( $queryMode == 'title_prefix' ) {
 		    	
 		    	$filtered['query']['match'] = array(
-					"title_pl.suggest" => array(
+					"title.suggest" => array(
 						"query" => $queryQ,
 						'analyzer' => 'standard',
 					),
@@ -517,16 +504,14 @@ class MPSearch {
 		    	$filtered['query']['multi_match'] = array(
 					"query" => $queryQ,
 				    "type" => "phrase",
-				    "fields" => array("title_pl.suggest", "text_pl"),
-					'analyzer' => 'morfologik',
+				    "fields" => array("title.suggest", "text"),
+					'analyzer' => 'pl',
 					'slop' => 10,
 		    	);
 						    	
 		    	$and_filters[] = array(
-	    			'range' => array(
-	    				'weights.suggester_main' => array(
-		    				'gt' => 0,
-	    				)
+	    			'term' => array(
+	    				'weights.main.enabled' => true,
 	    			),
 		    	);
 		    	
@@ -535,8 +520,8 @@ class MPSearch {
 		    	$filtered['query']['multi_match'] = array(
 					"query" => $queryQ,
 				    "type" => "phrase",
-				    "fields" => array("title_pl.suggest", "text_pl"),
-					'analyzer' => 'morfologik',
+				    "fields" => array("title.suggest", "text"),
+					'analyzer' => 'pl',
 					'slop' => 10,
 		    	);
 				
@@ -545,10 +530,8 @@ class MPSearch {
 				if( !$src ) {
     	
 			    	$and_filters[] = array(
-		    			'range' => array(
-		    				'weights.suggester_main' => array(
-			    				'gt' => 0,
-		    				)
+		    			'term' => array(
+		    				'weights.main.enabled' => true,
 		    			),
 			    	);
 		    	
@@ -582,20 +565,20 @@ class MPSearch {
 		    		
 		    	);
 		    	
-		    	
+		    	/*
 		    	$params['body']['suggest'] = array(
 				    "text" => $queryQ,
 				    "didyoumean" => array(
 				      "phrase" => array(
 				        "analyzer" => "simple",
-				        "field" => "text_pl",
+				        "field" => "text",
 				        "size" => 1,
 				        "real_word_error_likelihood" => 0.95,
 				        "max_errors" => 0.5,
 				        "gram_size" => 2,
 				        "direct_generator" => array(
 				        	array(
-					          "field" => "text_pl",
+					          "field" => "text",
 					          "suggest_mode" => "always",
 					          "min_word_length" => 1
 					        ),
@@ -606,7 +589,8 @@ class MPSearch {
 				        )
 				      )
 				    )
-				); 
+				);
+				*/ 
 			
 			}	
 	    		
@@ -635,34 +619,28 @@ class MPSearch {
 				if( $field == '_title' ) {
 					
 					$sort[] = array(
-						'title_pl.raw' => $direction,
+						'title.raw' => $direction,
 					);
 				
 				} elseif( $field == '_weight' ) {
 					
 					$sort[] = array(
-						'weights.suggester_main' => $direction,
+						'weights.main.score' => $direction,
 					);
 				
 				} elseif( $field == '_date' ) {
 					
 					$sort[] = array(
-						'date_v3' => $direction,
+						'date' => $direction,
 					);
 				
 				} elseif( $field == 'score' ) {
 				
 				
 				
-				} else {
+				} else {									
 					
-					// $sort['date_v3'] = 'desc';
-					
-					$prefix = 'data';
-					if( $this->_version )
-						$prefix .= '_' . $this->_version;
-					
-					$field = $prefix . '.' . $field;					
+					$field = $this->_data_prefix . '.' . $field;					
 					$sort[] = array(
 						$field => $direction,
 					);
@@ -675,12 +653,12 @@ class MPSearch {
         
         
         $sort[] = array(
-        	'date_v3' => 'desc',
+        	'date' => 'desc',
         );
         
         
         $sort[] = array(
-        	'title_pl.raw' => 'asc',
+        	'title.raw' => 'asc',
         );
         
         
@@ -694,57 +672,42 @@ class MPSearch {
 	        
 	        foreach( $queryFacets as $facet ) {
 	        	
-	        	if( is_array($facet) ) {
-	        		
-	        		if( $facet[0]=='alerts' ) {
-		        	
-			        	
-			        	$aggs['alerts'] = array(
-	        				'nested' => array(
-				                "path" => "__alerts",
-				            ),
-				            'aggs' => array(
-				                'groups' => array(
-					                'terms' => array(
-				                		'field' => '__alerts.group_id',
-				                		'include' => $facet[1],
-				                	),
-			                	),
-				            ),
-			        	);
-			        			        				        		        			        	
-		        	} else {
-	        		
-			        	if( $facet[1] ) {
-			        		$prefix = 'data_virtual';
-			        	} else {
-				        	
-				        	$prefix = 'data';
-				        	if( $this->_version )
-				        		$prefix .= '_' . $this->_version;			        	
-				        	
-			        	}
-			        	
-			        	$aggs[ $facet[0] ] = array(
-			        		'terms' => array(
-			        			'field' => $prefix . '.' . $facet[0],
-			        			'exclude' => '0',
-			        			'size' => 20,
-			        		),
-			        	);
-		        	
-		        	}
-	        	
-	        	} elseif( $facet == 'dataset' ) {
+	        	if( $facet == 'dataset' ) {
 		        	
 		        	$aggs[ 'dataset' ] = array(
 		        		'terms' => array(
-		        			'field' => '_type',
+		        			'field' => 'dataset',
 		        			'size' => 20,
 		        		),
 		        	);
 		        	
-	        	} 
+	        	} elseif( $facet=='alerts' ) {
+		        	
+		        	$aggs['alerts'] = array(
+        				'nested' => array(
+			                "path" => "__alerts",
+			            ),
+			            'aggs' => array(
+			                'groups' => array(
+				                'terms' => array(
+			                		'field' => '__alerts.group_id',
+			                		'include' => $facet[1],
+			                	),
+		                	),
+			            ),
+		        	);
+		        	
+		        } else {
+		        	
+		        	$aggs[ $facet ] = array(
+		        		'terms' => array(
+		        			'field' => $this->_data_prefix . '.' . $facet,
+		        			'exclude' => '0',
+		        			'size' => 20,
+		        		),
+		        	);
+		        	
+	        	}
 	        }
 	        
 	        if( !empty($aggs) )
@@ -755,23 +718,25 @@ class MPSearch {
         
         
         
-        
+        /*
         if( 
         	$force_main_weights || 
         	( !$src && ( ($queryMode == 'suggester_main') || ($queryMode == 'search_main') ) )
         ) {
-	        
+	    */
+	      
 	        $params['body']['query'] = array(
 	        	'function_score' => array(
 	        		'query' => $params['body']['query'],
 	        		'field_value_factor' => array(
-						'field' => 'weights.suggester_main'
+						'field' => 'weights.main.score'
 			        ),
 	        	),
 	        );
 	        
-	        
+	    /*    
         }
+        */
         
         
         

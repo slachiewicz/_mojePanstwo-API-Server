@@ -24,7 +24,7 @@ class Dataobject extends AppModel
             return Router::url(array('plugin' => 'KodyPocztowe', 'controller' => 'KodyPocztowe', 'action' => 'view', 'id' => $o['data']['kod']), true);
         }
 
-        return Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['object_id']), true);
+        return Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['id']), true);
     }
 
     public static function apiUrlStd($dataset, $object_id) {
@@ -32,7 +32,7 @@ class Dataobject extends AppModel
     }
 
     public static function mpUrl(&$o) {
-        return 'http://mojepanstwo.pl/dane/' . $o['dataset'] .'/' . $o['object_id'];
+        return 'http://mojepanstwo.pl/dane/' . $o['dataset'] .'/' . $o['id'];
     }
 
 
@@ -72,7 +72,13 @@ class Dataobject extends AppModel
 		else
 			return false;      
         
-
+        if( isset($params['slug']) && ( $params['slug']!=$this->data['slug'] ) ) {
+	        
+	        // correct the slug
+	        echo("correct the slug"); die();
+	        
+        }
+        
         // query dataset and its layers
         $mdataset = new Dataset();
         $ds = $mdataset->find('first', array(

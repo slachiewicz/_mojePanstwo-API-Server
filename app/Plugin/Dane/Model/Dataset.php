@@ -39,7 +39,12 @@ class Dataset extends AppModel
 	 	    
 	 	    $output = $this->MPCache->getDataset( $alias, @$queryData['full'] );
 	 	    $output['orders'] = isset($output['orders_es']) ? $output['orders_es'] : array();
-	 	    	        	        
+	 	    
+	 	    if( !empty( $output['filters'] ) )
+		 	    foreach( $output['filters'] as &$f )
+		 	    	if( strpos($f['filter']['field'], '.')===false )
+		 	    		$f['filter']['field'] = $alias . '.' . $f['filter']['field'];
+	 	    
 			return $output;
 			
 		}
@@ -191,8 +196,10 @@ class Dataset extends AppModel
 			),
 			'full' => 1,
 		));
-				
-		$_fields = array('_date', '_title', '_weight');
+		
+		$__fields = array('_date', '_title', '_weight');
+		$_fields = $__fields;
+		
 		foreach( array_column($dataset['fields'], 'fields') as $field ) {
 			
 			$_field = $field['field'];
@@ -232,8 +239,11 @@ class Dataset extends AppModel
 					$q = $value;
 				elseif( in_array($key, $_fields) ) {
 				
-					if( strpos($_k, '.')===false )
-						$_k = $alias . '.' . $_k;
+					if( 
+						( !in_array($key, $__fields) ) && 
+						( strpos($key, '.')===false )
+					)
+						$key = $alias . '.' . $key;
 					
 					$filters[ $key ] = $value;
 				
@@ -261,7 +271,7 @@ class Dataset extends AppModel
 	                	                
 					if( !empty($_filters[0]) ) {
 						foreach( $_filters[0] as $_k => $_v ) {
-														
+												
 							if( strpos($_k, '.')===false )
 								$_k = $alias . '.' . $_k;
 							
@@ -324,7 +334,10 @@ class Dataset extends AppModel
 			
 			if( in_array($_field, $_fields) ) {
 				
-				if( strpos($_field, '.')===false )
+				if( 
+					( !in_array($_field, $__fields) ) && 
+					( strpos($_field, '.')===false )
+				)
 					$o = $alias . '.' . $o;
 				
 				$_order[] = $o;

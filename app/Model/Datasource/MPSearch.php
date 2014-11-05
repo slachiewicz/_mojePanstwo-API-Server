@@ -209,8 +209,8 @@ class MPSearch {
         $alerts_groups_data = array();
         $and_filters = array();
         
-        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( $queryFilters ); die(); }
-                
+        // echo "\n\n"; debug( $queryFilters ); die();
+               
         foreach( $queryFilters as $key => $value ) {
         	
         	
@@ -258,9 +258,9 @@ class MPSearch {
 	        	}
         		
         		
-        		if( is_string($value[0]) || is_numeric($value[0]) ) {
+        		if( is_string($value) || is_numeric($value) ) {
         		
-	        		$_value = strtoupper( $value[0] );
+	        		$_value = strtoupper( $value );
 	        		
 					if( $_value == 'LAST_24H' ) {   		
 						
@@ -334,7 +334,7 @@ class MPSearch {
 							),
 						);
 					
-					} elseif( preg_match('^\[(.*?) TO (.*?)\]^i', $value[0], $match) ) {
+					} elseif( preg_match('^\[(.*?) TO (.*?)\]^i', $value, $match) ) {
 						
 						$range = array();
 						
@@ -354,17 +354,17 @@ class MPSearch {
 						
 						$and_filters[] = array(
 			        		'term' => array(
-			        			$key => $value[0],
+			        			$key => $value,
 			        		),
 			        	);
 						
 					}
 				
-				} elseif( is_array( $value[0] ) ) {
+				} elseif( is_array( $value ) ) {
 					
 					$and_filters[] = array(
 		        		'terms' => array(
-		        			$key => $value[0],
+		        			$key => $value,
 		        		),
 		        	);
 	        	

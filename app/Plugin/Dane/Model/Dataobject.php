@@ -20,8 +20,9 @@ class Dataobject extends AppModel
     }
 
     public static function apiUrl(&$o) {
+	    	    
         if ($o['dataset'] == 'kody_pocztowe') {
-            return Router::url(array('plugin' => 'KodyPocztowe', 'controller' => 'KodyPocztowe', 'action' => 'view', 'id' => $o['data']['kod']), true);
+            return Router::url(array('plugin' => 'KodyPocztowe', 'controller' => 'KodyPocztowe', 'action' => 'view', 'id' => $o['data']['kody_pocztowe.kod']), true);
         }
 
         return Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => $o['dataset'], 'object_id' => $o['id']), true);
@@ -72,12 +73,9 @@ class Dataobject extends AppModel
 		else
 			return false;      
         
-        if( isset($params['slug']) && ( $params['slug']!=$this->data['slug'] ) ) {
+        if( isset($params['slug']) && ( $params['slug']!=$this->data['slug'] ) )	        
+	        return $this->data;
 	        
-	        // correct the slug
-	        echo("correct the slug"); die();
-	        
-        }
         
         // query dataset and its layers
         $mdataset = new Dataset();

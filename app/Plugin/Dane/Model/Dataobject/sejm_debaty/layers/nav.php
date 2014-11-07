@@ -25,37 +25,40 @@
 	ORDER BY `s_posiedzenia_punkty`.`nr_int` ASC, `stenogramy_subpunkty`.`i` ASC 
 	LIMIT 100");
 	
-	
-	$posiedzenie = array(
-		'id' => $data[0]['posiedzenie.id'],
-		'tytul' => $data[0]['posiedzenie.tytul'],
-		'opis' => $data[0]['posiedzenie.opis'],
-		'punkty' => array(),
-	);
-	
-	$punkty = array();
-	
-	foreach( $data as $d ) {
+	if( $data ) {
 		
-		$punkty[ $d['punkt.id'] ]['id'] = $d['punkt.id'];
-		$punkty[ $d['punkt.id'] ]['numer'] = $d['punkt.numer'];
-		$punkty[ $d['punkt.id'] ]['tytul'] = $d['punkt.tytul'];
-		$punkty[ $d['punkt.id'] ]['wynik'] = $d['punkt.wynik'];
-		$punkty[ $d['punkt.id'] ]['debaty'][] = array(
-			'id' => $d['debata.id'],
-			'tytul' => $d['debata.tytul'],
-			'numer' => $d['debata.numer'],
-			'opis' => $d['debata.opis'],
-			'liczba_wystapien' => $d['debata.liczba_wystapien'],
+		$posiedzenie = array(
+			'id' => $data[0]['posiedzenie.id'],
+			'tytul' => $data[0]['posiedzenie.tytul'],
+			'opis' => $data[0]['posiedzenie.opis'],
+			'punkty' => array(),
 		);
 		
+		$punkty = array();
+		
+		foreach( $data as $d ) {
+			
+			$punkty[ $d['punkt.id'] ]['id'] = $d['punkt.id'];
+			$punkty[ $d['punkt.id'] ]['numer'] = $d['punkt.numer'];
+			$punkty[ $d['punkt.id'] ]['tytul'] = $d['punkt.tytul'];
+			$punkty[ $d['punkt.id'] ]['wynik'] = $d['punkt.wynik'];
+			$punkty[ $d['punkt.id'] ]['debaty'][] = array(
+				'id' => $d['debata.id'],
+				'tytul' => $d['debata.tytul'],
+				'numer' => $d['debata.numer'],
+				'opis' => $d['debata.opis'],
+				'liczba_wystapien' => $d['debata.liczba_wystapien'],
+			);
+			
+		}
+		
+		foreach( $punkty as $punkt_id => $punkt )
+			$posiedzenie['punkty'][] = $punkt;
+		
+		
+		return array(
+			'posiedzenie' => $posiedzenie
+		);
+	
 	}
-	
-	foreach( $punkty as $punkt_id => $punkt )
-		$posiedzenie['punkty'][] = $punkt;
-	
-	
-	return array(
-		'posiedzenie' => $posiedzenie
-	);
 	

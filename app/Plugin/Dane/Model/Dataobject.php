@@ -200,12 +200,12 @@ class Dataobject extends AppModel
 
                     $search_objects = $search['dataobjects'];
                     $group['objects'] = array();
-
+					
                     for ($i = 0; $i < count($objects); $i++) {
-
+												
                         reset($search_objects);
                         foreach ($search_objects as &$search_object)
-                            if (($search_object['dataset'] == $objects[$i]['dataset']) && ($search_object['object_id'] == $objects[$i]['object_id']))
+                            if (($search_object['dataset'] == $objects[$i]['dataset']) && ($search_object['id'] == $objects[$i]['object_id']))
                                 $group['objects'][] = $search_object;
 
                     }

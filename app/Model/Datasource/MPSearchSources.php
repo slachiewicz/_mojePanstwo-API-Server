@@ -320,6 +320,24 @@
 					
 				}
 				
+				case 'sejm_debaty.wystapienia':
+	            {
+					
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'sejm_wystapienia',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.sejm_wystapienia.debata_id' => $value,
+		        		),
+		        	);
+		        		                
+	                break;
+	
+	            }
+				
 	            case 'instytucje.prawo':
 	            {
 					
@@ -435,6 +453,45 @@
 	                
 	
 	            }
+	            
+	            case 'sejm_glosowania.glosy':
+	            {
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'poslowie_glosy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.poslowie_glosy.glosowanie_id' => $value,
+		        		),
+		        	);
+		        		                
+	                break;	
+	                
+	
+	            }
+	            
+	            case 'sejm_posiedzenia_punkty.glosowania':
+	            {
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'sejm_glosowania',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.sejm_glosowania.punkt_id' => $value,
+		        		),
+		        	);
+		        		                
+	                break;	
+	                
+	
+	            }
+	            	            
 	            
 	            case 'poslowie.prawo_projekty_za':
 	            {

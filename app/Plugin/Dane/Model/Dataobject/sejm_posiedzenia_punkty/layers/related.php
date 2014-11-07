@@ -1,15 +1,12 @@
 <?
 
 	$object = $this->getObject($dataset, $id);
-	
-	
-	
+		
 	$output = array(
 	    'groups' => array(),
-	);
+	);	
 	
-	
-	$punkt_id = $object['data']['id'];
+	$punkt_id = $object['id'];
 
 
 	

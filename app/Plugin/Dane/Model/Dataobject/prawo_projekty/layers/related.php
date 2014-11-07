@@ -13,7 +13,7 @@ $objects = array(
     'prawo' => array(),
 );
 
-$projekt_id = $object['data']['id'];
+$projekt_id = $object['id'];
 
 
 foreach ($this->DB->selectValues("SELECT id FROM rcl_katalogi WHERE akcept='1' AND katalog_id=0 AND s_projekt_id='" . $projekt_id . "' ORDER BY `data` ASC") as $pid)

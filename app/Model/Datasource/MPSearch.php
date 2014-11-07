@@ -202,8 +202,7 @@ class MPSearch {
 			$queryObjects = ( isset( $queryData['conditions']['objects'] ) && is_array( $queryData['conditions']['objects'] ) ) ? 
 				$queryData['conditions']['objects'] : 
 				array();
-		
-		
+				
 		$force_main_weights = false;
 		
         $alerts_groups_data = array();

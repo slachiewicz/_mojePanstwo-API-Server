@@ -1,6 +1,3 @@
-<?php
-require_once('SejmWystapienia.php');
-
-$obj = new SejmWystapienia();
-$obj->id = $id;
-return $obj->html();
+<?
+	
+	return $this->DB->selectValue("SELECT p_txt FROM stenogramy_wystapienia WHERE id='" . addslashes( $id ) . "'");

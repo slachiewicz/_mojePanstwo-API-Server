@@ -62,24 +62,27 @@ class Newalertobject extends AppModel
 	        		'_source' => 'alerts:' . $this->getCurrentUser('id') . '|' . $group_id . '|' . $visited,
 	        	),
 	        	'facets' => array(
-	    			array('alerts', '(' . implode('|', $alerts_gropu_ids) . ')'),
+	    			'alerts:' . implode(',', $alerts_gropu_ids),
 	        	),
 	        	// 'order' => $order,
 	        	'limit' => $limit,
 	        	'page' => $page,
-	        	'version' => 'v3',
 	        ));
-			
-
-			
+						
 			foreach( $alerts_groups as &$group ) {
 				
 				$group['alerts_unread_count'] = 0;
 				
-				for( $_i=0; $_i<count($search['facets']['alerts'][0]); $_i++ ) {
-					if( $search['facets']['alerts'][0][$_i]['key'] == $group['id'] ) {
-						$group['alerts_unread_count'] = $search['facets']['alerts'][0][$_i]['doc_count'];
-						break;
+				if( 
+					isset( $search['facets'] ) && 
+					isset( $search['facets']['alerts'] ) && 
+					isset( $search['facets']['alerts'][0] ) 
+				) {
+					for( $_i=0; $_i<count($search['facets']['alerts'][0]); $_i++ ) {
+						if( $search['facets']['alerts'][0][$_i]['key'] == $group['id'] ) {
+							$group['alerts_unread_count'] = $search['facets']['alerts'][0][$_i]['doc_count'];
+							break;
+						}
 					}
 				}
 				
@@ -229,7 +232,6 @@ class Newalertobject extends AppModel
 	    // $this->DB->q("INSERT LOW_PRIORITY INTO `m_users_history` (`user_id`, `object_id`) VALUES ('$user_id', '$object_id')");
 	    
 	    
-	    $dataset = $this->DB->selectValue("SELECT dataset FROM objects WHERE id='$object_id'");	    
 	    	    
 	    if( $action=='read' ) {
 	    	
@@ -242,7 +244,7 @@ class Newalertobject extends AppModel
 	    	
 	    	$ret = $MPSearch->API->update(array(
 	    		'index' => 'objects_v2_01',
-			  	'type' => 'alerts_' . $dataset,
+			  	'type' => 'alerts',
 			  	'id' => $object_id . '-' . $user_id,
 			  	'parent' => $object_id,
 			  	'body' => array(
@@ -270,7 +272,7 @@ class Newalertobject extends AppModel
 	    	
 	    	$ret = $MPSearch->API->update(array(
 	    		'index' => 'objects_v2_01',
-			  	'type' => 'alerts_' . $dataset,
+			  	'type' => 'alerts',
 			  	'id' => $object_id . '-' . $user_id,
 			  	'parent' => $object_id,
 			  	'body' => array(

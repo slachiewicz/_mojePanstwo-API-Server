@@ -66,14 +66,13 @@ class Dataobject extends AppModel
 
     public function getObject($dataset, $id, $params = array(), $throw_not_found = false)
     {
-        
-        
+                
 		if( $object = $this->getDataSource()->getObject($dataset, $id) )
 			$this->data =$object;
 		else
 			return false;      
         
-        if( isset($params['slug']) && ( $params['slug']!=$this->data['slug'] ) )	        
+        if( isset($params['slug']) && $params['slug'] && ( $params['slug']!=$this->data['slug'] ) )	        
 	        return $this->data;
 	        
         
@@ -267,7 +266,7 @@ class Dataobject extends AppModel
 		$order = (isset($queryData['order']) && $queryData['order']) ? $queryData['order'] : array();
 		$page = (isset($queryData['page']) && $queryData['page']) ? $queryData['page'] : 1;
 		$version = (isset($dataset['Dataset']['version']) && $dataset['Dataset']['version']) ? $dataset['Dataset']['version'] : false;
-		
+				
 		if( isset($queryData['conditions']) && is_array($queryData['conditions']) ) {
 			foreach( $queryData['conditions'] as $key => $value ) {
 				
@@ -276,7 +275,7 @@ class Dataobject extends AppModel
 					
 				if( $key=='q' )
 					$q = $value;
-				elseif( $key=='_source' )
+				elseif( in_array($key, array('_source', '_app')) )
 					$filters[ $key ] = $value;
 			
 			}

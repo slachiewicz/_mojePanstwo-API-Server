@@ -23,12 +23,12 @@ class ZamowieniaPubliczne extends AppModel
 		          "filters" => array(
 		            array(
 		              "term" => array(
-		                "data_v3.status_id" => "2"
+		                "data.zamowienia_publiczne.status_id" => "2"
 		              ),
 		            ),
 		            array(
 		              "range" => array(
-		                "date_v3" => array(
+		                "date" => array(
 		                  "gte" => "now-1M"
 		                ),
 		              ),
@@ -41,12 +41,12 @@ class ZamowieniaPubliczne extends AppModel
 		  "aggs" => array(
 		    "suma" => array(
 		      "sum" => array(
-		        "field" => "data_v3.wartosc_cena"
+		        "field" => "data.zamowienia_publiczne.wartosc_cena"
 		      ),
 		    ),
 		    "rodzaje" => array(
 		      "terms" => array(
-		        "field" => "data_v3.rodzaj_id",
+		        "field" => "data.zamowienia_publiczne.rodzaj_id",
 		        "exclude" => "0",
 		        "order" => array(
 		          "suma_zamowien" => "desc"
@@ -56,14 +56,14 @@ class ZamowieniaPubliczne extends AppModel
 		      "aggs" => array(
 		        "suma_zamowien" => array(
 		          "sum" => array(
-		            "field" => "data_v3.wartosc_cena"
+		            "field" => "data.zamowienia_publiczne.wartosc_cena"
 		          ),
 		        ),
 		      ),
 		    ),
 		    "tryby" => array(
 		      "terms" => array(
-		        "field" => "data_v3.tryb_id",
+		        "field" => "data.zamowienia_publiczne.tryb_id",
 		        "exclude" => "0",
 		        "order" => array(
 		          "suma_zamowien" => "desc"
@@ -73,14 +73,14 @@ class ZamowieniaPubliczne extends AppModel
 		      "aggs" => array(
 		        "suma_zamowien" => array(
 		          "sum" => array(
-		            "field" => "data_v3.wartosc_cena"
+		            "field" => "data.zamowienia_publiczne.wartosc_cena"
 		          ),
 		        ),
 		      ),
 		    ),
 		    "zamawiajacy" => array(
 		      "terms" => array(
-		        "field" => "data_v3.zamawiajacy_id",
+		        "field" => "data.zamowienia_publiczne.zamawiajacy_id",
 		        "order" => array(
 		          "suma_zamowien" => "desc"
 		        ), 
@@ -89,7 +89,7 @@ class ZamowieniaPubliczne extends AppModel
 		      "aggs" => array(
 		        "suma_zamowien" => array(
 		          "sum" => array(
-		            "field" => "data_v3.wartosc_cena"
+		            "field" => "data.zamowienia_publiczne.wartosc_cena"
 		          ),
 		        ),
 		      ),

@@ -10,41 +10,19 @@ class DataobjectsController extends AppController
     	
     	$q = (string) @$this->request->query['q'];
     	$app = (string) @$this->request->query['app'];
-    	
+    	    	
     	$conditions = array(
     		'q' => $q,
     	);
 		
 		if( $app )
-			$conditions['_source'] = 'app:' . $app;
-		    	
+			$conditions['_app'] = $app;
+					    	
         $objects = $this->Dataobject->search('*', array(
         	'conditions' => $conditions,
         	'mode' => 'suggester_main',
         	'limit' => 5,
         ));
-        
-        $_dict = array(
-        	'instytucje' => 'Instytucja',
-        	'bdl_wskazniki' => 'Wskaźniki',
-        	'bdl_wskazniki_grupy' => 'Wskaźniki',
-        	'bdl_wskazniki_kategorie' => 'Wskaźniki',
-        	'gminy' => 'Gmina',	
-        	'krs_podmioty' => 'Organizacja',
-        	'krs_osoby' => 'Osoba',
-        	'twitter' => 'Tweet', 
-        	'twitter_accounts' => 'Twitter',     
-        	'poslowie' => 'Poseł',
-        	'sejm_wystapienia' => 'Występienie',
-        	'ustawy' => 'Ustawa',
-        	'zamowienia_publiczne' => 'Zamówienie',  
-        	'prawo' => 'Prawo',  
-        	'prawo_hasla' => 'Temat w prawie',  
-        );
-        
-        if( isset($objects['dataobjects']) && !empty($objects['dataobjects']) )
-	        foreach( $objects['dataobjects'] as &$obj )
-		        $obj['label'] = @$_dict[ $obj['dataset'] ];
         
         $this->set('objects', $objects);
         $this->set('_serialize', array('objects'));

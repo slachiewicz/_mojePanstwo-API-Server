@@ -130,57 +130,39 @@
 	            case 'alerts': {
 		            
 	    			list($user_id, $group_id, $visited) = explode('|', $value);
-										
-					$_or_filters = array();
-					$_filter = array(
-						"and" => array(
-							array(
-								"term" =>array(
-					                "user_id" => $user_id,
+		                      
+		            $has_child_filter = array(
+		        		"has_child" => array(
+					        "type" => "alerts" ,
+					        "filter" => array(
+								"and" => array(
+									array(
+										"term" =>array(
+							                "user_id" => $user_id,
+							            ),
+									),
+									array(
+										"term" =>array(
+							                "read" => (boolean) $visited,
+							            ),
+									),
 					            ),
 							),
-							array(
-								"term" =>array(
-					                "read" => (boolean) $visited,
-					            ),
-							),
-			            ),
-					);
-					
-
-					
-					
-					foreach( ClassRegistry::init('DB')->selectValues("SELECT base_alias FROM datasets WHERE alerts='1'") as $_dataset ) {
-						$_or_filters[] = array(
-							"has_child" => array(
-						        "type" => "alerts_" . $_dataset ,
-						        "filter" => $_filter,
-						    ),
-						);
-					
-					}
-					
-		                       
-		            $and_filters[] = array(
-		        		'or' => $_or_filters,
+					    ),
 		        	);	
 		        	
 		        	
 		        	if( $group_id ) {
 			        	
-			        	$and_filters[] = array(
-			        		'nested' => array(
-			        			'path' => '__alerts',
-			        			'filter' => array(
-			        				'term' => array(
-			        					'group_id' => $group_id,
-			        				),
-			        			),
-			        		),
+			        	$has_child_filter['has_child']['filter']['and'][] = array(
+	        				'term' => array(
+	        					'group_id' => $group_id,
+	        				),
 			        	);
 			        	
 		        	}
-		        		        	
+		        	
+		        	$and_filters[] = $has_child_filter;
 		        	
 		        	break;
 		            
@@ -484,6 +466,25 @@
 		        	$and_filters[] = array(
 		        		'term' => array(
 		        			'data.sejm_glosowania.punkt_id' => $value,
+		        		),
+		        	);
+		        		                
+	                break;	
+	                
+	
+	            }
+	            
+	            case 'sejm_debaty.glosowania':
+	            {
+					
+					$and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'sejm_glosowania',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.sejm_glosowania.debata_id' => $value,
 		        		),
 		        	);
 		        		                
@@ -966,11 +967,6 @@
 		        			'dataset' => 'rady_gmin_interpelacje',
 		        		),
 		        	);
-		        	$and_filters[] = array(
-		        		'term' => array(
-		        			'data.rady_gmin_interpelacje.radni_gmin.gmina_id' => $value,
-		        		),
-		        	);
 	                break;
 	            }
 	            
@@ -1234,6 +1230,23 @@
 		        	$and_filters[] = array(
 		        		'terms' => array(
 		        			'data.zamowienia_publiczne.wykonawca_id' => $wykonawcy_ids,
+		        		),
+		        	);	                
+	                break;
+	   
+	            }
+	            
+	            case 'krs_podmioty.historia':
+	            {
+	            		            	
+	            	$and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'msig_zmiany',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.msig_zmiany.pozycja_id' => $value,
 		        		),
 		        	);	                
 	                break;

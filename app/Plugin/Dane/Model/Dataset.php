@@ -316,7 +316,8 @@ class Dataset extends AppModel
 		
 		}
 		
-				
+		
+			
 		$_order = array();
 		if( isset($queryData['order']) && $queryData['order'] )
 			$order = $queryData['order'];
@@ -345,7 +346,6 @@ class Dataset extends AppModel
 			}
 			
 		}
-
 				
 				
 		App::import('model','Dane.Dataobject');

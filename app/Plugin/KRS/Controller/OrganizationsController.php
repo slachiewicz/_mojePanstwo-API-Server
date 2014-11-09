@@ -6,10 +6,7 @@ class OrganizationsController extends AppController
     {
 	   	// NAJNOWSZE ORGANIZACJE
 	   	
-	   	$data = ClassRegistry::init('Dane.Dataobject')->find('all', array(
-	   		'filters' => array(
-	   			'dataset' => 'krs_podmioty',
-	   		),
+	   	$data = ClassRegistry::init('Dane.Dataset')->search('krs_podmioty', array(
 	   		'order' => 'data_rejestracji desc',
 	   		'limit' => 12,
 	   	));
@@ -22,11 +19,11 @@ class OrganizationsController extends AppController
 		    			    	
 			    $najnowsze_organizacje[] = array(
 			    	'type' => 'organization',
-			    	'id' => $object['data']['id'],
-			    	'nazwa' => $object['data']['nazwa'],
-			    	'data_rejestracji' => @$object['data']['data_rejestracji'],
-			    	'kapital_zakladowy' => @$object['data']['wartosc_kapital_zakladowy'],
-			    	'miejscowosc' => @$object['data']['adres_miejscowosc'],
+			    	'id' => $object['data']['krs_podmioty.id'],
+			    	'nazwa' => $object['data']['krs_podmioty.nazwa'],
+			    	'data_rejestracji' => @$object['data']['krs_podmioty.data_rejestracji'],
+			    	'kapital_zakladowy' => @$object['data']['krs_podmioty.wartosc_kapital_zakladowy'],
+			    	'miejscowosc' => @$object['data']['krs_podmioty.adres_miejscowosc'],
 			    );
 		    }
 	   	}

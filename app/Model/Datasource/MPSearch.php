@@ -73,6 +73,11 @@ class MPSearch {
 				                'filters' => array(
 				                    array(
 				                        'term' => array(
+				                        	'_type' => 'objects',
+				                        ),
+				                    ),
+				                    array(
+				                        'term' => array(
 				                        	'dataset' => $dataset,
 				                        ),
 				                    ),
@@ -108,20 +113,6 @@ class MPSearch {
     
     public function doc2object($doc) {
 	   	
-	   	$types = array('data_v3', 'data');
-	   	
-	   	foreach( $types as $type ) {
-		   	if( isset( $doc['_source'][$type] ) ) {
-			   	
-			   	$data_field = $type;
-			   	break;
-			   	
-		   	}
-	   	}
-	   	
-	   	if( !isset($doc['_source'][ $data_field ]) )
-	   		$data_field = 'data';
-	   	
 	    $output = array(
             'global_id' => $doc['_id'],
             'dataset' => $doc['fields']['dataset'][0],
@@ -154,7 +145,7 @@ class MPSearch {
         $this->MPCache = new MPCache();
     	$available_datasets = $this->MPCache->getAvailableDatasets();
     	
-    	    	
+    	    	    	
     	
     	$queryLimit = (isset($queryData['limit']) && $queryData['limit']) ?
                     $queryData['limit'] :
@@ -206,7 +197,13 @@ class MPSearch {
 		$force_main_weights = false;
 		
         $alerts_groups_data = array();
-        $and_filters = array();
+        $and_filters = array(
+	        array(
+		        'term' => array(
+			        '_type' => 'objects',
+		        ),
+	        ),
+        );
         
         // echo "\n\n"; debug( $queryFilters ); die();
                
@@ -231,7 +228,45 @@ class MPSearch {
 	        		include( __DIR__ . '/MPSearchSources.php' );
 	        		
         		}
-        		
+        	
+        	} elseif( $key == '_app' ) {
+	        	
+	        	$_app_filter = array(
+		        	'or'
+	        	);
+	        	
+	        	if(
+	        		( $app_data = $this->MPCache->getApp($value) ) && 
+	        		( isset( $app_data['datasets'] ) ) && 
+	        		( !empty( $app_data['datasets'] ) ) 
+	        	) {
+	        		
+	        		$_app_filter = array();
+	        		       		
+	        		foreach( $app_data['datasets'] as $dataset )
+		        		$_app_filter[] = array(
+			        		'term' => array(
+				        		'dataset' => $dataset
+			        		),	
+		        		);
+		        		
+		        	$and_filters[] = array(
+			        	'or' => $_app_filter,
+		        	);
+	        	
+	        	} else {
+		        	
+		        	$and_filters[] = array(
+			        	'term' => array(
+				        	'dataset' => false,
+			        	),
+		        	);
+		        	
+	        	}
+		        	
+		        	
+		        	
+	        	
 			} elseif( $key == 'page' ) {
 			
 				// ignore this key
@@ -668,29 +703,33 @@ class MPSearch {
         if( !empty($queryFacets) ) {
 	        
 	        $aggs = array();
-	        
+	                
 	        foreach( $queryFacets as $facet ) {
+	        	
+	        	$p = stripos($facet, 'alerts:');
 	        	
 	        	if( $facet == 'dataset' ) {
 		        	
-		        	$aggs[ 'dataset' ] = array(
+		        	$aggs['dataset'] = array(
 		        		'terms' => array(
 		        			'field' => 'dataset',
 		        			'size' => 20,
 		        		),
 		        	);
 		        	
-	        	} elseif( $facet=='alerts' ) {
+	        	} elseif( $p===0 ) {
+		        	
+		        	$group_ids = explode(',', substr($facet, 7));
 		        	
 		        	$aggs['alerts'] = array(
         				'nested' => array(
-			                "path" => "__alerts",
+			                "path" => "objects.alerts",
 			            ),
 			            'aggs' => array(
 			                'groups' => array(
 				                'terms' => array(
-			                		'field' => '__alerts.group_id',
-			                		'include' => $facet[1],
+			                		'field' => 'objects.alerts.group_id',
+			                		'include' => '(' . implode('|', $group_ids) . ')',
 			                	),
 		                	),
 			            ),

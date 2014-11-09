@@ -18,33 +18,34 @@ class KrsAppController extends AppController
 				'mode' => 'title_prefix',
 				'limit' => 10,
 			));
+						
 			if( isset($data['dataobjects']) && !empty($data['dataobjects']) )
 			{
 				foreach( $data['dataobjects'] as $object )
 				{
 				
 					$search_item = array(
-						'id' => $object['data']['id'],
+						'id' => $object['id'],
 					);
 					
 					if( $object['dataset']=='krs_osoby' )
 					{
 						$search_item = array_merge($search_item, array(
 							'type' => 'person',
-							'id' => $object['data']['id'],
-							'nazwa' => $object['data']['imiona'] . ' ' . $object['data']['nazwisko'],
-							'wiek' => pl_wiek( $object['data']['data_urodzenia'] ),
+							'id' => $object['id'],
+							'nazwa' => $object['data']['krs_osoby.imiona'] . ' ' . $object['data']['krs_osoby.nazwisko'],
+							'wiek' => pl_wiek( $object['data']['krs_osoby.data_urodzenia'] ),
 						));
 					}
 					elseif( $object['dataset']=='krs_podmioty' )
 					{
 						$search_item = array(							
 					    	'type' => 'organization',
-					    	'id' => $object['data']['id'],
-					    	'nazwa' => $object['data']['nazwa'],
-					    	'data_rejestracji' => $object['data']['data_rejestracji'],
-					    	'kapital_zakladowy' => $object['data']['wartosc_kapital_zakladowy'],
-					    	'miejscowosc' => $object['data']['adres_miejscowosc'],
+					    	'id' => $object['id'],
+					    	'nazwa' => $object['data']['krs_podmioty.nazwa'],
+					    	'data_rejestracji' => $object['data']['krs_podmioty.data_rejestracji'],
+					    	'kapital_zakladowy' => $object['data']['krs_podmioty.wartosc_kapital_zakladowy'],
+					    	'miejscowosc' => $object['data']['krs_podmioty.adres_miejscowosc'],
 						);
 					}
 										

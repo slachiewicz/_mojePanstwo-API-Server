@@ -32,6 +32,13 @@ class MPCache extends AppModel {
 		
 	}
 	
+	public function getApp($app, $full = false) {
+		
+		$path = 'data/apps/' . $app;
+		return json_decode( $this->getDataSource()->get($path), true );
+		
+	}
+	
 	public function getAvailableDatasets() {
 		return explode(',', $this->getDataSource()->get('data/datasets/main_search'));
 	}

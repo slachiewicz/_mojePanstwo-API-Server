@@ -137,7 +137,7 @@ class Dataset extends AppModel
     public function getMap($alias, $page)
     {
 		
-		$size = 15000;
+		$size = 10000;
 		$from = ($page-1) * $size;
 				
 		App::Import('ConnectionManager');

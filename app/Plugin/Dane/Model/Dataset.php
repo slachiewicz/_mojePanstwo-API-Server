@@ -137,30 +137,62 @@ class Dataset extends AppModel
     public function getMap($alias, $page)
     {
 		
-		$dataset = $this->query("SELECT `id` FROM `datasets` WHERE `base_alias`='" . addslashes( $alias ) . "' LIMIT 1");
-		$dataset_id = $dataset[0]['datasets']['id'];
-
-        if (empty($page)) {
-            $page = 1;
-        }
-        $page = (int) $page;
-        if ($page < 1) {
-            $page = 1;
-        }
-		$offset = ($page-1) * 50000;
+		$size = 15000;
+		$from = ($page-1) * $size;
+				
+		App::Import('ConnectionManager');
+		$MPSearch = ConnectionManager::getDataSource('MPSearch');
+		
+        $response = $MPSearch->search(array(
+			"size" => $size,
+			"from" => $from, 
+			"query" => array(
+				"filtered" => array(
+					"filter" => array(
+						"and" => array(
+							"filters" => array(
+								array(
+									"term" => array(
+										"_type" => "objects",
+									),
+								),
+								array(
+									"term" => array(
+										"dataset" => $alias,
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			"sort" => array(
+				array(
+					'date' => 'desc',
+				),
+				array(
+					'title.raw' => 'asc',
+				),
+			),
+			"fields" => array('slug', 'id', 'weights.main.score'),
+		));
+		
+		
+		// var_export( $response );
+		
+		$map = array();
+		
+		foreach( $response['hits']['hits'] as $hit ) {
 			
-        $items = $this->query("SELECT object_id 
-	    	FROM `objects`
-	    	WHERE `dataset_id`='" . $dataset_id . "'
-	    	AND `a`='3'
-	    	ORDER BY `object_id` DESC 
-	    	LIMIT $offset, 50000");
-	    	
-	    $output = array();
-	    foreach( $items as $item )
-	    	$output[] = $item['objects']['object_id'];
-	    
-	    return $output;
+			$map[] = array(
+				'id' => $hit['fields']['id'][0],
+				'slug' => $hit['fields']['slug'][0],
+				'weight' => $hit['fields']['weights.main.score'][0],
+			);
+			
+		}
+		
+		return $map;
 	    
     }
 

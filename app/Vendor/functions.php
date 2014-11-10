@@ -13,7 +13,7 @@ function _ucfirst($str)
             'ę', 'ó', 'ą', 'ś', 'ł', 'ż', 'ź', 'ć', 'ń',
         ), $rest);
 
-        $w = strtoupper($w[0]) . $rest;
+        $w = @strtoupper($w[0]) . $rest;
 
     }
     return implode(' ', $words);

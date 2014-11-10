@@ -60,7 +60,7 @@ class MPSearch {
     }
     
     public function getObject($dataset, $id) {
-	    
+	    	    
 	    $params = array(
 			'index' => $this->_index,
 			'body' => array(

@@ -70,8 +70,8 @@ class Dataobject extends AppModel
 		if( $object = $this->getDataSource()->getObject($dataset, $id) )
 			$this->data =$object;
 		else
-			return false;      
-        
+			return false;     
+			        
         if( isset($params['slug']) && $params['slug'] && ( $params['slug']!=$this->data['slug'] ) )	        
 	        return $this->data;
 	        

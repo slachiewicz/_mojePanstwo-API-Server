@@ -4,7 +4,7 @@ $data = $this->DB->query("SELECT `krs_nadzorcy`.nazwa, `krs_nadzorcy`.imiona, `k
 		FROM `krs_nadzorcy` 
 		LEFT JOIN `krs_osoby` 
 		ON `krs_nadzorcy`.`osoba_id` = `krs_osoby`.`id` 
-		WHERE `krs_nadzorcy`.`pozycja_id` = '" . addslashes($id) . "' AND `krs_nadzorcy`.`deleted`='0'
+		WHERE `krs_nadzorcy`.`pozycja_id` = '" . addslashes($id) . "' AND `krs_nadzorcy`.`deleted`='0' AND `krs_nadzorcy`.`removed`='0' 
 		ORDER BY `krs_nadzorcy`.`ord` ASC LIMIT 100");
 
 $output = array();

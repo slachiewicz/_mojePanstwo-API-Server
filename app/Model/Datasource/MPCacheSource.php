@@ -46,10 +46,12 @@ class MPCacheSource extends DataSource {
     }	
 	
 	public function get($key) {
-		
-		return $this->API->get( $key );		
-		
+		return $this->API->get( $key );
 	}
+
+    public function getRedisClient() {
+        return $this->API;
+    }
 	
 	public function scriptQuery($script, $arguments) {
 				

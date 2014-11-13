@@ -1068,6 +1068,54 @@
 	                break;
 	            }
 	            
+	            case 'dzielnice.uchwaly':
+	            {
+	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'krakow_dzielnice_uchwaly',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.krakow_dzielnice_uchwaly.dzielnica_id' => $value,
+		        		),
+		        	);	                
+	                break;
+	            }
+	            
+	            case 'krakow_dzielnice_uchwaly.glosy':
+	            {
+	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'krakow_radni_dzielnic_glosy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.krakow_radni_dzielnic_glosy.uchwala_id' => $value,
+		        		),
+		        	);	                
+	                break;
+	            }
+	            
+	            case 'radni_dzielnic.glosy':
+	            {
+	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'krakow_radni_dzielnic_glosy',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.krakow_radni_dzielnic_glosy.radny_id' => $value,
+		        		),
+		        	);	                
+	                break;
+	            }
+	            	            
 	            case 'sejm_posiedzenia.wystapienia':
 	            {
 	            	$and_filters[] = array(
@@ -1123,7 +1171,7 @@
 		        	);
 		        	$and_filters[] = array(
 		        		'term' => array(
-		        			'data.radni_dzielnic.gminy.id' => $value,
+		        			'data.radni_dzielnic.gmina_id' => $value,
 		        		),
 		        	);	                
 	                break;

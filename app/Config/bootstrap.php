@@ -130,6 +130,9 @@ CakePlugin::loadAll(array(
     'Kultura' => array(
         'routes' => true,
     ),
+    'WyjazdyPoslow' => array(
+        'routes' => true,
+    ),
 ));
 
 /**

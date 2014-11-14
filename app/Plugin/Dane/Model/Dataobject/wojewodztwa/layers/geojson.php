@@ -8,7 +8,7 @@ $cacheKey = 'geojson/wojewodztwo/' . $id;
 $cache = new MPCache();
 $cacheClient = $cache->getDataSource()->getRedisClient();
 if ($cacheClient->exists($cacheKey)) {
-    return json_decode($cache->get($cacheKey));
+    // TODO return json_decode($cache->get($cacheKey));
 }
 
 // Build geojson
@@ -21,6 +21,7 @@ $spat = geoPHP::load($wkt['wkt'], 'wkt');
 
 // TODO ? $simplified = $spat->simplify(1.0, true);
 // w tej postaci bedzie to nierównomiernie robił w pioniie i poziomie ze względu na CRS
+// może przetwarzać na http://spatialreference.org/ref/epsg/2175/?
 
 $geojsonConverter = new GeoJSON();
 $geojson = $geojsonConverter->write($spat, true);

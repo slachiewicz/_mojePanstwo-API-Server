@@ -8,7 +8,7 @@ $cacheKey = 'geojson/powiat/' . $id;
 $cache = new MPCache();
 $cacheClient = $cache->getDataSource()->getRedisClient();
 if ($cacheClient->exists($cacheKey)) {
-    return json_decode($cache->get($cacheKey));
+    // TODO return json_decode($cache->get($cacheKey));
 }
 
 // Build geojson

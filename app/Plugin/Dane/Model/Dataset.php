@@ -166,6 +166,14 @@ class Dataset extends AppModel
 					),
 				),
 			),
+			"aggs" => array(
+				"all_weights" => array(
+					"global" => new \stdClass(),
+					"aggs" => array(
+						"max_weight" => array("max" => array("field" => "weights.main.score")),
+					),
+				),
+			),
 			"sort" => array(
 				array(
 					'date' => 'desc',
@@ -178,7 +186,10 @@ class Dataset extends AppModel
 		));
 		
 		
-		// var_export( $response );
+		$divider = ( 
+			isset( $response['aggregations']['all_weights']['max_weight']['value'] ) && 
+			$response['aggregations']['all_weights']['max_weight']['value'] 
+		) ? $response['aggregations']['all_weights']['max_weight']['value'] : 1;
 		
 		$map = array();
 		
@@ -187,7 +198,7 @@ class Dataset extends AppModel
 			$map[] = array(
 				'id' => $hit['fields']['id'][0],
 				'slug' => $hit['fields']['slug'][0],
-				'weight' => $hit['fields']['weights.main.score'][0],
+				'weight' => $hit['fields']['weights.main.score'][0] / $divider,
 			);
 			
 		}

@@ -3,9 +3,9 @@
 $sql = <<<SQL
 SELECT
     l.iso2cc AS country_code,
-    e.id AS wydarzenie_id,
     e.delegacja,
-    e.lokalizacja,
+    kraj,
+    miasto,
     e.wniosek_nr,
     e.liczba_dni,
     e.date_start AS od,
@@ -23,7 +23,7 @@ SELECT
 FROM poslowie_wyjazdy w
 INNER JOIN poslowie_wyjazdy_wydarzenia e ON (w.wydarzenie_id = e.id)
 INNER JOIN poslowie_wyjazdy_lokalizacje l ON (l.lokalizacja = e.lokalizacja)
-WHERE w.posel_id = $id
+WHERE w.posel_id = $id AND e.deleted = '0'
 ORDER BY e.date_start DESC, e.id, w.id
 SQL;
 

@@ -34,7 +34,10 @@ class Wyjazdyposlow extends AppModel
 		ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id` 
 		JOIN `mowcy_poslowie`
 		ON `s_poslowie_kadencje`.`id` = `mowcy_poslowie`.`posel_id`
-		GROUP BY `poslowie_wyjazdy`.`posel_id` 
+		JOIN poslowie_wyjazdy_wydarzenia e
+		ON e.id = poslowie_wyjazdy.wydarzenie_id
+		WHERE e.deleted = '0'
+		GROUP BY `poslowie_wyjazdy`.`posel_id`
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt`) DESC
 		LIMIT 5
 		");
@@ -47,6 +50,9 @@ class Wyjazdyposlow extends AppModel
 		FROM `poslowie_wyjazdy` 
 		JOIN `s_kluby`
 		ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id`
+		JOIN poslowie_wyjazdy_wydarzenia e
+		ON e.id = poslowie_wyjazdy.wydarzenie_id
+		WHERE e.deleted = '0'
 		GROUP BY `poslowie_wyjazdy`.`klub_id` 
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt`) DESC
 		LIMIT 5
@@ -63,10 +69,11 @@ class Wyjazdyposlow extends AppModel
         $DB = new DB();
 
         $sql = <<<SQL
-SELECT l.iso2cc AS code, COUNT(e.id) AS ilosc_wyjazdow, SUM(w.koszt) AS laczna_kwota
+SELECT l.iso2cc AS code, MIN(kraj) AS kraj, COUNT(e.id) AS ilosc_wyjazdow, SUM(w.koszt) AS laczna_kwota
 FROM poslowie_wyjazdy w
 INNER JOIN poslowie_wyjazdy_wydarzenia e ON (w.wydarzenie_id = e.id)
 INNER JOIN poslowie_wyjazdy_lokalizacje l ON (l.lokalizacja = e.lokalizacja)
+WHERE e.deleted = '0'
 GROUP BY l.iso2cc
 ORDER BY laczna_kwota DESC
 SQL;
@@ -82,10 +89,11 @@ SQL;
 
         $sql = <<<SQL
 SELECT
-    l.iso2cc AS code,
+    l.iso2cc AS country_code,
     e.id AS wydarzenie_id,
     e.delegacja,
-    e.lokalizacja,
+    kraj,
+    miasto,
     e.wniosek_nr,
     e.liczba_dni,
     e.date_start AS od,
@@ -108,7 +116,7 @@ INNER JOIN poslowie_wyjazdy_wydarzenia e ON (w.wydarzenie_id = e.id)
 INNER JOIN poslowie_wyjazdy_lokalizacje l ON (l.lokalizacja = e.lokalizacja)
 INNER JOIN s_poslowie_kadencje p ON (w.posel_id = p.id)
 INNER JOIN s_kluby k ON (w.klub_id = k.id)
-WHERE l.iso2cc = '$countryCode'
+WHERE l.iso2cc = '$countryCode' AND e.deleted = '0'
 ORDER BY e.date_start, e.id, w.id
 SQL;
 
@@ -129,7 +137,7 @@ SQL;
                     array_push($tree, $wydarzenie);
 
                 $wydarzenie = array_intersect_key($row, array_flip(array(
-                        'delegacja', 'lokalizacja', 'wniosek_nr', 'liczba_dni', 'od', 'do'))
+                        'delegacja', 'country_code', 'kraj', 'miasto', 'wniosek_nr', 'liczba_dni', 'od', 'do'))
                 );
                 $wydarzenie['poslowie'] = array();
             }

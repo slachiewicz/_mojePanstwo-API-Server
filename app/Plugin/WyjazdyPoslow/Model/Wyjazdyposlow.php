@@ -46,7 +46,7 @@ class Wyjazdyposlow extends AppModel
 		`s_kluby`.`id`, 
 		`s_kluby`.`nazwa`, 
 		SUM(`poslowie_wyjazdy`.`koszt`) as 'sum',
-		COUNT(`poslowie_wyjazdy`.`klub_id`) as 'count'
+		COUNT(DISTINCT e.id) as 'count'
 		FROM `poslowie_wyjazdy` 
 		JOIN `s_kluby`
 		ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id`
@@ -69,7 +69,7 @@ class Wyjazdyposlow extends AppModel
         $DB = new DB();
 
         $sql = <<<SQL
-SELECT l.iso2cc AS code, MIN(kraj) AS kraj, COUNT(e.id) AS ilosc_wyjazdow, SUM(w.koszt) AS laczna_kwota
+SELECT l.iso2cc AS code, MIN(kraj) AS kraj, COUNT(DISTINCT e.id) AS ilosc_wyjazdow, SUM(w.koszt) AS laczna_kwota
 FROM poslowie_wyjazdy w
 INNER JOIN poslowie_wyjazdy_wydarzenia e ON (w.wydarzenie_id = e.id)
 INNER JOIN poslowie_wyjazdy_lokalizacje l ON (l.lokalizacja = e.lokalizacja)
@@ -115,7 +115,7 @@ FROM poslowie_wyjazdy w
 INNER JOIN poslowie_wyjazdy_wydarzenia e ON (w.wydarzenie_id = e.id)
 INNER JOIN poslowie_wyjazdy_lokalizacje l ON (l.lokalizacja = e.lokalizacja)
 INNER JOIN s_poslowie_kadencje p ON (w.posel_id = p.id)
-INNER JOIN s_kluby k ON (w.klub_id = k.id)
+LEFT OUTER JOIN s_kluby k ON (w.klub_id = k.id)
 WHERE l.iso2cc = '$countryCode' AND e.deleted = '0'
 ORDER BY e.date_start, e.id, w.id
 SQL;
@@ -131,7 +131,8 @@ SQL;
 
         $last_wydarzenie = null;
 
-        foreach ($rows as $row) {
+        for ($i = 0; $i < count($rows); $i++) {
+            $row = $rows[$i];
             if ($row['wydarzenie_id'] != $last_wydarzenie) {
                 if ($wydarzenie != null)
                     array_push($tree, $wydarzenie);
@@ -157,6 +158,9 @@ SQL;
                 'koszt_zaliczki',
             ))));
 
+            if ($i == count($rows) - 1 && $row['wydarzenie_id'] != $last_wydarzenie) {
+                array_push($tree, $wydarzenie); // push last
+            }
             $last_wydarzenie = $row['wydarzenie_id'];
         }
 

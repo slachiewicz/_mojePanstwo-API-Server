@@ -22,17 +22,21 @@ class Wyjazdyposlow extends AppModel
         $output['calosc']['indywidualne'] = $DB->selectAssocs("SELECT 
 		`s_poslowie_kadencje`.`id`, 
 		`s_poslowie_kadencje`.`nazwa`, 
+		`s_kluby`.`id` as 'klub_id', 
 		`s_kluby`.`skrot`, 
+		`mowcy_poslowie`.`mowca_id`, 
 		SUM(`poslowie_wyjazdy`.`koszt`) as 'sum',
 		COUNT(`poslowie_wyjazdy`.`posel_id`) as 'count'
 		FROM `poslowie_wyjazdy` 
 		JOIN `s_poslowie_kadencje` 
 		ON `poslowie_wyjazdy`.`posel_id` = `s_poslowie_kadencje`.`id` 
 		JOIN `s_kluby`
-		ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id`
+		ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id` 
+		JOIN `mowcy_poslowie`
+		ON `s_poslowie_kadencje`.`id` = `mowcy_poslowie`.`posel_id`
 		GROUP BY `poslowie_wyjazdy`.`posel_id` 
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt`) DESC
-		LIMIT 10
+		LIMIT 5
 		");
 		
 		$output['calosc']['klubowe'] = $DB->selectAssocs("SELECT 
@@ -43,11 +47,12 @@ class Wyjazdyposlow extends AppModel
 		FROM `poslowie_wyjazdy` 
 		JOIN `s_kluby`
 		ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id`
-		GROUP BY `poslowie_wyjazdy`.`posel_id` 
+		GROUP BY `poslowie_wyjazdy`.`klub_id` 
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt`) DESC
-		LIMIT 10
+		LIMIT 5
 		");
 		
+		/*
 		// TRANSPORT
         
         $output['transport']['indywidualne'] = $DB->selectAssocs("SELECT 
@@ -63,7 +68,7 @@ class Wyjazdyposlow extends AppModel
 		ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id`
 		GROUP BY `poslowie_wyjazdy`.`posel_id` 
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt_transport`) DESC
-		LIMIT 10
+		LIMIT 5
 		");
 		
 		$output['transport']['klubowe'] = $DB->selectAssocs("SELECT 
@@ -74,9 +79,9 @@ class Wyjazdyposlow extends AppModel
 		FROM `poslowie_wyjazdy` 
 		JOIN `s_kluby`
 		ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id`
-		GROUP BY `poslowie_wyjazdy`.`posel_id` 
+		GROUP BY `poslowie_wyjazdy`.`klub_id` 
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt_transport`) DESC
-		LIMIT 10
+		LIMIT 5
 		");
 		
 		// HOTEL
@@ -94,7 +99,7 @@ class Wyjazdyposlow extends AppModel
 		ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id`
 		GROUP BY `poslowie_wyjazdy`.`posel_id` 
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt_hotel`) DESC
-		LIMIT 10
+		LIMIT 5
 		");
 		
 		$output['hotel']['klubowe'] = $DB->selectAssocs("SELECT 
@@ -105,10 +110,11 @@ class Wyjazdyposlow extends AppModel
 		FROM `poslowie_wyjazdy` 
 		JOIN `s_kluby`
 		ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id`
-		GROUP BY `poslowie_wyjazdy`.`posel_id` 
+		GROUP BY `poslowie_wyjazdy`.`klub_id` 
 		ORDER BY SUM(`poslowie_wyjazdy`.`koszt_hotel`) DESC
-		LIMIT 10
+		LIMIT 5
 		");
+		*/
 		
 		return $output;
         

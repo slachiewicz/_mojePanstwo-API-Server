@@ -7,12 +7,10 @@ class MPCache extends AppModel {
     public $useTable = false;
 		
 
-	public function getObject($id) {
-		
-		return $this->getDataSource()->get('data/objects/' , $id);
-		
+	public function get($key) {
+		return $this->getDataSource()->get($key);
 	}
-		
+
 	public function getObjectByDataset($dataset, $object_id) {
 		
 		if( 

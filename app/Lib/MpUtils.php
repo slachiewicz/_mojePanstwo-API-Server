@@ -88,4 +88,32 @@ class MpUtils {
 
         return $tree;
     }
+
+    // ------ GEO functions -----------
+    public static function transposeCoordinates(&$geojson) {
+        // transpose coordinates from DB to be long,lat as required by GeoJSON
+        if (!is_array($geojson['coordinates'][0][0][0])) {
+            for($i = 0; $i < count($geojson['coordinates']); $i++) {
+                for($j = 0; $j < count($geojson['coordinates'][$i]); $j++) {
+                    $geojson['coordinates'][$i][$j] = array(
+                        $geojson['coordinates'][$i][$j][1],
+                        $geojson['coordinates'][$i][$j][0]
+                    );
+                }
+            }
+        } else {
+            // MultiPolygon
+            for($i = 0; $i < count($geojson['coordinates']); $i++) {
+                for($j = 0; $j < count($geojson['coordinates'][$i]); $j++) {
+                    for($k = 0; $k < count($geojson['coordinates'][$i][$j]); $k++) {
+                        $geojson['coordinates'][$i][$j][$k] = array(
+                            $geojson['coordinates'][$i][$j][$k][1],
+                            $geojson['coordinates'][$i][$j][$k][0]
+                        );
+                    }
+                }
+            }
+
+        }
+    }
 }

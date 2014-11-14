@@ -11,4 +11,11 @@ class WyjazdyposlowController extends AppController
         $this->set('_serialize', 'stats');
     }
 
+    public function world() {
+        $this->setSerialized('ret', $this->Wyjazdyposlow->getWorldStats());
+    }
+
+    public function countryDetails() {
+        $this->setSerialized('ret', $this->Wyjazdyposlow->getCountryDetails($this->request->params['countrycode']));
+    }
 } 

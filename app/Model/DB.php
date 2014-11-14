@@ -119,6 +119,10 @@ class DB extends AppModel
 
         $output = array();
         $result = $this->DB->query($q);
+
+        if (!$result) {
+            throw new Exception("Error " . $this->DB->error . " while executing " . $q);
+        }
 		
 		while ($row = $result->fetch_assoc()) {
 	        

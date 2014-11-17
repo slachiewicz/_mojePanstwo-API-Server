@@ -11,7 +11,7 @@ $cacheKey = 'geojson/gmina/' . $id;
 
 $cache = new MPCache();
 $cacheClient = $cache->getDataSource()->getRedisClient();
-if ($cacheClient->exists($cacheKey)) {
+if (false) { //$cacheClient->exists($cacheKey)) {
     $geojson = json_decode($cache->get($cacheKey));
 
 } else {
@@ -48,7 +48,7 @@ if ($cacheClient->exists($cacheKey)) {
 
 $feat = array(
     "type" => "Feature",
-    "id" => $id, // TODO apiurl?
+    "id" => $this->data['_id'],
     "properties" => $this->data['data'],
     "geometry" => $geojson
 );

@@ -37,7 +37,7 @@ if ($cacheClient->exists($cacheKey)) {
 
 $feat = array(
     "type" => "Feature",
-    "id" => $id, // TODO apiurl?
+    "id" => $this->data['_id'],
     "properties" => $this->data['data'],
     "geometry" => $geojson
 );

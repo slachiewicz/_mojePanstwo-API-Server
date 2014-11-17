@@ -1,4 +1,8 @@
 <?php
+/**
+* Zwraca obiekt GeoJson Feature zawierający obszar województwa (cache w redis) wraz z dynamicznie dociąganymi właściwościami
+*/
+
 App::import('Vendor', 'geoPHP', array('file' => '/phayes/geophp/geoPHP.inc'));
 App::import('model', 'MPCache');
 

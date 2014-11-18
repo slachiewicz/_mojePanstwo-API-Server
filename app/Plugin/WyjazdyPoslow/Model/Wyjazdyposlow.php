@@ -31,7 +31,7 @@ class Wyjazdyposlow extends AppModel
 		JOIN `s_poslowie_kadencje` 
 		ON `poslowie_wyjazdy`.`posel_id` = `s_poslowie_kadencje`.`id` 
 		JOIN `s_kluby`
-		ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id` 
+		ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id` 
 		JOIN `mowcy_poslowie`
 		ON `s_poslowie_kadencje`.`id` = `mowcy_poslowie`.`posel_id`
 		JOIN poslowie_wyjazdy_wydarzenia e
@@ -72,6 +72,33 @@ class Wyjazdyposlow extends AppModel
 		
 		
 		$output['najdrozsze']['calosc'] = $DB->selectAssocs("SELECT id, liczba_dni, liczba_poslow, koszt, delegacja, lokalizacja FROM poslowie_wyjazdy_wydarzenia ORDER BY koszt DESC LIMIT 4");
+		
+		$output['najdrozsze']['indywidualnie'] = $DB->selectAssocs("SELECT 
+		`s_poslowie_kadencje`.`id`, 
+		`s_poslowie_kadencje`.`nazwa`, 
+		`s_kluby`.`id` as 'klub_id', 
+		`s_kluby`.`skrot`, 
+		`mowcy_poslowie`.`mowca_id`, 
+		`poslowie_wyjazdy`.`koszt`,
+		`e`.`id` as 'wydarzenie_id', 
+		`e`.`lokalizacja`, 
+		`e`.`delegacja`
+		FROM `poslowie_wyjazdy` 
+		JOIN `s_poslowie_kadencje` 
+			ON `poslowie_wyjazdy`.`posel_id` = `s_poslowie_kadencje`.`id` 
+		JOIN `s_kluby`
+			ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id` 
+		JOIN `mowcy_poslowie`
+			ON `s_poslowie_kadencje`.`id` = `mowcy_poslowie`.`posel_id`
+		JOIN poslowie_wyjazdy_wydarzenia e
+			ON e.id = poslowie_wyjazdy.wydarzenie_id
+		WHERE 
+			e.deleted = '0' AND poslowie_wyjazdy.deleted = '0'
+		ORDER BY 
+			`poslowie_wyjazdy`.`koszt` DESC
+		LIMIT 6
+		");
+		
 		
 		
 		$data = $DB->selectAssocs("
@@ -215,6 +242,7 @@ SQL;
         for ($i = 0; $i < count($rows); $i++) {
             $row = $rows[$i];
             if ($row['wydarzenie_id'] != $last_wydarzenie) {
+                //if ($wydarzenie != null)
                 $w = array_intersect_key($row, array_flip(array(
                         'delegacja', 'country_code', 'kraj', 'miasto', 'wniosek_nr', 'liczba_dni', 'od', 'do'))
                 );
@@ -239,6 +267,9 @@ SQL;
                 'koszt_zaliczki',
             ))));
 
+//            if ($i == count($rows) - 1 && $row['wydarzenie_id'] != $last_wydarzenie) {
+//                array_push($tree, $wydarzenie); // push last
+//            }
             $last_wydarzenie = $row['wydarzenie_id'];
         }
 

@@ -45,7 +45,9 @@ class Wyjazdyposlow extends AppModel
         $output['calosc']['klubowe'] = $DB->selectAssocs("SELECT
 		`s_kluby`.`id`, 
 		`s_kluby`.`nazwa`, 
+		`s_kluby`.`skrot`, 
 		SUM(`poslowie_wyjazdy`.`koszt`) as 'sum',
+		AVG(`poslowie_wyjazdy`.`koszt`) as 'avg',
 		COUNT(DISTINCT e.id) as 'count'
 		FROM `poslowie_wyjazdy` 
 		JOIN `s_kluby`
@@ -54,8 +56,8 @@ class Wyjazdyposlow extends AppModel
 		ON e.id = poslowie_wyjazdy.wydarzenie_id
 		WHERE e.deleted = '0' AND poslowie_wyjazdy.deleted = '0'
 		GROUP BY `poslowie_wyjazdy`.`klub_id` 
-		ORDER BY SUM(`poslowie_wyjazdy`.`koszt`) DESC
-		LIMIT 5
+		ORDER BY AVG(`poslowie_wyjazdy`.`koszt`) DESC
+		LIMIT 10
 		");
 		
 		$output['koszta'] = $DB->selectAssoc("SELECT SUM(`koszt_transport`) as 'transport', SUM(`koszt_dieta`) as 'diety', SUM(`koszt_hotel`) as 'hotele', SUM(`koszt`) as 'calosc' FROM `poslowie_wyjazdy`");

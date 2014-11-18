@@ -17,10 +17,10 @@ class BDLController extends AppController
         'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje',
     );
 
-    public function tree()
+    public function categories()
     {
         // Try cache
-        $cacheKey = 'bdl/tree';
+        $cacheKey = 'bdl/categories';
 
         $cache = new MPCache();
         $cacheClient = $cache->getDataSource()->getRedisClient();

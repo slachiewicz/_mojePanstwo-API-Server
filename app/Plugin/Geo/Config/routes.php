@@ -1,5 +1,5 @@
 <?
-Router::connect('/geo/pl', array('plugin' => 'Geo', 'controller' => 'Geo', 'action' => 'pl'));
+Router::connect('/geo/pl', array('plugin' => 'Geo', 'controller' => 'Geo', 'action' => 'pl')); // TODO geojson controller
 Router::connect('/geo/wojewodztwa', array('plugin' => 'Geo', 'controller' => 'GeoWojewodztwa'));
 Router::connect('/geo/powiaty/:id', array('plugin' => 'Geo', 'controller' => 'GeoPowiaty'));
 Router::connect('/geo/gminy/:id', array('plugin' => 'Geo', 'controller' => 'GeoGminy'));

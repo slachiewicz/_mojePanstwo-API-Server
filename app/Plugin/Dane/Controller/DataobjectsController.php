@@ -2,33 +2,33 @@
 
 class DataobjectsController extends AppController
 {
-	
+    public $uses = array('Dane.Dataset', 'Dane.Dataobject');
 	public $components = array('S3');
-	
+
 	public function suggest()
     {
-    	
+
     	$q = (string) @$this->request->query['q'];
     	$app = (string) @$this->request->query['app'];
-    	    	
+
     	$conditions = array(
     		'q' => $q,
     	);
-		
+
 		if( $app )
 			$conditions['_app'] = $app;
-					    	
+
         $objects = $this->Dataobject->search('*', array(
         	'conditions' => $conditions,
         	'mode' => 'suggester_main',
         	'limit' => 5,
         ));
-        
+
         $this->set('objects', $objects);
         $this->set('_serialize', array('objects'));
 
     }
-	
+
     public function search()
     {
         $search = $this->Dataobject->search('*', $this->request->query);
@@ -44,16 +44,35 @@ class DataobjectsController extends AppController
 
         // TODO co to za dziwny redirect?
 		if( !$object && ($redirect = $this->Dataobject->getRedirect($this->request->params['alias'], $this->request->params['object_id'])) ) {
-			
+
 			$this->set('redirect', $redirect);
 			$serialize[] = 'redirect';
-			
+
 		}
-		
+
 		$this->set(array(
 			'object' => $object,
 			'_serialize' => $serialize,
 		));
+    }
+
+    public function view_layer()
+    {
+        $dataset = $this->Dataset->find('first', array(
+            'conditions' => array(
+                'Dataset.alias' => $this->request->params['alias'],
+            )));
+
+        $layer = $this->request->params['layer'];
+        $matching_layers = array_filter($dataset['Layer'], function($l) use($layer) {return $l['layer'] == $layer;});
+
+        if (empty($dataset) || empty($matching_layers)) {
+            throw new NotFoundException();
+        }
+
+        $layer = $this->Dataobject->getObjectLayer($this->request->params['alias'], $this->request->params['object_id'], $layer);
+
+        $this->setSerialized('layer', $layer);
     }
 
     public function layer()
@@ -61,9 +80,9 @@ class DataobjectsController extends AppController
 
         $alias = $this->request->params['alias'];
         $id = $this->request->params['object_id'];
-        $layer = $this->request->params['layer'];        
+        $layer = $this->request->params['layer'];
         $params = array_merge($this->request->query, $this->data);
-                
+
         if (!$alias || !$id || !$layer)
             return false;
 
@@ -74,7 +93,7 @@ class DataobjectsController extends AppController
             '_serialize' => 'layer',
         ));
     }
-    
+
     public function alertsQueries()
     {
 
@@ -86,6 +105,6 @@ class DataobjectsController extends AppController
             '_serialize' => 'queries',
         ));
     }
-    
+
 
 }

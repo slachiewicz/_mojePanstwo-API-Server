@@ -215,7 +215,6 @@ SQL;
         for ($i = 0; $i < count($rows); $i++) {
             $row = $rows[$i];
             if ($row['wydarzenie_id'] != $last_wydarzenie) {
-                //if ($wydarzenie != null)
                 $w = array_intersect_key($row, array_flip(array(
                         'delegacja', 'country_code', 'kraj', 'miasto', 'wniosek_nr', 'liczba_dni', 'od', 'do'))
                 );
@@ -240,9 +239,6 @@ SQL;
                 'koszt_zaliczki',
             ))));
 
-//            if ($i == count($rows) - 1 && $row['wydarzenie_id'] != $last_wydarzenie) {
-//                array_push($tree, $wydarzenie); // push last
-//            }
             $last_wydarzenie = $row['wydarzenie_id'];
         }
 

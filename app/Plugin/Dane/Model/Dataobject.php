@@ -15,8 +15,6 @@ class Dataobject extends AppModel
     private function fillIDs(&$o) {
         $o['_id'] = self::apiUrl($o);
         $o['_mpurl'] = self::mpUrl($o);
-
-
     }
 
     public static function apiUrl(&$o) {
@@ -74,7 +72,8 @@ class Dataobject extends AppModel
 			        
         if( isset($params['slug']) && $params['slug'] && ( $params['slug']!=$this->data['slug'] ) )	        
 	        return $this->data;
-	        
+
+        $this->fillIDs($this->data);
         
         // query dataset and its layers
         $mdataset = new Dataset();

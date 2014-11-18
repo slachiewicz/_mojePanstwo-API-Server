@@ -78,7 +78,7 @@ class BDLController extends AppController
             $cacheClient->set($cacheKey, json_encode($categories), 'EX', BDL_CACHE_TTL_SEC);
         }
 
-        $this->setSerialized('tree', array('categories' => $categories));
+        $this->setSerialized('tree', $categories);
     }
 
     public function search() {

@@ -58,6 +58,85 @@ class Wyjazdyposlow extends AppModel
 		LIMIT 5
 		");
 		
+		$output['koszta'] = $DB->selectAssoc("SELECT SUM(`koszt_transport`) as 'transport', SUM(`koszt_dieta`) as 'diety', SUM(`koszt_hotel`) as 'hotele', SUM(`koszt`) as 'calosc' FROM `poslowie_wyjazdy`");
+		
+		$output['koszta']['transport'] = (float) $output['koszta']['transport'];
+		$output['koszta']['diety'] = (float) $output['koszta']['diety'];
+		$output['koszta']['hotele'] = (float) $output['koszta']['hotele'];
+		$output['koszta']['calosc'] = (float) $output['koszta']['calosc'];
+		$output['koszta']['pozostale'] = $output['koszta']['calosc'] - $output['koszta']['transport'] - $output['koszta']['diety'] - $output['koszta']['hotele'];
+		
+		
+		
+		
+		$output['najdrozsze']['calosc'] = $DB->selectAssocs("SELECT id, liczba_dni, liczba_poslow, koszt, delegacja, lokalizacja FROM poslowie_wyjazdy_wydarzenia ORDER BY koszt DESC LIMIT 4");
+		
+		
+		$data = $DB->selectAssocs("
+		SELECT 
+			`poslowie_wyjazdy_wydarzenia`.`id`, 
+			`poslowie_wyjazdy_wydarzenia`.`lokalizacja`, 
+			`poslowie_wyjazdy_wydarzenia`.`delegacja`, 
+			`poslowie_wyjazdy_wydarzenia`.`liczba_dni`, 
+			`poslowie_wyjazdy_wydarzenia`.`liczba_poslow`, 
+			`poslowie_wyjazdy_wydarzenia`.`date_start`, 
+			`poslowie_wyjazdy_wydarzenia`.`date_stop`, 
+			`s_poslowie_kadencje`.`id` as `posel_id`,
+			`s_poslowie_kadencje`.`nazwa` as `posel_nazwa`, 
+			`s_poslowie_kadencje`.`pkw_plec` as `plec`, 
+			`poslowie_wyjazdy`.`glosowania_daty`,
+			`poslowie_wyjazdy`.`koszt_dieta`,
+			`poslowie_wyjazdy`.`koszt_transport`,
+			`poslowie_wyjazdy`.`koszt_hotel`,
+		    `mowcy_poslowie`.`mowca_id`,
+		    `s_kluby`.`id` as `klub_id`,
+		    `s_kluby`.`skrot` as `klub_skrot`
+		FROM `poslowie_wyjazdy` 
+			JOIN `poslowie_wyjazdy_wydarzenia` 
+				ON `poslowie_wyjazdy`.`wydarzenie_id` = `poslowie_wyjazdy_wydarzenia`.`id` 
+			JOIN `s_poslowie_kadencje` 
+				ON `poslowie_wyjazdy`.`posel_id` = `s_poslowie_kadencje`.`id` 
+			JOIN `s_kluby` 
+				ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id` 
+			JOIN `mowcy_poslowie` 
+				ON `s_poslowie_kadencje`.`id` = `mowcy_poslowie`.`posel_id`
+		WHERE `poslowie_wyjazdy`.`glosowania_daty`!='' 
+		ORDER BY 
+			`poslowie_wyjazdy_wydarzenia`.`date_start` ASC,
+			`poslowie_wyjazdy`.`koszt_dieta` DESC
+		");
+		
+		
+		$wydarzenia = array();
+		foreach( $data as $d ) {
+			$wydarzenia[ $d['id'] ]['data'] = array(
+				'id' => $d['id'],
+				'lokalizacja' => $d['lokalizacja'],
+				'delegacja' => $d['delegacja'],
+				'liczba_dni' => $d['liczba_dni'],
+				'liczba_poslow' => $d['liczba_poslow'],
+				'date_start' => $d['date_start'],
+				'date_stop' => $d['date_stop'],
+			);
+			$wydarzenia[ $d['id'] ]['poslowie'][] = array(
+				'id' => $d['posel_id'],
+				'nazwa' => $d['posel_nazwa'],
+				'mowca_id' => $d['mowca_id'],
+				'klub_id' => $d['klub_id'],
+				'klub_skrot' => $d['klub_skrot'],
+				'koszt_dieta' => $d['koszt_dieta'],
+				'koszt_transport' => $d['koszt_transport'],
+				'koszt_hotel' => $d['koszt_hotel'],
+				'plec' => $d['plec'],
+				'glosowania_dni' => explode(',', $d['glosowania_daty']),
+			);
+		}
+		
+		unset( $data );
+		$output['wydarzenia'] = array_values( $wydarzenia );
+		
+		
+				
 		return $output;
         
 

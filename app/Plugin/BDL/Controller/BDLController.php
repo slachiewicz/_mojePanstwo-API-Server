@@ -7,60 +7,78 @@ define('API_BDL_TOO_MANY_POINTS', 'API_BDL_TOO_MANY_POINTS');
 define('API_BDL_LEVEL_DATA_NOTAVAILABLE', 'API_BDL_LEVEL_DATA_NOTAVAILABLE');
 
 define('DATA_POINTS_LIMIT', 500);
+define('BDL_CACHE_TTL_SEC', 3600 * 24); // 1day
+
+App::import('model', 'MPCache');
 
 class BDLController extends AppController
 {
-    public $uses = array('Dane.Dataobject', 'BDL.Podgrupa', 'BDL.DataPl', 'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje');
+    public $uses = array('Dane.Dataobject', 'BDL.Podgrupa', 'BDL.DataPl',
+        'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje',
+    );
 
     public function tree()
     {
-        $tree_data = ConnectionManager::getDataSource('default')->query(
-"SELECT pg.tytul AS pg_tytul, pg.id AS pg_id, g.tytul AS g_tytul, g.id AS g_id,
-    k.w_tytul AS k_tytul, k.id AS k_id
-FROM epf.BDL_podgrupy pg INNER JOIN BDL_grupy g ON (pg.grupa_id = g.id)
-    INNER JOIN BDL_kategorie k ON (pg.kategoria_id = k.id)
-WHERE k.okres = 'R' AND k.deleted = '0' AND g.deleted = '0' AND pg.deleted = '0'
-ORDER BY k_id ASC, g_id ASC, pg_tytul ASC;");
+        // Try cache
+        $cacheKey = 'bdl/tree';
 
-        $tree = array();
-        $kategoria = null;
-        $grupa = null;
+        $cache = new MPCache();
+        $cacheClient = $cache->getDataSource()->getRedisClient();
+        if ($cacheClient->exists($cacheKey)) {
+            $categories = json_decode($cacheClient->get($cacheKey));
 
-        $last_kategoria = null;
-        $last_grupa = null;
+        } else {
+            $tree_data = ConnectionManager::getDataSource('default')->query(
+    "SELECT pg.tytul AS pg_tytul, pg.id AS pg_id, g.tytul AS g_tytul, g.id AS g_id,
+        k.w_tytul AS k_tytul, k.id AS k_id
+    FROM epf.BDL_podgrupy pg INNER JOIN BDL_grupy g ON (pg.grupa_id = g.id)
+        INNER JOIN BDL_kategorie k ON (pg.kategoria_id = k.id)
+    WHERE k.okres = 'R' AND k.deleted = '0' AND g.deleted = '0' AND pg.deleted = '0' AND pg.akcept = '1'
+    ORDER BY k_id ASC, g_id ASC, pg_tytul ASC;");
 
-        foreach($tree_data as $row) {
-            if ($row['g']['g_id'] != $last_grupa) {
-                if ($grupa != null)
-                    array_push($kategoria['groups'], $grupa);
+            $categories = array();
+            $kategoria = null;
+            $grupa = null;
 
-                $grupa = array(
-                    'subgroups' => array(),
-                    'name' => $row['g']['g_tytul']
-                );
+            $last_kategoria = null;
+            $last_grupa = null;
+
+            foreach($tree_data as $row) {
+                // dodaj nowa kategorie
+                if ($row['k']['k_id'] != $last_kategoria) {
+                    $k = array(
+                        'groups' => array(),
+                        'name' => $row['k']['k_tytul']
+                    );
+
+                    array_push($categories, $k);
+                    $kategoria = &$categories[count($categories) - 1];
+                }
+
+                // dodaj nowa grupe
+                if ($row['g']['g_id'] != $last_grupa) {
+                    $g = array(
+                        'subgroups' => array(),
+                        'name' => $row['g']['g_tytul']
+                    );
+
+                    array_push($kategoria['groups'], $g);
+                    $grupa = &$kategoria['groups'][count($kategoria['groups']) - 1];
+                }
+
+                array_push($grupa['subgroups'], array(
+                    'name' => $row['pg']['pg_tytul'],
+                    '_id' => Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => 'bdl_wskazniki', 'object_id' => $row['pg']['pg_id']), true)
+                ));
+
+                $last_grupa = $row['g']['g_id'];
+                $last_kategoria = $row['k']['k_id'];
             }
-            if ($row['k']['k_id'] != $last_kategoria) {
-                if ($kategoria != null)
-                    array_push($tree, $kategoria);
 
-                $kategoria = array(
-                    'groups' => array(),
-                    'name' => $row['k']['k_tytul']
-                );
-            }
-
-            array_push($grupa['subgroups'], array(
-                'name' => $row['pg']['pg_tytul'],
-                '_id' => Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => 'bdl_wskazniki', 'object_id' => $row['pg']['pg_id']), true)
-            ));
-
-            $last_grupa = $row['g']['g_id'];
-            $last_kategoria = $row['k']['k_id'];
+            $cacheClient->set($cacheKey, json_encode($categories), 'EX', BDL_CACHE_TTL_SEC);
         }
 
-        // TODO redis cache
-
-        $this->setSerialized('tree', $tree);
+        $this->setSerialized('tree', array('categories' => $categories));
     }
 
     public function search() {

@@ -18,19 +18,4 @@ class GeoController extends AppController
             '_serialize' => array('gminy'),
         ));
     }
-
-    public function pl() {
-        $this->viewClass = 'Media';
-
-        $params = array(
-            'id'        => 'pl.json',
-            'name'      => 'pl',
-            'download'  => false,
-            'extension' => 'json',
-            'cache' => true,
-            'path'      => APP . 'Plugin/Geo/webroot/'
-        );
-
-        $this->set($params);
-    }
 } 

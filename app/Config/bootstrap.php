@@ -133,6 +133,9 @@ CakePlugin::loadAll(array(
     'WyjazdyPoslow' => array(
         'routes' => true,
     ),
+    'WydatkiPoslow' => array(
+        'routes' => true,
+    ),
 ));
 
 /**

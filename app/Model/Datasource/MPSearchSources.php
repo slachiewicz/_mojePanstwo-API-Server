@@ -985,6 +985,24 @@
 	                break;
 	            }
 	            
+	            case 'krs_podmioty.dotacje_ue':
+	            {
+		            
+		            $beneficjent_ids = ClassRegistry::init('DB')->selectValues("SELECT id FROM dotacje_ue_beneficjenci WHERE krs_id='" . addslashes($value) . "'");
+		            
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'dotacje_ue',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'terms' => array(
+		        			'data.dotacje_ue.beneficjent_id' => $beneficjent_ids,
+		        		),
+		        	);
+	                break;
+	            }
+	            
 	            case 'radni_gmin.wystapienia':
 	            {
 	                

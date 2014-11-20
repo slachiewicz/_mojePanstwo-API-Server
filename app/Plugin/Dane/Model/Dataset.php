@@ -243,6 +243,7 @@ class Dataset extends AppModel
 		$__fields = array('_date', '_title', '_weight');
 		$_fields = $__fields;
 		
+		
 		foreach( array_column($dataset['fields'], 'fields') as $field ) {
 			
 			$_field = $field['field'];
@@ -252,6 +253,32 @@ class Dataset extends AppModel
 			$_fields[] = $field['alias'] . '.' . $_field;
 			
 		}
+		
+		
+		
+		
+		$requested_fields = array();
+		
+		if(
+			isset( $queryData['fields'] ) && 
+			!empty( $queryData['fields'] )
+		) {
+			
+			foreach( $queryData['fields'] as $field ) {
+				
+				if( strpos($field, '.')===false )
+					$field = $alias . '.' . $field;
+					
+				if( in_array($field, $_fields) )
+					$requested_fields[] = 'data.' . $field;
+				
+			}
+			
+		}
+
+		
+		
+		
 		
 		$virtual_fields = $dataset['virtual_fields'];		
 		$filters = array(
@@ -402,6 +429,7 @@ class Dataset extends AppModel
         	'limit' => $limit,
         	'page' => $page,
         	'version' => $version,
+        	'fields' => $requested_fields,
         ));
 		
 		

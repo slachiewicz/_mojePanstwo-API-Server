@@ -12,7 +12,7 @@ class Wydatkiposlow extends AppModel
         $DB = new DB();
 		
 		$biura = $DB->selectAssocs("
-		SELECT `s_poslowie_rozliczenia_pola`.`id` , `s_poslowie_rozliczenia_pola`.`tytul` , SUM( `s_poslowie_rozliczenia-pola`.`wartosc` ) AS `wartosc` 
+		SELECT `s_poslowie_rozliczenia_pola`.`id` , `s_poslowie_rozliczenia_pola`.`tytul`, `s_poslowie_rozliczenia_pola`.`skrot` , SUM( `s_poslowie_rozliczenia-pola`.`wartosc` ) AS `wartosc` 
 		FROM `s_poslowie_rozliczenia-pola`
 		JOIN `s_poslowie_rozliczenia` ON `s_poslowie_rozliczenia-pola`.`rozliczenie_id` = `s_poslowie_rozliczenia`.`id`
 		JOIN `s_poslowie_rozliczenia_pola` ON `s_poslowie_rozliczenia_pola`.`id` = `s_poslowie_rozliczenia-pola`.`pole_id`
@@ -26,4 +26,12 @@ class Wydatkiposlow extends AppModel
 		);
         
     }
+    
+    public function getCategory($id)
+    {
+	    
+	    return 'asdfg';
+	    
+    }
+    
 }

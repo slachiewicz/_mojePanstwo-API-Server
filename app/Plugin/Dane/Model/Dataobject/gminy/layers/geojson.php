@@ -11,7 +11,7 @@ $cacheKey = 'geojson/gmina/' . $id;
 
 $cache = new MPCache();
 $cacheClient = $cache->getDataSource()->getRedisClient();
-if (false) { //$cacheClient->exists($cacheKey)) {
+if ($cacheClient->exists($cacheKey)) {
     $geojson = json_decode($cache->get($cacheKey));
 
 } else {
@@ -35,8 +35,7 @@ if (false) { //$cacheClient->exists($cacheKey)) {
         }
     }
 
-// TODO ? $simplified = $spat->simplify(1.0, true);
-// w tej postaci bedzie to nierównomiernie robił w pionie i poziomie ze względu na CRS
+    // TODO ? $simplified = $spat->simplify(1.0, true); // TODO jak duze zniekształcenie, gdy nie operujemy na EPSG polskim?
 
     $geojsonConverter = new GeoJSON();
     $geojson = $geojsonConverter->write($geom, true);
@@ -52,5 +51,6 @@ $feat = array(
     "properties" => $this->data['data'],
     "geometry" => $geojson
 );
+MpUtils::geoStampCRS($feat);
 
 return $feat;

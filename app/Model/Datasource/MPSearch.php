@@ -151,7 +151,7 @@ class MPSearch {
                     $queryData['limit'] :
                     20;
                     
-        $queryLimit = max( min( $queryLimit, 100 ), 0 );
+        $queryLimit = max( min( $queryLimit, 1000 ), 0 );
     	
     	$queryPage = (isset($queryData['page']) && is_numeric($queryData['page'])) ?
                     $queryData['page'] :

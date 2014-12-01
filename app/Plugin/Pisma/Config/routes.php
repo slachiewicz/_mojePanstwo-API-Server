@@ -8,8 +8,8 @@ foreach(array('', '_v0') as $version) {
     Router::connect("$base_slug$version/templates", array('plugin' => 'Pisma', 'controller' => 'templates', 'action' => 'index'));
     Router::connect("$base_slug$version/templates/:id", array('plugin' => 'Pisma', 'controller' => 'templates', 'action' => 'view'), array('id' => '[0-9]+'));
 
-    Router::connect("$base_slug$version", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'index', '[method]' => 'GET'));
-    Router::connect("$base_slug$version/index", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'index', '[method]' => 'GET'));
+    Router::connect("$base_slug$version", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'search', '[method]' => 'GET'));
+    Router::connect("$base_slug$version/search", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'search', '[method]' => 'GET'));
     Router::connect("$base_slug$version", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'save', '[method]' => 'POST'));
     Router::connect("$base_slug$version/index", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'save', '[method]' => 'POST'));
     Router::connect("$base_slug$version/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'view', '[method]' => 'GET'), array('id' => '[A-Za-z0-9]+'));

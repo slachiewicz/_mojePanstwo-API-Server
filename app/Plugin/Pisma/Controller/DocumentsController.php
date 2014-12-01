@@ -44,20 +44,13 @@ class DocumentsController extends AppController
         }
     }
 
-    public function index() {
+    public function search() {
+        
         $user = $this->user;
 
-        $response = $this->Document->find('all', array(
-            'conditions' => array(
-                'from_user_id' => $this->user_id
-            )
-        ));
-
-        // TODO ustalić format zwracania obiektów przez index
-        // - key: search
-        // - opakowywanie w model_name (bo obiekty zalezne moga tez byc zwrocone)
-        // - pagination czy przekazujemy w odpowiedzi?
-        $this->setSerialized('data', $this->flatResponseArray($response, 'Document'));
+		$search = $this->Document->search($user['id']);
+		
+        $this->setSerialized('search', $search);
     }
 
     public function view() {
@@ -71,7 +64,11 @@ class DocumentsController extends AppController
         
         $map = array(
         	'id' => 'id', 
+        	'data_pisma' => 'date',
+        	'nazwa' => 'name',
         	'tytul' => 'title',
+        	'tresc' => 'content',
+        	'adresat' => 'to_str',
         	'nadawca' => 'from_str',
         	'miejscowosc' => 'from_location',
         	'data' => 'date',
@@ -113,10 +110,8 @@ class DocumentsController extends AppController
             $data['from_user_id'] = $this->user_id;
 	        $data['from_name'] = "from_name";
 	        $data['from_email'] = "test@test.com";
-	        $data['to_dataset'] = 'instytucje';
-	        $data['to_id'] = '1';
-	        
-	        $data['slug'] = substr(Inflector::slug($data['title'], '-'), 0, 127);
+	        $data['to_dataset'] = 'instytucje';	        
+	        $data['slug'] = substr(Inflector::slug($data['name'], '-'), 0, 127);
 	        	        
         }
 

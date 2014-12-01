@@ -36,6 +36,7 @@ if ($cacheClient->exists($cacheKey)) {
         "type" => "FeatureCollection",
         "features" => $gminy
     );
+    MpUtils::geoStampCRS($featc);
 
     // Put in cache
     $cacheClient->set($cacheKey, json_encode($featc));

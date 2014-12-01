@@ -43,4 +43,6 @@ $feat = array(
     "geometry" => $geojson
 );
 
+MpUtils::geoStampCRS($feat);
+
 return $feat;

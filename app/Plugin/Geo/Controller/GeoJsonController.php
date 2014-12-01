@@ -44,7 +44,7 @@ class GeoJsonController extends AppController
             $features = array();
             foreach($ids as $id) {
                 $d = new $this->Dataobject();
-                $f = $d->getObjectLayer($dataset, $id, ($dataset == 'wojewodztwa') ? 'geojson' : 'geojson_simplified', $params = array());
+                $f = $d->getObjectLayer($dataset, $id, 'geojson_simplified', $params = array());
 
                 unset($f['crs']);
                 $features[] = $f;

@@ -10,13 +10,36 @@ class Document extends AppModel {
 
     public $useTable = 'pisma_documents';
     public $recursive = -1;
-
+	
+	public $virtualFields = array(
+	    'tytul' => 'Document.title',
+	    'tytul' => 'Document.title',
+    	'nadawca' => 'Document.from_str',
+    	'miejscowosc' => 'Document.from_location',
+    	'data' => 'Document.date',
+    	'adresat_id' => 'Document.to_id',
+    	'szablon_id' => 'Document.template_id',
+    	'podpis' => 'Document.from_signature',
+	);
+	
+	
+        	
+	
     /**
  * Validation rules
  *
  * @var array
  */
 	public $validate = array(
+		'alphaid' => array(
+			'maxLength' => array(
+				'rule' => array('maxLength', 5),
+			),
+            'notEmpty' => array(
+                'rule' => 'notEmpty',
+                'required' => true,
+            ),
+		),
 		'hash' => array(
 			'maxLength' => array(
 				'rule' => array('maxLength', 32),

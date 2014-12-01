@@ -112,14 +112,14 @@ class MPSearch {
     }
     
     public function doc2object($doc) {
-	   	
+	   		   	
 	    $output = array(
             'global_id' => $doc['_id'],
             'dataset' => $doc['fields']['dataset'][0],
     		'id' => $doc['fields']['id'][0],
     		'slug' => $doc['fields']['slug'][0],
             'score' => $doc['_score'],
-            'data' => $doc['_source']['data'],
+            'data' => @isset($doc['fields']['data'][0]['data']) ? $doc['fields']['data'][0]['data'] : $doc['_source']['data'],
     	);
     	    	
     	if( isset($doc['highlight']['text']) && is_array($doc['highlight']['text']) && isset($doc['highlight']['text'][0]) )
@@ -151,7 +151,7 @@ class MPSearch {
                     $queryData['limit'] :
                     20;
                     
-        $queryLimit = max( min( $queryLimit, 100 ), 0 );
+        $queryLimit = max( min( $queryLimit, 1000 ), 0 );
     	
     	$queryPage = (isset($queryData['page']) && is_numeric($queryData['page'])) ?
                     $queryData['page'] :
@@ -160,7 +160,11 @@ class MPSearch {
     	$queryQ = (isset($queryData['q']) && $queryData['q']) ?
                     mb_convert_encoding($queryData['q'], 'UTF-8', 'UTF-8') :
                     false;
-        
+                    
+        $queryFields = (isset($queryData['fields']) && $queryData['fields']) ?
+                    $queryData['fields'] :
+                    false;
+                
         $queryMode = (isset($queryData['mode']) && $queryData['mode']) ?
                     $queryData['mode'] :
                     'full_prefix';
@@ -461,6 +465,12 @@ class MPSearch {
 			),
 		);
 		
+		
+		if( !empty($queryFields) )
+			$params['body']['partial_fields']['data'] = array(
+				'include' => $queryFields,
+				// 'exclude' => '*',
+			);
 		
 		
 		$sort = array();
@@ -788,9 +798,9 @@ class MPSearch {
         
         
         // Configure::write('debug', 2);
-        // echo "\n\n"; debug( $params );
+        echo "\n\n"; debug( $params );
 	    $es_result = $this->API->search( $params );
-        // echo "\n\n"; debug( $es_result );
+        echo "\n\n"; debug( $es_result );
         
         
         

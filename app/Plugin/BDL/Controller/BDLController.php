@@ -75,7 +75,7 @@ class BDLController extends AppController
                 $last_kategoria = $row['k']['k_id'];
             }
 
-            $cacheClient->set($cacheKey, json_encode($categories), 'EX', BDL_CACHE_TTL_SEC);
+            $cacheClient->setex($cacheKey, BDL_CACHE_TTL_SEC, json_encode($categories));
         }
 
         $this->setSerialized('tree', $categories);

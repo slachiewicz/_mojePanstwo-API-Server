@@ -24,8 +24,6 @@ if ($cacheClient->exists($cacheKey)) {
     $spat = geoPHP::load($wkt['wkt'], 'wkt');
 
 // TODO ? $simplified = $spat->simplify(1.0, true);
-// w tej postaci bedzie to nierównomiernie robił w pioniie i poziomie ze względu na CRS
-// może przetwarzać na http://spatialreference.org/ref/epsg/2175/?
 
     $geojsonConverter = new GeoJSON();
     $geojson = $geojsonConverter->write($spat, true);

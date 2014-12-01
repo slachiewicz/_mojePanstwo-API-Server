@@ -25,7 +25,11 @@ if ($cacheClient->exists($cacheKey)) {
     $gminy = array();
     foreach($gminy_ids as $gid) {
         $d = new Dataobject();
-        $gminy[] = $d->getObjectLayer('gminy', $gid, 'geojson', $params = array());
+        $g = $d->getObjectLayer('gminy', $gid, 'geojson', $params = array());
+
+        unset($g['crs']);
+
+        $gminy[] = $g;
     }
 
     $featc = array(

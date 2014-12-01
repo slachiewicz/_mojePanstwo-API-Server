@@ -25,13 +25,18 @@ if ($cacheClient->exists($cacheKey)) {
     $powiaty = array();
     foreach($powiaty_ids as $pid) {
         $d = new Dataobject();
-        $powiaty[] = $d->getObjectLayer('powiaty', $pid, 'geojson', $params = array());
+        $p = $d->getObjectLayer('powiaty', $pid, 'geojson', $params = array());
+
+        unset($p['crs']);
+
+        $powiaty[] = $p;
     }
 
     $featc = array(
         "type" => "FeatureCollection",
         "features" => $powiaty
     );
+    MpUtils::geoStampCRS($featc);
 
     // Put in cache
     $cacheClient->set($cacheKey, json_encode($featc));

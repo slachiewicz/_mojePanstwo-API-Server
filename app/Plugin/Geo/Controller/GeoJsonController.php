@@ -44,13 +44,18 @@ class GeoJsonController extends AppController
             $features = array();
             foreach($ids as $id) {
                 $d = new $this->Dataobject();
-                $features[] = $d->getObjectLayer($dataset, $id, 'geojson', $params = array());
+                $f = $d->getObjectLayer($dataset, $id, ($dataset == 'wojewodztwa') ? 'geojson' : 'geojson_simplified', $params = array());
+
+                unset($f['crs']);
+                $features[] = $f;
             }
 
             $featc = array(
                 "type" => "FeatureCollection",
                 "features" => $features
             );
+
+            MpUtils::geoStampCRS($featc);
 
             // Put in cache
             $cacheClient->set($cacheKey, json_encode($featc));
@@ -67,8 +72,7 @@ class GeoJsonController extends AppController
         $this->getAggregatedGeojson('powiaty', 'pl_powiaty');
     }
 
-    // TODO simplify (może bez properties, lub ograniczona ilośc)
-//    public function gminy() {
-//        $this->getAggregatedGeojson('gminy', 'pl_gminy');
-//    }
+    public function gminy() {
+        $this->getAggregatedGeojson('gminy', 'pl_gminy');
+    }
 } 

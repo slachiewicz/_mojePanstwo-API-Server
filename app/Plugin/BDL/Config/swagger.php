@@ -6,14 +6,14 @@ $api = array(
     "apis" => array(
         array(
             // In path one can use [plugin/controller/action/param1:val1,param2:val2]/pathparam1 that will be reverse-mapped by Router::url
-            "path" => "[BDL/BDL/tree]",
+            "path" => "[BDL/BDL/categories]",
             "description" => "Drzewo kategorii wskaźników",
             "operations" => array(
                 array(
                     "method" => "GET",
                     "summary" => "Drzewo kategorii wskaźników",
-                    "nickname" => "tree",
-                    "type" => "Tree",
+                    "nickname" => "categories",
+                    "type" => "CategoriesTree",
                     "parameters" => array(),
                     "responseMessages" => array(
                         array(

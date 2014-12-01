@@ -7,12 +7,12 @@ App::import('model', 'MPCache');
 App::uses('Model', 'Dane.Dataobject');
 
 // Try cache
-$cacheKey = 'geojson/agg/powiat/' . $id . '/gminy';
+$cacheKey = 'geojson/agg/gminy/powiat/' . $id ;
 
 $cache = new MPCache();
 $cacheClient = $cache->getDataSource()->getRedisClient();
 if ($cacheClient->exists($cacheKey)) {
-    return json_decode($cache->get($cacheKey));
+    return json_decode($cacheClient->get($cacheKey));
 
 } else {
     // Build geojson feature collection
@@ -25,16 +25,21 @@ if ($cacheClient->exists($cacheKey)) {
     $gminy = array();
     foreach($gminy_ids as $gid) {
         $d = new Dataobject();
-        $gminy[] = $d->getObjectLayer('gminy', $gid, 'geojson', $params = array());
+        $g = $d->getObjectLayer('gminy', $gid, 'geojson', $params = array());
+
+        unset($g['crs']);
+
+        $gminy[] = $g;
     }
 
     $featc = array(
         "type" => "FeatureCollection",
         "features" => $gminy
     );
+    MpUtils::geoStampCRS($featc);
 
     // Put in cache
-    $cacheClient->set($cacheKey, json_encode($featc), 'EX', 3600 * 24 * 7);
+    $cacheClient->set($cacheKey, json_encode($featc));
 
     return $featc;
 }

@@ -38,7 +38,9 @@ class Dataset extends AppModel
 	        $this->MPCache = new MPCache();
 	 	    
 	 	    $output = $this->MPCache->getDataset( $alias, @$queryData['full'] );
-	 	    $output['orders'] = isset($output['orders_es']) ? $output['orders_es'] : array();
+            if (!empty($output)) {
+	 	        $output['orders'] = isset($output['orders_es']) ? $output['orders_es'] : array();
+            }
 	 	    
 	 	    if( !empty( $output['filters'] ) )
 		 	    foreach( $output['filters'] as &$f )

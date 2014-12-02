@@ -6,7 +6,7 @@ define('API_BDL_INVALID_INPUT', 'API_BDL_INVALID_INPUT');
 define('API_BDL_TOO_MANY_POINTS', 'API_BDL_TOO_MANY_POINTS');
 define('API_BDL_LEVEL_DATA_NOTAVAILABLE', 'API_BDL_LEVEL_DATA_NOTAVAILABLE');
 
-define('DATA_POINTS_LIMIT', 500);
+define('DATA_POINTS_LIMIT', 10000);
 define('BDL_CACHE_TTL_SEC', 3600 * 24); // 1day
 
 App::import('model', 'MPCache');
@@ -141,7 +141,8 @@ class BDLController extends AppController
 
         // check if slices match metrics
         if ($slice != null) {
-            if (!preg_match('/^\\[(\\d+(,?\\d+)*)\\]$/', $slice, $slices)) {
+            $slice = preg_replace('/\\s+/', '', $slice);
+            if (!preg_match('/^\\[((\\d+|\\*)(,(\\d+|\\*))*)\\]$/', $slice, $slices)) {
                 throw new ApiException(API_BDL_INVALID_INPUT, array('param' => 'slice'));
             }
 
@@ -185,7 +186,7 @@ class BDLController extends AppController
             $model = 'DataWojewodztwa';
             $fields[] = 'wojewodztwo_id';
 
-            if ($metric['data']['poziom_id'] < 2) {
+            if ($metric['data']['bdl_wskazniki.poziom_id'] < 2) {
                 throw new ApiException(API_BDL_LEVEL_DATA_NOTAVAILABLE, array(
                     'requested' => $metric_depths[2],
                     'available_till' => $metric_depths[$metric['data']['poziom_id']]
@@ -210,10 +211,10 @@ class BDLController extends AppController
             $model = 'DataPowiaty';
             $fields[] = 'powiat_id';
 
-            if ($metric['data']['poziom_id'] < 4) {
+            if ($metric['data']['bdl_wskazniki.poziom_id'] < 4) {
                 throw new ApiException(API_BDL_LEVEL_DATA_NOTAVAILABLE, array(
                     'requested' => $metric_depths[4],
-                    'available_till' => $metric_depths[$metric['data']['poziom_id']]
+                    'available_till' => $metric_depths[$metric['data']['bdl_wskazniki.poziom_id']]
                 ), 'Data at this regional level is not available');
             }
 
@@ -235,10 +236,10 @@ class BDLController extends AppController
             $model = 'DataGminy';
             $fields[] = 'gmina_id';
 
-            if ($metric['data']['poziom_id'] < 5) {
+            if ($metric['data']['bdl_wskazniki.poziom_id'] < 5) {
                 throw new ApiException(API_BDL_LEVEL_DATA_NOTAVAILABLE, array(
                     'requested' => $metric_depths[5],
-                    'available_till' => $metric_depths[$metric['data']['poziom_id']]
+                    'available_till' => $metric_depths[$metric['data']['bdl_wskazniki.poziom_id']]
                 ), 'Data at this regional level is not available');
             }
 
@@ -299,23 +300,30 @@ class BDLController extends AppController
 
         $data_count = $this->$model->find('count', array(
             'conditions' => $conditions,
-            'fields' => $fields,
-            'order' => array('kombinacja_id', 'rocznik'),
+            'fields' => $fields
         ));
 
         if ($data_count > DATA_POINTS_LIMIT) {
-            throw new ApiException(API_BDL_TOO_MANY_POINTS, array('limit' => DATA_POINTS_LIMIT));
+            throw new ApiException(API_BDL_TOO_MANY_POINTS, array('limit' => DATA_POINTS_LIMIT, 'found' => $data_count));
         }
+
+        $order = array('kombinacja_id', 'rocznik');
+        if ($wojewodztwo_id != null)
+            array_splice($order, 1, 0, 'wojewodztwo_id');
+        if ($powiat_id != null)
+            array_splice($order, 1, 0, 'powiat_id');
+        if ($gmina_id != null)
+            array_splice($order, 1, 0, 'gmina_id');
 
         $data = $this->$model->find('all', array(
             'conditions' => $conditions,
             'fields' => $fields,
-            'order' => array('kombinacja_id', 'rocznik'),
+            'order' => $order,
         ));
 
         $slice_parts = array_slice(array('w1'=>0, 'w2'=>0, 'w3'=>0, 'w4'=>0, 'w5'=>0), 0, count($slices));
         $response = MpUtils::maptable2tree($data, array(
-                   array('name' => 'series', 'key' => function($r) use($model) {
+                   array('name' => 'slices', 'key' => function($r) use($model) {
                            return $r[$model]['kombinacja_id'] . '-' . @$r[$model]['wojewodztwo_id']; // TODO rest regions
                        }, 'content' => function($r) use($model, $slice_parts, $units) {
                            $legend = array(
@@ -342,11 +350,11 @@ class BDLController extends AppController
             // include meta by default
             $response['meta'] = array(
                 'metric_id' =>  Dataobject::apiUrl($metric),
-                'metric_name' => $metric['data']['tytul'],
-                'metric_depth' => $metric_depths[$metric['data']['poziom_id']],
+                'metric_name' => $metric['data']['bdl_wskazniki.tytul'],
+                'metric_depth' => $metric_depths[$metric['data']['bdl_wskazniki.poziom_id']],
                 'metric_mpurl' => Dataobject::mpUrl($metric),
-                'group_name' => $metric['data']['grupa_tytul'],
-                'category_name' => $metric['data']['kategoria_tytul'],
+                'group_name' => $metric['data']['bdl_wskazniki.grupa_tytul'],
+                'category_name' => $metric['data']['bdl_wskazniki.kategoria_tytul'],
                 'dimensions' => $dims,
             );
         }

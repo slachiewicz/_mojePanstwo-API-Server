@@ -3,6 +3,7 @@ class MPSearch {
 
     public $cacheSources = true;
     public $description = 'Serwer szukania platformy mojePaństwo';
+	public $API;
 	
 	private $_index = 'mojepanstwo_v1';
 	private $_data_prefix = 'data';

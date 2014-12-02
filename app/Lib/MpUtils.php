@@ -62,7 +62,7 @@ class MpUtils
         $last = array();
         $last_level = array_pop($levels);
 
-        $ptr = array_fill(0, 2 * count($levels), 0);
+        $ptr = array_fill(0, 2 * count($levels), -1);
         $ai = 0;
         foreach ($levels as $lvl) {
             $ptr[$ai * 2] = $lvl['name'];
@@ -78,6 +78,7 @@ class MpUtils
                     if (@$lvl['content'] != null) {
                         self::setArray($tree, array_slice($ptr, 0, ($ai + 1) * 2), $lvl['content']($row));
                     }
+
 
                     $zi = $ai * 2 + 1 + 2;
                     while ($zi < count($ptr)) {

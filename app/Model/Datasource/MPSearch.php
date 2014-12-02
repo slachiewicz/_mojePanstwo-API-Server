@@ -63,6 +63,7 @@ class MPSearch {
 	    	    
 	    $params = array(
 			'index' => $this->_index,
+			'type' => 'objects',
 			'body' => array(
 				'from' => 0, 
 				'size' => 1,
@@ -71,11 +72,6 @@ class MPSearch {
 				        'filter' => array(
 				            'and' => array(
 				                'filters' => array(
-				                    array(
-				                        'term' => array(
-				                        	'_type' => 'objects',
-				                        ),
-				                    ),
 				                    array(
 				                        'term' => array(
 				                        	'dataset' => $dataset,
@@ -92,7 +88,7 @@ class MPSearch {
 				        ),
 				    ),
 				),
-				'fields' => array('_source', 'dataset', 'id', 'slug'),
+				'fields' => array('_source', 'id', 'dataset', 'slug'),
 			),
 		);
 
@@ -112,7 +108,9 @@ class MPSearch {
     }
     
     public function doc2object($doc) {
-	   		   	
+	    
+	    // echo "\n\n"; debug( $doc );
+	    
 	    $output = array(
             'global_id' => $doc['_id'],
             'dataset' => $doc['fields']['dataset'][0],
@@ -201,13 +199,7 @@ class MPSearch {
 		$force_main_weights = false;
 		
         $alerts_groups_data = array();
-        $and_filters = array(
-	        array(
-		        'term' => array(
-			        '_type' => 'objects',
-		        ),
-	        ),
-        );
+        $and_filters = array();
         
         // echo "\n\n"; debug( $queryFilters ); die();
                
@@ -457,6 +449,7 @@ class MPSearch {
 	    
         $params = array(
 			'index' => $this->_index,
+			'type' => 'objects',
 			'body' => array(
 				'from' => $_from, 
 				'size' => $queryLimit,
@@ -798,9 +791,9 @@ class MPSearch {
         
         
         // Configure::write('debug', 2);
-        echo "\n\n"; debug( $params );
+        // echo "\n\n"; debug( $params );
 	    $es_result = $this->API->search( $params );
-        echo "\n\n"; debug( $es_result );
+        // echo "\n\n"; debug( $es_result );
         
         
         

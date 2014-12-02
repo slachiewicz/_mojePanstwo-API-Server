@@ -6,7 +6,7 @@ App::uses('AppModel', 'Model');
 */
 class Template extends AppModel {
 
-    public $useTable = 'pisma_templates';
+    public $useTable = 'pisma_szablony';
     public $recursive = -1;
 
     /**

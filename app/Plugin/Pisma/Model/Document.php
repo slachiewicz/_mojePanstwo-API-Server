@@ -12,9 +12,12 @@ class Document extends AppModel {
     public $recursive = -1;
 	
 	public $virtualFields = array(
+		'data_pisma' => 'Document.date',
 	    'tytul' => 'Document.title',
-	    'tytul' => 'Document.title',
+	    'nazwa' => 'Document.name',
+	    'tresc' => 'Document.content',
     	'nadawca' => 'Document.from_str',
+    	'adresat' => 'Document.to_str',
     	'miejscowosc' => 'Document.from_location',
     	'data' => 'Document.date',
     	'adresat_id' => 'Document.to_id',
@@ -161,4 +164,91 @@ class Document extends AppModel {
 			'order' => ''
 		)
 	);
+	
+	
+	
+	public function afterSave($created, $options) {
+				
+		if( ($data = $this->data['Document']) && isset($data['id']) && $data['id'] ) {
+			
+			$data['text'] = $data['name'] . "\n";
+			$data['text'] .= $data['from_str'] . "\n";
+			$data['text'] .= $data['from_location'] . "\n";
+			$data['text'] .= $data['date'] . "\n";
+			$data['text'] .= $data['to_str'] . "\n";
+			$data['text'] .= $data['title'] . "\n";
+			$data['text'] .= $data['content'] . "\n";
+			$data['text'] .= $data['from_signature'] . "\n";
+			$data['created_at'] = str_replace(' ', 'T', $data['created_at']);
+			$data['modified_at'] = str_replace(' ', 'T', $data['modified_at']);
+			$data['sent'] = (boolean) @$data['sent'];
+			
+			App::Import('ConnectionManager');
+			$ES = ConnectionManager::getDataSource('MPSearch');
+			
+			$response = $ES->API->index(array(
+				'index' => 'mojepanstwo_v1',
+				'type' => 'letters',
+				'id' => $data['id'],
+				'body' => $data,
+			));
+						
+		}
+		
+	}
+	
+	public function search($user_id, $params = array()) {
+		
+		App::Import('ConnectionManager');
+		$ES = ConnectionManager::getDataSource('MPSearch');
+				
+		$data = $ES->API->search(array(
+			'index' => 'mojepanstwo_v1',
+			'body' => array(
+				'from' => 0, 
+				'size' => 20,
+				'query' => array(
+					'filtered' => array(
+				        'filter' => array(
+				            'and' => array(
+				                'filters' => array(
+				                    array(
+				                        'term' => array(
+				                        	'_type' => 'letters',
+				                        ),
+				                    ),
+				                    array(
+				                        'term' => array(
+				                        	'from_user_id' => $user_id,
+				                        ),
+				                    ),
+				                ),
+				                '_cache' => true,
+				            ),
+				        ),
+				    ),
+				),
+				'partial_fields' => array(
+					'data' => array(
+						'include' => array('id', 'alphaid', 'name', 'slug', 'date', 'created_at', 'modified_at'),
+					),
+				),
+				'sort' => array(
+					'created_at' => 'desc',
+				),
+			),
+		));
+
+				
+		$items = array();
+		
+		foreach( $data['hits']['hits'] as $hit )
+			$items[] = $hit['fields']['data'][0];
+		
+		return array(
+			'items' => $items,
+		);
+		
+	}
+
 }

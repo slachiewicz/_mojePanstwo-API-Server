@@ -25,20 +25,14 @@ class Wyjazdyposlow extends AppModel
 		`s_kluby`.`id` as 'klub_id', 
 		`s_kluby`.`skrot`, 
 		`mowcy_poslowie`.`mowca_id`, 
-		SUM(`poslowie_wyjazdy`.`koszt`) as 'sum',
-		COUNT(`poslowie_wyjazdy`.`posel_id`) as 'count'
-		FROM `poslowie_wyjazdy` 
-		JOIN `s_poslowie_kadencje` 
-		ON `poslowie_wyjazdy`.`posel_id` = `s_poslowie_kadencje`.`id` 
+		s_poslowie_kadencje.wartosc_wyjazdow as 'sum',
+		s_poslowie_kadencje.liczba_wyjazdow as 'count' 
+		FROM `s_poslowie_kadencje` 
 		JOIN `s_kluby`
-		ON `poslowie_wyjazdy`.`klub_id` = `s_kluby`.`id` 
+		ON `s_poslowie_kadencje`.`klub_id` = `s_kluby`.`id` 
 		JOIN `mowcy_poslowie`
 		ON `s_poslowie_kadencje`.`id` = `mowcy_poslowie`.`posel_id`
-		JOIN poslowie_wyjazdy_wydarzenia e
-		ON e.id = poslowie_wyjazdy.wydarzenie_id
-		WHERE e.deleted = '0' AND poslowie_wyjazdy.deleted = '0'
-		GROUP BY `poslowie_wyjazdy`.`posel_id`
-		ORDER BY SUM(`poslowie_wyjazdy`.`koszt`) DESC
+		ORDER BY s_poslowie_kadencje.wartosc_wyjazdow DESC
 		LIMIT 5
 		");
 

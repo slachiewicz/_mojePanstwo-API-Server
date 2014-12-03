@@ -6,6 +6,7 @@ SELECT
     e.delegacja,
     kraj,
     miasto,
+    e.id,
     e.wniosek_nr,
     e.liczba_dni,
     e.date_start AS od,

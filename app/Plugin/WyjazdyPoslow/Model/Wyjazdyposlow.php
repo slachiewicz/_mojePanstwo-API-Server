@@ -245,7 +245,7 @@ SQL;
             if ($row['wydarzenie_id'] != $last_wydarzenie) {
                 //if ($wydarzenie != null)
                 $w = array_intersect_key($row, array_flip(array(
-                        'id', 'delegacja', 'country_code', 'kraj', 'miasto', 'wniosek_nr', 'liczba_dni', 'od', 'do'))
+                        'wydarzenie_id', 'id', 'delegacja', 'country_code', 'kraj', 'miasto', 'wniosek_nr', 'liczba_dni', 'od', 'do'))
                 );
                 $w['poslowie'] = array();
 

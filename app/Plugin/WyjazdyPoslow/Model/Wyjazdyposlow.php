@@ -206,6 +206,7 @@ SELECT
     e.liczba_dni,
     e.date_start AS od,
     e.date_stop AS do,
+    w.id,
     w.koszt_transport,
     w.koszt_dieta,
     w.koszt_hotel,

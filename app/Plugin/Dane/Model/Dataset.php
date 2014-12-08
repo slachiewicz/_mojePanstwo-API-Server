@@ -258,8 +258,7 @@ class Dataset extends AppModel
 		
 		
 		
-		
-		$requested_fields = array();
+		// debug( $_fields ); die();
 		
 		if(
 			isset( $queryData['fields'] ) && 
@@ -273,12 +272,14 @@ class Dataset extends AppModel
 					
 				if( in_array($field, $_fields) )
 					$requested_fields[] = 'data.' . $field;
+				elseif( $field=='sejm_wystapienia.data' ) // TEMP HACK
+					$requested_fields[] = 'data.' . $field;
 				
 			}
 			
 		}
 
-		
+		// debug( $requested_fields ); die();
 		
 		
 		

@@ -257,7 +257,7 @@ class Dataset extends AppModel
 		}
 		
 		
-		
+		$requested_fields = array();
 		// debug( $_fields ); die();
 		
 		if(

@@ -4,7 +4,7 @@
 JOIN `s_poslowie_rozliczenia-pola` ON `s_poslowie_rozliczenia`.`id` = `s_poslowie_rozliczenia-pola`.`rozliczenie_id` 
 JOIN `s_poslowie_rozliczenia_pola` ON `s_poslowie_rozliczenia-pola`.`pole_id` = `s_poslowie_rozliczenia_pola`.`id` 
 WHERE `s_poslowie_rozliczenia`.`posel_id` = '" . addslashes( $id ) . "' AND `s_poslowie_rozliczenia`.`dane_akcept` = '1' 
-ORDER BY `s_poslowie_rozliczenia`.`rocznik` DESC, `s_poslowie_rozliczenia_pola`.`nr` ASC");
+ORDER BY `s_poslowie_rozliczenia`.`rocznik` DESC, `s_poslowie_rozliczenia_pola`.`nr` ASC, `s_poslowie_rozliczenia`.`id` ASC");
 
 	
 	$pola = array();

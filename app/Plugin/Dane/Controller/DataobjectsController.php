@@ -55,6 +55,35 @@ class DataobjectsController extends AppController
 			'_serialize' => $serialize,
 		));
     }
+    
+    public function feed()
+    {
+	    	    
+	    $class = ucfirst( $this->request->params['alias'] ) . 'Object';
+	    $this->loadModel('Dane.' . $class);
+	    	    
+	    if( class_exists($class) )
+		    $model = $this->$class;
+	    else
+		    $model = $this->Dataobject;
+	    
+	    $direction = 'desc';
+	    if(
+			isset($this->request->query['direction']) && 
+			( $this->request->query['direction'] == 'asc' )
+		)
+			$direction = 'asc';
+	    
+	    $feed = $model->getFeed($this->request->params['alias'] . '.' . $this->request->params['object_id'], array(
+		    'order' => '_date ' . $direction,
+	    ));
+	    	     
+	    $this->set(array(
+			'search' => $feed,
+			'_serialize' => array('search'),
+		));
+	    
+    }
 
     public function view_layer()
     {

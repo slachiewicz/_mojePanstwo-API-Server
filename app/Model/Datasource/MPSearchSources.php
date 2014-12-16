@@ -940,6 +940,56 @@
 	                break;
 	            }
 	            
+	            case 'gminy.radni6':
+	            {
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'radni_gmin',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.radni_gmin.gmina_id' => $value,
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.radni_gmin.aktywny' => '1',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.radni_gmin.kadencja_6' => '1',
+		        		),
+		        	);	                
+	                break;
+	            }
+	            
+	            case 'gminy.radni7':
+	            {
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'radni_gmin',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.radni_gmin.gmina_id' => $value,
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.radni_gmin.aktywny' => '1',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.radni_gmin.kadencja_7' => '1',
+		        		),
+		        	);	                
+	                break;
+	            }
+	            
 	            case 'gminy.byli_radni':
 	            {
 	            	$and_filters[] = array(

@@ -89,7 +89,12 @@ class MPSearch {
 				        ),
 				    ),
 				),
-				'fields' => array('_source', 'id', 'dataset', 'slug'),
+				'fields' => array('dataset', 'id', 'slug'),
+				'partial_fields' => array(
+					'source' => array(
+						'include' => array('data'),
+					),
+				),
 			),
 		);
 
@@ -118,10 +123,43 @@ class MPSearch {
     		'id' => $doc['fields']['id'][0],
     		'slug' => $doc['fields']['slug'][0],
             'score' => $doc['_score'],
-            'data' => @isset($doc['fields']['data'][0]['data']) ? $doc['fields']['data'][0]['data'] : $doc['_source']['data'],
+            'data' => $doc['fields']['source'][0]['data'],            
     	);
-    	    	
-    	if( isset($doc['highlight']['text']) && is_array($doc['highlight']['text']) && isset($doc['highlight']['text'][0]) )
+    	
+    	if( 
+	    	isset( $doc['fields']['source'][0]['contexts'] ) && 
+	    	!empty( $doc['fields']['source'][0]['contexts'] )
+    	) {
+	    	
+	    	$context = array();
+    		foreach( $doc['fields']['source'][0]['contexts'] as $key => $value ) {
+	    		
+	    		$key_parts = explode('.', $key);
+	    		$value_parts = explode("\n\r", $value);
+	    		
+	    		$context[] = array(
+		    		'creator' => array(
+			    		'dataset' => $key_parts[0],
+			    		'id' => $key_parts[1],
+			    		'global_id' => $value_parts[0],
+			    		'name' => $value_parts[1],
+			    		'slug' => $value_parts[2],
+		    		),
+		    		'action' => $key_parts[2],
+		    		'label' => $value_parts[3],
+		    		'sentence' => $value_parts[4],
+	    		);
+	    		
+    		}
+    		$output['contexts'] = $context;
+    	
+    	}
+    	
+    	if( 
+    		isset( $doc['highlight']['text'] ) && 
+    		is_array( $doc['highlight']['text'] ) && 
+    		isset( $doc['highlight']['text'][0] )
+    	)
     		$output['hl'] = $doc['highlight']['text'][0];
     	
     	return $output;
@@ -167,6 +205,10 @@ class MPSearch {
         $queryMode = (isset($queryData['mode']) && $queryData['mode']) ?
                     $queryData['mode'] :
                     'full_prefix';
+                    
+        $queryContext = (isset($queryData['context']) && $queryData['context']) ?
+                    $queryData['context'] :
+                    false;
                                             	
 		$queryFilters = ( isset( $queryData['filters'] ) && is_array( $queryData['filters'] ) ) ? 
 			$queryData['filters'] : 
@@ -182,7 +224,7 @@ class MPSearch {
 		$queryOrder = ( isset( $queryData['order'] ) && is_array( $queryData['order'] ) ) ? 
 			$queryData['order'] : 
 			array();
-			
+						
 		if ( isset( $queryData['order'] ) && is_array( $queryData['order'] ) && isset($queryData['order'][0]) && is_array($queryData['order'][0]) )
 			$queryOrder = $queryData['order'][0];
 		
@@ -201,9 +243,7 @@ class MPSearch {
 		
         $alerts_groups_data = array();
         $and_filters = array();
-        
-        // echo "\n\n"; debug( $queryFilters ); die();
-               
+                       
         foreach( $queryFilters as $key => $value ) {
         	
         	
@@ -225,6 +265,14 @@ class MPSearch {
 	        		include( __DIR__ . '/MPSearchSources.php' );
 	        		
         		}
+        	
+        	} elseif( $key == '_feed' ) {
+        	
+        		$and_filters[] = array(
+	        		'term' => array(
+	        			'feeds_v2' => $value,
+	        		),
+	        	);
         	
         	} elseif( $key == '_app' ) {
 	        	
@@ -455,16 +503,21 @@ class MPSearch {
 				'from' => $_from, 
 				'size' => $queryLimit,
 				'query' => array(),
-				'fields' => array('_source', 'dataset', 'id', 'slug'),
+				'fields' => array('dataset', 'id', 'slug'),
+				'partial_fields' => array(
+					'source' => array(
+						'include' => array('data'),
+					),
+				),
 			),
 		);
 		
 		
 		if( !empty($queryFields) )
-			$params['body']['partial_fields']['data'] = array(
-				'include' => $queryFields,
-				// 'exclude' => '*',
-			);
+			$params['body']['partial_fields']['source']['include'] = $queryFields;
+			
+		if( !empty($queryContext) )
+			$params['body']['partial_fields']['source']['include'] = array_merge($params['body']['partial_fields']['source']['include'], array('contexts.' . $queryContext . '.*'));
 		
 		
 		$sort = array();

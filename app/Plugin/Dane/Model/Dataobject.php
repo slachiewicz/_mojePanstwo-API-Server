@@ -373,6 +373,27 @@ class Dataobject extends AppModel
 		return $search;
 	    
     }
+    
+    public function getFeed($id, $params) {
+	    	    	    
+	    $params = array_merge(array(
+        	'q' => false,
+        	'mode' => 'search_main',
+        	'filters' => array(
+	        	'_feed' => $id,
+        	),
+        	'facets' => false,
+        	'order' => false,
+        	'context' => $id,
+        	'limit' => 20,
+        	'page' => 1,
+        ), $params);
+	    
+	    $search = $this->find('all', $params);
+        
+        return $search;
+	    
+    }
 
 }
 

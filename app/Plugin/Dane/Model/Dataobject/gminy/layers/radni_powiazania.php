@@ -30,7 +30,8 @@
 			`pl_gminy_radni`.`gmina_id` = '$id' AND 
 			`pl_gminy_radni`.`akcept` = '1' AND 
 			`pl_gminy_radni`.`aktywny` = '1' AND 
-			`pl_gminy_radni`.`krs_osoba_id` != 0 
+			`pl_gminy_radni`.`krs_osoba_id` != 0 AND 
+			`pl_gminy_radni`.`kadencja_7` != 0 
 		ORDER BY 
 			`pl_gminy_radni`.`nazwa` ASC 
 	";

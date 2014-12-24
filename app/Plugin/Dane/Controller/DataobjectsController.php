@@ -74,8 +74,18 @@ class DataobjectsController extends AppController
 		)
 			$direction = 'asc';
 	    
+	    $limit = 20;
+	    if( isset($this->request->query['perPage']) && $this->request->query['perPage'] )
+	    	$limit = (int) $this->request->query['perPage'];
+	    	
+	    $page = 1;
+	    if( isset($this->request->query['page']) && $this->request->query['page'] )
+	    	$page = (int) $this->request->query['page'];	    	
+	    	    
 	    $feed = $model->getFeed($this->request->params['alias'] . '.' . $this->request->params['object_id'], array(
 		    'order' => '_date ' . $direction,
+		    'limit' => $limit,
+		    'page' => $page,
 	    ));
 	    	     
 	    $this->set(array(

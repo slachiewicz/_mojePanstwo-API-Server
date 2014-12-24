@@ -385,8 +385,8 @@ class Dataobject extends AppModel
         	'facets' => false,
         	'order' => false,
         	'context' => $id,
-        	'limit' => 20,
-        	'page' => 1,
+        	'limit' => $params['limit'],
+        	'page' => $params['page'],
         ), $params);
 	    
 	    $search = $this->find('all', $params);

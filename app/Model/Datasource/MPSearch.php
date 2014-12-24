@@ -144,6 +144,7 @@ class MPSearch {
 			    		'global_id' => $value_parts[0],
 			    		'name' => $value_parts[1],
 			    		'slug' => $value_parts[2],
+			    		'url' => @$value_parts[5],
 		    		),
 		    		'action' => $key_parts[2],
 		    		'label' => $value_parts[3],

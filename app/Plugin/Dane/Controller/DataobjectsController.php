@@ -81,11 +81,16 @@ class DataobjectsController extends AppController
 	    $page = 1;
 	    if( isset($this->request->query['page']) && $this->request->query['page'] )
 	    	$page = (int) $this->request->query['page'];	    	
+	    
+	    $channel = '';
+	    if( isset($this->request->query['channel']) && $this->request->query['channel'] )
+	    	$channel = $this->request->query['channel'];	
 	    	    
 	    $feed = $model->getFeed($this->request->params['alias'] . '.' . $this->request->params['object_id'], array(
 		    'order' => '_date ' . $direction,
 		    'limit' => $limit,
 		    'page' => $page,
+		    'channel' => $channel,
 	    ));
 	    	     
 	    $this->set(array(

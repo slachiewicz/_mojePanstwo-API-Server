@@ -376,11 +376,16 @@ class Dataobject extends AppModel
     
     public function getFeed($id, $params) {
 	    	    	    
+	    $feed = $id;
+	    
+	    if( $params['channel'] )
+	    	$feed .= ':' . $params['channel'];
+	    
 	    $params = array_merge(array(
         	'q' => false,
         	'mode' => 'search_main',
         	'filters' => array(
-	        	'_feed' => $id,
+	        	'_feed' => $feed,
         	),
         	'facets' => false,
         	'order' => false,

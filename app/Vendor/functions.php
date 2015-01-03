@@ -149,3 +149,30 @@ function getmicrotime(){
     list($usec, $sec) = explode(" ",microtime()); 
     return ((float)$usec + (float)$sec); 
 } 
+
+
+function mpapi_get_field_type($field)
+{
+	
+	if( $p = strrpos($field, '.') ) {
+		
+		$field = substr($field, $p+1);
+		
+	}
+	
+    if ( ( ($field=='data') || (strpos($field, 'data_')===0) ) && ($field != 'data_str') )
+        return 'date';
+    elseif( in_array($field, array('_ord', 'liczba_akcji_wszystkich_emisji') ) )
+    	return 'bigint';
+    elseif( strpos($field, '_ord') === 0 )
+    	return 'bigint';
+    elseif ( strpos($field, 'liczba_') === 0 || strpos($field, 'dlugosc_') === 0 || strpos($field, 'numer_') === 0 || strpos($field, 'nr_') === 0 || strpos($field, 'rok_') === 0 )
+        return 'int';
+    elseif (in_array($field, array('rok', 'nr', 'numer', 'poz', 'pozycja', 'kolejnosc', 'dlugosc_rozpatrywania', 'liczba', 'dlugosc')))
+        return 'int';
+    elseif ( (strpos($field, 'procent_') === 0) || (strpos($field, 'wartosc_') === 0) || (strpos($field, 'budzet_') === 0) || in_array($field, array('frekwencja', 'zbuntowanie', 'procent', 'wartosc', 'budzet')) )
+        return 'float';
+	else
+        return 'string';
+
+}

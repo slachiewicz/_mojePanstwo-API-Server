@@ -340,6 +340,26 @@
 	
 	            }
 	            
+	            case 'instytucje.twitter':
+	            {
+					
+	                $twitter_account_id = ClassRegistry::init('DB')->selectValue("SELECT twitter_account_id FROM administracja_publiczna WHERE id='" . addslashes($value) . "'");
+
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'twitter',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.twitter_accounts.id' => $twitter_account_id,
+		        		),
+		        	);
+		        		                
+	                break;
+	
+	            }
+	            
 	            case 'instytucje.zamowienia_udzielone':
 	            {
 					

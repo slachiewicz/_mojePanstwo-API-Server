@@ -167,7 +167,7 @@
 	}
 	
 	
-		
+	$numery = array_unique($numery);			
 	$output = array();
 	
 	foreach( $numery as $numer ) {

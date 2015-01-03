@@ -241,8 +241,9 @@ class Dataset extends AppModel
 			),
 			'full' => 1,
 		));
-		
+				
 		$__fields = array('_date', '_title', '_weight');
+		$__orders = $__fields;
 		$_fields = $__fields;
 		
 		
@@ -255,6 +256,20 @@ class Dataset extends AppModel
 			$_fields[] = $field['alias'] . '.' . $_field;
 			
 		}
+		
+		reset( $field );
+				
+		foreach( array_column($dataset['orders_es'], 'sorting') as $field ) {
+						
+			$_field = $field['field'];
+			
+			$__orders[] = $_field;
+			$__orders[] = $alias . '.' . $_field;
+			
+		}
+		
+				
+		
 		
 		
 		$requested_fields = array();
@@ -406,7 +421,7 @@ class Dataset extends AppModel
 				
 			
 			
-			if( in_array($_field, $_fields) ) {
+			if( in_array($_field, $__orders) || (mpapi_get_field_type($_field)!='string') ) {
 				
 				if( 
 					( !in_array($_field, $__fields) ) && 

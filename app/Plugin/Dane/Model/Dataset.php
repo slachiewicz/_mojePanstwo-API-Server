@@ -38,6 +38,7 @@ class Dataset extends AppModel
 	        $this->MPCache = new MPCache();
 	 	    
 	 	    $output = $this->MPCache->getDataset( $alias, @$queryData['full'] );
+	 	    	 	    
             if (!empty($output)) {
 	 	        $output['orders'] = isset($output['orders_es']) ? $output['orders_es'] : array();
             }
@@ -245,7 +246,7 @@ class Dataset extends AppModel
 		$__fields = array('_date', '_title', '_weight');
 		$__orders = $__fields;
 		$_fields = $__fields;
-		
+				
 		
 		foreach( array_column($dataset['fields'], 'fields') as $field ) {
 			
@@ -413,6 +414,7 @@ class Dataset extends AppModel
 		if( is_string($order) )
 			$order = array( $order );
 		
+		
 		foreach( $order as $o ) {
 						
 			$_field = $o;
@@ -421,7 +423,10 @@ class Dataset extends AppModel
 				
 			
 			
-			if( in_array($_field, $__orders) || (mpapi_get_field_type($_field)!='string') ) {
+			if( 
+				( in_array($_field, $_fields) ) && 
+				( in_array($_field, $__orders) || (mpapi_get_field_type($_field)!='string') )
+			) {
 				
 				if( 
 					( !in_array($_field, $__fields) ) && 
@@ -434,8 +439,7 @@ class Dataset extends AppModel
 			}
 			
 		}
-				
-				
+								
 		App::import('model','Dane.Dataobject');
 		$this->Dataobject = new Dataobject();
         $search = $this->Dataobject->find('all', array(
@@ -449,7 +453,9 @@ class Dataset extends AppModel
         	'version' => $version,
         	'fields' => $requested_fields,
         ));
+
 		
+				
 		
 		if( isset($search['facets']) ) {
 						

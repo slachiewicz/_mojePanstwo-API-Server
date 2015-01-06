@@ -1172,6 +1172,22 @@
 	                break;
 	            }
 	            
+	            case 'dzielnice.posiedzenia':
+	            {
+	                
+	                $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'krakow_dzielnice_rady_posiedzenia',
+		        		),
+		        	);
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.krakow_dzielnice_rady_posiedzenia.dzielnica_id' => $value,
+		        		),
+		        	);	                
+	                break;
+	            }
+	            
 	            case 'krakow_dzielnice_uchwaly.glosy':
 	            {
 	                

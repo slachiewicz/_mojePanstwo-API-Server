@@ -386,6 +386,7 @@ class Dataobject extends AppModel
         	'mode' => 'search_main',
         	'filters' => array(
 	        	'_feed' => $feed,
+	        	'_date' => '[* TO now]',
         	),
         	'facets' => false,
         	'order' => false,

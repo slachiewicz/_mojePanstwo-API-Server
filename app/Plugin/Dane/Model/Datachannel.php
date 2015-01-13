@@ -89,6 +89,12 @@ class Datachannel extends AppModel
 		if( isset($queryData['order']) && $queryData['order'] )
 			$order = $queryData['order'];	
 		
+		$_order = array();
+		foreach( $order as $o ) {
+			$parts = explode(' ', $o);
+			if( in_array($parts[0], array('_date', '_title')) )
+				$_order[] = $o;
+		}
 		
 		
 		App::import('model','Dane.Dataobject');
@@ -98,7 +104,7 @@ class Datachannel extends AppModel
         	'mode' => $mode,
         	'filters' => $filters,
         	'facets' => $facets,
-        	'order' => $order,
+        	'order' => $_order,
         	'limit' => $limit,
         	'page' => $page,
         ));

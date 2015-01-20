@@ -60,8 +60,11 @@ class MPSearch {
 	    
     }
     
-    public function getObject($dataset, $id) {
-	    	    
+    public function getObject($dataset, $id, $field='id') {
+	    
+	    if( $field!='id' )
+	    	$field = 'data.' . $field;
+	    
 	    $params = array(
 			'index' => $this->_index,
 			'type' => 'objects',
@@ -80,7 +83,7 @@ class MPSearch {
 				                    ),
 				                    array(
 				                    	'term' => array(
-				                        	'id' => $id,
+				                        	$field => $id,
 				                        ),
 				                    ),
 				                ),
@@ -99,7 +102,7 @@ class MPSearch {
 		);
 
 		
-		// echo "\n\n"; debug( $params );
+		// echo "\n\n"; var_export( $params );
 	    $es_result = $this->API->search($params);
 	    // echo "\n\n"; debug( $es_result ); die();
 	    

@@ -64,8 +64,10 @@ class Dataobject extends AppModel
 
     public function getObject($dataset, $id, $params = array(), $throw_not_found = false)
     {
-                
-		if( $object = $this->getDataSource()->getObject($dataset, $id) )
+        
+        $search_field = isset($params['search_field']) ? $params['search_field'] : 'id';
+        
+		if( $object = $this->getDataSource()->getObject($dataset, $id, $search_field) )
 			$this->data =$object;
 		else
 			return false;     

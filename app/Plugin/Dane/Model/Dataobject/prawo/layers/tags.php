@@ -7,5 +7,5 @@
 				ON `prawo-hasla`.`haslo_id` = `ISAP_hasla`.`id` 
 		WHERE `prawo-hasla`.`prawo_id`='" . addslashes( $id ) . "' AND `prawo-hasla`.`deleted` = '0' 
 		ORDER BY `ISAP_hasla`.`q` ASC 
-		LIMIT 100 
+		LIMIT 10 
 	");

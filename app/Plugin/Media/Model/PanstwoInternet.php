@@ -16,7 +16,7 @@ class PanstwoInternet extends AppModel
     
     public function get_twitter_stats($range)
     {
-		
+				
 		App::import('model', 'DB');
         $this->DB = new DB();
         

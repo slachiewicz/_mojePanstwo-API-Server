@@ -9,6 +9,7 @@ App::uses('AppModel', 'Model');
 class Document extends AppModel {
 
     public $useTable = 'pisma_documents';
+    public $primaryKey = 'alphaid';
     public $recursive = -1;
 	
 	public $virtualFields = array(
@@ -23,6 +24,7 @@ class Document extends AppModel {
     	'adresat_id' => 'Document.to_id',
     	'szablon_id' => 'Document.template_id',
     	'podpis' => 'Document.from_signature',
+    	'id' => 'Document.alphaid',
 	);
 	
 	
@@ -34,6 +36,7 @@ class Document extends AppModel {
  * @var array
  */
 	public $validate = array(
+		/*
 		'alphaid' => array(
 			'maxLength' => array(
 				'rule' => array('maxLength', 5),
@@ -43,9 +46,11 @@ class Document extends AppModel {
                 'required' => true,
             ),
 		),
+		*/
+		/*
 		'hash' => array(
 			'maxLength' => array(
-				'rule' => array('maxLength', 32),
+				'rule' => array('maxLength', 64),
 			),
             'notEmpty' => array(
                 'rule' => 'notEmpty',
@@ -67,10 +72,12 @@ class Document extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
+		*/
+		/*
 		'from_user_id' => array(
 			'numeric' => array(
 				'rule' => array('numeric'),
-                'required' => true,
+                'required' => false,
 				//'message' => 'Your custom message here',
 				//'allowEmpty' => false,
 				//'required' => false,
@@ -78,10 +85,11 @@ class Document extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
+		*/
 		'from_name' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-                'required' => true,
+                'required' => false,
 				//'message' => 'Your custom message here',
 				//'allowEmpty' => false,
 				//'required' => false,
@@ -95,7 +103,7 @@ class Document extends AppModel {
 		'from_email' => array(
             'email' => array(
                 'rule' => 'email',
-                'required' => true,
+                'required' => false,
             ),
             'maxLength' => array(
                 'rule' => array('maxLength', 255),
@@ -106,10 +114,11 @@ class Document extends AppModel {
                 'rule' => array('maxLength', 255),
             ),
         ),
+        /*
 		'to_dataset' => array(
 			'notEmpty' => array(
 				'rule' => array('notEmpty'),
-                'required' => true,
+                'required' => false,
 				//'message' => 'Your custom message here',
 				//'allowEmpty' => false,
 				//'required' => false,
@@ -117,10 +126,12 @@ class Document extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
+		*/
+		/*
 		'to_id' => array(
 			'numeric' => array(
 				'rule' => array('numeric'),
-                'required' => true,
+                'required' => false,
 				//'message' => 'Your custom message here',
 				//'allowEmpty' => false,
 				//'required' => false,
@@ -128,10 +139,11 @@ class Document extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			)
 		),
+		*/
 		'sent' => array(
 			'boolean' => array(
 				'rule' => array('boolean'),
-                'required' => true,
+                'required' => false,
 				//'message' => 'Your custom message here',
 				//'allowEmpty' => false,
 				//'required' => false,
@@ -169,85 +181,285 @@ class Document extends AppModel {
 	
 	public function afterSave($created, $options) {
 				
-		if( ($data = $this->data['Document']) && isset($data['id']) && $data['id'] ) {
+		if( ($data = $this->data['Document']) && isset($data['alphaid']) && $data['alphaid'] ) {
 			
-			$data['text'] = $data['name'] . "\n";
-			$data['text'] .= $data['from_str'] . "\n";
-			$data['text'] .= $data['from_location'] . "\n";
-			$data['text'] .= $data['date'] . "\n";
-			$data['text'] .= $data['to_str'] . "\n";
-			$data['text'] .= $data['title'] . "\n";
-			$data['text'] .= $data['content'] . "\n";
-			$data['text'] .= $data['from_signature'] . "\n";
-			$data['created_at'] = str_replace(' ', 'T', $data['created_at']);
-			$data['modified_at'] = str_replace(' ', 'T', $data['modified_at']);
-			$data['sent'] = (boolean) @$data['sent'];
+			if( $saved = (isset($data['saved']) ? (boolean) $data['saved'] : false) ) {
+				
+				
+				App::uses('ConnectionManager', 'Model');
+				
+				
+				// GET HASH
+				
+				if(
+					( $db = ConnectionManager::getDataSource('default') ) && 
+					( $dbdata = $db->query("SELECT id, hash FROM pisma_documents WHERE alphaid='" . addslashes( $data['alphaid'] ) . "'") ) 
+				)				
+					$data['id'] = $dbdata[0]['pisma_documents']['id'];
+					$data['hash'] = $dbdata[0]['pisma_documents']['hash'];
+									
+				// SEND TO THUMBNAILS GENERATOR
+				
+				
+				$db = ConnectionManager::getDataSource('MPCache');				
+				$db->API->sadd('pisma/thumbnails/incoming', json_encode($data));				
+				
+				
+				
+				
+				// SEND TO ELASTIC SEARCH
+				
+				$mask = "Ymd\THis\Z";
+				
+				$data['text'] = @$data['name'] . "\n";
+				$data['text'] .= @$data['from_str'] . "\n";
+				$data['text'] .= @$data['from_location'] . "\n";
+				$data['text'] .= @$data['date'] . "\n";
+				$data['text'] .= @$data['to_str'] . "\n";
+				$data['text'] .= @$data['title'] . "\n";
+				$data['text'] .= @$data['content'] . "\n";
+				$data['text'] .= @$data['from_signature'] . "\n";
+				
+				$data['saved'] = $saved;
+				
+									
+				if( 
+					isset($data['created_at']) && 
+					( $created_at = strtotime( $data['created_at'] ) ) 
+				)
+					$data['created_at'] = date($mask, $created_at);
+					
+				if( 
+					isset($data['modified_at']) && 
+					( $modified_at = strtotime( $data['modified_at'] ) ) 
+				)
+					$data['modified_at'] = date($mask, $modified_at);
+											
+				require_once(APP . 'Vendor' . DS . 'autoload.php');
+		        $ES = new Elasticsearch\Client(array(
+			    	'hosts' => array(
+			    		'10.80.53.11:9200',
+			    	),
+			    ));
+				
+				$response = $ES->index(array(
+					'index' => 'mojepanstwo_v1',
+					'type' => 'letters',
+					'id' => $data['alphaid'],
+					'body' => $data,
+				));
+				
+				
+				
 			
-			App::Import('ConnectionManager');
-			$ES = ConnectionManager::getDataSource('MPSearch');
-			
-			$response = $ES->API->index(array(
-				'index' => 'mojepanstwo_v1',
-				'type' => 'letters',
-				'id' => $data['id'],
-				'body' => $data,
-			));
+			}		
 						
 		}
 		
 	}
 	
-	public function search($user_id, $params = array()) {
+	public function search($params) {
 		
-		App::Import('ConnectionManager');
-		$ES = ConnectionManager::getDataSource('MPSearch');
-				
-		$data = $ES->API->search(array(
+		require_once(APP . 'Vendor' . DS . 'autoload.php');
+        $ES = new Elasticsearch\Client(array(
+	    	'hosts' => array(
+	    		'10.80.53.11:9200',
+	    	),
+	    ));
+			
+		$page = isset($params['page']) ? $params['page'] : 1;
+		$from = ($page-1) * 20;		
+		
+		$filtered = array(
+	        'filter' => array(
+	            'and' => array(
+	                'filters' => array(
+	                    array(
+	                        'term' => array(
+	                        	'from_user_type' => $params['user_type'],
+	                        ),
+	                    ),
+	                    array(
+	                        'term' => array(
+	                        	'from_user_id' => $params['user_id'],
+	                        ),
+	                    ),
+	                ),
+	                '_cache' => true,
+	            ),
+	        ),
+	    );
+	    
+	    if( $params['q'] )
+	    	$filtered['query'] = array(
+		        'match' => array(
+			        'text' => $params['q'],
+		        ),
+	        );
+		
+		$data = $ES->search(array(
 			'index' => 'mojepanstwo_v1',
+			'type' => 'letters',
 			'body' => array(
-				'from' => 0, 
+				'from' => $from, 
 				'size' => 20,
 				'query' => array(
-					'filtered' => array(
-				        'filter' => array(
-				            'and' => array(
-				                'filters' => array(
-				                    array(
-				                        'term' => array(
-				                        	'_type' => 'letters',
-				                        ),
-				                    ),
-				                    array(
-				                        'term' => array(
-				                        	'from_user_id' => $user_id,
-				                        ),
-				                    ),
-				                ),
-				                '_cache' => true,
-				            ),
-				        ),
-				    ),
+					'filtered' => $filtered,
 				),
 				'partial_fields' => array(
 					'data' => array(
-						'include' => array('id', 'alphaid', 'name', 'slug', 'date', 'created_at', 'modified_at'),
+						'include' => array('id', 'alphaid', 'name', 'slug', 'date', 'created_at', 'modified_at', 'to_name', 'hash'),
 					),
 				),
 				'sort' => array(
-					'created_at' => 'desc',
+					'modified_at' => 'desc',
 				),
 			),
 		));
-
-				
-		$items = array();
 		
+						
+		$items = array();
+				
 		foreach( $data['hits']['hits'] as $hit )
 			$items[] = $hit['fields']['data'][0];
 		
 		return array(
+			'performance' => array(
+				'took' => $data['took'],
+			),
+			'pagination' => array(
+				'page' => $page,
+				'perPage' => 20,
+				'total' => $data['hits']['total'],
+			),
 			'items' => $items,
 		);
+		
+	}
+	
+	public function delete($id, $params) {
+		
+		App::import('model','DB');
+		$DB = new DB();
+		
+		
+		$item = $DB->selectAssoc("SELECT `id`, `saved` FROM `pisma_documents` WHERE `alphaid`='" . addslashes($id) . "' AND `from_user_type`='" . addslashes( $params['from_user_type'] ) . "' AND `from_user_id`='" . addslashes( $params['from_user_id'] ) . "' LIMIT 1");
+		
+		if( $item ) {
+			
+			$DB->q("UPDATE `pisma_documents` SET `deleted`='1', `deleted_at`=NOW() WHERE `id`='" . $item['id'] . "' LIMIT 1");
+			
+			
+			require_once(APP . 'Vendor' . DS . 'autoload.php');
+	        $ES = new Elasticsearch\Client(array(
+		    	'hosts' => array(
+		    		'10.80.53.11:9200',
+		    	),
+		    ));
+					
+			$deleteParams = array();
+			$deleteParams['index'] = 'mojepanstwo_v1';
+			$deleteParams['type'] = 'letters';
+			$deleteParams['id'] = $id;
+			$deleteParams['ignore'] = array(404);
+			
+			$ES->delete($deleteParams);
+						
+			return 200;
+			
+		} else return 404;
+				
+	}
+	
+	public function send($id, $user, $params) {
+		
+		if( $pismo = $this->find('first', array(
+	        'conditions' => array(
+		        'deleted' => '0',
+		        'id' => $id,
+		        'from_user_type' => $user['type'],
+		        'from_user_id' => $user['id'],
+	        ),
+        )) ) {
+	        	        
+	    	$pismo = $pismo['Document'];	    	
+	    	App::uses('CakeEmail', 'Network/Email');
+	    	
+			$Email = new CakeEmail('pisma');
+			$Email->viewVars(array('pismo' => $pismo));
+			$status = $Email->template('Pisma.pismo', 'Pisma.layout')
+				->addHeaders(array('X-Mailer' => 'mojePaństwo'))
+				->emailFormat('html')
+				->subject($pismo['title'])
+				->to('daniel.macyszyn@epf.org.pl', 'Daniel Macyszyn')
+				->from('pisma@mojepanstwo.pl', 'Pisma | mojePaństwo')
+				->replyTo('daniel@macysz.com', 'Nadawca pisma')
+				->send();    	    
+    	    
+    	    require_once(APP . 'Vendor' . DS . 'autoload.php');
+	        $ES = new Elasticsearch\Client(array(
+		    	'hosts' => array(
+		    		'10.80.53.11:9200',
+		    	),
+		    ));
+			
+		    $ES->update(array(
+			    'index' => 'mojepanstwo_v1',
+			    'type' => 'letters',
+			    'id' => $id,
+			    'body' => array(
+				    'doc' => array(
+					    'sent' => true,
+				    	'sent_at' => date('Ymd\THis\Z'),
+				    ),
+			    ),
+		    ));
+    	    
+    	    $db = ConnectionManager::getDataSource('default');
+    	    $db->query("UPDATE `pisma_documents` SET `sent`='1', `sent_at`=NOW() WHERE `alphaid`='" . addslashes( $id ) . "'");
+
+    	    return (boolean) $status;
+	        
+        } else throw new NotFoundException();
+				
+	}
+	
+	public function transfer_anonymous($anonymous_user_id, $user_id) {
+				
+		if(
+			( $db = ConnectionManager::getDataSource('default') ) && 
+			( $where = "from_user_type='anonymous' AND from_user_id='" . addslashes( $anonymous_user_id ) . "'" ) && 
+			( $ids = $db->query("SELECT alphaid, saved FROM pisma_documents WHERE $where") ) 
+		) {
+			
+			require_once(APP . 'Vendor' . DS . 'autoload.php');
+	        $ES = new Elasticsearch\Client(array(
+		    	'hosts' => array(
+		    		'10.80.53.11:9200',
+		    	),
+		    ));
+			
+			foreach( $ids as $id ) {
+				if( $id['pisma_documents']['saved'] ) {
+				    $ES->update(array(
+					    'index' => 'mojepanstwo_v1',
+					    'type' => 'letters',
+					    'id' => $id['pisma_documents']['alphaid'],
+					    'body' => array(
+						    'doc' => array(
+							    'from_user_type' => 'account',
+						    	'from_user_id' => $user_id,
+						    ),
+					    ),
+				    ));
+			    }
+			}
+			
+			$db->query("UPDATE pisma_documents SET `from_user_type`='account', `from_user_id`='" . addslashes( $user_id ) . "' WHERE $where");
+			
+			return true;
+			
+		} else return false;
 		
 	}
 

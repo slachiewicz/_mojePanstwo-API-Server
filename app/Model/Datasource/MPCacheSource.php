@@ -29,7 +29,7 @@ class MPCacheSource extends DataSource {
 
 
     public $description = 'MPCache';
-	private $API = false;
+	public $API = false;
 	private $scripts = array();
 
     public function __construct($config) {
@@ -40,9 +40,7 @@ class MPCacheSource extends DataSource {
 		    'host'   =>	$config['host'],
 		    'port'   =>	$config['port'],
 		));
-		
-		
-		
+				
     }	
 	
 	public function get($key) {

@@ -43,7 +43,7 @@ class TemplatesController extends AppController
 			FROM `pisma_szablony` 
 			JOIN `pisma_kategorie`
 			ON `pisma_szablony`.`pisma_kategorie_id` = `pisma_kategorie`.`id` 
-			WHERE pisma_szablony.akcept='1' 
+			WHERE pisma_szablony.akcept='1' AND `pisma_szablony`.`pisma_kategorie_id`='16' 
 			ORDER BY pisma_kategorie.ord ASC, pisma_szablony.ord ASC
 		");
 		

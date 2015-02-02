@@ -21,6 +21,7 @@ foreach(array('', '_v0') as $version) {
     
     Router::connect("$base_slug$version/documents/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'view', '[method]' => 'GET'), array('id' => '[A-Za-z0-9]{5}'));
     Router::connect("$base_slug$version/documents/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'save', '[method]' => 'POST'), array('id' => '[A-Za-z0-9]{5}', 'pass' => array('id')));
+    Router::connect("$base_slug$version/documents/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'update', '[method]' => 'PUT'), array('id' => '[A-Za-z0-9]{5}', 'pass' => array('id')));
     Router::connect("$base_slug$version/documents/:id", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'delete', '[method]' => 'DELETE'), array('id' => '[A-Za-z0-9]{5}', 'pass' => array('id')));
         
     Router::connect("$base_slug$version/documents/:id/send", array('plugin' => 'Pisma', 'controller' => 'documents', 'action' => 'send', '[method]' => 'POST'), array('id' => '[A-Za-z0-9]{5}', 'pass' => array('id')));

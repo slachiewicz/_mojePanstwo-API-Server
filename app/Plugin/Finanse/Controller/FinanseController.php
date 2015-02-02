@@ -18,14 +18,27 @@ class FinanseController extends AppController
         $this->set('data', $data);
         $this->set('_serialize', 'data');
     }
+
+    public function getBudgetData2()
+    {
+        $gmina_id = isset($this->request->query['gmina_id'] ) ? $this->request->query['gmina_id'] : false;
+        $data = $this->Finanse->getBudgetData2($gmina_id);
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+    }
+
+    public function getCommuneData()
+    {
+        $gmina_id = isset($this->request->query['id'] ) ? $this->request->query['id'] : 0;
+        $data = $this->Finanse->getCommuneData($gmina_id);
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+    }
     
     public function getBudgetData()
     {
-    	
-    	$gmina_id = isset( $this->request->query['gmina_id'] ) ? $this->request->query['gmina_id'] : false;
-    	
+    	$gmina_id = isset($this->request->query['gmina_id'] ) ? $this->request->query['gmina_id'] : false;
         $data = $this->Finanse->getBudgetData($gmina_id);
-
         $this->set('data', $data);
         $this->set('_serialize', 'data');
     }

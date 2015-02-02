@@ -63,6 +63,24 @@
 	                break;
 	            }
 	            
+	            case 'zbiory.katalog': {
+		            
+		            $and_filters[] = array(
+		        		'term' => array(
+		        			'dataset' => 'zbiory',
+		        		),
+		        	);
+		        	
+		        	$and_filters[] = array(
+		        		'term' => array(
+		        			'data.zbiory.katalog' => '1',
+		        		),
+		        	);
+		        	
+		        	break;
+		            
+	            }
+	            
 	            case 'prawo.weszly': {
 		            
 		            $and_filters[] = array(

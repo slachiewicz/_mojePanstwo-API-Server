@@ -274,7 +274,7 @@ class MPSearch {
         	
         		$and_filters[] = array(
 	        		'term' => array(
-	        			'feeds_v2' => $value,
+	        			'feeds' => $value,
 	        		),
 	        	);
         	
@@ -727,6 +727,12 @@ class MPSearch {
 					
 					$sort[] = array(
 						'date' => $direction,
+					);
+				
+				} elseif( stripos($field, 'feed_dataset_order.')===0 ) {
+					
+					$sort[] = array(
+						$field => $direction,
 					);
 				
 				} elseif( $field == 'score' ) {

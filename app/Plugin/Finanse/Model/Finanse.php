@@ -75,8 +75,138 @@ class Finanse extends AppModel
 		return $data;
 	    
     }
-    
-    public function getBudgetData($gmina_id = null)
+
+    /**
+     * @param int $gmina_id
+     * @return array Wydatki gminy dla każdego działu
+     */
+    public function getCommuneData($gmina_id = 0)
+    {
+        App::import('model','DB');
+        $DB = new DB();
+
+        $gmina_id = (int) $gmina_id;
+
+        $data = $DB->selectAssocs("
+            SELECT
+              dzial_id,
+              sum_wydatki
+            FROM
+              mf_wydatki_gminy_dzialy
+            WHERE
+              gmina_id = $gmina_id
+            GROUP BY
+              dzial_id
+        ");
+
+        return $data;
+    }
+
+    public function getBudgetData()
+    {
+        App::import('model','DB');
+        $DB = new DB();
+
+        $data = array();
+        $data['stats'] = array();
+
+        $data['stats']['sum'] = (float) $DB->selectValue("
+            SELECT sum_wydatki
+            FROM mf_wydatki_roczniki
+            WHERE rocznik = 2014
+        ");
+
+        $data['sections'] = $DB->selectAssocs("
+            SELECT
+              pl_budzety_wydatki_dzialy.id,
+              pl_budzety_wydatki_dzialy.src,
+              pl_budzety_wydatki_dzialy.tresc,
+              mf_wydatki_dzialy.sum_wydatki,
+              mf_wydatki_dzialy.wydatki_min_gmina_id,
+              mf_wydatki_dzialy.wydatki_max_gmina_id
+            FROM
+              mf_wydatki_dzialy
+            JOIN
+              pl_budzety_wydatki_dzialy
+                ON pl_budzety_wydatki_dzialy.id = mf_wydatki_dzialy.dzial_id
+            GROUP BY
+              mf_wydatki_dzialy.dzial_id
+            ORDER BY
+              mf_wydatki_dzialy.sum_wydatki DESC
+        ");
+
+        foreach($data['sections'] as $i => $section)
+        {
+            $gmina_min = $DB->selectAssoc("
+                SELECT
+                  sum_wydatki,
+                  pl_gminy.nazwa
+                FROM
+                  mf_wydatki_gminy_dzialy
+                JOIN
+                  pl_gminy ON pl_gminy.id = mf_wydatki_gminy_dzialy.gmina_id
+                WHERE
+                  gmina_id = ".$section['wydatki_min_gmina_id']." AND
+                  dzial_id = ".$section['id']."
+            ");
+
+            $data['sections'][$i]['min'] = $gmina_min['sum_wydatki'];
+            $data['sections'][$i]['min_nazwa'] = $gmina_min['nazwa'];
+
+            $gmina_max = $DB->selectAssoc("
+                SELECT
+                  sum_wydatki,
+                  pl_gminy.nazwa
+                FROM
+                  mf_wydatki_gminy_dzialy
+                JOIN
+                  pl_gminy ON pl_gminy.id = mf_wydatki_gminy_dzialy.gmina_id
+                WHERE
+                  gmina_id = ".$section['wydatki_max_gmina_id']." AND
+                  dzial_id = ".$section['id']."
+            ");
+
+            $data['sections'][$i]['max'] = $gmina_max['sum_wydatki'];
+            $data['sections'][$i]['max_nazwa'] = $gmina_max['nazwa'];
+        }
+
+        foreach($data['sections'] as $i => $section) {
+            $data['sections'][$i]['buckets'] = array();
+            $min = (int)$section['min'];
+            $max = (int)$section['max'];
+            $segment = (int) (($max - $min) / 10);
+            $segments = array();
+            for ($m = 1; $m <= 10; $m++) {
+                $segments[] = array(
+                    'min' => $min + $m * $segment,
+                    'max' => $min + ($m + 1) * $segment
+                );
+            }
+
+            foreach ($segments as $segment) {
+                $count = (int) $DB->selectValue("
+                    SELECT
+                        COUNT(*)
+                    FROM
+                      mf_wydatki_gminy_dzialy
+                    WHERE
+                      dzial_id = " . $section['id'] . " AND
+                      sum_wydatki
+                        BETWEEN " . $segment['min'] . " AND " . $segment['max'] . "
+                ");
+                $data['sections'][$i]['buckets'][] = array(
+                    'count'     => $count,
+                    'height'    => $count
+                );
+            }
+        }
+
+        return $data;
+    }
+
+
+    // stara wersja API
+    public function getBudgetData2($gmina_id = null)
     {
 	    
 	    App::import('model','DB');
@@ -252,9 +382,9 @@ class Finanse extends AppModel
 		        'teryt_min' => @$item['teryt_min_sum_section'],
 		        'teryt_max' => @$item['teryt_max_sum_section'],
 		        'teryt_section_percent' => @$item['teryt_section_percent'],
-		        'teryt_min_nazwa' => $item['teryt_min_nazwa'],
-		        'teryt_max_nazwa' => $item['teryt_max_nazwa'],
-				'teryt_buckets' => $item['teryt_buckets']
+		        'teryt_min_nazwa' => @$item['teryt_min_nazwa'],
+		        'teryt_max_nazwa' => @$item['teryt_max_nazwa'],
+				'teryt_buckets' => @$item['teryt_buckets']
 		    );
 		}
 		//debug($finalResult); die();

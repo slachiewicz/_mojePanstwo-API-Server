@@ -143,7 +143,27 @@ class DocumentsController extends AppController
         */
         
     }
-
+	
+	public function update($id, $slug = null) {
+		
+		$status = false;		
+		if(
+			isset( $this->request->query['name'] ) && 
+			( $name = $this->request->query['name'] )
+		) {
+			
+			$status = $this->Document->rename($id, array(
+				'name' => $name,
+				'user' => $this->user,
+			));
+			
+		}
+		
+		$this->set('status', $status);
+		$this->set('_serialize', 'status');	
+		
+	}
+	
     public function save($id = null) {
                 
         $map = array(
@@ -203,6 +223,12 @@ class DocumentsController extends AppController
         
         
         
+        
+        
+        App::import('model','DB');
+		$DB = new DB();
+        
+        
         // edit & create in one func, path param has precedence
         if ($id != null) {
             $data['alphaid'] = $id;
@@ -222,70 +248,48 @@ class DocumentsController extends AppController
             $data['alphaid'] = $this->generateID(5);
 	        $data['name'] = false;
 	        $data['saved'] = '0';
-	        	        
+	       
+	    }
+	    
+	    
+        if(
+	        isset( $data['template_id'] ) && 
+        	$data['template_id'] && 
+        	$template = $DB->selectAssoc("SELECT nazwa, tresc FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'")
+        ) {
 	        
-	        if( 
-	        	isset( $data['template_id'] ) || 
-	        	(
-		        	isset( $data['to_dataset'] ) && 
-		        	isset( $data['to_id'] ) 
-	        	)
-	        ) {
-		        
-		        App::import('model','DB');
-				$DB = new DB();
-		        
-		        if(
-		        	$data['template_id'] && 
-		        	$template = $DB->selectAssoc("SELECT nazwa, tresc FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'")
-		        ) {
-			        
-		        	$data['content'] = $template['tresc'];
-		        	
-		        	if( !$data['name'] && $template['nazwa'] )
-		        		$data['name'] = $template['nazwa'];
-		        	
-		        }
-		        
-		        if(
-			        isset( $data['template_id'] ) && 
-		        	$data['template_id'] && 
-		        	$template = $DB->selectAssoc("SELECT nazwa, tresc FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'")
-		        ) {
-			        
-		        	$data['content'] = $template['tresc'];
-		        	$data['title'] = $template['nazwa'];
-		        	
-		        	if( !$data['name'] && $template['nazwa'] )
-		        		$data['name'] = $template['nazwa'];
-		        	
-		        }
-		        
-		        if(
-			        isset( $data['to_dataset'] ) && 
-		        	$data['to_dataset'] && 
-		        	isset( $data['to_id'] ) && 
-		        	$data['to_id'] && 
-		        	( $data['to_dataset']=='instytucje') && 
-		        	$to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM administracja_publiczna WHERE id='" . addslashes( $data['to_id'] ) . "'")
-		        ) {
-			       				       	 
-		        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['adres_str'] . '</p>';
-		        	$data['to_name'] = $to['nazwa'];
-		        	$data['to_email'] = $to['email'];
-
-		        	
-		        }
-		        
-	        }
-	        
-	        
-	        if( !$data['name'] )
-	        	$data['name'] = 'Nowe pismo';
+        	$data['title'] = $template['nazwa'];
+        	
+        	if( $data['saved']=='0' ) {
 	        	
-            $this->Document->create();       	 
-	        	        	        
+	        	$data['content'] = $template['tresc'];
+	        	
+	        	if( !$data['name'] && $template['nazwa'] )
+	        		$data['name'] = $template['nazwa'];
+        		
+        	}
+        	
         }
+        
+        
+        if(
+	        isset( $data['to_dataset'] ) && 
+        	$data['to_dataset'] && 
+        	isset( $data['to_id'] ) && 
+        	$data['to_id'] && 
+        	( $data['to_dataset']=='instytucje' ) && 
+        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM administracja_publiczna WHERE id='" . addslashes( $data['to_id'] ) . "'" ) )
+        ) {
+	       	
+	       			       	 
+        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['adres_str'] . '</p>';
+        	$data['to_name'] = $to['nazwa'];
+        	$data['to_email'] = $to['email'];
+
+        	
+        }
+	                
+        	        	        	        
 
 		if( !isset($data['to_dataset']) )
 	        $data['to_dataset'] = false;	        
@@ -309,6 +313,16 @@ class DocumentsController extends AppController
 		*/
 	       
 	    
+	    if( $data['saved']=='0' ) {
+	        
+	        if( !$data['name'] )
+	        	$data['name'] = 'Nowe pismo';
+	        	
+	        $this->Document->create();  
+        
+        } 
+	    
+	    	    
         if ($doc = $this->Document->save(array('Document' => $data))) {
             $this->response->statusCode(201);  // 201 Created
             

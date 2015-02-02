@@ -235,14 +235,11 @@ class Document extends AppModel {
 				)
 					$data['modified_at'] = date($mask, $modified_at);
 											
-				require_once(APP . 'Vendor' . DS . 'autoload.php');
-		        $ES = new Elasticsearch\Client(array(
-			    	'hosts' => array(
-			    		'10.80.53.11:9200',
-			    	),
-			    ));
 				
-				$response = $ES->index(array(
+			    
+			    $ES = ConnectionManager::getDataSource('MPSearch');
+								
+				$response = $ES->API->index(array(
 					'index' => 'mojepanstwo_v1',
 					'type' => 'letters',
 					'id' => $data['alphaid'],
@@ -260,12 +257,7 @@ class Document extends AppModel {
 	
 	public function search($params) {
 		
-		require_once(APP . 'Vendor' . DS . 'autoload.php');
-        $ES = new Elasticsearch\Client(array(
-	    	'hosts' => array(
-	    		'10.80.53.11:9200',
-	    	),
-	    ));
+		$ES = ConnectionManager::getDataSource('MPSearch');
 			
 		$page = isset($params['page']) ? $params['page'] : 1;
 		$from = ($page-1) * 20;		
@@ -297,7 +289,7 @@ class Document extends AppModel {
 		        ),
 	        );
 		
-		$data = $ES->search(array(
+		$data = $ES->API->search(array(
 			'index' => 'mojepanstwo_v1',
 			'type' => 'letters',
 			'body' => array(
@@ -317,7 +309,6 @@ class Document extends AppModel {
 			),
 		));
 		
-						
 		$items = array();
 				
 		foreach( $data['hits']['hits'] as $hit )
@@ -337,6 +328,37 @@ class Document extends AppModel {
 		
 	}
 	
+	public function rename($id, $params) {
+		
+		if( !$params['name'] )
+			return false;
+		
+		App::import('model','DB');
+		$DB = new DB();
+		
+		$q = "UPDATE `pisma_documents` SET `name`='" . addslashes( $params['name'] ) . "' WHERE `alphaid`='" . addslashes($id) . "' AND `from_user_type`='" . addslashes( $params['user']['type'] ) . "' AND `from_user_id`='" . addslashes( $params['user']['id'] ) . "' LIMIT 1";
+		$DB->query($q);
+		
+		if( $DB->getAffectedRows() ) {
+			
+			$ES = ConnectionManager::getDataSource('MPSearch');
+			$ES->API->update(array(
+			    'index' => 'mojepanstwo_v1',
+			    'type' => 'letters',
+			    'id' => $id,
+			    'body' => array(
+				    'doc' => array(
+					    'name' => $params['name'],
+				    ),
+			    ),
+		    ));
+		    
+		    return true;
+			
+		} else return true;
+		
+	}
+	
 	public function delete($id, $params) {
 		
 		App::import('model','DB');
@@ -350,12 +372,7 @@ class Document extends AppModel {
 			$DB->q("UPDATE `pisma_documents` SET `deleted`='1', `deleted_at`=NOW() WHERE `id`='" . $item['id'] . "' LIMIT 1");
 			
 			
-			require_once(APP . 'Vendor' . DS . 'autoload.php');
-	        $ES = new Elasticsearch\Client(array(
-		    	'hosts' => array(
-		    		'10.80.53.11:9200',
-		    	),
-		    ));
+			$ES = ConnectionManager::getDataSource('MPSearch');
 					
 			$deleteParams = array();
 			$deleteParams['index'] = 'mojepanstwo_v1';
@@ -363,7 +380,7 @@ class Document extends AppModel {
 			$deleteParams['id'] = $id;
 			$deleteParams['ignore'] = array(404);
 			
-			$ES->delete($deleteParams);
+			$ES->API->delete($deleteParams);
 						
 			return 200;
 			
@@ -396,14 +413,10 @@ class Document extends AppModel {
 				->replyTo('daniel@macysz.com', 'Nadawca pisma')
 				->send();    	    
     	    
-    	    require_once(APP . 'Vendor' . DS . 'autoload.php');
-	        $ES = new Elasticsearch\Client(array(
-		    	'hosts' => array(
-		    		'10.80.53.11:9200',
-		    	),
-		    ));
+    	    
+    	    $ES = ConnectionManager::getDataSource('MPSearch');
 			
-		    $ES->update(array(
+		    $ES->API->update(array(
 			    'index' => 'mojepanstwo_v1',
 			    'type' => 'letters',
 			    'id' => $id,
@@ -432,16 +445,11 @@ class Document extends AppModel {
 			( $ids = $db->query("SELECT alphaid, saved FROM pisma_documents WHERE $where") ) 
 		) {
 			
-			require_once(APP . 'Vendor' . DS . 'autoload.php');
-	        $ES = new Elasticsearch\Client(array(
-		    	'hosts' => array(
-		    		'10.80.53.11:9200',
-		    	),
-		    ));
+			$ES = ConnectionManager::getDataSource('MPSearch');
 			
 			foreach( $ids as $id ) {
 				if( $id['pisma_documents']['saved'] ) {
-				    $ES->update(array(
+				    $ES->API->update(array(
 					    'index' => 'mojepanstwo_v1',
 					    'type' => 'letters',
 					    'id' => $id['pisma_documents']['alphaid'],

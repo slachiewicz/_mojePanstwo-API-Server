@@ -78,17 +78,19 @@ function number_format_h($n, $decimals = 0, $dec_point = '.', $thousands_sep = '
     return number_format($n, $decimals, $dec_point, $thousands_sep);
 }
 
-function dataSlownie($data)
+function dataSlownie($data, $options = array())
 {
     $_data = $data;
-
+	
+	$relative = isset($options['relative']) ? (boolean) $options['relative'] : true;
+	
     $timestamp = strtotime($data);
     if (!$timestamp)
         return false;
 
     $data = date('Y-m-d', $timestamp);
 
-    if ($data == date('Y-m-d', time())) // TODAY
+    if ( $relative && ($data == date('Y-m-d', time())) ) // TODAY
     {
 
         $str = 'dzisiaj';

@@ -16,6 +16,7 @@ class UsersController extends PaszportAppController
      */
     public function beforeFilter()
     {
+	   	    
         parent::beforeFilter();
 
 //        $this->Auth->allow(array('login', 'add', 'gate', 'api_ping', 'forgot', 'reset', 'fblogin', 'api_gate', 'import','api_fblogin', 'twitterlogin', 'twitter','failed','client'));
@@ -74,7 +75,7 @@ class UsersController extends PaszportAppController
     public function info()
     {
     	$user = $this->user;
-
+			
         if( $user )
         {
             $this->UserAdditionalData->id = $user['id'];

@@ -2,10 +2,11 @@
 
 class DocumentsController extends AppController
 {
+	
     public $uses = array('Dane.Dataobject', 'Pisma.Document');
     public $components = array('Session');
 	
-	protected $user = false;
+	protected $service_user = false;
 	
 	private function crypto_rand_secure($min, $max) {
         $range = $max - $min;
@@ -35,24 +36,24 @@ class DocumentsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-		
+				
 		if( $user = $this->Auth->user() ) {
 			
-			$this->user = array(
+			$this->service_user = array(
 				'type' => 'account',
 				'id' => $user['id'],
 			);
 			
 		} elseif( isset($this->request->data['anonymous_user_id']) ) {
 			
-			$this->user = array(
+			$this->service_user = array(
 				'type' => 'anonymous',
 				'id' => $this->request->data['anonymous_user_id'],
 			);
 						
 		} elseif( isset($this->request->query['anonymous_user_id']) ) {
 			
-			$this->user = array(
+			$this->service_user = array(
 				'type' => 'anonymous',
 				'id' => $this->request->query['anonymous_user_id'],
 			);
@@ -79,8 +80,8 @@ class DocumentsController extends AppController
 	        	is_numeric($this->request->query['page'])
 	        ) ? $this->request->query['page'] : 1,
 	        'q' => (isset( $this->request->query['q'] ) && $this->request->query['q']) ? $this->request->query['q'] : false,
-	        'user_type' => $this->user['type'],
-	        'user_id' => $this->user['id'],
+	        'user_type' => $this->service_user['type'],
+	        'user_id' => $this->service_user['id'],
         );
 						
 		$search = $this->Document->search($params);
@@ -154,7 +155,7 @@ class DocumentsController extends AppController
 			
 			$status = $this->Document->rename($id, array(
 				'name' => $name,
-				'user' => $this->user,
+				'user' => $this->service_user,
 			));
 			
 		}
@@ -172,6 +173,7 @@ class DocumentsController extends AppController
         	'nazwa' => 'name',
         	'tytul' => 'title',
         	'tresc' => 'content',
+        	'tresc_html' => 'content_html',
         	'adresat' => 'to_str',
         	'nadawca' => 'from_str',
         	'miejscowosc' => 'from_location',
@@ -344,8 +346,8 @@ class DocumentsController extends AppController
 
     public function send($id = null) {
         
-        if( $id ) {
-	        
+        if( $id && ($this->service_user['type']=='account') ) {
+	        	        
 	        $status = $this->Document->send($id, $this->user, array());
 	        $this->setSerialized('status', $status);
 	        
@@ -393,8 +395,8 @@ class DocumentsController extends AppController
 		        'id' => $id,
 		        'OR' => array(
 			        array(
-			        	'from_user_type' => $this->user['type'],
-				        'from_user_id' => $this->user['id'],
+			        	'from_user_type' => $this->service_user['type'],
+				        'from_user_id' => $this->service_user['id'],
 				    ),
 				    'access' => 'public',
 			    )

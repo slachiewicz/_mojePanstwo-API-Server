@@ -394,7 +394,7 @@ class Document extends AppModel {
 	        'conditions' => array(
 		        'deleted' => '0',
 		        'id' => $id,
-		        'from_user_type' => $user['type'],
+		        'from_user_type' => 'account',
 		        'from_user_id' => $user['id'],
 	        ),
         )) ) {
@@ -402,15 +402,19 @@ class Document extends AppModel {
 	    	$pismo = $pismo['Document'];	    	
 	    	App::uses('CakeEmail', 'Network/Email');
 	    	
+	    
+	    	
 			$Email = new CakeEmail('pisma');
 			$Email->viewVars(array('pismo' => $pismo));
 			$status = $Email->template('Pisma.pismo', 'Pisma.layout')
 				->addHeaders(array('X-Mailer' => 'mojePaństwo'))
 				->emailFormat('html')
 				->subject($pismo['title'])
-				->to('daniel.macyszyn@epf.org.pl', 'Daniel Macyszyn')
+				->to($pismo['to_email'], $pismo['to_name'])
+				// ->to('daniel.macyszyn@epf.org.pl', 'Daniel Macyszyn')
 				->from('pisma@mojepanstwo.pl', 'Pisma | mojePaństwo')
-				->replyTo('daniel@macysz.com', 'Nadawca pisma')
+				->replyTo($user['email'], $user['username'])
+				->cc($user['email'], $user['username'])
 				->send();    	    
     	    
     	    

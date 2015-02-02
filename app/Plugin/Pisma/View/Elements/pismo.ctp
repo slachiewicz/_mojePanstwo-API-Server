@@ -10,7 +10,7 @@
                                     <?= '<p>' . str_replace("\n", '</p><p>', $pismo['nadawca']) . '</p>' ?>
                                 </td>
                                 <td align="right" valign="top">
-                                    <?= '<p>' . $this->Czas->dataSlownie( $pismo['data_pisma'] ) . '</p>' ?>
+                                    <?= '<p>' . $this->Czas->dataSlownie( $pismo['data_pisma'], array('relative'=>false) ) . '</p>' ?>
                                 </td>
                             </tr>
                         </table>

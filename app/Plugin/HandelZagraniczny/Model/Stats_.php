@@ -16,7 +16,7 @@ class Stats extends AppModel
         $order = (isset($params['order']) && $params['order'] == 'eksport') ? 'eksport' : 'import';
 
         $data = $DB->selectAssocs("
-          SELECT hz_panstwa.id, hz_data.rocznik, hz_data.typ, hz_panstwa.nazwa, hz_panstwa.symbol, hz_data.wartosc_pln
+          SELECT hz_data.rocznik, hz_data.typ, hz_panstwa.nazwa, hz_panstwa.symbol, hz_data.wartosc_pln
           FROM hz_data
           JOIN hz_panstwa ON hz_panstwa.id = hz_data.panstwo_id
           WHERE

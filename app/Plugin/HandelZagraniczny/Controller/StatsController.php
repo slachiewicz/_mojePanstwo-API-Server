@@ -65,6 +65,24 @@ class StatsController extends AppController
         $this->set('_serialize', 'data');
     }
 
+    public function getSymbols()
+    {
+        $params = array(
+            'parent_id' => 0,
+            'year'      => 2014,
+            'type'      => 'import',
+            'limit'     => 5
+        );
+
+        foreach($params as $param => $value) {
+            if(isset($this->request->query[$param]))
+                $params[$param] = $this->request->query[$param];
+        }
+
+        $this->set('data', $this->Stats->getSymbols($params));
+        $this->set('_serialize', 'data');
+    }
+
     public function getTopSymbolsData()
     {
         $year = $this->countriesDataYearValidator($this->request->query);

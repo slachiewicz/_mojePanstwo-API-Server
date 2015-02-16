@@ -30,6 +30,13 @@ class MPCache extends AppModel {
 		
 	}
 	
+	public function getDatasetId($dataset) {
+		
+		$path = 'data/datasets-map/';
+		return json_decode( $this->getDataSource()->get($path . $dataset), true );
+		
+	}
+	
 	public function getApp($app, $full = false) {
 		
 		$path = 'data/apps/' . $app;

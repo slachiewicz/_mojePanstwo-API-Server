@@ -68,10 +68,11 @@ class StatsController extends AppController
     public function getSymbols()
     {
         $params = array(
-            'parent_id' => 0,
-            'year'      => 2014,
-            'type'      => 'import',
-            'limit'     => 5
+            'parent_id'     => 0,
+            'year'          => 2014,
+            'type'          => 'import',
+            'limit'         => 5,
+            'country_id'    => 0,
         );
 
         foreach($params as $param => $value) {

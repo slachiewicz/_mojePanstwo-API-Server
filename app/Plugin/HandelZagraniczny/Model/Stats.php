@@ -140,6 +140,12 @@ class Stats extends AppModel
         $parent_id = isset($params['parent_id']) ? (int) $params['parent_id'] : 0;
         $type = isset($params['type']) && $params['type'] == 'import' ? 'import' : 'eksport';
         $limit = isset($params['limit']) ? (int) $params['limit'] : 5;
+        $country_id = isset($params['country_id']) ? (int) $params['country_id'] : 0;
+
+        $country_where = '';
+        if($country_id > 0)
+            $country_where = 'AND hz_data.panstwo_id = '.$country_id;
+
 
         App::import('model', 'DB');
         $db = new DB();
@@ -155,6 +161,7 @@ class Stats extends AppModel
             hz_data.rocznik = $year AND
             hz_cn_symbole.parent_id = $parent_id AND
             hz_data.typ = '$type'
+            $country_where
           GROUP BY hz_data.symbol_id
           ORDER BY wartosc_pln DESC
           LIMIT $limit

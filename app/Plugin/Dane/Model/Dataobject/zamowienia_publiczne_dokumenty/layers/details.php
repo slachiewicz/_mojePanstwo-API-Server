@@ -2,6 +2,9 @@
 	
 	$output = array();
 	
+	$load_dat = false;
+	
+	
 	
 	if( $this->data['data']['zamowienia_publiczne_dokumenty.typ_id']=='1' ) {
 		
@@ -9,23 +12,12 @@
 		
 		// $output['kryteria'] = $this->DB->selectAssocs("SELECT `nazwa`, `punkty` FROM `uzp_dokumenty_kryteria` WHERE `dokument_id`='" . $id . "' AND `deleted`='0' ORDER BY `ord` ASC");
 		
-		$body = $this->S3Files->getBody('resources/UZP-details/' . $id . '.dat');
-		
-		if( $body && ($data = unserialize($body)) && is_array($data) ) {
-			
-			foreach( $data as $key => $value )
-				if( in_array(str_ireplace('.', '', $value), array('Brak warunku szczegółowego', 'Zamawiający nie stawia szczególnych wymagań do tego warunku', 'nie określa się', 'Zamawiający nie wyznacza szczegółowego warunku w tym zakresie', 'Zamawiający nie stawia specjalnych wymagań odnośnie spełnienia tego warunku', 'Nie dotyczy', 'nie dotyczy', 'Zamawiający nie określa szczegółowo tego warunku', 'zamawiający nie precyzuje warunku w tym zakresie')) )
-					unset( $data[ $key ] );
-			
-			unset( $data['niepelnosprawne'] );
-			$output = array_merge($output, $data);
-			
-		}
+		$load_dat = true;
 		
 	} elseif( $this->data['data']['zamowienia_publiczne_dokumenty.typ_id']=='2' ) {
 		
 		
-		
+		$load_dat = true;
 		
 		
 		
@@ -101,8 +93,45 @@
 		
 		$output['czesci-wykonawcy'] = $czesci;
 		
+		$load_dat = true;
 		
 
+	}
+	
+	$output['data'] = $this->DB->selectAssoc("SELECT `ogloszenie_pozycja_numer` as 'numer', `data_publikacji` as 'data' FROM `uzp_dokumenty` WHERE `id`='$id' AND akcept='1'");
+	
+	if( $load_dat ) {
+		
+		$body = $this->S3Files->getBody('resources/UZP-details/' . $id . '.dat');
+		
+		if( $body && ($data = unserialize($body)) && is_array($data) ) {
+			
+			foreach( $data as $key => $value )
+				if( in_array(str_ireplace('.', '', $value), array('Brak warunku szczegółowego', 'Zamawiający nie stawia szczególnych wymagań do tego warunku', 'nie określa się', 'Zamawiający nie wyznacza szczegółowego warunku w tym zakresie', 'Zamawiający nie stawia specjalnych wymagań odnośnie spełnienia tego warunku', 'Nie dotyczy', 'nie dotyczy', 'Zamawiający nie określa szczegółowo tego warunku', 'zamawiający nie precyzuje warunku w tym zakresie')) )
+					unset( $data[ $key ] );
+			
+			unset( $data['niepelnosprawne'] );
+			$output = array_merge($output, $data);
+			
+		}
+		
+	}
+	
+	if( 
+		( $this->data['data']['zamowienia_publiczne_dokumenty.typ_id']=='1' ) || 
+		( 
+			( $this->data['data']['zamowienia_publiczne_dokumenty.tryb_id']=='3' ) &&
+			( $this->data['data']['zamowienia_publiczne_dokumenty.typ_id']=='3' ) 
+		) ||
+		( 
+			( $this->data['data']['zamowienia_publiczne_dokumenty.tryb_id']=='2' ) &&
+			( $this->data['data']['zamowienia_publiczne_dokumenty.typ_id']=='3' ) 
+		) 
+	) {
+	} else {
+		
+		unset( $output['przedmiot'] );
+		
 	}
 	
 	return $output;

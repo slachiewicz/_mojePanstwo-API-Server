@@ -126,8 +126,18 @@ class MPSearch {
     		'id' => $doc['fields']['id'][0],
     		'slug' => $doc['fields']['slug'][0],
             'score' => $doc['_score'],
-            'data' => $doc['fields']['source'][0]['data'],            
+            'data' => $doc['fields']['source'][0]['data'],     
     	);
+    	
+    	
+    	if( 
+	    	isset( $doc['fields']['source'][0]['static'] ) && 
+	    	!empty( $doc['fields']['source'][0]['static'] )
+    	) {
+	    	
+			$output['static'] = $doc['fields']['source'][0]['static'];
+	    	
+	    }
     	
     	if( 
 	    	isset( $doc['fields']['source'][0]['contexts'] ) && 
@@ -510,18 +520,18 @@ class MPSearch {
 				'fields' => array('dataset', 'id', 'slug'),
 				'partial_fields' => array(
 					'source' => array(
-						'include' => array('data'),
+						'include' => array('data', 'static'),
 					),
 				),
 			),
 		);
-		
-		
+				
 		if( !empty($queryFields) )
 			$params['body']['partial_fields']['source']['include'] = $queryFields;
 			
 		if( !empty($queryContext) )
 			$params['body']['partial_fields']['source']['include'] = array_merge($params['body']['partial_fields']['source']['include'], array('contexts.' . $queryContext . '.*'));
+		
 		
 		
 		$sort = array();

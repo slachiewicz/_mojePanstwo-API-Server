@@ -13,9 +13,69 @@ App::import('model', 'MPCache');
 
 class BDLController extends AppController
 {
+
     public $uses = array('Dane.Dataobject', 'BDL.Podgrupa', 'BDL.DataPl',
         'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje',
     );
+
+    /**
+     * Pobiera dane dla danej konfiguracji ustawień
+     */
+    public function getDataForIndicatorSet()
+    {
+        $options = array(
+            'w1', 'w2', 'w3', 'w4', 'w5'
+        );
+
+        App::import('model','DB');
+        $DB = new DB();
+
+        $where = '';
+        foreach($this->request->query as $name => $val) {
+            if(in_array($name, $options)) {
+                $where .= "`$name` = '$val' AND ";
+            }
+        }
+        $where = substr($where, 0, -4);
+
+        $data = $DB->selectAssocs("
+            SELECT rocznik, v, a, kombinacja_id FROM `BDL_data_pl` WHERE $where AND deleted='0' ORDER BY rocznik DESC LIMIT 1
+        ");
+
+        $this->setSerialized('data', $data);
+    }
+
+    public function getCategories()
+    {
+        App::import('model','DB');
+        $DB = new DB();
+
+        $cache = new MPCache();
+        $cacheClient = $cache->getDataSource()->getRedisClient();
+        $cacheKey = 'bdl/getCategories';
+
+        if($cacheClient->exists($cacheKey)) {
+            $categories = json_decode($cacheClient->get($cacheKey));
+        } else {
+            $categories = $DB->selectAssocs("
+                SELECT id, w_tytul, tytul FROM BDL_kategorie WHERE deleted = '0' AND okres = 'R'
+            ");
+
+            foreach ($categories as $i => $category) {
+                $categories[$i]['groups'] = $DB->selectAssocs("
+                    SELECT id, tytul FROM BDL_grupy WHERE kat_id = " . $category['id'] . " AND deleted = '0' AND okres = 'R'
+                ");
+
+                foreach ($categories[$i]['groups'] as $m => $group) {
+                    $categories[$i]['groups'][$m]['subgroups'] = $DB->selectAssocs("
+                        SELECT id, tytul FROM BDL_podgrupy WHERE grupa_id = " . $group['id'] . " AND deleted = '0' AND okres = 'R'
+                    ");
+                }
+            }
+        }
+
+        $this->setSerialized('categories', $categories);
+    }
 
     public function categories()
     {

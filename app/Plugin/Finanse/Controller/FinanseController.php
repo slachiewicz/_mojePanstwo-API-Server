@@ -42,6 +42,13 @@ class FinanseController extends AppController
         $this->set('data', $data);
         $this->set('_serialize', 'data');
     }
+
+    public function getCommuneBudgetData()
+    {
+        $data = array(1,2,3);
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+    }
     
 
 } 

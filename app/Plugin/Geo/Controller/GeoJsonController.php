@@ -5,8 +5,9 @@ App::import('model', 'DB');
 
 class GeoJsonController extends AppController
 {
-    public $uses = array('Dane.Dataobject');
-
+    public $uses = array('Dane.Dataobject', 'Geo.GeoJsonMP');
+	
+	/*
     public function pl() {
         $this->viewClass = 'Media';
 
@@ -21,10 +22,13 @@ class GeoJsonController extends AppController
 
         $this->set($params);
     }
+    */
 
     private function getAggregatedGeojson($dataset, $table) {
         $this->DB = new DB();
-
+				
+		
+		/*
         // Try cache
         $cacheKey = "geojson/agg/$dataset";
 
@@ -60,6 +64,8 @@ class GeoJsonController extends AppController
             // Put in cache
             $cacheClient->set($cacheKey, json_encode($featc));
         }
+        */
+        
 
         $this->setSerialized('featc', $featc);
     }
@@ -74,5 +80,11 @@ class GeoJsonController extends AppController
 
     public function gminy() {
         $this->getAggregatedGeojson('gminy', 'pl_gminy');
+    }
+    
+    public function pl() {
+	    $data = $this->GeoJsonMP->getData();	    
+	    $this->setSerialized('data', $data);
+	    
     }
 } 

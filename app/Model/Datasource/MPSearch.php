@@ -867,7 +867,7 @@ class MPSearch {
         // Configure::write('debug', 2);
         // echo "\n\n"; debug( $params );
 	    $es_result = $this->API->search( $params );
-        // echo "\n\n"; debug( $es_result );
+        // echo "\n\n"; debug( $es_result ); die();
         
         
         

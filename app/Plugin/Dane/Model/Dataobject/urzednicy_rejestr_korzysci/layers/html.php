@@ -1,7 +1,5 @@
 <?
-// TODO optimalize and cache urzednicy_rejestr_korzysci.html_sha1 in Elastic Search
-$html_sha1 = $this->DB->selectValue("
-	SELECT html_sha1 FROM administracja_publiczna_rejestr_korzysci WHERE id = " . addslashes($id));
+$html_sha1 = $this->data['data']['urzednicy_rejestr_korzysci.html_sha1'];
 
 if (!$html_sha1) {
 	return false;

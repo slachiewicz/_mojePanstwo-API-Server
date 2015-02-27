@@ -6,10 +6,6 @@ $html_sha1 = $this->DB->selectValue("
 if (!$html_sha1) {
 	return false;
 }
-//
-//public $components = array(
-//	'S3',
-//);
 
 $osoba_id = $this->data['data']['urzednicy_rejestr_korzysci.osoba_id'];
 $url = 'resources/PKW/urzednicy/deklaracje/' . $osoba_id . '/' . $html_sha1 . '.html';

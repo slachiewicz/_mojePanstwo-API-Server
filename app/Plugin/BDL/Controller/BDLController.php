@@ -17,8 +17,14 @@ class BDLController extends AppController
     public $uses = array('Dane.Dataobject', 'BDL.Podgrupa', 'BDL.DataPl',
         'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje',
     );
+	
+	public function getDataForDims() {
+		
+		// PARAMS: wskaznik_id + 5 dims
+		
+	}
 
-    /**
+   /**
      * Pobiera dane dla danej konfiguracji ustawień
      */
     public function getDataForIndicatorSet()
@@ -30,21 +36,79 @@ class BDLController extends AppController
         App::import('model','DB');
         $DB = new DB();
 
-        $where = '';
-        foreach($this->request->query as $name => $val) {
-            if(in_array($name, $options)) {
-                $where .= "`$name` = '$val' AND ";
-            }
+        $types = array(
+            'wojewodztwo',
+            'powiat',
+            'gmina'
+        );
+
+        if(isset($this->request->query['type'])) {
+            if(in_array($this->request->query['type'], $types))
+                $type = $this->request->query['type'];
+            else
+                $type = $types[0];
         }
+        else
+            $type = $types[0];
+
+        $tables = array(
+            'wojewodztwo'   => array(
+                'name'  => 'BDL_data_wojewodztwa',
+                'field' => 'wojewodztwo_id'
+            ),
+            'powiat'    => array(
+                'name'  => 'BDL_data_powiaty',
+                'field' => 'powiat_id'
+            ),
+            'gmina'     => array(
+                'name'  => 'BDL_data_gminy',
+                'field' => 'gmina_id'
+            ),
+        );
+
+        $table = $tables[$type];
+
+        $where = '';
+        foreach($options as $name) {
+            $v = 0;
+            if(isset($this->request->query[$name]))
+                $v = (int) $this->request->query[$name];
+            $where .= "`$name` = '$v' AND ";
+        }
+
         $where = substr($where, 0, -4);
 
+        $kombinacja = $DB->selectAssoc("SELECT id, jednostka, ly, lv FROM BDL_wymiary_kombinacje WHERE $where");
+        $kombinacja_id = (int) $kombinacja['id'];
+        $unit = $kombinacja['jednostka'];
+        $value = $kombinacja['lv'];
+
+
+        /* $y = $DB->selectAssocs("SELECT rocznik FROM ".$table['name']." WHERE kombinacja_id = $kombinacja_id AND deleted='0' GROUP BY rocznik ORDER BY rocznik DESC");
+        $years = array();
+        foreach($y as $yr)
+            $years[] = (int) $yr['rocznik']; */
+
+        $year = (int) $kombinacja['ly'];
+        if(isset($this->request->query['year'])) {
+            if(in_array($this->request->query['year'], $years))
+                $year = (int) $this->request->query['year'];
+        }
+
         $data = $DB->selectAssocs("
-            SELECT rocznik, v, a, kombinacja_id FROM `BDL_data_pl` WHERE $where AND deleted='0' ORDER BY rocznik DESC LIMIT 1
+            SELECT v, ".$table['field']." FROM ".$table['name']." WHERE kombinacja_id = $kombinacja_id AND rocznik = $year AND deleted='0' ORDER BY ".$table['field']." ASC
         ");
 
-        $this->setSerialized('data', $data);
+        $this->setSerialized('data', array(
+            // 'years' => $years,
+            'data'  => $data,
+            'unit'  => $unit,
+            'year'  => $year,
+            'value' => $value
+        ));
     }
 
+	
     public function getCategories()
     {
         App::import('model','DB');

@@ -38,7 +38,7 @@ $data['sections'] = $this->DB->selectAssocs("
       pl_budzety_wydatki_dzialy
         ON pl_budzety_wydatki_dzialy.id = mf_wydatki_dzialy_zakresy.dzial_id
     WHERE
-      mf_wydatki_dzialy_zakresy.zakres = '$range' AND mf_wydatki_dzialy_zakresy.sum_wydatki>0
+      mf_wydatki_dzialy_zakresy.zakres = '$range'
     GROUP BY
       mf_wydatki_dzialy_zakresy.dzial_id
     ORDER BY

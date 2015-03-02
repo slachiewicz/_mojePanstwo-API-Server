@@ -193,10 +193,12 @@ class Document extends AppModel {
 				
 				if(
 					( $db = ConnectionManager::getDataSource('default') ) && 
-					( $dbdata = $db->query("SELECT id, hash FROM pisma_documents WHERE alphaid='" . addslashes( $data['alphaid'] ) . "'") ) 
-				)				
+					( $dbdata = $db->query("SELECT id, hash, to_name FROM pisma_documents WHERE alphaid='" . addslashes( $data['alphaid'] ) . "'") ) 
+				) {		
 					$data['id'] = $dbdata[0]['pisma_documents']['id'];
 					$data['hash'] = $dbdata[0]['pisma_documents']['hash'];
+					$data['to_name'] = $dbdata[0]['pisma_documents']['to_name'];
+				}
 									
 				// SEND TO THUMBNAILS GENERATOR
 				
@@ -238,7 +240,9 @@ class Document extends AppModel {
 				
 			    
 			    $ES = ConnectionManager::getDataSource('MPSearch');
-								
+				
+				debug( $data );
+				
 				$response = $ES->API->index(array(
 					'index' => 'mojepanstwo_v1',
 					'type' => 'letters',
@@ -308,6 +312,8 @@ class Document extends AppModel {
 				),
 			),
 		));
+		
+		// debug($data); die();
 		
 		$items = array();
 				

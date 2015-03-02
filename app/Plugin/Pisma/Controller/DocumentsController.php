@@ -257,10 +257,10 @@ class DocumentsController extends AppController
         if(
 	        isset( $data['template_id'] ) && 
         	$data['template_id'] && 
-        	$template = $DB->selectAssoc("SELECT nazwa, tresc FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'")
+        	$template = $DB->selectAssoc("SELECT nazwa, tresc, tytul FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'")
         ) {
 	        
-        	$data['title'] = $template['nazwa'];
+        	$data['title'] = $template['tytul'] ? $template['tytul'] : $template['nazwa'];
         	
         	if( $data['saved']=='0' ) {
 	        	
@@ -278,15 +278,29 @@ class DocumentsController extends AppController
 	        isset( $data['to_dataset'] ) && 
         	$data['to_dataset'] && 
         	isset( $data['to_id'] ) && 
-        	$data['to_id'] && 
-        	( $data['to_dataset']=='instytucje' ) && 
-        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM administracja_publiczna WHERE id='" . addslashes( $data['to_id'] ) . "'" ) )
+        	$data['to_id']
         ) {
 	       	
-	       			       	 
-        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['adres_str'] . '</p>';
-        	$data['to_name'] = $to['nazwa'];
-        	$data['to_email'] = $to['email'];
+	       	
+	       	if(
+		       	( $data['to_dataset']=='instytucje' ) && 
+	        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM administracja_publiczna WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+	        ) {
+	       		       	 
+	        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['adres_str'] . '</p>';
+	        	$data['to_name'] = $to['nazwa'];
+	        	$data['to_email'] = $to['email'];
+        	
+        	} elseif(
+	        	( $data['to_dataset']=='radni_gmin' ) && 
+	        	( $to = $DB->selectAssoc("SELECT pl_gminy_radni.id, pl_gminy_radni.nazwa, pl_gminy_radni_krakow.email FROM pl_gminy_radni LEFT JOIN pl_gminy_radni_krakow ON pl_gminy_radni.id=pl_gminy_radni_krakow.id WHERE pl_gminy_radni.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	
+	        	$data['to_str'] = '<p>Radny Miasta Kraków</p><p>' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+	        	$data['to_name'] = 'Radny Miasta Kraków - ' . $to['nazwa'];
+	        	$data['to_email'] = $to['email'];
+	        	
+        	}
 
         	
         }

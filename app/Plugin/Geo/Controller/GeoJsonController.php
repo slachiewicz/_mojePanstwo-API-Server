@@ -81,10 +81,70 @@ class GeoJsonController extends AppController
     public function gminy() {
         $this->getAggregatedGeojson('gminy', 'pl_gminy');
     }
-    
+
+    public function get() {
+        $params = (array) $this->request->query;
+        $quality = $this->getQuality($params);
+        $types = $this->getTypes($params);
+        $elements = $this->getElements($params);
+
+        $data = $this->GeoJsonMP->getMapData($quality, $types, $elements);
+        $this->setSerialized('data', $data);
+    }
+
+    private function getElements($params) {
+        $e = array('wojewodztwa', 'gminy', 'powiaty');
+        $elements = array();
+        foreach($e as $type) {
+            $elements[$type] = array();
+            if(isset($params[$type])) {
+                if(strpos('x'.$params[$type],',')) {
+                    $ids = explode(',', $params[$type]);
+                    foreach($ids as $id) {
+                        $elements[$type][] = (int) $id;
+                    }
+                } else {
+                    $elements[$type][] = (int) $params[$type];
+                }
+            }
+        }
+
+        return $elements;
+    }
+
+    private function getTypes($params) {
+        $d = array('wojewodztwa', 'gminy', 'powiaty');
+        if(!isset($params['types']))
+            return array($d[0]);
+        if(strpos('x'.$params['types'],',')) {
+            $types = explode(',', $params['types']);
+            $t = array();
+            foreach($types as $type) {
+                if(in_array($type, $d))
+                    $t[] = $type;
+            }
+            if(count($t) > 0) {
+                return $t;
+            } else {
+                return array($d[0]);
+            }
+        } else {
+            if(in_array($params['types'], $d))
+                return array($params['types']);
+            else
+                return array($d[0]);
+        }
+    }
+
+    private function getQuality($params) {
+        $q = (int) @$params['quality'];
+        if($q >= 1 && $q <= 4)
+            return $q;
+        return 4;
+    }
+
     public function pl() {
 	    $data = $this->GeoJsonMP->getData();	    
 	    $this->setSerialized('data', $data);
-	    
     }
 } 

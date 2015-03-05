@@ -17,14 +17,8 @@ class BDLController extends AppController
     public $uses = array('Dane.Dataobject', 'BDL.Podgrupa', 'BDL.DataPl',
         'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje',
     );
-	
-	public function getDataForDims() {
-		
-		// PARAMS: wskaznik_id + 5 dims
-		
-	}
 
-   /**
+    /**
      * Pobiera dane dla danej konfiguracji ustawień
      */
     public function getDataForIndicatorSet()
@@ -108,7 +102,6 @@ class BDLController extends AppController
         ));
     }
 
-	
     public function getCategories()
     {
         App::import('model','DB');

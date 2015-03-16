@@ -101,6 +101,43 @@ class BDLController extends AppController
             'value' => $value
         ));
     }
+	
+	public function getCategory()
+	{
+		$id = (int) @$this->request->query['id'];
+		if(!$id)
+			throw new BadRequestException('id parameter is required');
+		
+        App::import('model','DB');
+        $DB = new DB();
+		$category = array();
+		
+		$cache = new MPCache();
+        $cacheClient = $cache->getDataSource()->getRedisClient();
+        $cacheKey = 'bdl/getCategory/'.$id;
+		
+		if($cacheClient->exists($cacheKey)) 
+            $category = json_decode($cacheClient->get($cacheKey));
+		else 
+		{
+			$category = array(
+				'id' => $id,
+				'groups' => array()
+			);
+			
+			$category['groups'] = $DB->selectAssocs("
+				SELECT id, tytul FROM BDL_grupy WHERE kat_id = ".$category['id']." AND deleted = '0' AND okres = 'R'
+			");
+			
+			foreach($category['groups'] as $i => $group) {
+				$category['groups'][$i]['subgroups'] = $DB->selectAssocs("
+					SELECT id, tytul FROM BDL_podgrupy WHERE grupa_id = " . $group['id'] . " AND deleted = '0' AND okres = 'R'
+				");
+			}	
+		}
+		
+		$this->setSerialized('category', $category);
+	}
 
     public function getCategories()
     {

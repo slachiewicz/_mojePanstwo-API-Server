@@ -4,7 +4,7 @@ class DataobjectsController extends AppController
 {
     public $uses = array('Dane.Dataset', 'Dane.Dataobject');
 	public $components = array('S3');
-
+		
 	public function suggest()
     {
 
@@ -153,6 +153,21 @@ class DataobjectsController extends AppController
             '_serialize' => 'queries',
         ));
     }
-
+	
+	public function subscribe($object_id)
+	{
+		
+		if( $this->user_id ) {
+			
+			$status = $this->Dataobject->subscribe($object_id, $this->user_id);
+			
+			$this->set(array(
+	            'status' => 'OK',
+	            '_serialize' => array('status'),
+	        ));
+        
+        }
+		
+	}
 
 }

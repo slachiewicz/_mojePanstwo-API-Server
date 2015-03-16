@@ -22,5 +22,7 @@ Router::connect('/dane/:alias/:object_id', array('plugin' => 'Dane', 'controller
 
 Router::connect('/dane/:alias/:object_id/feed', array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'feed'), array('object_id' => '[0-9]+'));
 
+Router::connect('/dane/:alias/:object_id/subscribe', array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'subscribe'), array('object_id' => '[0-9]+', 'pass' => array('object_id')));
+
 
 Router::connect('/dane/:alias/:object_id/:layer', array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view_layer'), array('object_id' => '[0-9]+'));

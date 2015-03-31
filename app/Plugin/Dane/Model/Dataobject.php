@@ -33,33 +33,13 @@ class Dataobject extends AppModel
     public static function mpUrl(&$o) {
         return 'http://mojepanstwo.pl/dane/' . $o['dataset'] .'/' . $o['id'];
     }
-
-
+	
+	/*
     public function setId($id)
     {
 
         return $this->id = $id;
 
-    }
-
-    public function find($type = 'first', $queryData = array())
-    {
-
-        /*
-        $queryData = array_merge(array(
-            'fields' => array('id', 'alias', 'name', 'count'),
-            'order' => array('ord' => 'asc'),
-            'limit' => 100,
-        ), $queryData);
-        */
-
-        $objects = parent::find($type, $queryData);
-
-        foreach($objects['dataobjects'] as &$o) {
-            $this->fillIDs($o);
-        }
-
-        return $objects;
     }
 
     public function getObject($dataset, $id, $params = array(), $throw_not_found = false)
@@ -132,6 +112,7 @@ class Dataobject extends AppModel
 
         return $this->data;
     }
+    */
     
     public function getRedirect($dataset, $id)
     {
@@ -168,15 +149,30 @@ class Dataobject extends AppModel
     public function getObjectLayer($dataset, $id, $layer, $params = array())
     {
     	
+    	/*
+    	debug(array(
+	    	'function' => 'getObjectLayer',
+	    	'dataset' => $dataset,
+	    	'id' => $id,
+	    	'layer' => $layer,
+	    	'params' => $params,
+    	));
+    	*/
+    	
     	$id = (int) $id;
     	
         $file = ROOT . DS . APP_DIR . DS . 'Plugin' . DS . 'Dane' . DS . 'Model' . DS . 'Dataobject' . DS . $dataset . DS . 'layers' . DS . $layer . '.php';
-
+		
+		/*
+		debug(array(
+			'file' => $file,
+			'file_exists' => file_exists($file),
+			'data' => $this->data,
+		));
+		*/
+		
         if (!file_exists($file))
             return false;
-		
-		if( empty($this->data) )
-			$this->getObject($dataset, $id);
 		
         App::import('model', 'DB');
         $this->DB = new DB();
@@ -188,30 +184,6 @@ class Dataobject extends AppModel
 		$this->ES = ConnectionManager::getDataSource('MPSearch');
 
         $output = include($file);
-        if ($layer == 'related') {
-
-            if (@!empty($output['groups']))
-                foreach ($output['groups'] as &$group) {
-
-                    $objects = $group['objects'];
-                    $search = $this->find('all', array(
-                        'objects' => $objects,
-                    ));
-
-                    $search_objects = $search['dataobjects'];
-                    $group['objects'] = array();
-					
-                    for ($i = 0; $i < count($objects); $i++) {
-												
-                        reset($search_objects);
-                        foreach ($search_objects as &$search_object)
-                            if (($search_object['dataset'] == $objects[$i]['dataset']) && ($search_object['id'] == $objects[$i]['object_id']))
-                                $group['objects'][] = $search_object;
-
-                    }
-
-                }
-        }
         return $output;
     }
     
@@ -249,6 +221,7 @@ class Dataobject extends AppModel
 	    
     }
     
+    /*
     public function search($aliases, $queryData = array()) {
 	    	    
 	   	$filters = array();
@@ -287,20 +260,20 @@ class Dataobject extends AppModel
 			
 			$facets[] = 'dataset';
 			
-			/*
-			$facets_dict = array();
-			if( isset($dataset['filters']) ) {
-					
-				foreach( $dataset['filters'] as $filter ) 
-					if( ( $filter = $filter['filter'] ) && in_array($filter['typ_id'], array(1, 2)) ) {
-											
-						$facets[] = array($filter['field'], in_array($filter['field'], $virtual_fields));
-						$facets_dict[ $filter['field'] ] = $filter;
-					
-					}
 			
-			}
-			*/
+			// $facets_dict = array();
+			// if( isset($dataset['filters']) ) {
+					
+			// 	foreach( $dataset['filters'] as $filter ) 
+			// 		if( ( $filter = $filter['filter'] ) && in_array($filter['typ_id'], array(1, 2)) ) {
+											
+			// 			$facets[] = array($filter['field'], in_array($filter['field'], $virtual_fields));
+			// 			$facets_dict[ $filter['field'] ] = $filter;
+					
+			// 		}
+			
+			// }
+			
 		
 		}
 		
@@ -375,7 +348,9 @@ class Dataobject extends AppModel
 		return $search;
 	    
     }
+    */
     
+    /*
     public function getFeed($id, $params) {
 	    	    	    
 	    $feed = $id;
@@ -400,6 +375,105 @@ class Dataobject extends AppModel
 	    $search = $this->find('all', $params);
         
         return $search;
+	    
+    }
+    */
+    
+    public function subscribe($params) {
+	    
+	    App::import('model', 'DB');
+        $this->DB = new DB();
+        
+        if(
+	        isset( $params['dataset'] ) && 
+	        isset( $params['id'] ) && 
+	        is_numeric( $params['id'] ) && 
+	        ( $global_id = $this->DB->selectValue("SELECT `id` FROM `objects` WHERE `dataset`='" . addslashes( $params['dataset'] ) . "' AND `object_id`='" . $params['id'] . "'") )
+        ) {
+	        
+	        $this->DB->insertUpdateAssoc('objects_subscriptions', array(
+		        'id' => $global_id,
+		        'dataset' => $params['dataset'],
+		        'object_id' => $params['id'],
+		        'user_type' => $params['user_type'],
+		        'user_id' => $params['user_id'],
+		        'deleted' => '0',
+		        'mts' => 'NOW()',
+	        ));
+	        
+	        App::Import('ConnectionManager');
+			$this->ES = ConnectionManager::getDataSource('MPSearch');
+			
+			$es_params = array();
+			$es_params['index'] = 'mojepanstwo_v1';
+			$es_params['type']  = 'subs';
+			$es_params['parent']  = $global_id;
+			$es_params['id']  = $global_id . '-' . $params['user_type'] . '-' . $params['user_id'];
+			$es_params['body']  = array(
+				'user_type' => $params['user_type'],
+				'user_id' => $params['user_id'],
+			);
+			
+			$ret = $this->ES->API->index($es_params);
+	        return true;
+	        
+        } else {
+	        
+	        throw new BadRequestException();
+	        
+        }
+        	    
+    }
+    
+    public function unsubscribe($params) {
+	    
+	    App::import('model', 'DB');
+        $this->DB = new DB();
+        
+        if(
+	        isset( $params['dataset'] ) && 
+	        isset( $params['id'] ) && 
+	        is_numeric( $params['id'] ) && 
+	        ( $global_id = $this->DB->selectValue("SELECT `id` FROM `objects` WHERE `dataset`='" . addslashes( $params['dataset'] ) . "' AND `object_id`='" . $params['id'] . "'") )
+        ) {
+	        
+	        $this->DB->q("UPDATE `objects_subscriptions` SET `deleted`='1' WHERE `id`='" . $global_id . "' AND `user_type`='" . $params['user_type'] . "' AND `user_id`='" . $params['user_id'] . "' AND `deleted`='0'");
+	        
+	        App::Import('ConnectionManager');
+			$this->ES = ConnectionManager::getDataSource('MPSearch');
+			
+			$deleteParams = array();
+			$deleteParams['index'] = 'mojepanstwo_v1';
+			$deleteParams['type'] = 'subs';
+			$deleteParams['id'] = $global_id . '-' . $params['user_type'] . '-' . $params['user_id'];
+		    $deleteParams['ignore'] = array(404);
+			
+			$ret = $this->ES->API->delete($deleteParams);
+	        return true;
+	        	        
+        } else {
+	        
+	        throw new BadRequestException();
+	        
+        }
+        	    
+    }
+    
+    public function checkSubscribtion($params) {
+	    
+	    App::import('model', 'DB');
+        $this->DB = new DB();
+	    
+	    if(
+		    isset($params['global_id']) &&  
+		    isset($params['user_type']) &&  
+		    isset($params['user_id']) && 
+		    ( $subscribtion = $this->DB->selectAssoc("SELECT `mts` FROM `objects_subscriptions` WHERE `id`='" . addslashes( $params['global_id'] ) . "' AND `user_type`='" . addslashes( $params['user_type'] ) . "' AND `user_id`='" . addslashes( $params['user_id'] ) . "' AND `deleted`='0'") ) 
+	    ) {
+		    
+		    return true;
+		    
+	    } else return false;
 	    
     }
 

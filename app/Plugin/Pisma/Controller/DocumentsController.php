@@ -4,10 +4,8 @@ class DocumentsController extends AppController
 {
 	
     public $uses = array('Dane.Dataobject', 'Pisma.Document');
-    public $components = array('Session');
-	
-	protected $service_user = false;
-	
+    public $components = array('Session', 'RequestHandler');
+		
 	private function crypto_rand_secure($min, $max) {
         $range = $max - $min;
         if ($range < 0) return $min; // not so random...
@@ -32,56 +30,19 @@ class DocumentsController extends AppController
 	    return $id;
 			
 	}
-	
-    public function beforeFilter()
-    {
-        parent::beforeFilter();
-				
-		if( $user = $this->Auth->user() ) {
-			
-			$this->service_user = array(
-				'type' => 'account',
-				'id' => $user['id'],
-			);
-			
-		} elseif( isset($this->request->data['anonymous_user_id']) ) {
-			
-			$this->service_user = array(
-				'type' => 'anonymous',
-				'id' => $this->request->data['anonymous_user_id'],
-			);
-						
-		} elseif( isset($this->request->query['anonymous_user_id']) ) {
-			
-			$this->service_user = array(
-				'type' => 'anonymous',
-				'id' => $this->request->query['anonymous_user_id'],
-			);
-						
-		}
-		
-		/*
-        if (!MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
-            // deny access to Documents from untrusted clients
-            throw new ForbiddenException();
-        }
-
-        if (empty($this->user)) {
-            throw new UnauthorizedException();
-        }
-        */
-    }
 
     public function search() {
-                
+               
+        $this->Auth->deny();
+         
         $params = array(
 	        'page' => ( 
 	        	isset($this->request->query['page']) && 
 	        	is_numeric($this->request->query['page'])
 	        ) ? $this->request->query['page'] : 1,
 	        'q' => (isset( $this->request->query['q'] ) && $this->request->query['q']) ? $this->request->query['q'] : false,
-	        'user_type' => $this->service_user['type'],
-	        'user_id' => $this->service_user['id'],
+	        'user_type' => $this->Auth->user('type'),
+	        'user_id' => $this->Auth->user('id'),
         );
 						
 		$search = $this->Document->search($params);
@@ -90,7 +51,7 @@ class DocumentsController extends AppController
     }
 
     public function view() {
-        
+                
         $temp = $this->readOrThrow($this->request->params['id']);
     	$this->setSerialized('object', $temp);
         
@@ -166,7 +127,9 @@ class DocumentsController extends AppController
 	}
 	
     public function save($id = null) {
-                
+        
+        $this->Auth->deny();
+        
         $map = array(
         	'id' => 'id', 
         	'data_pisma' => 'date',
@@ -181,12 +144,13 @@ class DocumentsController extends AppController
         	'szablon_id' => 'template_id',
         	'podpis' => 'from_signature',
         );
-        
-        
+                
+                
         $data = $this->request->data;
         if (empty($data)) {
             $data = array();
         }
+                
         
         $adresat_id = isset($data['adresat_id']) ? $data['adresat_id'] : false;
         
@@ -194,20 +158,10 @@ class DocumentsController extends AppController
         foreach( $data as $k => $v )
         	if( array_key_exists($k, $map) )
         		$temp[ $map[$k] ] = $v;
-        
-        
-        if( $user = $this->Auth->user() ) {
-	        
-	        $temp['from_user_type'] = 'account';
-	        $temp['from_user_id'] = $user['id'];
-	        
-        } elseif( isset($data['anonymous_user_id']) ) {
-	        
-	        $temp['from_user_type'] = 'anonymous';
-	        $temp['from_user_id'] = $data['anonymous_user_id'];
-	        
-        } else return false;
-        
+                
+        $temp['from_user_type'] = $this->Auth->user('type');
+        $temp['from_user_id'] = $this->Auth->user('id');
+                
         
         $data = $temp;
         unset( $temp );
@@ -343,7 +297,7 @@ class DocumentsController extends AppController
             $this->response->statusCode(201);  // 201 Created
             
             $url = '/pisma/' . $doc['Document']['alphaid'];
-            
+                        
             if( $doc['Document']['slug'] )
             	$url .= ',' . $doc['Document']['slug'];
             
@@ -359,10 +313,13 @@ class DocumentsController extends AppController
     }
 
     public function send($id = null) {
-        
-        if( $id && ($this->service_user['type']=='account') ) {
+                
+        if( $id && ($this->Auth->user('type')=='account') ) {
 	        	        
-	        $status = $this->Document->send($id, $this->user, array());
+	        $status = $this->Document->send(array(
+		        'id' => $id,
+		        'user_id' => $this->Auth->user('id'),
+	        ));
 	        $this->setSerialized('status', $status);
 	        
         } else throw new BadRequestException();
@@ -371,12 +328,12 @@ class DocumentsController extends AppController
 
     public function delete() {
         
-        $params = array();
+        $this->Auth->deny();
         
-        if( isset($this->request->query['anonymous_user_id']) ) {
-        	$params['from_user_type'] = 'anonymous';
-        	$params['from_user_id'] = $this->request->query['anonymous_user_id'];
-        }
+        $params = array(
+	        'from_user_type' => $this->Auth->user('type'),
+	        'from_user_id' => $this->Auth->user('id'),
+        );
         
         $status = $this->Document->delete($this->request->params['id'], $params);
         $this->setSerialized('status', $status);
@@ -409,8 +366,8 @@ class DocumentsController extends AppController
 		        'id' => $id,
 		        'OR' => array(
 			        array(
-			        	'from_user_type' => $this->service_user['type'],
-				        'from_user_id' => $this->service_user['id'],
+			        	'from_user_type' => $this->Auth->user('type'),
+				        'from_user_id' => $this->Auth->user('id'),
 				    ),
 				    'access' => 'public',
 			    )

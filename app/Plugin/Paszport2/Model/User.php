@@ -17,10 +17,10 @@ class User extends PaszportAppModel
                 'rule' => 'isUnique',
                 'message' => __('LC_PASZPORT_USERNAME_MUST_BE_UNIQUE', true),
             ),
-            'alphanumeric' => array(
+            'alpha' => array(
                 'rule' => 'alphaNumeric',
                 'message' => __('LC_PASZPORT_ALPHANUMERIC', true)
-            )
+            ),
         ));
 
         $this->validator()->add('email', array(
@@ -31,19 +31,17 @@ class User extends PaszportAppModel
             'email' => array(
                 'rule' => 'email',
                 'message' => __('LC_PASZPORT_NOT_A_VALID_EMAIL', true),
-            )
+            ),
         ));
 
         $this->validator()->add('password', array(
             'rule' => array('minLength', 6),
             'message' => __('LC_PASZPORT_PASSWORD_REQUIRED_AND_LENGTH', true),
-            //'required' => true
         ));
 
         $this->validator()->add('repassword', array(
             'rule' => array('confirmPassword'),
             'message' => __('LC_PASZPORT_PASSWORDS_DONT_MATCH', true),
-            //'required' => true
         ));
 
         $this->validator()->add('facebook_id', array(

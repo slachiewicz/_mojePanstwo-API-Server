@@ -7,15 +7,19 @@ class Wydatkiposlow extends AppModel
 
     public function getStats()
     {
-
-        App::import('model', 'Dane.Dataobject');
-        $this->Dataset = new Dataset();
 		
-		$data = $this->Dataset->search('poslowie_biura_wydatki');
-		
+		App::import('model', 'Dane.Dataobject');
+        $Dataobject = new Dataobject();
+        		
+		$data = $Dataobject->find('all', array(
+			'conditions' => array(
+				'dataset' => 'poslowie_biura_wydatki'
+			),
+		));
+				
 		return array(
-			'biura' => $data['dataobjects'],
-		);
+			'biura' => $data,
+		);        
         
     }
     

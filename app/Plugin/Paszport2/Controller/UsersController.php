@@ -23,10 +23,9 @@ class UsersController extends PaszportAppController
 //        $this->Auth->deny(array('index'));
 //        $this->OAuth->allow();
 //        $this->OAuth->deny('me');
-
-        /*if ($this->params->action == 'login' && $this->Auth->loggedIn()) {
+        if ($this->params->action == 'login' && $this->Auth->loggedIn()) {
             $this->redirect(array('action' => 'index'));
-        }*/
+        }
 
 
     }
@@ -106,152 +105,39 @@ class UsersController extends PaszportAppController
         ));
     }
 
-    public function register()
-    {
-        if(isset($this->data) && is_array($this->data)) {
-            $this->User->set($this->data);
-            if($this->User->validates()) {
-                $user = $this->data;
-                $errors = array();
-            } else {
-                $user = false;
-                $errors = $this->User->validationErrors;
-            }
-
-            $this->set(array(
-                'errors' => $errors,
-                'user' => $user,
-                '_serialize' => array('errors', 'user'),
-            ));
-        } else {
-            throw new BadRequestException();
-        }
-    }
 
     public function login()
     {
-        if ($this->data && isset($this->data['password']) && isset($this->data['email'])) {
+        if ($this->data && isset($this->data['User']['password']) && isset($this->data['User']['email'])) {
             $data = $this->data;
-            $user = $this->User->find('first', array('conditions' => array('User.email' => $data['email'])));
+            $data['User']['password'] = $this->Auth->password($data['User']['password']);
+            $user = $this->User->find('first', array('conditions' => array('User.email' => $data['User']['email'], 'User.password' => $data['User']['password'])));
 
             if ($user) {
-                if($user['User']['password'] == $this->Auth->password($data['password'])) {
-                    unset($user['User']['password']);
-                    unset($user['User']['repassword']);
-                    $this->set(array(
-                        'user' => $user,
-                        '_serialize' => 'user',
-                    ));
-                }
-                else {
-                    throw new ForbiddenException();
-                }
+                $this->set(array(
+                    'user' => $user['User'],
+                    '_serialize' => array('user'),
+                ));
 
             } else {
-                throw new NotFoundException();
+                $user = $this->User->checkAndLoginAgainstPostImport($data, $this->Auth->password($data['User']['password']));
+                if ($user) {
+                    $this->set(array(
+                        'user' => $user['User'],
+                        '_serialize' => array('user'),
+                    ));
+                } else {
+                    $this->set(array(
+                        'user' => null,
+                        '_serialize' => array('user'),
+                    ));
+                    // TODO error, passwords doesn't match
+                }
             }
 
         } else {
             throw new BadRequestException();
         }
-    }
-
-    public function setUserName() {
-        $this->Auth->deny();
-        if($this->Auth->user('type') != 'account')
-            throw new ForbiddenException();
-
-        $response = false;
-        $id = (int) $this->Auth->user('id');
-        if($this->request->isPost() && isset($this->data['value'])) {
-            $this->User->id = $id;
-            $this->User->set(array('User' => array(
-                'username' => $this->data['value'],
-            )));
-            if($this->User->validates(array('fieldList' => array('username')))) {
-                $this->User->save(array('username' => $this->data['value']));
-                $response = true;
-            }
-        }
-
-        $this->set(array(
-            'response' => $response,
-            '_serialize' => 'response',
-        ));
-    }
-
-    public function setEmail() {
-        $this->Auth->deny();
-        if($this->Auth->user('type') != 'account')
-            throw new ForbiddenException();
-
-        $response = false;
-        $id = (int) $this->Auth->user('id');
-        if($this->request->isPost() && isset($this->data['value'])) {
-            $this->User->id = $id;
-            $this->User->set(array('User' => array(
-                'email' => $this->data['value'],
-            )));
-            if($this->User->validates(array('fieldList' => array('email')))) {
-                $this->User->save(array('email' => $this->data['value']));
-                $response = true;
-            }
-        }
-
-        $this->set(array(
-            'response' => $response,
-            '_serialize' => 'response',
-        ));
-    }
-
-    public function setUserPassword() {
-        $this->Auth->deny();
-        if($this->Auth->user('type') != 'account')
-            throw new ForbiddenException();
-
-        $response = false;
-        $id = (int) $this->Auth->user('id');
-        if($this->request->isPost() && isset($this->data['old_password']) && isset($this->data['new_password'])) {
-            $user = $this->User->find('first', array('conditions' => array('User.id' => $id)));
-            if(($user['User']['password'] == $this->Auth->password($this->data['old_password'])) || true) {
-                $this->User->id = $id;
-                $this->User->set(array('User' => array(
-                    'password' => $this->data['new_password'],
-                )));
-                if($this->User->validates(array('fieldList' => array('password')))) {
-                    $this->User->save(array('password' => $this->Auth->password($this->data['new_password'])));
-                    $response = true;
-                }
-            }
-        }
-
-        $this->set(array(
-            'response' => $response,
-            '_serialize' => 'response',
-        ));
-    }
-
-    public function deletePaszport()
-    {
-        $this->Auth->deny();
-        if($this->Auth->user('type') != 'account')
-            throw new ForbiddenException();
-
-        $response = false;
-        $id = (int) $this->Auth->user('id');
-
-        if($this->request->isPost() && isset($this->data['password'])) {
-            $exists = $this->User->find('count', array('conditions' => array('User.id' => $id, 'User.password' => $this->Auth->password($this->data['password']))));
-            if($exists > 0) {
-                $this->User->delete($id);
-                $response = true;
-            }
-        }
-
-        $this->set(array(
-            'response' => $response,
-            '_serialize' => 'response',
-        ));
     }
 
     /**
@@ -261,7 +147,7 @@ class UsersController extends PaszportAppController
     {
         $id = $this->authorizeUser();
         $user = $this->User->find('first', array('recursive' => -2, 'conditions' => array('User.id' => $id)));
-        if($user['User']['password_set']) {
+        if ($user['User']['password_set']) {
             $this->set('_serialize', '');
         }
 

@@ -37,16 +37,14 @@ App::uses('ValidationException', 'Error');
  */
 class AppController extends Controller
 {
-    public $uses = array('Paszport.User');
 
     // serve only json
     public $viewClass = 'Json';
-
-    protected $user_id = null;
-    protected $user = null;
     
     public $components = array('RequestHandler', 'Auth');
-
+    public $uses = array('Paszport.User');
+	
+	/*
     protected function actAsUser($userArray) {
         if ($userArray && isset($userArray['User']) && !empty($userArray['User'])) {
             $this->user = $userArray['User'];
@@ -65,11 +63,39 @@ class AppController extends Controller
             Configure::write('User.id', null);
         }
     }
+    */
 
     public function  beforeFilter()
     {
+	    	    
     	// AuthComponent::$sessionKey = false;
         parent::beforeFilter();
+        
+        if(
+	        isset( $this->request->query['apiKey'] ) && 
+	        ( $this->request->query['apiKey'] == ROOT_API_KEY )
+        ) {
+	        
+	        if( isset($this->request->query['user_id']) ) {
+	        	$this->Auth->login(array(
+		        	'type' => 'account',
+		        	'id' => $this->request->query['user_id'],
+	        	));
+	        } elseif( isset($this->request->query['temp_user_id']) ) {
+	        	$this->Auth->login(array(
+		        	'type' => 'anonymous',
+		        	'id' => $this->request->query['temp_user_id'],
+	        	));
+	        }
+	        
+        }
+                
+        // debug( $this->request->query ); die();
+        
+        
+        // debug(1); die();
+        
+        /*
         $this->response = new MPResponse();
 
         $this->loadModel('Paszport.UserAdditionalData');
@@ -85,9 +111,10 @@ class AppController extends Controller
             // @TU BEDZIE PELNA AUTORYZACJA (OAuth) DLA IP INNYCH NIZ KLIENCKIE
             // throw new ForbiddenException();
         }
+        */
         
-        $this->Auth->allow();
-                
+        $this->Auth->allow();        
+        
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Credentials: true');
     }

@@ -4,7 +4,8 @@ class DataobjectsController extends AppController
 {
     public $uses = array('Dane.Dataset', 'Dane.Dataobject');
 	public $components = array('S3');
-		
+	
+	/*
 	public function suggest()
     {
 
@@ -28,79 +29,161 @@ class DataobjectsController extends AppController
         $this->set('_serialize', array('objects'));
 
     }
-
-    public function search()
-    {
-        $search = $this->Dataobject->search('*', $this->request->query);
-        $this->set('search', $search);
-        $this->set('_serialize', array('search'));
-
-    }
-
-    public function view()
-    {
-   		$object = $this->Dataobject->getObject($this->request->params['alias'], $this->request->params['object_id'], $this->request->query);
-		$serialize = array('object');
-
-        // TODO co to za dziwny redirect?
-		if( !$object && ($redirect = $this->Dataobject->getRedirect($this->request->params['alias'], $this->request->params['object_id'])) ) {
-
-			$this->set('redirect', $redirect);
-			$serialize[] = 'redirect';
-
+    */
+	
+	public function index($dataset = false)
+	{
+		
+		$query = $this->request->query;
+				
+		if( $dataset ) {
+			
+			$query['conditions']['dataset'] = $dataset;
+			
+		} else {
+			
+			$query['conditions']['_main'] = true;
+			
 		}
+		
+		if(
+			isset( $query['conditions'] ) && 
+			isset( $query['conditions']['subscribtions'] ) && 
+			$query['conditions']['subscribtions']
+		) {
+						
+			$query['conditions']['subscribtions'] = array(
+				'user_type' => $this->Auth->user('type'),
+				'user_id' => $this->Auth->user('id'),
+			); 
+			
+		}
+		
+		$objects = $this->Dataobject->find('all', $query);
+		$count = ( 
+			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
+			isset( $lastResponse['hits'] ) && 
+			isset( $lastResponse['hits']['total'] ) 
+		) ? $lastResponse['hits']['total'] : null;
+		
+		$took = ( 
+			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
+			isset( $lastResponse['took'] ) 
+		) ? $lastResponse['took'] : null;
+		
+		$_serialize = array('Dataobject', 'Count', 'Took');
+		
+		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
+			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();
+			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
+			$_serialize[] = 'Aggs';
+		}
+		
+				
+		$this->set('Dataobject', $objects);
+		$this->set('Count', $count);
+		$this->set('Took', $took);
+        $this->set('_serialize', $_serialize);
+		
+	}
+	
+    public function view($dataset, $id)
+    {
 
+	    $query = $this->request->query;
+	    	    
+	    $layers = array();
+	    if( isset($query['layers']) ) {
+		    $layers = $query['layers'];
+		    unset( $query['layers'] );
+	    }
+					    	    
+	    $query['conditions']['dataset'] = $dataset;
+	    $query['conditions']['id'] = $id;
+	        
+	    $object = $this->Dataobject->find('first', $query);
+	    $this->Dataobject->data = $object;
+	    
+	    $_serialize = array('Dataobject');
+	    	    
+	    if(
+		    isset( $object['global_id'] ) && 
+	    	$this->Auth->user() && 
+	    	( $subscribtion = $this->Dataobject->checkSubscribtion(array(
+		    	'global_id' => $object['global_id'],
+		    	'user_type' => $this->Auth->user('type'),
+		    	'user_id' => $this->Auth->user('id'),
+	    	)) )
+	    ) {
+		    
+		    $object['subscribtion'] = true;
+		    
+	    }
+	    
+	    			
+		if( !empty($layers) ) {
+			
+			if( is_string($layers) )
+				$layers = array($layers);
+						
+			foreach( $layers as $layer ) {
+								
+				if( $layer=='dataset' ) {
+
+				} else {
+					$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
+				}
+			}
+			
+		}
+			
+	    	    
+	    
 		$this->set(array(
-			'object' => $object,
-			'_serialize' => $serialize,
+			'Dataobject' => $object,
+			'_serialize' => $_serialize,
 		));
     }
     
-    public function feed()
+    public function feed($dataset, $id)
     {
-	    	    
-	    $class = ucfirst( $this->request->params['alias'] ) . 'Object';
-	    $this->loadModel('Dane.' . $class);
-	    	    
-	    if( class_exists($class) )
-		    $model = $this->$class;
-	    else
-		    $model = $this->Dataobject;
 	    
-	    $direction = 'desc';
-	    if(
-			isset($this->request->query['direction']) && 
-			( $this->request->query['direction'] == 'asc' )
-		)
-			$direction = 'asc';
+	    $query = $this->request->query;
+	    if( !isset($query['conditions']) )
+	    	$query['conditions'] = array();
 	    
-	    $limit = 20;
-	    if( isset($this->request->query['perPage']) && $this->request->query['perPage'] )
-	    	$limit = (int) $this->request->query['perPage'];
-	    	
-	    $page = 1;
-	    if( isset($this->request->query['page']) && $this->request->query['page'] )
-	    	$page = (int) $this->request->query['page'];	    	
+	    $query['conditions']['_feed'] = $dataset . '.' . $id;
 	    
-	    $channel = '';
-	    if( isset($this->request->query['channel']) && $this->request->query['channel'] )
-	    	$channel = $this->request->query['channel'];	
-	    
-	    $order = array('_date ' . $direction);
-	    if( in_array($this->request->params['alias'], array('rady_druki')) )
-	    	$order[] = 'feed_dataset_order.' . $this->request->params['alias'] . ' ' . $direction;
-	    
-	    $feed = $model->getFeed($this->request->params['alias'] . '.' . $this->request->params['object_id'], array(
-		    'order' => $order,
-		    'limit' => $limit,
-		    'page' => $page,
-		    'channel' => $channel,
-	    ));
-	    	     
-	    $this->set(array(
-			'search' => $feed,
-			'_serialize' => array('search'),
-		));
+	    if( isset($query['channel']) )
+	    	$query['conditions']['_feed'] .= ':' . $query['channel'];
+	    	    	    
+		$objects = $this->Dataobject->find('all', $query);
+		$count = ( 
+			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
+			isset( $lastResponse['hits'] ) && 
+			isset( $lastResponse['hits']['total'] ) 
+		) ? $lastResponse['hits']['total'] : null;
+		
+		$took = ( 
+			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
+			isset( $lastResponse['took'] ) 
+		) ? $lastResponse['took'] : null;
+		
+		$_serialize = array('Dataobject', 'Count', 'Took');
+		
+		/*
+		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
+			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();
+			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
+			$_serialize[] = 'Aggs';
+		}
+		*/
+		
+				
+		$this->set('Dataobject', $objects);
+		$this->set('Count', $count);
+		$this->set('Took', $took);
+        $this->set('_serialize', $_serialize);
 	    
     }
 
@@ -141,7 +224,8 @@ class DataobjectsController extends AppController
             '_serialize' => 'layer',
         ));
     }
-
+	
+	/*
     public function alertsQueries()
     {
 
@@ -153,20 +237,39 @@ class DataobjectsController extends AppController
             '_serialize' => 'queries',
         ));
     }
+    */
 	
-	public function subscribe($object_id)
+	public function subscribe()
 	{
 		
-		if( $this->user_id ) {
-			
-			$status = $this->Dataobject->subscribe($object_id, $this->user_id);
-			
-			$this->set(array(
-	            'status' => 'OK',
-	            '_serialize' => array('status'),
-	        ));
-        
-        }
+		$this->Auth->deny();
+		
+		$status = $this->Dataobject->subscribe(array(
+			'dataset' => $this->request->params['dataset'],
+			'id' => $this->request->params['id'],
+			'user_type' => $this->Auth->user('type'),
+			'user_id' => $this->Auth->user('id'),
+		));
+		
+		$this->set('status', $status);
+		$this->set('_serialize', array('status'));
+		
+	}
+	
+	public function unsubscribe()
+	{
+		
+		$this->Auth->deny();
+		
+		$status = $this->Dataobject->unsubscribe(array(
+			'dataset' => $this->request->params['dataset'],
+			'id' => $this->request->params['id'],
+			'user_type' => $this->Auth->user('type'),
+			'user_id' => $this->Auth->user('id'),
+		));
+		
+		$this->set('status', $status);
+		$this->set('_serialize', array('status'));
 		
 	}
 

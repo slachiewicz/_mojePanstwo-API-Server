@@ -2,6 +2,7 @@
 
 class ClientsController extends OAuthAppController
 {
+
     public function find($client_id)
     {
         $clients = $this->Client->find('first', array(

@@ -3,7 +3,7 @@
 class PaszportAppController extends AppController
 {
     public $components = array(
-        /*'Auth' => array(
+        'Auth' => array(
             'loginAction' => array(
                 'controller' => 'users',
                 'action' => 'login',
@@ -20,7 +20,7 @@ class PaszportAppController extends AppController
                     'contain' => array('Language', 'Group', 'UserExpand'),
                 )
             )
-        ),*/
+        ),
         'RequestHandler',
 //        'Facebook.Connect',
     );
@@ -31,7 +31,7 @@ class PaszportAppController extends AppController
 
         if (!MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
             // deny access to Paszport from untrusted clients
-            //throw new ForbiddenException();
+            throw new ForbiddenException();
         }
 
         $this->Auth->allow();

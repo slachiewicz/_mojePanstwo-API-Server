@@ -13,7 +13,6 @@ class OAuthAppController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-
         if (!MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
             // deny access to Paszport from untrusted clients
             throw new ForbiddenException();

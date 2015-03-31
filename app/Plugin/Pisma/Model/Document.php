@@ -240,9 +240,7 @@ class Document extends AppModel {
 				
 			    
 			    $ES = ConnectionManager::getDataSource('MPSearch');
-				
-				debug( $data );
-				
+								
 				$response = $ES->API->index(array(
 					'index' => 'mojepanstwo_v1',
 					'type' => 'letters',
@@ -394,21 +392,23 @@ class Document extends AppModel {
 				
 	}
 	
-	public function send($id, $user, $params) {
+	public function send($params) {
 		
-		if( $pismo = $this->find('first', array(
-	        'conditions' => array(
-		        'deleted' => '0',
-		        'id' => $id,
-		        'from_user_type' => 'account',
-		        'from_user_id' => $user['id'],
-	        ),
-        )) ) {
+		if(
+			($pismo = $this->find('first', array(
+		        'conditions' => array(
+			        'deleted' => '0',
+			        'id' => $params['id'],
+			        'from_user_type' => 'account',
+			        'from_user_id' => $params['user_id'],
+		        ),
+	        ))) && 
+			($user = $this->User->findById( $params['user_id'] ))
+		) {
 	        	        
-	    	$pismo = $pismo['Document'];	    	
+	    	$pismo = $pismo['Document'];	    		    	
 	    	App::uses('CakeEmail', 'Network/Email');
-	    	
-	    
+	    		    	
 	    	
 			$Email = new CakeEmail('pisma');
 			$Email->viewVars(array('pismo' => $pismo));
@@ -417,10 +417,9 @@ class Document extends AppModel {
 				->emailFormat('html')
 				->subject($pismo['title'])
 				->to($pismo['to_email'], $pismo['to_name'])
-				// ->to('daniel.macyszyn@epf.org.pl', 'Daniel Macyszyn')
 				->from('pisma@mojepanstwo.pl', 'Pisma | mojePaństwo')
-				->replyTo($user['email'], $user['username'])
-				->cc($user['email'], $user['username'])
+				->replyTo($user['User']['email'], $user['User']['username'])
+				->cc($user['User']['email'], $user['User']['username'])
 				->send();    	    
     	    
     	    
@@ -429,7 +428,7 @@ class Document extends AppModel {
 		    $ES->API->update(array(
 			    'index' => 'mojepanstwo_v1',
 			    'type' => 'letters',
-			    'id' => $id,
+			    'id' => $params['id'],
 			    'body' => array(
 				    'doc' => array(
 					    'sent' => true,
@@ -439,7 +438,7 @@ class Document extends AppModel {
 		    ));
     	    
     	    $db = ConnectionManager::getDataSource('default');
-    	    $db->query("UPDATE `pisma_documents` SET `sent`='1', `sent_at`=NOW() WHERE `alphaid`='" . addslashes( $id ) . "'");
+    	    $db->query("UPDATE `pisma_documents` SET `sent`='1', `sent_at`=NOW() WHERE `alphaid`='" . addslashes( $params['id'] ) . "'");
 
     	    return (boolean) $status;
 	        

@@ -53,7 +53,7 @@ Router::connect('/swagger/:slug', array('controller' => 'swagger', 'action' => '
  */
 Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
 
-Router::connect('/docs/:id', array('controller' => 'docs', 'action' => 'info'));
+Router::connect('/docs/:id', array('controller' => 'docs', 'action' => 'view'));
 Router::connect('/docs/:id/html/:package', array('controller' => 'docs', 'action' => 'html'));
 
 /**

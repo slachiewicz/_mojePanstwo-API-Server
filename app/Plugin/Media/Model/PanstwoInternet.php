@@ -138,15 +138,16 @@ class PanstwoInternet extends AppModel
 
             $t = array(
                 'id' => $t,
-                'search' => ClassRegistry::init('Dane.Dataset')->search('twitter', array(
-                        'conditions' => array(
-                            'twitter_accounts.typ_id' => $t,
-                            '!bez_retweetow' => '1',
-                            '_date' => 'LAST_' . $range,
-                        ),
-                        'order' => $order,
-                        'limit' => 3,
-                    )),
+                'search' => ClassRegistry::init('Dane.Dataobject')->find('all', array(
+                    'conditions' => array(
+	                    'dataset' => 'twitter',
+                        'twitter_accounts.typ_id' => $t,
+                        'twitter.retweet' => '0',
+                        '_date' => 'LAST_' . $range,
+                    ),
+                    'order' => array('twitter.' . $order),
+                    'limit' => 3,
+                )),
             );
 
         }

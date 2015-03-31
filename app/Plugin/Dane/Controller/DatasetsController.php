@@ -2,11 +2,11 @@
 
 class DatasetsController extends AppController
 {
-    public $uses = array('Dane.Dataset');
+    public $uses = array('Dane.Dataset', 'Dane.Dataobject');
 
     public function index()
     {
-
+				
         $datasets = $this->Dataset->find('all', array(
             'fields' => array(
                 'Dataset.id',
@@ -46,6 +46,21 @@ class DatasetsController extends AppController
 	        
         $this->set('dataset', $dataset);
         $this->set('_serialize', array('dataset'));
+    }
+    
+    public function view($alias = false)
+    {
+				
+        $object = $this->Dataobject->find('first', array(
+                'conditions' => array(
+                    'dataset' => 'zbiory',
+                    'zbiory.slug' => $alias,
+                ),
+            )
+        );
+	     	      
+        $this->set('Dataobject', $object);
+        $this->set('_serialize', array('Dataobject'));
     }
 
     public function search()

@@ -2,55 +2,49 @@
 
 class DataobjectsController extends AppController
 {
-    public $uses = array('Dane.Dataset', 'Dane.Dataobject');
+    public $uses = array('Dane.Dataobject');
 	public $components = array('S3');
 	
-	/*
-	public function suggest()
-    {
-
-    	$q = (string) @$this->request->query['q'];
-    	$app = (string) @$this->request->query['app'];
-
-    	$conditions = array(
-    		'q' => $q,
-    	);
-
-		if( $app )
-			$conditions['_app'] = $app;
-
-        $objects = $this->Dataobject->search('*', array(
-        	'conditions' => $conditions,
-        	'mode' => 'suggester_main',
-        	'limit' => 5,
-        ));
-
-        $this->set('objects', $objects);
-        $this->set('_serialize', array('objects'));
-
-    }
-    */
+	public function index($dataset = false) {
+		
+		$this->_index(array(
+			'dataset' => $dataset
+		));
+	}
 	
-	public function index($dataset = false)
-	{
+	public function feed($dataset, $id)
+    {	    
+		
+		$feed_params = array(
+			'dataset' => $dataset,
+			'object_id' => $id,
+		);
+		
+		if( isset($this->request->query['channel']) )
+			$feed_params['channel'] = $this->request->query['channel'];
+		
+	    $this->_index(array(
+		    '_feed' => $feed_params,
+	    ));
+	    
+    }
+
+
+	private function _index($params = array()){
 		
 		$query = $this->request->query;
 				
-		if( $dataset ) {
-			
-			$query['conditions']['dataset'] = $dataset;
-			
-		} else {
-			
+		if( isset($params['dataset']) && $params['dataset'] )
+			$query['conditions']['dataset'] = $params['dataset'];
+		
+		
+		if( isset($params['_main']) && $params['_main'] )
 			$query['conditions']['_main'] = true;
 			
-		}
+		if( isset($params['_feed']) && $params['_feed'] )
+			$query['conditions']['_feed'] = $params['_feed'];		
 		
-		if(
-			isset( $query['conditions'] ) && 
-			isset( $query['conditions']['subscribtions'] ) && 
-			$query['conditions']['subscribtions']
-		) {
+		if( isset( $query['conditions']['subscribtions'] ) && $query['conditions']['subscribtions'] ) {
 						
 			$query['conditions']['subscribtions'] = array(
 				'user_type' => $this->Auth->user('type'),
@@ -125,11 +119,44 @@ class DataobjectsController extends AppController
 			
 			if( is_string($layers) )
 				$layers = array($layers);
-						
+			
+			$this->loadModel('Dane.DatasetChannel');
+			
 			foreach( $layers as $layer ) {
 								
 				if( $layer=='dataset' ) {
-
+				
+				} elseif( $layer=='channels' ) {
+										
+					$object['layers']['channels'] = $channels = $this->DatasetChannel->find('all', array(
+						'fields' => array('channel', 'title'),
+						'conditions' => array(
+							'creator_dataset' => $object['dataset'],
+						),
+						'order' => 'ord asc',
+					));
+															
+				} elseif( $layer=='subscriptions' ) {
+					
+					$this->loadModel('Dane.Subscription');
+															
+					$subscriptions = array();
+					foreach( $this->Subscription->find('all', array(
+						'fields' => array(
+							'Subscription.id', 'Subscription.title', 'Subscription.url'
+						),
+						'conditions' => array(
+							'user_type' => $this->Auth->user('type'),
+							'user_id' => $this->Auth->user('id'),
+							'dataset' => $dataset,
+							'object_id' => $id,
+						),
+					)) as $sub )
+						$subscriptions[] = $sub['Subscription'];
+						
+					
+					$object['layers']['subscriptions'] = $subscriptions;
+														
 				} else {
 					$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 				}
@@ -145,50 +172,9 @@ class DataobjectsController extends AppController
 		));
     }
     
-    public function feed($dataset, $id)
-    {
-	    
-	    $query = $this->request->query;
-	    if( !isset($query['conditions']) )
-	    	$query['conditions'] = array();
-	    
-	    $query['conditions']['_feed'] = $dataset . '.' . $id;
-	    
-	    if( isset($query['channel']) )
-	    	$query['conditions']['_feed'] .= ':' . $query['channel'];
-	    	    	    
-		$objects = $this->Dataobject->find('all', $query);
-		$count = ( 
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['hits'] ) && 
-			isset( $lastResponse['hits']['total'] ) 
-		) ? $lastResponse['hits']['total'] : null;
-		
-		$took = ( 
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['took'] ) 
-		) ? $lastResponse['took'] : null;
-		
-		$_serialize = array('Dataobject', 'Count', 'Took');
-		
-		/*
-		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
-			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();
-			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
-			$_serialize[] = 'Aggs';
-		}
-		*/
-		
-				
-		$this->set('Dataobject', $objects);
-		$this->set('Count', $count);
-		$this->set('Took', $took);
-        $this->set('_serialize', $_serialize);
-	    
-    }
-
     public function view_layer()
     {
+	    $this->loadModel('Dane.Dataset');
         $dataset = $this->Dataset->find('first', array(
             'conditions' => array(
                 'Dataset.alias' => $this->request->params['alias'],

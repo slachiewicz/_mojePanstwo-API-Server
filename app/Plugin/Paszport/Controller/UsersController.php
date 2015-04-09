@@ -10,7 +10,14 @@ class UsersController extends PaszportAppController
 {
     public $uses = array('Paszport.User', 'Paszport.UserAdditionalData');
     public $components = array('Session', 'Paszport.Image2');
-
+	public $userFields = array('User.email', 'User.created', 'User.photo', 'User.photo_small', 'User.group_id', 'User.username');
+	
+	
+	
+	
+	
+	
+	
     /**
      * Sets permissions
      */
@@ -108,21 +115,71 @@ class UsersController extends PaszportAppController
 
     public function register()
     {
-        if(isset($this->data) && is_array($this->data)) {
+        if(
+        	isset($this->data) && 
+        	is_array($this->data) && 
+        	(
+	        	(
+	        		isset( $this->data['email'] ) && 
+		        	$this->data['email']
+		        ) || 
+		        (
+			        isset( $this->data['User']['email'] ) && 
+		        	$this->data['User']['email']
+		        )
+		    )
+        ) {
+            
+            $errors = array();
+            $user = false;
             $this->User->set($this->data);
+            
             if($this->User->validates()) {
-                $user = $this->data;
-                $errors = array();
-            } else {
-                $user = false;
-                $errors = $this->User->validationErrors;
-            }
+            
+            	$this->User->data['User']['password'] = $this->Auth->password( $this->User->data['User']['password'] );
+	            $this->User->data['User']['group_id'] = 1;			
+				
+	            $this->User->getDataSource()->begin();
+	            
+	            $saved = $this->User->save($this->User->data, false, array(
+		            'id', 'email', 'password', 'username', 'group_id', 'language_id'
+	            ));
+	            	            
+	            if ($saved) {
+	                
+	                try {
+	                    $this->UserAdditionalData->save(array('id' => $this->User->id));
+	                    $this->User->getDataSource()->commit();
+	
+	                } catch (Exception $e) {
+	                    $this->User->getDataSource()->rollback();
+	                    throw $e;
+	                }
+					
+					if( $user = $this->User->find('first', array(
+						'fields' => $this->userFields,
+						'conditions' => array(
+							'User.id' =>  $this->User->id,
+						),
+					)) ) {
+						
+						$user = $user['User'];
+						$this->Auth->login(array(
+			                'type' => 'account',
+			                'id' => $this->User->id,
+		                ));
+						
+						
+					} else $errors = array('Internal error');
+	            } else $errors = $this->User->validationErrors; // email verification
+            } else $errors = $this->User->validationErrors; // basic validation
 
             $this->set(array(
                 'errors' => $errors,
                 'user' => $user,
                 '_serialize' => array('errors', 'user'),
             ));
+            
         } else {
             throw new BadRequestException();
         }

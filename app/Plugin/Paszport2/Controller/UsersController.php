@@ -442,7 +442,8 @@ class UsersController extends PaszportAppController
             $to_save['User']['repassword'] = $this->Auth->password($this->data['User']['repassword']);
 
             $this->User->getDataSource()->begin();
-            $saved = $this->User->save($to_save);
+            $saved = $this->User->save();
+                        
             if ($saved) {
                 try {
                     $this->UserAdditionalData->save(array('id' => $this->User->id));

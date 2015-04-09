@@ -1,5 +1,8 @@
 <?
 
+Router::mapResources('Dane.subscriptions', array('prefix' => '/dane/'));
+
+
 Router::connect('/dane/index', array(
 	'plugin' => 'Dane', 
 	'controller' => 'Dataobjects',

@@ -67,7 +67,8 @@ class User extends PaszportAppModel
             ),
         ));
     }
-
+	
+	
     /**
      * Check if user is post import and has logged before
      * if he did, that means he misspeled his passowrd | email

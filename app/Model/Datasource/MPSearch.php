@@ -14,10 +14,12 @@ class MPSearch {
     
     private $aggs_allowed = array(
 	    'date_histogram' => array('field', 'interval', 'format'),
-	    'terms' => array('field', 'include', 'exclude'),
+	    'terms' => array('field', 'include', 'exclude', 'size'),
 	    'range' => array('field', 'ranges'),
 	    'sum' => array('field'),
+	    'nested' => array('path'),
 	    'aggs' => array(),
+	    'global' => array(),
     );
     
     public $Aggs = array();
@@ -328,38 +330,89 @@ class MPSearch {
 			
 			// debug( $queryData['aggs'] );
 			$aggs = array();
-			
+						
 			foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
-				foreach( $agg_data as $agg_type => $agg_params ) {
+				
+				if( 
+					( $agg_id === '_channels' ) && 
+					isset( $queryData['conditions']['_feed'] )
+				) {
+														
+					$aggs['_channels'] = array(
+	                    'global' => new \stdClass(),
+	                    'aggs' => array(
+	                        'feed_data' => array(
+	                            'nested' => array(
+	                                'path' => 'feeds_channels',
+	                            ),
+	                            'aggs' => array(
+	                                'feed' => array(
+	                                    'filter' => array(
+	                                        'and' => array(
+	                                            'filters' => array(
+	                                                array(
+	                                                    'term' => array(
+	                                                        'feeds_channels.dataset' => $queryData['conditions']['_feed']['dataset'],
+	                                                    ),
+	                                                ),
+	                                                array(
+	                                                    'term' => array(
+	                                                        'feeds_channels.object_id' => $queryData['conditions']['_feed']['object_id'],
+	                                                    ),
+	                                                )
+	                                            ),
+	                                        ),
+	                                    ),
+	                                    'aggs' => array(
+	                                        'channel' => array(
+	                                            'terms' => array(
+	                                                'field' => 'feeds_channels.channel',
+	                                                'size' => 100,
+	                                            ),
+	                                        ),
+	                                    ),
+	                                ),
+	                            ),
+	                        ),
+	                    ),
+	                );
+	                
+	                $this->Aggs[ '_channels' ][ 'global' ] = array();
 					
-					if( in_array($agg_type, array_keys($this->aggs_allowed)) ) {
+				} else {
+				
+					foreach( $agg_data as $agg_type => $agg_params ) {
 						
-						$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
-						$es_params = array();
-						
-						foreach( $agg_params as $key => $value ) {
-							if( ($agg_type == 'aggs') || in_array($key, $this->aggs_allowed[$agg_type]) ) {
-								
-								if( 
-									( $key == 'field' ) && 
-									!in_array($value, array('date', 'dataset'))
-								) {
-									$value = 'data.' . $value;
-								}
-								
-								$es_params[ $key ] = $value;
+						if( in_array($agg_type, array_keys($this->aggs_allowed)) ) {
 							
+							$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
+							$es_params = array();
+							
+							foreach( $agg_params as $key => $value ) {
+								if( ($agg_type == 'aggs') || in_array($key, $this->aggs_allowed[$agg_type]) ) {
+									
+									if( 
+										( $key == 'field' ) && 
+										!in_array($value, array('date', 'dataset'))
+									) {
+										$value = 'data.' . $value;
+									}
+									
+									$es_params[ $key ] = $value;
+								
+								}
 							}
+													
+							if( !empty($es_params) )
+								$aggs[ $agg_id ][ $agg_type ] = $es_params;
+						
 						}
-												
-						if( !empty($es_params) )
-							$aggs[ $agg_id ][ $agg_type ] = $es_params;
-					
+						
 					}
-					
+				
 				}
 			}
-						
+							
 			if( !empty($aggs) )
 				$params['body']['aggs'] = $aggs;
 			
@@ -385,13 +438,17 @@ class MPSearch {
         	        		        		
         	} elseif( $key == 'q' ) {
 				
-				$params['body']['query']['function_score']['query']['filtered']['query']['match_phrase']['text'] = array(
-		        	'query' => $value,
-					'analyzer' => 'pl',
-					'slop' => 3,
-	        	);
+				if( $value ) {
+					
+					$params['body']['query']['function_score']['query']['filtered']['query']['match_phrase']['text'] = array(
+			        	'query' => $value,
+						'analyzer' => 'pl',
+						'slop' => 3,
+		        	);
+		        	
+		        	unset( $params['body']['sort'] );
 	        	
-	        	unset( $params['body']['sort'] );
+	        	}
         	
         	} elseif( $key == '_main' ) {
         	
@@ -403,15 +460,49 @@ class MPSearch {
         	
         	} elseif( $key == '_feed' ) {
         		
-        		$filter_type = is_array($value) ? 'terms' : 'term';
-        		$and_filters[] = array(
-	        		$filter_type => array(
-	        			'feeds' => $value,
-	        		),
-	        	);
-	        	
-	        	$context = ($p = strpos($value, ':')) ? substr($value, 0, $p) : $value;	        	
-	        	$params['body']['partial_fields']['source']['include'][] = 'contexts.' . $context . '.*';
+        		if (
+        			isset($value['dataset']) && 
+        			isset($value['object_id']) && 
+        			is_numeric($value['object_id'])
+        		) {
+	        		
+	        		$_and_filters = array(
+	        			array(
+	        				'term' => arraY(
+		        				'feeds_channels.dataset' => $value['dataset'],
+		        			),
+	        			),
+	        			array(
+	        				'term' => arraY(
+		        				'feeds_channels.object_id' => (int) $value['object_id'],
+		        			),
+	        			),
+        			);
+        			
+        			if (
+	        			isset($value['channel']) && 
+	        			is_numeric($value['channel'])
+	        		) 
+	        			$_and_filters[] = array(
+		        			'term' => array(
+			        			'feeds_channels.channel' => $value['channel'],
+		        			),
+	        			);
+	        		
+        			$and_filters[] = array(
+	        			'nested' => array(
+		        			'path' => 'feeds_channels',
+		        			'filter' => array(
+			        			'and' => arraY(
+				        			'filters' => $_and_filters,
+			        			),
+		        			),
+	        			),
+        			);
+	        		
+		        	$params['body']['partial_fields']['source']['include'][] = 'contexts.' . $value['dataset'] . '.' . $value['object_id'] . '.*';
+	        			        			
+        		}	        	
 	        	
 	        } elseif( $key == '_date' ) {
 	        	
@@ -541,43 +632,6 @@ class MPSearch {
 	        		),
 	        	);
         	
-        	} elseif( $key == '_app' ) {
-	        	
-	        	$_app_filter = array(
-		        	'or'
-	        	);
-	        	
-	        	if(
-	        		( $app_data = $this->MPCache->getApp($value) ) && 
-	        		( isset( $app_data['datasets'] ) ) && 
-	        		( !empty( $app_data['datasets'] ) ) 
-	        	) {
-	        		
-	        		$_app_filter = array();
-	        		       		
-	        		foreach( $app_data['datasets'] as $dataset )
-		        		$_app_filter[] = array(
-			        		'term' => array(
-				        		'dataset' => $dataset
-			        		),	
-		        		);
-		        		
-		        	$and_filters[] = array(
-			        	'or' => $_app_filter,
-		        	);
-	        	
-	        	} else {
-		        	
-		        	$and_filters[] = array(
-			        	'term' => array(
-				        	'dataset' => false,
-			        	),
-		        	);
-		        	
-	        	}
-		        	
-		        	
-        	
         	} else {
 	        	
 	        	$and_filters[] = array(
@@ -597,7 +651,12 @@ class MPSearch {
 		
 		
 		
-		if( isset($queryData['highlight']) && $queryData['highlight'] ) {
+		if( 
+			isset($queryData['highlight']) && 
+			$queryData['highlight'] && 
+			isset($queryData['conditions']) && 
+			$queryData['conditions']
+		) {
 			
 			$params['body']['highlight'] = array(
 	    		'fields' => array(
@@ -615,7 +674,7 @@ class MPSearch {
 						
 		
 		
-		// debug( $params ); die();
+		// debug( $params );
 		
 		$response = $this->API->search( $params ); 
 
@@ -623,12 +682,14 @@ class MPSearch {
         if( isset($this->lastResponse['hits']) && isset($this->lastResponse['hits']['hits']) )
 	        unset( $this->lastResponse['hits']['hits'] );
         
-        // debug( $response ); die();
+        // debug( $response['aggregations'] ); die();
+        // debug( $this->Aggs );
         
         if( !empty($this->Aggs) ) {
 	        
 	        foreach( $this->Aggs as $agg_id => &$agg_data ) {
-			        
+			    
+			    
 		        if( isset($response['aggregations'][$agg_id]) )
 		        	$agg_data = $response['aggregations'][$agg_id];
 			        			        
@@ -642,46 +703,7 @@ class MPSearch {
         for( $h=0; $h<count($hits); $h++ ) 
         	$hits[$h] = $this->doc2object( $hits[$h] );
         
-        return $hits;
-        
-        
-        if( $response ) {
-        	
-        	$_count = count( $response['hits']['hits'] );
-        	$output['performance']['took'] = $response['took'];
-        	
-        	$output['pagination'] = array_merge($output['pagination'], array(
-        		'count' => $_count,
-        		'total' => $response['hits']['total'],
-        	));
-        	
-		    if( $_count ) {
-			    
-			    foreach( $response['hits']['hits'] as $doc )
-			    	$output['dataobjects'][] = $this->doc2object( $doc );
-			    
-		    }
-	    
-	    }
-	    
-	    /*
-	    if( !empty( $queryFacets ) ) 		    
-		    foreach( $queryFacets as $field ) {
-		    	
-		    	if( is_array($field) )
-		    		$field = $field[0];
-		    	
-		    	if( $field=='alerts' )
-		    		$output['facets'][$field][] = $es_result['aggregations'][$field]['groups']['buckets'];
-			    elseif( isset( $es_result['aggregations'][$field] ) ) 
-				    $output['facets'][$field][] = $es_result['aggregations'][$field]['buckets'];
-				    
-			}
-        */
-        
-        debug( $output );
-        
-        return $output;
+        return $hits;        
 
     }
 

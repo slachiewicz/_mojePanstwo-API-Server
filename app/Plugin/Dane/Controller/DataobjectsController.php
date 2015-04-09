@@ -129,7 +129,7 @@ class DataobjectsController extends AppController
 				} elseif( $layer=='channels' ) {
 										
 					$object['layers']['channels'] = $channels = $this->DatasetChannel->find('all', array(
-						'fields' => array('channel', 'title'),
+						'fields' => array('channel', 'title', 'subject_dataset'),
 						'conditions' => array(
 							'creator_dataset' => $object['dataset'],
 						),

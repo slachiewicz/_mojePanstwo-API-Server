@@ -519,4 +519,15 @@ class BDLController extends AppController
 
         $this->setSerialized('response', $response);
     }
+    
+    
+    public function tree() {
+	    
+	    $this->loadModel('BDL.BDL');
+	    
+	    $tree = $this->BDL->getTree();
+	    $this->setSerialized('tree', $tree);
+	    
+    }
+    
 }

@@ -458,6 +458,35 @@ class MPSearch {
 	        		),
 	        	);
         	
+        	} elseif( $key == 'feeds_channels' ) {
+        		        		
+        		$and_filters[] = array(
+	        		'nested' => array(
+	        			'path' => 'feeds_channels',
+	        			'filter' => array(
+		        			'and' => arraY(
+			        			'filters' => array(
+				        			array(
+					        			'term' => array(
+						        			'feeds_channels.dataset' => $value['dataset'],
+					        			)
+				        			),
+				        			array(
+					        			'term' => array(
+						        			'feeds_channels.object_id' => $value['object_id'],
+					        			)
+				        			),
+				        			array(
+					        			'term' => array(
+						        			'feeds_channels.channel' => $value['channel'],
+					        			)
+				        			),
+			        			),
+		        			),
+	        			),
+        			),
+	        	);
+	        	        	        	
         	} elseif( $key == '_feed' ) {
         		
         		if (
@@ -468,12 +497,12 @@ class MPSearch {
 	        		
 	        		$_and_filters = array(
 	        			array(
-	        				'term' => arraY(
+	        				'term' => array(
 		        				'feeds_channels.dataset' => $value['dataset'],
 		        			),
 	        			),
 	        			array(
-	        				'term' => arraY(
+	        				'term' => array(
 		        				'feeds_channels.object_id' => (int) $value['object_id'],
 		        			),
 	        			),
@@ -506,7 +535,7 @@ class MPSearch {
 	        	
 	        } elseif( $key == '_date' ) {
 	        	
-	        	$_value = strtoupper($value);
+	        	$_value = strtoupper($value);	        	
 	        	
 	        	$key = 'date';
 	        	
@@ -674,7 +703,7 @@ class MPSearch {
 						
 		
 		
-		// debug( $params );
+		// debug( $params ); die();
 		
 		$response = $this->API->search( $params ); 
 

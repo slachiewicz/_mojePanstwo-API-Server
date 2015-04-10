@@ -131,5 +131,8 @@ $depth = 3;
 $queryBuilder = new QueryBuilder($depth, $id);
 $query = $queryBuilder->getQuery();
 $results = $this->DB->selectAssocs($query);
+
+return $results;
+
 $treeBuilder = new TreeBuilder($results, $id, $depth);
 return $treeBuilder->getData();

@@ -9,3 +9,4 @@ Router::connect('/paszport/user/setUserName', array('plugin' => 'Paszport', 'con
 Router::connect('/paszport/user/setEmail', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'setEmail'));
 Router::connect('/paszport/user/setPassword', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'setUserPassword'));
 Router::connect('/paszport/user/deletePaszport', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'deletePaszport'));
+Router::connect('/paszport/user/registerFromFacebook', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'registerFromFacebook'));

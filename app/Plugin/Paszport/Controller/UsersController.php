@@ -113,6 +113,115 @@ class UsersController extends PaszportAppController
         ));
     }
 
+    public function registerFromFacebook() {
+        if($this->data && isset($this->data['id']) && isset($this->data['email']))
+        {
+            $errors = array();
+            $user = $this->User->find('first', array(
+                'conditions' => array("User.email" => $this->data['email']))
+            );
+
+            if(!$user)
+            {
+                $password = md5($this->data['id'] . $this->data['email']);
+                $this->User->set(array(
+                    'User' => array(
+                        'email'         => $this->data['email'],
+                        'username'      => $this->data['first_name'] . '' . $this->data['last_name'] . rand(0, 9999),
+                        'password'      => $password,
+                        'repassword'    => $password,
+                        'facebook_id'   => $this->data['id']
+                    )
+                ));
+
+                if($this->User->validates())
+                {
+                    $this->User->data['User']['password'] = $this->Auth->password($this->User->data['User']['password']);
+                    $this->User->data['User']['group_id'] = 1;
+
+                    $this->User->getDataSource()->begin();
+
+                    $saved = $this->User->save($this->User->data, false, array(
+                        'id', 'email', 'password', 'username', 'group_id', 'facebook_id'
+                    ));
+
+                    if($saved) {
+
+                        try {
+                            $this->UserAdditionalData->save(array('id' => $this->User->id));
+                            $this->User->getDataSource()->commit();
+
+                        } catch (Exception $e) {
+                            $this->User->getDataSource()->rollback();
+                            throw $e;
+                        }
+
+                        if($user = $this->User->find('first', array(
+                            'fields' => $this->userFields,
+                            'conditions' => array(
+                                'User.id' =>  $this->User->id,
+                            ),
+                        ))) {
+                            $user = $user['User'];
+                            $this->Auth->login(array(
+                                'type' => 'account',
+                                'id' => $this->User->id,
+                            ));
+                        } else
+                            $errors = array('Internal error');
+                    } else
+                        $errors = $this->User->validationErrors;
+                } else
+                    $errors = $this->User->validationErrors;
+            } elseif($user['User']['facebook_id'] != $this->data['id']) {
+                $this->User->id = $user['User']['id'];
+                $this->User->set(array('User' => array(
+                    'facebook_id' => $this->data['id'],
+                )));
+                $this->User->save(array('facebook_id' => $this->data['id']));
+                $user['User']['facebook_id'] = $this->data['id'];
+                $user = $user['User'];
+                $this->Auth->login(array(
+                    'type' => 'account',
+                    'id' => $user['id'],
+                ));
+            } else {
+                $user = $user['User'];
+                $this->Auth->login(array(
+                    'type' => 'account',
+                    'id' => $user['id'],
+                ));
+            }
+
+            $this->set(array(
+                'errors' => $errors,
+                'user' => $user,
+                '_serialize' => array('errors', 'user'),
+            ));
+
+        } else {
+            throw new BadRequestException();
+        }
+    }
+
+    public function findFacebook()
+    {
+        if($this->data && isset($this->data['facebook_id']) && isset($this->data['email'])) {
+            $user = $this->User->find('first', array(
+                'conditions' => array(
+                    'User.facebook_id' => $this->data['facebook_id'],
+                    'User.email' => $this->data['email']
+                ))
+            );
+            $this->set(array(
+                'user' => $this->data,
+                '_serialize' => array('user'),
+            ));
+        } else {
+            throw new BadRequestException();
+        }
+    }
+
     public function register()
     {
         if(

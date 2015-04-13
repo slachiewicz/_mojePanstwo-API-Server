@@ -79,6 +79,9 @@
 			        	'autotitle' => $add_data['title'],
 		        	));
 		        	
+		        	$data = array_merge($data, $add_data);
+		        	$this->Subscription->index($data);
+		        	
 		        	$this->set('url', $add_data['url']);
 		        	$_serialize[] = 'url';
 		        	
@@ -118,7 +121,8 @@
 			        'Subscription.user_id' => $this->Auth->user('id'),
 		        ),
 	        )) ) {
-	        
+	        	
+	        	$this->Subscription->data['id'] = $id;
 		        if ($this->Subscription->delete($id)) {
 		            $message = 'Deleted';
 		        } else {

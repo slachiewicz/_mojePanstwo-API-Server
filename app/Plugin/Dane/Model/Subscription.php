@@ -3,8 +3,8 @@
 class Subscription extends AppModel
 {
     
-    public function afterSave($created, $options = array()) {
-	    
+    public function index($data) {
+	    	    
 	    $ES = ConnectionManager::getDataSource('MPSearch');	    
 	    
 	    $parent_doc = $ES->API->search(array(
@@ -16,12 +16,12 @@ class Subscription extends AppModel
 					    'must' => array(
 						    array(
 							    'term' => array(
-								    'dataset' => $this->data['Subscription']['dataset'],
+								    'dataset' => $data['dataset'],
 							    ),
 						    ),
 						    array(
 							    'term' => array(
-								    'id' => $this->data['Subscription']['object_id'],
+								    'id' => $data['object_id'],
 							    ),
 						    ),
 					    ),
@@ -38,49 +38,99 @@ class Subscription extends AppModel
 		    $params = array();
 			$params['index'] = 'mojepanstwo_v1';
 			$params['type']  = '.percolator';
-			$params['id']    = $this->data['Subscription']['id'];
+			$params['id']    = $data['id'];
 			$params['parent'] = $_id;
 			
-			$cts = strtotime( $this->data['Subscription']['cts'] );
+			$cts = strtotime( $data['cts'] );
 			$mask = "Ymd\THis\Z";
 			
-			$params['body']  = array(
-				'id' => $this->data['Subscription']['id'],
-				'query' => array(
-					'match' => array(
-						'text' => 'test',
-					),
-				),
-				'cts' => date($mask, $cts),
-				'q' => $this->data['Subscription']['q'],
-				'channel' => $this->data['Subscription']['channel'],
-				'hash' => $this->data['Subscription']['hash'],
-				'user_type' => $this->data['Subscription']['user_type'],
-				'user_id' => $this->data['Subscription']['user_id'],
+			
+			
+			if(
+				isset( $data['conditions'] ) && 
+				$data['conditions'] && 
+				( $data['conditions'] = json_decode($data['conditions'], true) )
+			) {
+				$es_conditions = $data['conditions'];
+			} else {
+				$es_conditions = array();
+			}
+			
+			$es_conditions['_feed'] = array (
+				'dataset' => $data['dataset'],
+				'object_id' => $data['object_id'],
 			);
 			
-			var_export( $params );
-			$ret = $ES->API->index($params);		
-			var_export( $ret );	    
-		    die();
-		    
-		    debug('afterSave');
-		    debug( $this->data );
-		    
-		    die();
+			if( isset($data['q']) && $data['q'] )
+				$es_conditions['q'] = $data['q'];
+				
+			if( isset($data['channel']) && $data['channel'] )
+				$es_conditions['_feed']['channel'] = $data['channel'];
+				
+			$es_query = $ES->buildESQuery(array(
+				'conditions' => $es_conditions,
+			));
+			
+			$params['body']  = array(
+				'id' => $data['id'],
+				'query' => $es_query['body']['query']['function_score']['query'],
+				'cts' => date($mask, $cts),
+				'hash' => $data['hash'],
+				'user_type' => $data['user_type'],
+				'user_id' => $data['user_id'],
+				'url' => $data['url'],
+				'title' => $data['title'],
+			);
+			
+			if( isset($data['q']) && $data['q'] )
+				$params['body']['q'] = $data['q'];
+				
+			if( isset($data['channel']) && $data['channel'] )
+				$params['body']['channel'] = $data['channel'];
+				
+			
+			$ret = $ES->API->index($params);		    
 		    
 		}
 	    
     }
     
+    public function afterDelete() {
+		
+		if( $this->data['id'] ) {
+			
+			$ES = ConnectionManager::getDataSource('MPSearch');
+			$deleteParams = array();
+			$deleteParams['index'] = 'mojepanstwo_v1';
+			$deleteParams['type'] = '.percolator';
+			$deleteParams['id'] = $this->data['id'];
+			$ret = $ES->API->delete($deleteParams);
+						
+		}
+	
+	}
+    
     public function generateData($data = array()) {
 	    
 	    $base = '/dane';
-	    $base .= '/' . $data['dataset'];
-	    $base .= '/' . $data['object_id'];
-		
-		if( $data['dataset']=='prawo' )
-			$base .= '/feed';
+	    
+	    if( $data['dataset']=='rady_gmin' ) {
+		    
+		    $base .= '/gminy/903,krakow/rada';
+		    
+	    } elseif( $data['dataset']=='urzedy_gmin' ) {
+
+		    $base .= '/gminy/903,krakow/urzad';
+	    
+	    } else {
+	    
+		    $base .= '/' . $data['dataset'];
+		    $base .= '/' . $data['object_id'];
+			
+			if( $data['dataset']=='prawo' )
+				$base .= '/feed';
+			
+		}
 		
 		$title_parts = array();
 		

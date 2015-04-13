@@ -204,46 +204,18 @@ class MPSearch {
 	    
     }	
 	
-    public function read(Model $model, $queryData = array())
-    {
+	public function buildESQuery( $queryData = array() ) {
 		
-		// Configure::write('debug', 2);
-        // if( $this->getCurrentUser('id')=='2375' ) { echo "\n\n"; debug( 'asd' ); }
-		
-		
-		/*
-		array(
-			'conditions' => array(
-				'dataset' => 'prawo',
-				'id' => '137911'
-			),
-			'fields' => null,
-			'joins' => array(),
-			'limit' => (int) 1,
-			'offset' => null,
-			'order' => array(
-				(int) 0 => null
-			),
-			'page' => (int) 1,
-			'group' => null,
-			'callbacks' => '1',
-			'layers' => array(
-				(int) 0 => 'docs',
-				(int) 1 => 'counters',
-				(int) 2 => 'files',
-				(int) 3 => 'tags',
-				(int) 4 => 'dataset'
-			),
-			'apiKey' => '1234abcd'
-		)
-		*/
-		
-		
-		$this->lastReponse = false;
+		// debug($queryData); die();
 		
 		if( !isset($queryData['conditions']) )
 			$queryData['conditions'] = array();
 		
+		if( !isset($queryData['page']) )
+			$queryData['page'] = 1;
+			
+		if( !isset($queryData['limit']) )
+			$queryData['limit'] = 50;
 		
 		$from = ( $queryData['page'] - 1 ) * $queryData['limit'];
 		$size = $queryData['limit'];
@@ -511,6 +483,7 @@ class MPSearch {
         			
         			if (
 	        			isset($value['channel']) && 
+	        			$value['channel'] && 
 	        			is_numeric($value['channel'])
 	        		) 
 	        			$_and_filters[] = array(
@@ -642,7 +615,7 @@ class MPSearch {
 	        	
 	        	$and_filters[] = array(
 	        		'has_child' => array(
-	        			'type' => 'subs',
+	        			'type' => '.percolator',
 	        			'filter' => array(
 		        			'and' => array(
 			        			'filters' => array(
@@ -700,12 +673,17 @@ class MPSearch {
 	    	);
 			
 		}
-				
-						
 		
+		return $params;
 		
+	}
+	
+    public function read(Model $model, $queryData = array()) {
+	
+		$params = $this->buildESQuery($queryData);
 		// debug( $params ); die();
-		
+				
+		$this->lastReponse = false;
 		$response = $this->API->search( $params ); 
 
         $this->lastResponse = $response;

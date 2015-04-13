@@ -53,6 +53,8 @@ class DataobjectsController extends AppController
 			
 		}
 		
+		// debug($query); die();
+		
 		$objects = $this->Dataobject->find('all', $query);
 		$count = ( 
 			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 

@@ -1,0 +1,10 @@
+<?
+
+class DatasetChannel extends AppModel
+{
+    
+    
+
+}
+
+

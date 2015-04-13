@@ -177,9 +177,7 @@ class DocumentsController extends AppController
         	));
         
         
-        
-        
-        
+                
         
         App::import('model','DB');
 		$DB = new DB();
@@ -265,8 +263,14 @@ class DocumentsController extends AppController
 	        $data['to_dataset'] = false;	        
         
 		if( !isset($data['to_id']) )        
-			$data['to_id'] = false;	 
+			$data['to_id'] = false;
 			
+		if( 
+			( $data['saved']=='0' ) && 
+			!$data['name']
+		)
+        	$data['name'] = 'Nowe pismo';
+        			
 		$data['slug'] = @substr(Inflector::slug($data['name'], '-'), 0, 127);
                 
         // TODO powinno być zwrócone w innym formacie dTt, czemu cake sam tego nie formatuje w bazie?! Albo zwracajac?
@@ -283,14 +287,8 @@ class DocumentsController extends AppController
 		*/
 	       
 	    
-	    if( $data['saved']=='0' ) {
-	        
-	        if( !$data['name'] )
-	        	$data['name'] = 'Nowe pismo';
-	        	
+	    if( $data['saved']=='0' )	        	
 	        $this->Document->create();  
-        
-        } 
 	    
 	    	    
         if ($doc = $this->Document->save(array('Document' => $data))) {

@@ -39,8 +39,8 @@
 	        if( isset( $this->request->data['channel'] ) && $this->request->data['channel'] )
 	        	$data['channel'] = $this->request->data['channel'];
 	        	
-	        if( isset( $this->request->data['query'] ) && $this->request->data['query'] )
-	        	$data['query'] = $this->request->data['query'];
+	        if( isset( $this->request->data['conditions'] ) && $this->request->data['conditions'] )
+	        	$data['conditions'] = json_encode( $this->request->data['conditions'] );
 	        
 	        $data['hash'] = md5(json_encode($data));
 	        	        
@@ -64,15 +64,7 @@
 		        	$_serialize[] = 'url';
 		        	$message = 'Already Exists';
 		        
-	        } else {     
-							
-		        if( isset($this->request->data['query']) ) {
-			        
-			        $query = $this->request->data['query'];
-			        $query_json = json_encode($query);
-		        	$data['query'] = $query_json;
-		        			        			        	
-		        }   
+	        } else {       
 	
 	        		        			        
 		        if ($this->Subscription->save($data)) {
@@ -84,6 +76,7 @@
 			        	'id' => $data['id'],
 			        	'url' => $add_data['url'],
 			        	'title' => $add_data['title'],
+			        	'autotitle' => $add_data['title'],
 		        	));
 		        	
 		        	$this->set('url', $add_data['url']);

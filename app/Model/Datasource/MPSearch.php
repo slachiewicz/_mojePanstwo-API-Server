@@ -424,10 +424,11 @@ class MPSearch {
 		// FITERS
 		
 		$and_filters = array();
+        
                     
         foreach( $queryData['conditions'] as $key => $value ) {
         	      
-        	if( in_array($key, array('dataset', 'id', 'date')) ) {
+        	if( in_array($key, array('dataset', 'id')) ) {
         		
         		$filter_type = is_array($value) ? 'terms' : 'term';
         		$and_filters[] = array(
@@ -533,8 +534,8 @@ class MPSearch {
 	        			        			
         		}	        	
 	        	
-	        } elseif( $key == '_date' ) {
-	        	
+	        } elseif( in_array($key, array('date', '_date')) ) {
+	        		        		        	
 	        	$_value = strtoupper($value);	        	
 	        	
 	        	$key = 'date';

@@ -70,17 +70,17 @@
 		        if ($this->Subscription->save($data)) {
 		        	
 		        	$data['id'] = $this->Subscription->getInsertID();
-		        	$add_data = $this->Subscription->generateData($data);
-		        	   	
+		        	$add_data = $this->Subscription->generateData($data);		        	
+		        	$data = array_merge($data, $add_data);
+		        	$parent_id = $this->Subscription->index($data);
+		        	
 		        	$this->Subscription->save(array(
 			        	'id' => $data['id'],
 			        	'url' => $add_data['url'],
 			        	'title' => $add_data['title'],
 			        	'autotitle' => $add_data['title'],
+			        	'parent_id' => $parent_id,
 		        	));
-		        	
-		        	$data = array_merge($data, $add_data);
-		        	$this->Subscription->index($data);
 		        	
 		        	$this->set('url', $add_data['url']);
 		        	$_serialize[] = 'url';
@@ -137,5 +137,23 @@
 		        throw new NotFoundException();
 	        }
 	    }
+	    
+	    public function transfer_anonymous() {
+				
+			$status = false;
+			
+			if(
+				( $user = $this->Auth->user() ) && 
+				isset($this->request->query['anonymous_user_id']) && 
+				$this->request->query['anonymous_user_id']
+			) {
+				
+				$status = $this->Subscription->transfer_anonymous($this->request->query['anonymous_user_id'], $this->Auth->user('id'));
+				
+			}
+			
+			$this->setSerialized('status', $status);
+			
+		}
 	}
 	

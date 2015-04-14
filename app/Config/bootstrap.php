@@ -73,9 +73,6 @@ Cache::config('default', array('engine' => 'File'));
  */
 
 CakePlugin::loadAll(array(
-    'Powiadomienia' => array(
-        'routes' => true,
-    ),
     'Paszport' => array(
         'routes' => true,
     ),

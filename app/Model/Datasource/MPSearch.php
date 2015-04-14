@@ -200,6 +200,23 @@ class MPSearch {
     	)
     		$output['highlight'] = array($doc['highlight']['text']);
     	
+    	if(
+    		isset($doc['inner_hits']) && 
+    		isset($doc['inner_hits']['inner']) && 
+    		isset($doc['inner_hits']['inner']['hits']) && 
+    		isset($doc['inner_hits']['inner']['hits']['hits']) 
+    	) {
+	    	
+	    	foreach( $doc['inner_hits']['inner']['hits']['hits'] as $hit ) {
+		    	
+		    	$output['inner_hits'][] = array(
+			    	'id' => $hit['_id'],
+			    	'title' => $hit['fields']['title'][0],
+		    	);
+		    	
+	    	}	    	
+    	}
+    	
     	return $output;
 	    
     }	
@@ -350,7 +367,47 @@ class MPSearch {
 	                );
 	                
 	                $this->Aggs[ '_channels' ][ 'global' ] = array();
-					
+	            
+	            
+	            /*  
+	            } elseif( 
+					( $agg_id === '_channels' ) && 
+					isset( $queryData['conditions']['subscribtions'] )
+				) {
+																	
+					$aggs['_channels'] = array(
+	                    'terms' => array(
+		                    'field' => 'dataset',
+		                    'size' => 20
+	                    ),
+	                    'aggs' => array(
+		                    'id' => array(
+			                    'terms' => array(
+				                    'field' => 'id',
+				                    'size' => 20
+			                    ),
+			                    'aggs' => array(
+				                    'channels' => array(
+					                    'children' => array(
+						                    'type' => '.percolator',
+					                    ),
+					                    'aggs' => array(
+						                    'user_id' => array(
+							                    'terms' => array(
+								                    'field' => 'title',
+								                    'size' => 20,
+							                    ),
+						                    ),
+					                    ),
+				                    ),
+			                    ),
+		                    )
+	                    ),
+	                );
+	                
+	                $this->Aggs[ '_channels' ][ 'terms' ] = array();
+				*/
+				
 				} else {
 				
 					foreach( $agg_data as $agg_type => $agg_params ) {
@@ -632,6 +689,10 @@ class MPSearch {
 			        			),
 		        			),
 	        			),
+	        			'inner_hits' => array(
+		        			'name' => 'inner',
+			        		'fields' => array('id', 'title', 'url'),
+		        		),
 	        		),
 	        	);
         	
@@ -679,9 +740,9 @@ class MPSearch {
 	}
 	
     public function read(Model $model, $queryData = array()) {
-	
+		
 		$params = $this->buildESQuery($queryData);
-		// debug( $params ); die();
+		// debug( $params );
 				
 		$this->lastReponse = false;
 		$response = $this->API->search( $params ); 
@@ -690,7 +751,7 @@ class MPSearch {
         if( isset($this->lastResponse['hits']) && isset($this->lastResponse['hits']['hits']) )
 	        unset( $this->lastResponse['hits']['hits'] );
         
-        // debug( $response['aggregations'] ); die();
+        // debug( $response ); die();
         // debug( $this->Aggs );
         
         if( !empty($this->Aggs) ) {

@@ -1,5 +1,6 @@
 <?php
 App::uses('HttpSocket', 'Network/Http');
+App::import('Vendor', 'Paszport.Encrypt');
 
 /**
  * Class UsersController
@@ -587,13 +588,56 @@ class UsersController extends PaszportAppController
             return 2; # english
         }
     }
+	
+	public function forgot()
+	{
+		App::uses('CakeEmail', 'Network/Email');
+		$errors = array();
+		$success = false;
+		if($this->data && $this->data['User']['email']) {
+			$user = $this->User->find('first', array('conditions' => array('User.email' => $this->data['User']['email']), 'recursive' => -2));
+			if($user) {
+				$Email = new CakeEmail();
+				$Email->config('noreply');
+                $Email->to($user['User']['email'])
+                    ->template('Paszport.reset')
+                    ->emailFormat('text')
+                    ->subject('Nowe hasło');
+
+                $e = new Encryption(MCRYPT_BlOWFISH, MCRYPT_MODE_CBC);
+                $data = json_encode(array(
+                    'email' => $user['User']['email'],
+                    'expires' => strtotime('+24 hours')
+                ));
+                $hash = base64_encode($e->encrypt($data, Configure::read('Security.salt')));
+                $Email->viewVars(array('hash' => urlencode($hash)));
+
+                if($Email->send()) {
+                    $this->User->field('users', $user['User']['id'], array('User' => array('reset_hash' => urlencode($hash))));
+                    $success = true;
+                } else {
+					$errors[] = 'LC_MAIL_SEND_ERROR';
+                }
+			} else {
+				$errors[] = 'LC_PASZPORT_USER_DOES_NOT_EXIST';
+			}
+		} else {
+			$errors[] = 'BAD_REQUEST';
+		}
+		
+		$this->set(array(
+			'success' => $success,
+			'errors' => $errors,
+			'_serialize' => array('success', 'errors'),
+		));
+	}
 
     /**
      *
      * Generates token, sends mail, validates token and redirect to password changing method
      * @return bool
      */
-    public function forgot()
+    private function __forgot()
     {
         App::uses('CakeEmail', 'Network/Email');
         if ($this->request->isPost()) { # if post then someone sent form, we should find user with given e-mail

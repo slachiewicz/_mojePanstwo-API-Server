@@ -331,10 +331,12 @@ class MPSearch {
 				
 				if( $value ) {
 					
-					$params['body']['query']['function_score']['query']['filtered']['query']['match_phrase']['text'] = array(
-			        	'query' => $value,
+		        	$params['body']['query']['function_score']['query']['filtered']['query']['multi_match'] = array(
+			        	'query' => mb_convert_encoding($value, 'UTF-8', 'UTF-8'),
+					    'type' => "phrase",
+					    'fields' => array('title.suggest', "text"),
 						'analyzer' => 'pl',
-						'slop' => 3,
+						'slop' => 5,
 		        	);
 		        	
 		        	unset( $params['body']['sort'] );

@@ -41,7 +41,11 @@ class AppController extends Controller
     // serve only json
     public $viewClass = 'Json';
     
-    public $components = array('RequestHandler', 'Auth');
+    public $components = array('RequestHandler',
+        'Auth' => array(
+            'sessionKey' => false, // don't use sessions
+            'unauthorizedRedirect' => false, // don't redirect, throw ForbiddenException
+        ));
     public $uses = array('Paszport.User');
 	
 	/*
@@ -67,14 +71,13 @@ class AppController extends Controller
 
     public function  beforeFilter()
     {
-	    	    
-    	// AuthComponent::$sessionKey = false;
         parent::beforeFilter();
         
         if(
 	        isset( $this->request->query['apiKey'] ) && 
 	        ( $this->request->query['apiKey'] == ROOT_API_KEY )
         ) {
+            // TODO rethink authorization!
 	        
 	        if( isset($this->request->query['user_id']) ) {
 	        	$this->Auth->login(array(
@@ -90,16 +93,16 @@ class AppController extends Controller
 	        
         }
                 
-        // debug( $this->request->query ); die();
-        
-        
-        // debug(1); die();
-        
-        /*
-        $this->response = new MPResponse();
+        // force all requests to be perceived as ajax (no template rendering)
+        $this->request->addDetector('ajax', array(
+            'callback' => function() {
+                return true; // results in $this->request->is('ajax') == true
+            }
+        ));
 
-        $this->loadModel('Paszport.UserAdditionalData');
-        
+
+        /*
+
         if (MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
             if (env('HTTP_X_USER_ID')) {
                 $user_id = Sanitize::paranoid(env('HTTP_X_USER_ID'));

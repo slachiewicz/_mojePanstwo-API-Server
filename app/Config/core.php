@@ -223,7 +223,8 @@ Configure::write('Cache.disable', true);
  *
  */
 Configure::write('Session', array(
-    'defaults' => 'php'
+    'defaults' => 'php',
+    'Session.cookie' => false
 ));
 
 /**

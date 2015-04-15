@@ -11,31 +11,13 @@ class UsersController extends PaszportAppController
     public $uses = array('Paszport.User', 'Paszport.UserAdditionalData');
     public $components = array('Session', 'Paszport.Image2');
 	public $userFields = array('User.email', 'User.created', 'User.photo', 'User.photo_small', 'User.group_id', 'User.username');
-	
-	
-	
-	
-	
-	
-	
+
     /**
      * Sets permissions
      */
     public function beforeFilter()
     {
-	   	    
         parent::beforeFilter();
-
-//        $this->Auth->allow(array('login', 'add', 'gate', 'api_ping', 'forgot', 'reset', 'fblogin', 'api_gate', 'import','api_fblogin', 'twitterlogin', 'twitter','failed','client'));
-//        $this->Auth->deny(array('index'));
-//        $this->OAuth->allow();
-//        $this->OAuth->deny('me');
-
-        /*if ($this->params->action == 'login' && $this->Auth->loggedIn()) {
-            $this->redirect(array('action' => 'index'));
-        }*/
-
-
     }
 
     public function avatar($id = null)
@@ -100,17 +82,23 @@ class UsersController extends PaszportAppController
         $this->set('_serialize', array('user', 'applications', 'streams'));
     }
 
-    public function index($id = null)
+    /**
+     * Return full user information
+     */
+    public function read()
     {
-        $id = $this->user_id;
-        $this->data = $this->User->find('first', array(
-            'conditions' => array('User.id' => $id),
+        $user = $this->Auth->user();
+        $user_data = $this->User->find('first', array(
+            'conditions' => array('User.id' => $user['id']),
             'contain' => array('Language', 'UserExpand', 'Group'),
         ));
-        $this->set(array(
-            'user' => $this->data,
-            '_serialize' => array('user', 'info'),
-        ));
+
+        // TODO should be restricted depending what app is authenticated
+        $filtered_keys = array('id', 'email', 'created', 'modified', 'language_id', 'twitter_id', 'facebook_id',
+            'photo', 'photo_small', 'group_id', 'username');
+        $filtered_data = array_intersect_key($user_data['User'], array_flip($filtered_keys))    ;
+
+        $this->setSerialized($filtered_data);
     }
 
     public function registerFromFacebook() {
@@ -119,7 +107,7 @@ class UsersController extends PaszportAppController
             $errors = array();
             $user = $this->User->find('first', array(
                 'conditions' => array("User.email" => $this->data['email']))
-            );
+                );
 
             if(!$user)
             {

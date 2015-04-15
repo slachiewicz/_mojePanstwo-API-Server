@@ -561,11 +561,31 @@ class MPSearch {
         	
         	} else {
 	        	
-	        	$and_filters[] = array(
-		        	'term' => array(
-			        	'data.' . $key => $value,
-		        	),
-	        	);
+	        	
+	        	if( preg_match('^\[(.*?)(\s*)TO(\s*)(.*?)\]^i', $value, $match) ) {
+		        			        	
+		        	$range = array();
+					
+					if( $match[1]!=='' )
+						$range['gte'] = $match[1];
+					if( $match[4]!=='' )
+						$range['lte'] = $match[4];
+					
+					$and_filters[] = array(
+						'range' => array(
+							'data.' . $key => $range,
+						),
+					);
+							        	
+	        	} else {
+	        			        	
+		        	$and_filters[] = array(
+			        	'term' => array(
+				        	'data.' . $key => $value,
+			        	),
+		        	);
+	        	
+	        	}
 	        	
         	}
 

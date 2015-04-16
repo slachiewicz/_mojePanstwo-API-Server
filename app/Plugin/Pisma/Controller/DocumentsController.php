@@ -55,68 +55,29 @@ class DocumentsController extends AppController
         $temp = $this->readOrThrow($this->request->params['id']);
     	$this->setSerialized('object', $temp);
         
-        /*
-        if(
-	        isset( $this->request->query['temp'] ) && 
-	        (boolean) $this->request->query['temp'] 
-        ) {
-        
-        	$temp = $this->readOrThrow($this->request->params['id']);
-        	$this->setSerialized('object', $temp);
-        
-        } elseif( $object = $this->Document->get($this->request->params['id']) ) {
-        	        
-	        $map = array(
-	        	'id' => 'id', 
-	        	'data_pisma' => 'date',
-	        	'nazwa' => 'name',
-	        	'tytul' => 'title',
-	        	'tresc' => 'content',
-	        	'adresat' => 'to_str',
-	        	'nadawca' => 'from_str',
-	        	'miejscowosc' => 'from_location',
-	        	'data' => 'date',
-	        	'szablon_id' => 'template_id',
-	        	'podpis' => 'from_signature',
-	        	'alphaid' => 'alphaid',
-	        	'to_dataset' => 'to_dataset',
-	        	'to_id' => 'to_id',
-	        	'adresat_nazwa' => 'to_name',
-	        	'hash' => 'hash',
-	        	'slug' => 'slug',
-	        	'adresat_id' => 'to_id',
-	        	'from_user_id' => 'from_user_id',
-	        	'from_user_type' => 'from_user_type',
-	        	
-	        );
-	        
-	        $temp = array();
-	        foreach( $map as $k=>$v )
-	        	if( array_key_exists($v, $object) )
-	        		$temp[$k] = $object[$v];
-        	
-        	$this->setSerialized('object', $temp);
-        	
-        } else {
-	        
-	        throw new NotFoundException('Could not find that document');
-	        
-        }
-        */
-        
     }
 	
-	public function update($id, $slug = null) {
-		
+	public function update($id) {
+
 		$status = false;		
-		if(
+
+		if( isset($this->data['access']) ) {
+			
+			$status = $this->Document->changeAccess($id, array(
+				'access' => $this->data['access'],
+				'user_type' => $this->Auth->user('type'),
+		        'user_id' => $this->Auth->user('id'),
+			));
+			
+		} elseif(
 			isset( $this->request->query['name'] ) && 
 			( $name = $this->request->query['name'] )
 		) {
 			
 			$status = $this->Document->rename($id, array(
 				'name' => $name,
-				'user' => $this->service_user,
+				'user_type' => $this->Auth->user('type'),
+		        'user_id' => $this->Auth->user('id'),
 			));
 			
 		}
@@ -290,7 +251,21 @@ class DocumentsController extends AppController
 	    if( $data['saved']=='0' )	        	
 	        $this->Document->create();  
 	    
-	    	    
+	    
+	    $data['from_user_name'] = '';
+	    if( $data['from_user_type']=='account' ) {
+		    
+		    $this->loadModel('Paszport.User');
+		    $user = $this->User->find('first', array(
+			    'conditions' => array(
+				    'User.id' => $data['from_user_id'],
+			    ),
+		    ));
+		    
+		    $data['from_user_name'] = $user['User']['username'];
+		    
+	    }
+	    
         if ($doc = $this->Document->save(array('Document' => $data))) {
             $this->response->statusCode(201);  // 201 Created
             

@@ -589,6 +589,82 @@ class UsersController extends PaszportAppController
         }
     }
 	
+	public function forgotNewPassword() {
+		$errors = array();
+		$success = false;
+		
+		if($this->data && $this->data['User']['password'] && $this->data['token']) {
+			$password = $this->Auth->password($this->data['User']['password']);
+			$token = urlencode($this->data['token']);
+			
+			$user = $this->User->find('first', array(
+				'conditions' => array(
+					'User.reset_hash' => $token
+				)
+			));
+			
+			if($user['User']) {
+				$this->User->id = $user['User']['id'];
+				$this->User->set(array('User' => array(
+					'password' => $password
+				)));
+				$this->User->save(array('password' => $password));
+				$success = true;
+			} else {
+				$errors[] = 'LC_PASZPORT_SECURITY_TOKEN_INVALID';
+			}
+			
+		} else {
+			$errors[] = 'BAD_REQUEST';
+		}
+		
+		$this->set(array(
+			'success' => $success,
+			'errors' => $errors,
+			'_serialize' => array('success', 'errors'),
+		));
+	}
+	
+	public function forgotToken() {
+		$errors = array();
+		$success = false;
+		
+		if($this->data && $this->data['token']) {
+				$hash = $this->data['token'];
+                $hash = str_replace(' ', '+', urldecode($hash));
+                $e = new Encryption(MCRYPT_BlOWFISH, MCRYPT_MODE_CBC);
+
+                $token_data = json_decode($e->decrypt(base64_decode($hash), Configure::read('Security.salt')), true);
+                $user_email = $token_data['email'];
+                $expires = $token_data['expires'];
+                if (time() > $expires) {
+					$errors[] = 'LC_PASZPORT_SECURITY_TOKEN_EXPIRED';
+                } else {
+                    $user = $this->User->find('first', array(
+                        'conditions' => array(
+                            'User.email' => $user_email,
+                            'User.reset_hash' => urlencode($this->data['token'])
+                        )
+                    ));
+											
+                    $user = isset($user['User']) ? $user['User'] : false;
+                    if ($user) {
+                        $success = true;
+                    } else {
+                        $errors[] = 'LC_PASZPORT_SECURITY_TOKEN_INVALID';
+                    }
+                }
+		} else {
+			$errors[] = 'BAD_REQUEST';
+		}
+		
+		$this->set(array(
+			'success' => $success,
+			'errors' => $errors,
+			'_serialize' => array('success', 'errors'),
+		));
+	}
+	
 	public function forgot()
 	{
 		App::uses('CakeEmail', 'Network/Email');
@@ -613,7 +689,12 @@ class UsersController extends PaszportAppController
                 $Email->viewVars(array('hash' => urlencode($hash)));
 
                 if($Email->send()) {
-                    $this->User->field('users', $user['User']['id'], array('User' => array('reset_hash' => urlencode($hash))));
+					$this->User->id = $user['User']['id'];
+					$this->User->set(array('User' => array(
+						'reset_hash' => urlencode($hash)
+					)));
+					$this->User->save(array('reset_hash' => urlencode($hash)));
+                    //$this->User->field('users', $user['User']['id'], array('User' => array('reset_hash' => urlencode($hash))));
                     $success = true;
                 } else {
 					$errors[] = 'LC_MAIL_SEND_ERROR';

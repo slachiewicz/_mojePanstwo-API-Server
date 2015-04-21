@@ -302,7 +302,7 @@ class Document extends AppModel {
 				),
 				'partial_fields' => array(
 					'data' => array(
-						'include' => array('id', 'alphaid', 'name', 'slug', 'date', 'created_at', 'modified_at', 'to_name', 'hash'),
+						'include' => array('id', 'alphaid', 'name', 'slug', 'date', 'created_at', 'modified_at', 'to_name', 'hash', 'sent', 'sent_at'),
 					),
 				),
 				'sort' => array(
@@ -340,7 +340,7 @@ class Document extends AppModel {
 		App::import('model','DB');
 		$DB = new DB();
 		
-		$q = "UPDATE `pisma_documents` SET `name`='" . addslashes( $params['name'] ) . "' WHERE `alphaid`='" . addslashes($id) . "' AND `from_user_type`='" . addslashes( $params['user']['type'] ) . "' AND `from_user_id`='" . addslashes( $params['user']['id'] ) . "' LIMIT 1";
+		$q = "UPDATE `pisma_documents` SET `name`='" . addslashes( $params['name'] ) . "' WHERE `alphaid`='" . addslashes($id) . "' AND `from_user_type`='" . addslashes( $params['user_type'] ) . "' AND `from_user_id`='" . addslashes( $params['user_id'] ) . "' LIMIT 1";
 		$DB->query($q);
 		
 		if( $DB->getAffectedRows() ) {
@@ -353,6 +353,37 @@ class Document extends AppModel {
 			    'body' => array(
 				    'doc' => array(
 					    'name' => $params['name'],
+				    ),
+			    ),
+		    ));
+		    
+		    return true;
+			
+		} else return true;
+		
+	}
+	
+	public function changeAccess($id, $params) {
+		
+		if( !$params['access'] )
+			return false;
+		
+		App::import('model','DB');
+		$DB = new DB();
+		
+		$q = "UPDATE `pisma_documents` SET `access`='" . addslashes( $params['access'] ) . "' WHERE `alphaid`='" . addslashes($id) . "' AND `from_user_type`='" . addslashes( $params['user_type'] ) . "' AND `from_user_id`='" . addslashes( $params['user_id'] ) . "' LIMIT 1";
+		$DB->query($q);
+		
+		if( $DB->getAffectedRows() ) {
+			
+			$ES = ConnectionManager::getDataSource('MPSearch');
+			$ES->API->update(array(
+			    'index' => 'mojepanstwo_v1',
+			    'type' => 'letters',
+			    'id' => $id,
+			    'body' => array(
+				    'doc' => array(
+					    'access' => $params['access'],
 				    ),
 			    ),
 		    ));

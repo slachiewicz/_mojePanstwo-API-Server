@@ -3,15 +3,12 @@ class MPSearch {
 
     public $cacheSources = true;
     public $description = 'Serwer wyszukania platformy mojePaństwo';
+	private $_index = 'mojepanstwo_v1';    
+
 	public $API;
-	
-	private $_index = 'mojepanstwo_v1';
-	private $_data_prefix = 'data';
-    private $_excluded_fields = array('datachannel', 'dataset', 'search', 'q');
-    private $_fields_multi_dict = array();
-    
     public $lastReponse = false;
     
+    public $Aggs = array();
     private $aggs_allowed = array(
 	    'date_histogram' => array('field', 'interval', 'format'),
 	    'terms' => array('field', 'include', 'exclude', 'size'),
@@ -21,8 +18,6 @@ class MPSearch {
 	    'aggs' => array(),
 	    'global' => array(),
     );
-    
-    public $Aggs = array();
     
     public function query(){
 	    return null;
@@ -50,100 +45,11 @@ class MPSearch {
 	    		$config['host'] . ':' . $config['port'],
 	    	),
 	    ));
-        // parent::__construct($config);
 
     }
-    
-    /*
-    public function getCurrentUser($field = false) {
-	 	
-		App::uses('CakeSession', 'Model/Datasource');
-		$Session = new CakeSession();	
-		$user = $Session->read('Auth.User');
-				
-		if( $user && is_array($user) ) {
-						
-			if( $field===false )
-				return $user;
-			else
-				return isset( $user[$field] ) ? $user[$field] : false;
- 			
-		} else return false;
-	
-	}
-    
-    public function search($body) {
-	    
-	    $params = array(
-	    	'index' => $this->_index,
-	    	'body' => $body,
-	    );
-	    
-	    return $this->API->search($params);
-	    
-    }
-    
-    public function getObject($dataset, $id, $field='id') {
-	    
-	    if( $field!='id' )
-	    	$field = 'data.' . $field;
-	    
-	    $params = array(
-			'index' => $this->_index,
-			'type' => 'objects',
-			'body' => array(
-				'from' => 0, 
-				'size' => 1,
-				'query' => array(
-					'filtered' => array(
-				        'filter' => array(
-				            'and' => array(
-				                'filters' => array(
-				                    array(
-				                        'term' => array(
-				                        	'dataset' => $dataset,
-				                        ),
-				                    ),
-				                    array(
-				                    	'term' => array(
-				                        	$field => $id,
-				                        ),
-				                    ),
-				                ),
-				                '_cache' => true,
-				            ),
-				        ),
-				    ),
-				),
-				'fields' => array('dataset', 'id', 'slug'),
-				'partial_fields' => array(
-					'source' => array(
-						'include' => array('data'),
-					),
-				),
-			),
-		);
-
-		
-		// echo "\n\n"; var_export( $params );
-	    $es_result = $this->API->search($params);
-	    // echo "\n\n"; debug( $es_result ); die();
-	    
-	    
-	    $object = false;
-	    if( $es_result && $es_result['hits']['total'] )
-		    return $this->doc2object( $es_result['hits']['hits'][0] );
-	    else 
-	    	return false;
-	    
-	    
-    }
-    */
     
     public function doc2object($doc) {
-	    
-	    // echo "\n\n"; debug( $doc );
-	    
+	    	    
 	    $output = array(
             'global_id' => $doc['_id'],
             'dataset' => $doc['fields']['dataset'][0],
@@ -368,46 +274,6 @@ class MPSearch {
 	                
 	                $this->Aggs[ '_channels' ][ 'global' ] = array();
 	            
-	            
-	            /*  
-	            } elseif( 
-					( $agg_id === '_channels' ) && 
-					isset( $queryData['conditions']['subscribtions'] )
-				) {
-																	
-					$aggs['_channels'] = array(
-	                    'terms' => array(
-		                    'field' => 'dataset',
-		                    'size' => 20
-	                    ),
-	                    'aggs' => array(
-		                    'id' => array(
-			                    'terms' => array(
-				                    'field' => 'id',
-				                    'size' => 20
-			                    ),
-			                    'aggs' => array(
-				                    'channels' => array(
-					                    'children' => array(
-						                    'type' => '.percolator',
-					                    ),
-					                    'aggs' => array(
-						                    'user_id' => array(
-							                    'terms' => array(
-								                    'field' => 'title',
-								                    'size' => 20,
-							                    ),
-						                    ),
-					                    ),
-				                    ),
-			                    ),
-		                    )
-	                    ),
-	                );
-	                
-	                $this->Aggs[ '_channels' ][ 'terms' ] = array();
-				*/
-				
 				} else {
 				
 					foreach( $agg_data as $agg_type => $agg_params ) {
@@ -444,16 +310,11 @@ class MPSearch {
 							
 			if( !empty($aggs) )
 				$params['body']['aggs'] = $aggs;
-			
-			// debug($aggs); die();
-			
+						
 		}
 		
-		
-		// FITERS
-		
+				
 		$and_filters = array();
-        
                     
         foreach( $queryData['conditions'] as $key => $value ) {
         	      
@@ -470,10 +331,12 @@ class MPSearch {
 				
 				if( $value ) {
 					
-					$params['body']['query']['function_score']['query']['filtered']['query']['match_phrase']['text'] = array(
-			        	'query' => $value,
+		        	$params['body']['query']['function_score']['query']['filtered']['query']['multi_match'] = array(
+			        	'query' => mb_convert_encoding($value, 'UTF-8', 'UTF-8'),
+					    'type' => "phrase",
+					    'fields' => array('title.suggest', "text"),
 						'analyzer' => 'pl',
-						'slop' => 3,
+						'slop' => 5,
 		        	);
 		        	
 		        	unset( $params['body']['sort'] );
@@ -698,11 +561,31 @@ class MPSearch {
         	
         	} else {
 	        	
-	        	$and_filters[] = array(
-		        	'term' => array(
-			        	'data.' . $key => $value,
-		        	),
-	        	);
+	        	
+	        	if( preg_match('^\[(.*?)(\s*)TO(\s*)(.*?)\]^i', $value, $match) ) {
+		        			        	
+		        	$range = array();
+					
+					if( $match[1]!=='' )
+						$range['gte'] = $match[1];
+					if( $match[4]!=='' )
+						$range['lte'] = $match[4];
+					
+					$and_filters[] = array(
+						'range' => array(
+							'data.' . $key => $range,
+						),
+					);
+							        	
+	        	} else {
+	        			        	
+		        	$and_filters[] = array(
+			        	'term' => array(
+				        	'data.' . $key => $value,
+			        	),
+		        	);
+	        	
+	        	}
 	        	
         	}
 
@@ -742,7 +625,6 @@ class MPSearch {
     public function read(Model $model, $queryData = array()) {
 		
 		$params = $this->buildESQuery($queryData);
-		// debug( $params );
 				
 		$this->lastReponse = false;
 		$response = $this->API->search( $params ); 
@@ -751,13 +633,9 @@ class MPSearch {
         if( isset($this->lastResponse['hits']) && isset($this->lastResponse['hits']['hits']) )
 	        unset( $this->lastResponse['hits']['hits'] );
         
-        // debug( $response ); die();
-        // debug( $this->Aggs );
-        
         if( !empty($this->Aggs) ) {
 	        
 	        foreach( $this->Aggs as $agg_id => &$agg_data ) {
-			    
 			    
 		        if( isset($response['aggregations'][$agg_id]) )
 		        	$agg_data = $response['aggregations'][$agg_id];

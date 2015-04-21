@@ -89,7 +89,9 @@ class Subscription extends AppModel
 				$params['body']['channel'] = $data['channel'];
 				
 			
-			$ret = $ES->API->index($params);		    
+			$ret = $ES->API->index($params);	
+			
+			return $_id;	    
 		    
 		}
 	    
@@ -179,6 +181,39 @@ class Subscription extends AppModel
 	    );
 	    
     }
+    
+    public function transfer_anonymous($anonymous_user_id, $user_id) {
+		
+		if(
+			( $db = ConnectionManager::getDataSource('default') ) && 
+			( $where = "user_type='anonymous' AND user_id='" . addslashes( $anonymous_user_id ) . "'" ) && 
+			( $subs = $db->query("SELECT id, parent_id FROM subscriptions WHERE $where") ) 
+		) {
+			
+			$ES = ConnectionManager::getDataSource('MPSearch');
+						
+			foreach( $subs as $sub ) {
+			    $ES->API->update(array(
+				    'index' => 'mojepanstwo_v1',
+				    'type' => '.percolator',
+				    'id' => $sub['subscriptions']['id'],
+				    'parent' => $sub['subscriptions']['parent_id'],
+				    'body' => array(
+					    'doc' => array(
+						    'user_type' => 'account',
+					    	'user_id' => $user_id,
+					    ),
+				    ),
+			    ));
+			}
+			
+			$db->query("UPDATE subscriptions SET `user_type`='account', `user_id`='" . addslashes( $user_id ) . "' WHERE $where");
+			
+			return true;
+			
+		} else return false;
+		
+	}
 
 }
 

@@ -48,6 +48,16 @@ class EmailConfig {
         'helpers' => array('Czas', 'Style'),
     );
 	
+	public $noreply = array(
+        'host' => 'ssl://smtp.gmail.com',
+        'port' => 465,
+		'from' => array('no-reply@mojepanstwo.pl' => '_mojePaństwo'),
+        'username' => 'no-reply@mojepanstwo.pl',
+        'password' => '8eguCRAb',
+        'transport' => 'Smtp',
+        'helpers' => array('Czas', 'Style'),
+	);
+	
 /*
 	public $default = array(
 		'transport' => 'Mail',

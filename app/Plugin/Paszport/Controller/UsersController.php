@@ -108,7 +108,7 @@ class UsersController extends PaszportAppController
             $errors = array();
             $user = $this->User->find('first', array(
                 'conditions' => array("User.email" => $this->data['email']))
-                );
+            );
 
             if(!$user)
             {

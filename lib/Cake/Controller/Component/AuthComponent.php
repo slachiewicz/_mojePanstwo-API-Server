@@ -375,7 +375,7 @@ class AuthComponent extends Component
             $this->_stop();
             return false;
         }
-        $controller->redirect(null, 403);
+        $controller->redirect(null, 401); // corrected to throw UnAuthorized if not authenticated
         return false;
     }
 

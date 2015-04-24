@@ -33,8 +33,9 @@ class PaszportAppController extends AppController
             // deny access to Paszport from untrusted clients
             throw new ForbiddenException();
         }
+        // deny all unauthenticated if not explicitly allowed
+        $this->Auth->deny();
 
-        $this->Auth->allow();
         if ($this->params->query && !$this->request->isPost()) {
             $this->data = $this->params->query;
         }

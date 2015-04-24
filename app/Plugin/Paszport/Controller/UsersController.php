@@ -665,8 +665,8 @@ class UsersController extends PaszportAppController
 				$Email->config('noreply');
                 $Email->to($user['User']['email'])
                     ->template('Paszport.reset')
-                    ->emailFormat('text')
-                    ->subject('Nowe hasło');
+                    ->emailFormat('html')
+                    ->subject('Zmiana hasła');
 
                 $e = new Encryption(MCRYPT_BlOWFISH, MCRYPT_MODE_CBC);
                 $data = json_encode(array(

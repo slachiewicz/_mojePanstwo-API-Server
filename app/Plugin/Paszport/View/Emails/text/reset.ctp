@@ -1,3 +1,3 @@
-Aby zainicjowac procedurę zmiany hasła kliknij na poniższy link i podążaj wg. instrukcji:
+Aby zainicjowac procedurę zmiany hasła kliknij na poniższy link i podążaj według instrukcji:
 
-<?php echo $this->Html->url('http://mojepanstwo.loc/forgot' . '?token=' . $hash); ?>
+<?php echo $this->Html->url('http://mojepanstwo.pl/forgot' . '?token=' . $hash); ?>

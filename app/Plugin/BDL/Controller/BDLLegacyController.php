@@ -3,6 +3,52 @@
 class BDLLegacyController extends AppController
 {
     
+	public function getLocalDataForDimension()
+	{
+		$types = array(
+			'wojewodztwa'	=> array('BDL_data_wojewodztwa', 'wojewodztwo_id'),
+			'powiaty'	=> array('BDL_data_powiaty', 'powiat_id'),
+			'gminy'		=> array('BDL_data_gminy', 'gmina_id')
+		);
+
+		$type = isset($this->request->query['localtype']) ? $this->request->query['localtype'] : 'wojewodztwa';
+		$type_id = isset($this->request->query['localid']) ? (int) $this->request->query['localid'] : 0;
+		$dim_id = isset($this->request->query['dimid']) ? (int) $this->request->query['dimid'] : 0;
+
+		if(!isset($types[$type]))
+			throw new Exception("Undefined localtype param");
+
+		App::import('model', 'DB');
+        	$this->DB = new DB();
+
+		$type = $types[$type];
+
+		$query = "SELECT `rocznik` as 'y', `v` FROM `".$type[0]."` WHERE `".$type[1]."` = $type_id AND `kombinacja_id` = $dim_id";
+
+		$bdl = $this->DB->selectAssocs($query);
+
+		$data = $bdl;
+
+		/**
+			Skrypt js spodziewa się danych typu 
+			$data = array(
+				array(
+					'y' => 2015,	// rok
+					'v' => 1000	// wartość	
+				),
+			);
+			
+			Na podstawie:
+			$dim_id = $this->request->query['dim_id'];		// kombinacja
+			$localtype = $this->request->query['localtype'];	// typ danych (woj, pow, gmin)
+			$localid = $this->request->query['localid'];		// id typu np. wojewodztwa
+
+		**/
+		//$data = $this->request->query;
+		$this->set('data', $data);
+		$this->set('_serialize', array('data'));
+	}
+
     public function dataForDimmesions()
     {
 

@@ -29,9 +29,9 @@ class PaszportAppController extends AppController
     {
         parent::beforeFilter();
 
-        if (!MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
+        if( $this->request->query['apiKey'] !== ROOT_API_KEY ) {
             // deny access to Paszport from untrusted clients
-            //throw new ForbiddenException();
+            throw new ForbiddenException();
         }
 
         $this->Auth->allow();

@@ -3,6 +3,8 @@
 // COMPABILITY
 
 Router::connect("/bdl/chartDataForDimmesions", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'chartDataForDimmesions'));
+Router::connect("/bdl/getLocalDataForDimension", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'getLocalDataForDimension'));
+
 Router::connect("/bdl/dataForDimmesions", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'dataForDimmesions'));
 
 Router::connect("/bdl/dataForDimmesion/:dim_id", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'dataForDimmesion'), array('dim_id' => '[0-9]+'));

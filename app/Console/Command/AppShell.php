@@ -29,5 +29,18 @@ App::uses('Shell', 'Console');
  */
 class AppShell extends Shell
 {
-
+	
+	public $uses = array('Pisma.Document');
+	
+	public function lettersSyncAll() {
+        
+        $this->Document->syncAll();
+        
+    }
+    
+    public function lettersSync() {
+        
+        $this->Document->sync( $this->args[0] );
+        
+    }
 }

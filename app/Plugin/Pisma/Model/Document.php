@@ -182,7 +182,7 @@ class Document extends AppModel {
 	public function afterSave($created, $options) {
 				
 		if( ($data = $this->data['Document']) && isset($data['alphaid']) && $data['alphaid'] ) {
-			
+						
 			if( $saved = (isset($data['saved']) ? (boolean) $data['saved'] : false) ) {
 				
 				
@@ -308,11 +308,46 @@ class Document extends AppModel {
 				'sort' => array(
 					'modified_at' => 'desc',
 				),
+				'aggs' => array(
+					'access' => array(
+						'terms' => array(
+							'field' => 'access',
+						),
+					),
+					'sent' => array(
+						'terms' => array(
+							'field' => 'sent',
+						),
+					),
+					'to_dataset' => array(
+			            'terms' => array(
+				            'field' => 'to_dataset',
+				            'exclude' => array(
+					            'pattern' => '(|false)'
+				            ),
+			            ),
+			            'aggs' => array(
+				            'to_id' => array(
+					            'terms' => array(
+						            'field' => 'to_id',
+						            'exclude' => array(
+							            'pattern' => '(|false)'
+						            ),
+					            ),
+					            'aggs' => array(
+						            'to_name' => array(
+							            'terms' => array(
+								            'field' => 'to_name',
+							            ),
+						            ),
+					            ),
+				            ),
+			            ),
+			        ),
+				),
 			),
 		));
-		
-		// debug($data); die();
-		
+				
 		$items = array();
 				
 		foreach( $data['hits']['hits'] as $hit )
@@ -328,6 +363,7 @@ class Document extends AppModel {
 				'total' => $data['hits']['total'],
 			),
 			'items' => $items,
+			'aggs' => $data['aggregations'],
 		);
 		
 	}
@@ -509,6 +545,94 @@ class Document extends AppModel {
 			
 		} else return false;
 		
+	}
+	
+	public function syncAll() {
+		
+		$db = ConnectionManager::getDataSource('default');
+		$ids = $db->query("SELECT alphaid FROM pisma_documents WHERE saved='1'");
+		foreach( $ids as $id ) {
+			
+			$this->sync( $id['pisma_documents']['alphaid'] );
+			
+		}
+		
+	}
+	
+	public function sync($id) {
+		
+		$db = ConnectionManager::getDataSource('default');
+	    $ES = ConnectionManager::getDataSource('MPSearch');
+
+		$mask = "Ymd\THis\Z";
+
+		$doc = $db->query("SELECT * FROM pisma_documents WHERE alphaid='" . addslashes( $id ) . "'");
+		$doc = $doc[0]['pisma_documents'];				
+						
+		$data = array(
+			'date' => $doc['date'],
+			'to_str' => $doc['to_str'],
+			'template_id' => $doc['template_id'],
+			'title' => $doc['title'],
+			'name' => $doc['name'],
+			'content_html' => $doc['content_html'],
+			'from_str' => $doc['from_str'],
+			'from_signature' => $doc['from_signature'],
+			'from_user_type' => $doc['from_user_type'],
+			'from_user_id' => $doc['from_user_id'],
+			'from_user_name' => $doc['from_user_name'],
+			'to_dataset' => $doc['to_dataset'],
+			'to_id' => $doc['to_id'],
+			'alphaid' => $doc['alphaid'],
+			'to_name' => $doc['to_name'],
+			'to_email' => $doc['to_email'],
+			'slug' => $doc['slug'],
+			
+			'id' => $doc['id'],
+			'hash' => $doc['hash'],
+			'to_name' => $doc['to_name'],
+			'saved' => (boolean) $doc['saved'],
+		);
+		
+		$data['text'] = @$doc['name'] . "\n";
+		$data['text'] .= @$doc['from_str'] . "\n";
+		$data['text'] .= @$doc['from_location'] . "\n";
+		$data['text'] .= @$doc['date'] . "\n";
+		$data['text'] .= @$doc['to_str'] . "\n";
+		$data['text'] .= @$doc['title'] . "\n";
+		$data['text'] .= @$doc['content'] . "\n";
+		$data['text'] .= @$doc['from_signature'] . "\n";		
+		
+		$ts_fields = array('created_at', 'modified_at', 'saved_at', 'sent_at', 'deleted_at');
+		foreach( $ts_fields as $ts_field ) {
+			if( 
+				isset($doc[ $ts_field ]) && 
+				( $doc[$ts_field] != '0000-00-00 00:00:00' ) && 
+				$ts = strtotime( $doc[$ts_field] )
+			)
+				$data[ $ts_field ] = date($mask, $ts);
+		}		
+		
+		if( $data['from_user_type'] == 'account' ) {
+			
+			App::import('model','Paszport.User');
+			$user = new User();
+			$user = $this->User->findById($data['from_user_id']);
+			$data['from_user_name'] = $user['User']['username'];
+			
+		}
+		
+		debug( $data );
+				
+		$response = $ES->API->index(array(
+			'index' => 'mojepanstwo_v1',
+			'type' => 'letters',
+			'id' => $data['alphaid'],
+			'body' => $data,
+		));
+		
+		debug( $response );
+				
 	}
 
 }

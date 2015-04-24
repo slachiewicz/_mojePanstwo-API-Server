@@ -16,8 +16,10 @@ class RefreshTokensController extends OAuthAppController
 
     public function find($type = 'whatever')
     {
-        $data = $this->request->query;
-        if ($type !== 'first' || !isset($data['conditions']['refresh_token'])) {
+	    	    
+        $data = $this->request->data;
+        
+        if (!isset($data['conditions']['refresh_token'])) {
             throw new BadRequestException();
         }
 
@@ -26,7 +28,9 @@ class RefreshTokensController extends OAuthAppController
             $params['recursive'] = $data['recursive'];
         }
         $params['conditions'] = array('RefreshToken.refresh_token' => $data['conditions']['refresh_token']);
-
+		
+		var_export( $params ); die();
+		
         $refresh_token = $this->RefreshToken->find('first', $params);
 
         $this->set(array(

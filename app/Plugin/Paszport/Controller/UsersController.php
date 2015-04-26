@@ -368,7 +368,7 @@ class UsersController extends PaszportAppController
         $id = (int) $this->Auth->user('id');
         if($this->request->isPost() && isset($this->data['old_password']) && isset($this->data['new_password'])) {
             $user = $this->User->find('first', array('conditions' => array('User.id' => $id)));
-            if(($user['User']['password'] == $this->Auth->password($this->data['old_password'])) || true) {
+            if(($user['User']['password'] == $this->Auth->password($this->data['old_password']))) {
                 $this->User->id = $id;
                 $this->User->set(array('User' => array(
                     'password' => $this->data['new_password'],
@@ -1015,5 +1015,16 @@ class UsersController extends PaszportAppController
         }
         exit();
     }
+
+	public function find() {
+		if(!isset($this->data['type']) || !isset($this->data['conditions']))
+			throw new BadRequestException();
+
+		$user = $this->User->find($this->data['type'], $this->data['conditions']);
+	    $this->set(array(
+	        'user' => $user,
+	        '_serialize' => 'user'
+	    ));
+	}
 
 }

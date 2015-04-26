@@ -34,7 +34,7 @@ class DocumentsController extends AppController
     public function search() {
                
         $this->Auth->deny();
-         
+                
         $params = array(
 	        'page' => ( 
 	        	isset($this->request->query['page']) && 
@@ -44,6 +44,29 @@ class DocumentsController extends AppController
 	        'user_type' => $this->Auth->user('type'),
 	        'user_id' => $this->Auth->user('id'),
         );
+        
+        if( 
+        	isset($this->request->query['conditions']) && 
+        	( $conditions = $this->request->query['conditions'] )
+        ) {
+        	        	
+	        if( isset($conditions['access']) && in_array($conditions['access'], array('private', 'public')) )
+	        	$params['conditions']['access'] = $conditions['access'];
+	        	
+	        if( isset($conditions['template']) )
+	        	$params['conditions']['template_id'] = $conditions['template'];
+	        	
+	        if( isset($conditions['sent']) )
+	        	$params['conditions']['sent'] = (boolean) $conditions['sent'];
+	        	
+	        if( isset($conditions['to']) && ($parts = explode(':', $conditions['to'])) && ( count($parts) >= 2 ) ) {
+		        		        
+	        	$params['conditions']['to_dataset'] = $parts[0];
+	        	$params['conditions']['to_id'] = $parts[1];
+
+	        }
+
+        }
 						
 		$search = $this->Document->search($params);
         $this->setSerialized('search', $search);

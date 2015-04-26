@@ -13,3 +13,4 @@ Router::connect('/paszport/user/registerFromFacebook', array('plugin' => 'Paszpo
 Router::connect('/paszport/user/forgot', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'forgot'));
 Router::connect('/paszport/user/forgotToken', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'forgotToken'));
 Router::connect('/paszport/user/forgotNewPassword', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'forgotNewPassword'));
+Router::connect('/paszport/user/find', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'find'));

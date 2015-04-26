@@ -181,79 +181,37 @@ class Document extends AppModel {
 	
 	public function afterSave($created, $options) {
 				
-		if( ($data = $this->data['Document']) && isset($data['alphaid']) && $data['alphaid'] ) {
+		if( 
+			( $data = $this->data['Document'] ) && 
+			isset( $data['alphaid'] ) && 
+			$data['alphaid'] && 
+			( $saved = (isset($data['saved']) ? (boolean) $data['saved'] : false) )
+		) {
 						
-			if( $saved = (isset($data['saved']) ? (boolean) $data['saved'] : false) ) {
-				
-				
-				App::uses('ConnectionManager', 'Model');
-				
-				
-				// GET HASH
-				
-				if(
-					( $db = ConnectionManager::getDataSource('default') ) && 
-					( $dbdata = $db->query("SELECT id, hash, to_name FROM pisma_documents WHERE alphaid='" . addslashes( $data['alphaid'] ) . "'") ) 
-				) {		
-					$data['id'] = $dbdata[0]['pisma_documents']['id'];
-					$data['hash'] = $dbdata[0]['pisma_documents']['hash'];
-					$data['to_name'] = $dbdata[0]['pisma_documents']['to_name'];
-				}
-									
-				// SEND TO THUMBNAILS GENERATOR
-				
-				
-				$db = ConnectionManager::getDataSource('MPCache');				
-				$db->API->sadd('pisma/thumbnails/incoming', json_encode($data));				
-				
-				
-				
-				
-				// SEND TO ELASTIC SEARCH
-				
-				$mask = "Ymd\THis\Z";
-				
-				$data['text'] = @$data['name'] . "\n";
-				$data['text'] .= @$data['from_str'] . "\n";
-				$data['text'] .= @$data['from_location'] . "\n";
-				$data['text'] .= @$data['date'] . "\n";
-				$data['text'] .= @$data['to_str'] . "\n";
-				$data['text'] .= @$data['title'] . "\n";
-				$data['text'] .= @$data['content'] . "\n";
-				$data['text'] .= @$data['from_signature'] . "\n";
-				
-				$data['saved'] = $saved;
-				
-									
-				if( 
-					isset($data['created_at']) && 
-					( $created_at = strtotime( $data['created_at'] ) ) 
-				)
-					$data['created_at'] = date($mask, $created_at);
-					
-				if( 
-					isset($data['modified_at']) && 
-					( $modified_at = strtotime( $data['modified_at'] ) ) 
-				)
-					$data['modified_at'] = date($mask, $modified_at);
-											
-				
-			    
-			    $ES = ConnectionManager::getDataSource('MPSearch');
-								
-				$response = $ES->API->index(array(
-					'index' => 'mojepanstwo_v1',
-					'type' => 'letters',
-					'id' => $data['alphaid'],
-					'body' => $data,
-				));
-				
-				
-				
-			
-			}		
+			$this->sync( $data['alphaid'] );		
 						
 		}
+		
+	}
+	
+	private function prepareAggs($params, $field = false) {
+		
+		if( $field && isset($params['and']) && isset($params['and']['filters']) ) {
+			
+			$filters = array();
+			
+			foreach( $params['and']['filters'] as $f ) {
+				
+				$keys = array_keys( $f['term'] );
+				if( $keys[0] !== $field )
+					$filters[] = $f;
+				
+			}
+			
+			$params['and']['filters'] = $filters;
+			return $params;
+			
+		} else return $params;
 		
 	}
 	
@@ -283,7 +241,19 @@ class Document extends AppModel {
 	            ),
 	        ),
 	    );
-	    
+	    	    
+	    if( isset($params['conditions']) ) {
+		    foreach( $params['conditions'] as $key => $val ) {
+			    
+			    $filtered['filter']['and']['filters'][] = array(
+				    'term' => array(
+					    $key => $val,
+				    ),
+			    );
+			    
+		    }
+	    }
+	    	      
 	    if( $params['q'] )
 	    	$filtered['query'] = array(
 		        'match' => array(
@@ -291,7 +261,7 @@ class Document extends AppModel {
 		        ),
 	        );
 		
-		$data = $ES->API->search(array(
+		$es_params = array(
 			'index' => 'mojepanstwo_v1',
 			'type' => 'letters',
 			'body' => array(
@@ -302,56 +272,103 @@ class Document extends AppModel {
 				),
 				'partial_fields' => array(
 					'data' => array(
-						'include' => array('id', 'alphaid', 'name', 'slug', 'date', 'created_at', 'modified_at', 'to_name', 'hash', 'sent', 'sent_at'),
+						'include' => array('id', 'alphaid', 'name', 'slug', 'date', 'created_at', 'modified_at', 'to_label', 'hash', 'sent', 'sent_at'),
 					),
 				),
 				'sort' => array(
 					'modified_at' => 'desc',
 				),
 				'aggs' => array(
-					'access' => array(
-						'terms' => array(
-							'field' => 'access',
-						),
-					),
-					'sent' => array(
-						'terms' => array(
-							'field' => 'sent',
-						),
-					),
-					'to_dataset' => array(
-			            'terms' => array(
-				            'field' => 'to_dataset',
-				            'exclude' => array(
-					            'pattern' => '(|false)'
-				            ),
-			            ),
-			            'aggs' => array(
-				            'to_id' => array(
-					            'terms' => array(
-						            'field' => 'to_id',
-						            'exclude' => array(
-							            'pattern' => '(|false)'
-						            ),
-					            ),
-					            'aggs' => array(
-						            'to_name' => array(
+					'all' => array(
+						'global' => new \stdClass(),
+						'aggs' => array(
+							'access' => array(
+								'filter' => $this->prepareAggs( $filtered['filter'], 'access' ),
+								'aggs' => array(
+									'filtered' => array(
+										'terms' => array(
+											'field' => 'access',
+										),
+									),
+								),
+							),
+							'sent' => array(
+								'filter' => $this->prepareAggs( $filtered['filter'], 'sent' ),
+								'aggs' => array(
+									'filtered' => array(
+										'terms' => array(
+											'field' => 'sent',
+										),
+									),
+								),
+							),
+							'to_dataset' => array(
+								'filter' => $this->prepareAggs( $filtered['filter'], 'to_dataset' ),
+								'aggs' => array(
+									'filtered' => array(
 							            'terms' => array(
-								            'field' => 'to_name',
+								            'field' => 'to_dataset',
+								            'exclude' => array(
+									            'pattern' => '(|false)'
+								            ),
 							            ),
-						            ),
-					            ),
-				            ),
-			            ),
-			        ),
+							            'aggs' => array(
+								            'to_id' => array(
+									            'terms' => array(
+										            'field' => 'to_id',
+										            'exclude' => array(
+											            'pattern' => '(|false)'
+										            ),
+									            ),
+									            'aggs' => array(
+										            'to_name' => array(
+											            'terms' => array(
+												            'field' => 'to_label',
+											            ),
+										            ),
+									            ),
+								            ),
+							            ),
+							        ),
+							    ),
+					        ),
+					        'template_id' => array(
+								'filter' => $this->prepareAggs( $filtered['filter'], 'template_id' ),
+								'aggs' => array(
+									'filtered' => array(
+								        'terms' => array(
+									        'field' => 'template_id',
+									        'exclude' => array(
+									            'pattern' => '(|false)'
+								            ),
+								        ),
+								        'aggs' => array(
+									        'template_label' => array(
+										        'terms' => array(
+											        'field' => 'template_label',
+										        ),
+										    ),
+								        ),
+								    ),
+								),
+					        ),
+					    ),
+				    ),
 				),
 			),
-		));
+		);
+		
+		// debug( $es_params );
+		$data = $ES->API->search($es_params);
+		// debug( $data ); die();
 				
 		$items = array();
 				
-		foreach( $data['hits']['hits'] as $hit )
+		foreach( $data['hits']['hits'] as $hit ) {			
+			$hit['fields']['data'][0]['to_name'] = $hit['fields']['data'][0]['to_label'];
+			unset( $hit['fields']['data'][0]['to_label'] );
 			$items[] = $hit['fields']['data'][0];
+		}
 		
 		return array(
 			'performance' => array(
@@ -584,14 +601,15 @@ class Document extends AppModel {
 			'to_dataset' => $doc['to_dataset'],
 			'to_id' => $doc['to_id'],
 			'alphaid' => $doc['alphaid'],
-			'to_name' => $doc['to_name'],
+			'to_label' => $doc['to_name'],
 			'to_email' => $doc['to_email'],
 			'slug' => $doc['slug'],
+			'access' => $doc['access'],
 			
 			'id' => $doc['id'],
 			'hash' => $doc['hash'],
-			'to_name' => $doc['to_name'],
 			'saved' => (boolean) $doc['saved'],
+			'sent' => (boolean) $doc['sent'],
 		);
 		
 		$data['text'] = @$doc['name'] . "\n";
@@ -619,10 +637,20 @@ class Document extends AppModel {
 			$user = new User();
 			$user = $this->User->findById($data['from_user_id']);
 			$data['from_user_name'] = $user['User']['username'];
+			$db->query("UPDATE pisma_documents SET `from_user_name`='" . addslashes( $user['User']['username'] ) . "' WHERE alphaid='" . addslashes( $id ) . "'");
 			
 		}
 		
-		debug( $data );
+		if( $data['template_id'] ) {
+			
+			$template = $db->query("SELECT nazwa FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'");			
+			$data['template_label'] = $template[0]['pisma_szablony']['nazwa'];
+			
+		} else {
+			$data['template_label'] = 'Bez szablonu';
+		}
+		
+		// debug( $data );
 				
 		$response = $ES->API->index(array(
 			'index' => 'mojepanstwo_v1',
@@ -631,7 +659,8 @@ class Document extends AppModel {
 			'body' => $data,
 		));
 		
-		debug( $response );
+		
+		// debug( $response );
 				
 	}
 

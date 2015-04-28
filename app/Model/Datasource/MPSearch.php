@@ -424,6 +424,17 @@ class MPSearch {
         			);
 	        		
 		        	$params['body']['partial_fields']['source']['include'][] = 'contexts.' . $value['dataset'] . '.' . $value['object_id'] . '.*';
+		        	
+		        	if( $value['dataset']=='rady_druki' ) {
+		        	
+			        	$params['body']['sort'] = array(
+				        	'date' => 'asc',
+				        	'feed_dataset_order.rady_druki' => 'asc',
+			        	);
+		        	
+		        	}
+		        	
+		        	// unset( $params['body']['sort'] );
 	        			        			
         		}	        	
 	        	
@@ -618,6 +629,8 @@ class MPSearch {
 			
 		}
 		
+		// debug($params); die();
+		
 		return $params;
 		
 	}
@@ -625,7 +638,9 @@ class MPSearch {
     public function read(Model $model, $queryData = array()) {
 		
 		$params = $this->buildESQuery($queryData);
-					
+		
+		// debug($params);
+		
 		$this->lastReponse = false;
 		$response = $this->API->search( $params ); 
 

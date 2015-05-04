@@ -109,6 +109,13 @@ class DataobjectsController extends AppController
 	    $query['conditions']['id'] = $id;
 	        
 	    $object = $this->Dataobject->find('first', $query);
+	    
+	    if( !$object ) {
+		    
+		    throw new NotFoundException();
+		    
+	    }
+	    
 	    $this->Dataobject->data = $object;
 	    
 	    $_serialize = array('Dataobject');

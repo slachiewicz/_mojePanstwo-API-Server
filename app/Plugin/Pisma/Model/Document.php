@@ -452,23 +452,34 @@ class Document extends AppModel {
 		App::import('model','DB');
 		$DB = new DB();
 		
+		if( is_string($id) )
+			$id = array($id);
 		
-		$item = $DB->selectAssoc("SELECT `id`, `saved` FROM `pisma_documents` WHERE `alphaid`='" . addslashes($id) . "' AND `from_user_type`='" . addslashes( $params['from_user_type'] ) . "' AND `from_user_id`='" . addslashes( $params['from_user_id'] ) . "' LIMIT 1");
+		foreach( $id as &$i )
+			$i = addslashes( $i );
 		
-		if( $item ) {
+		$items = $DB->selectAssocs("SELECT `id`, `alphaid`, `saved` FROM `pisma_documents` WHERE `alphaid`='" . implode("' OR `alphaid`='", $id) . "' AND `from_user_type`='" . addslashes( $params['from_user_type'] ) . "' AND `from_user_id`='" . addslashes( $params['from_user_id'] ) . "'");
+		
 			
-			$DB->q("UPDATE `pisma_documents` SET `deleted`='1', `deleted_at`=NOW() WHERE `id`='" . $item['id'] . "' LIMIT 1");
+		if( $items ) {
 			
+			foreach( $items as $item ) {
 			
-			$ES = ConnectionManager::getDataSource('MPSearch');
-					
-			$deleteParams = array();
-			$deleteParams['index'] = 'mojepanstwo_v1';
-			$deleteParams['type'] = 'letters';
-			$deleteParams['id'] = $id;
-			$deleteParams['ignore'] = array(404);
+				$DB->q("UPDATE `pisma_documents` SET `deleted`='1', `deleted_at`=NOW() WHERE `id`='" . $item['id'] . "' LIMIT 1");
+				
+				
+				$ES = ConnectionManager::getDataSource('MPSearch');
+						
+				$deleteParams = array();
+				$deleteParams['index'] = 'mojepanstwo_v1';
+				$deleteParams['type'] = 'letters';
+				$deleteParams['id'] = $item['alphaid'];
+				$deleteParams['refresh'] = true;
+				$deleteParams['ignore'] = array(404);
+				
+				$ES->API->delete($deleteParams);
 			
-			$ES->API->delete($deleteParams);
+			}
 						
 			return 200;
 			

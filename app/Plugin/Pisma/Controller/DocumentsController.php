@@ -330,8 +330,8 @@ class DocumentsController extends AppController
 	        'from_user_type' => $this->Auth->user('type'),
 	        'from_user_id' => $this->Auth->user('id'),
         );
-        
-        $status = $this->Document->delete($this->request->params['id'], $params);
+                
+        $status = $this->Document->delete($this->request->data['id'], $params);
         $this->setSerialized('status', $status);
         
     }

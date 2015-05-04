@@ -12,16 +12,27 @@ class DataobjectsController extends AppController
 		));
 	}
 	
-	public function feed($dataset, $id)
+	public function feed($dataset, $id = false)
     {	    
 		
-		$feed_params = array(
-			'dataset' => $dataset,
-			'object_id' => $id,
-		);
+		if( $dataset == 'user' ) {
+			
+			$feed_params = array(
+				'user_type' => $this->Auth->user('type'),
+				'user_id' => $this->Auth->user('id'),
+			);
+						
+		} else {
 		
-		if( isset($this->request->query['channel']) )
-			$feed_params['channel'] = $this->request->query['channel'];
+			$feed_params = array(
+				'dataset' => $dataset,
+				'object_id' => $id,
+			);
+			
+			if( isset($this->request->query['channel']) )
+				$feed_params['channel'] = $this->request->query['channel'];
+		
+		}
 		
 	    $this->_index(array(
 		    '_feed' => $feed_params,

@@ -69,30 +69,55 @@ class MPSearch {
 	    	
 	    }
     	
+    	
+
+    	
     	if( 
 	    	isset( $doc['fields']['source'][0]['contexts'] ) && 
 	    	!empty( $doc['fields']['source'][0]['contexts'] )
     	) {
 	    	
+	    	$force_context = false;
+	    	
+	    	if(
+	    		isset($doc['inner_hits']) && 
+	    		isset($doc['inner_hits']['alert-data']) && 
+	    		isset($doc['inner_hits']['alert-data']['hits']) && 
+	    		isset($doc['inner_hits']['alert-data']['hits']['total']) && 
+	    		$doc['inner_hits']['alert-data']['hits']['total'] && 
+	    		isset( $doc['inner_hits']['alert-data']['hits']['hits'][0]['fields']['context'][0] )
+	    	) {
+		    			    	
+		    	$force_context = $doc['inner_hits']['alert-data']['hits']['hits'][0]['fields']['context'][0];
+		    	
+		    }
+	    		    	
 	    	$context = array();
     		foreach( $doc['fields']['source'][0]['contexts'] as $key => $value ) {
 	    		
-	    		$key_parts = explode('.', $key);
-	    		$value_parts = explode("\n\r", $value);
+	    		if( 
+		    		!$force_context || 
+	    			( $force_context && (strpos($key, $force_context)!==false) )
+    			) {
 	    		
-	    		$context[] = array(
-		    		'creator' => array(
-			    		'dataset' => $key_parts[0],
-			    		'id' => $key_parts[1],
-			    		'global_id' => $value_parts[0],
-			    		'name' => $value_parts[1],
-			    		'slug' => $value_parts[2],
-			    		'url' => @$value_parts[5],
-		    		),
-		    		'action' => $key_parts[2],
-		    		'label' => $value_parts[3],
-		    		'sentence' => $value_parts[4],
-	    		);
+		    		$key_parts = explode('.', $key);
+		    		$value_parts = explode("\n\r", $value);
+		    		
+		    		$context[] = array(
+			    		'creator' => array(
+				    		'dataset' => $key_parts[0],
+				    		'id' => $key_parts[1],
+				    		'global_id' => $value_parts[0],
+				    		'name' => $value_parts[1],
+				    		'slug' => $value_parts[2],
+				    		'url' => @$value_parts[5],
+			    		),
+			    		'action' => $key_parts[2],
+			    		'label' => $value_parts[3],
+			    		'sentence' => $value_parts[4],
+		    		);
+	    		
+	    		}
 	    		
     		}
     		$output['contexts'] = $context;
@@ -382,7 +407,43 @@ class MPSearch {
 	        	        	        	
         	} elseif( $key == '_feed' ) {
         		
-        		if (
+        		if(
+	        		isset($value['user_type']) && 
+        			isset($value['user_id']) && 
+        			is_numeric($value['user_id'])
+        		) {
+	        		
+	        		
+	        		$and_filters[] = array(
+	        			'has_child' => array(
+		        			'type' => 'objects-alerts',
+		        			'filter' => array(
+			        			'and' => arraY(
+				        			'filters' => array(
+					        			array(
+						        			'term' => array(
+							        			'user_type' => $value['user_type'],
+						        			),
+					        			),
+					        			array(
+						        			'term' => array(
+							        			'user_id' => $value['user_id'],
+						        			),
+					        			),
+				        			),
+			        			),
+		        			),
+		        			'inner_hits' => array(
+			        			'name' => 'alert-data',
+				        		'fields' => array('objects-alerts.sub_id', 'objects-alerts.context', 'objects-alerts.read', 'objects-alerts.created'),
+			        		),
+	        			),
+        			);
+        			
+        			$params['body']['partial_fields']['source']['include'][] = 'contexts.*';
+	        		
+	        		
+        		} elseif (
         			isset($value['dataset']) && 
         			isset($value['object_id']) && 
         			is_numeric($value['object_id'])
@@ -639,11 +700,11 @@ class MPSearch {
 		
 		$params = $this->buildESQuery($queryData);
 		
-		// debug($params);
+		// debug($params); die();
 		
 		$this->lastReponse = false;
 		$response = $this->API->search( $params ); 
-
+				
         $this->lastResponse = $response;
         if( isset($this->lastResponse['hits']) && isset($this->lastResponse['hits']['hits']) )
 	        unset( $this->lastResponse['hits']['hits'] );

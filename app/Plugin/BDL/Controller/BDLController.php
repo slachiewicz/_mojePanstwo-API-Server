@@ -85,7 +85,7 @@ class BDLController extends AppController
 
         $year = (int) $kombinacja['ly'];
         if(isset($this->request->query['year'])) {
-            if(in_array($this->request->query['year'], $years))
+            if(in_array($this->request->query['year'], $years)) // TODO undefined years
                 $year = (int) $this->request->query['year'];
         }
 
@@ -482,13 +482,13 @@ class BDLController extends AppController
                                'units' => $units[$r[$model]['kombinacja_id']]);
 
                            if (@$r[$model]['wojewodztwo_id'])
-                                $legend['wojewodztwo_id'] = Dataobject::apiUrlStd('wojewodztwa', $r[$model]['wojewodztwo_id']);
+                                $legend['wojewodztwo_id'] = Dataobject::apiUrl('wojewodztwa', $r[$model]['wojewodztwo_id']);
 
                            if (@$r[$model]['powiat_id'])
-                               $legend['powiat_id'] = Dataobject::apiUrlStd('powiaty', $r[$model]['powiat_id']);
+                               $legend['powiat_id'] = Dataobject::apiUrl('powiaty', $r[$model]['powiat_id']);
 
                            if (@$r[$model]['gmina_id'])
-                               $legend['gmina_id'] = Dataobject::apiUrlStd('gminy', $r[$model]['gmina_id']);
+                               $legend['gmina_id'] = Dataobject::apiUrl('gminy', $r[$model]['gmina_id']);
 
                            return $legend;
                        }),
@@ -500,10 +500,10 @@ class BDLController extends AppController
         if ($meta !== '0') {
             // include meta by default
             $response['meta'] = array(
-                'metric_id' =>  Dataobject::apiUrl($metric),
+                'metric_id' =>  Dataobject::apiUrl($metric['dataset'], $metric['id']),
                 'metric_name' => $metric['data']['bdl_wskazniki.tytul'],
                 'metric_depth' => $metric_depths[$metric['data']['bdl_wskazniki.poziom_id']],
-                'metric_mpurl' => Dataobject::mpUrl($metric),
+                'metric_mpurl' => Dataobject::mpUrl($metric['dataset'], $metric['id']),
                 'group_name' => $metric['data']['bdl_wskazniki.grupa_tytul'],
                 'category_name' => $metric['data']['bdl_wskazniki.kategoria_tytul'],
                 'dimensions' => $dims,

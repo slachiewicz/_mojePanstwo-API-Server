@@ -497,13 +497,13 @@ class BDLController extends AppController
                                'units' => $units[$r[$model]['kombinacja_id']]);
 
                            if (@$r[$model]['wojewodztwo_id'])
-                                $legend['wojewodztwo_id'] = Dataobject::apiUrl('wojewodztwa', $r[$model]['wojewodztwo_id']);
+                                $legend['wojewodztwo_id'] = $r[$model]['wojewodztwo_id'];
 
                            if (@$r[$model]['powiat_id'])
-                               $legend['powiat_id'] = Dataobject::apiUrl('powiaty', $r[$model]['powiat_id']);
+                               $legend['powiat_id'] = $r[$model]['powiat_id'];
 
                            if (@$r[$model]['gmina_id'])
-                               $legend['gmina_id'] = Dataobject::apiUrl('gminy', $r[$model]['gmina_id']);
+                               $legend['gmina_id'] = $r[$model]['gmina_id'];
 
                            return $legend;
                        }),

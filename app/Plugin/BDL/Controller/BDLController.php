@@ -241,17 +241,14 @@ class BDLController extends AppController
         $q = @$this->request->query['q'];
         if( $q )
         {
-            $data = $this->Dataobject->search(array('bdl_wskazniki', 'bdl_wskazniki_grupy', 'bdl_wskazniki_kategorie'), array(
+            $search = $this->Dataobject->find('all', array(
                 'conditions' => array(
                     'q' => $q,
+                    'dataset' => array('bdl_wskazniki', 'bdl_wskazniki_grupy', 'bdl_wskazniki_kategorie')
                 ),
 //                'mode' => 'title_prefix',
                 'limit' => 10,
             ));
-            if( isset($data['dataobjects']) && !empty($data['dataobjects']) )
-            {
-                $search = $data['dataobjects'];
-            }
         } else {
             throw new BadRequestException('Query parameter is required: q');
         }

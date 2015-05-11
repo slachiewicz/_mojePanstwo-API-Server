@@ -490,7 +490,7 @@ class BDLController extends AppController
         $slice_parts = array_slice(array('w1'=>0, 'w2'=>0, 'w3'=>0, 'w4'=>0, 'w5'=>0), 0, count($slices));
         $response = MpUtils::maptable2tree($data, array(
                    array('name' => 'slices', 'key' => function($r) use($model) {
-                           return $r[$model]['kombinacja_id'] . '-' . @$r[$model]['wojewodztwo_id']; // TODO rest regions
+                           return $r[$model]['kombinacja_id'] . '-' . @$r[$model]['wojewodztwo_id']. @$r[$model]['powiat_id'] . @$r[$model]['gmina_id'];
                        }, 'content' => function($r) use($model, $slice_parts, $units) {
                            $legend = array(
                                'slice' => array_values(array_intersect_key($r[$model], $slice_parts)),

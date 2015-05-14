@@ -18,6 +18,7 @@ class BDLController extends AppController
         'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje',
     );
 
+    // TODO cleanup
     /**
      * Pobiera dane dla danej konfiguracji ustawień
      */
@@ -85,7 +86,7 @@ class BDLController extends AppController
 
         $year = (int) $kombinacja['ly'];
         if(isset($this->request->query['year'])) {
-            if(in_array($this->request->query['year'], $years))
+            if(in_array($this->request->query['year'], $years)) // TODO undefined years
                 $year = (int) $this->request->query['year'];
         }
 
@@ -101,7 +102,8 @@ class BDLController extends AppController
             'value' => $value
         ));
     }
-	
+
+    // TODO cleanup
 	public function getCategory()
 	{
 		$id = (int) @$this->request->query['id'];
@@ -139,6 +141,7 @@ class BDLController extends AppController
 		$this->setSerialized('category', $category);
 	}
 
+    // TODO cleanup
     public function getCategories()
     {
         App::import('model','DB');
@@ -222,7 +225,7 @@ class BDLController extends AppController
 
                 array_push($grupa['subgroups'], array(
                     'name' => $row['pg']['pg_tytul'],
-                    '_id' => Router::url(array('plugin' => 'Dane', 'controller' => 'dataobjects', 'action' => 'view', 'alias' => 'bdl_wskazniki', 'object_id' => $row['pg']['pg_id']), true)
+                    'url' => Router::url(array('plugin' => 'Dane', 'controller' => 'Dataobjects', 'action' => 'view', 'dataset' => 'bdl_wskazniki', 'id' => $row['pg']['pg_id']), true)
                 ));
 
                 $last_grupa = $row['g']['g_id'];
@@ -236,27 +239,22 @@ class BDLController extends AppController
     }
 
     public function search() {
-        $search = array();
-
         $q = @$this->request->query['q'];
         if( $q )
         {
-            $data = $this->Dataobject->search(array('bdl_wskazniki', 'bdl_wskazniki_grupy', 'bdl_wskazniki_kategorie'), array(
+            $search = $this->Dataobject->find('all', array(
                 'conditions' => array(
                     'q' => $q,
+                    'dataset' => array('bdl_wskazniki', 'bdl_wskazniki_grupy', 'bdl_wskazniki_kategorie')
                 ),
 //                'mode' => 'title_prefix',
                 'limit' => 10,
             ));
-            if( isset($data['dataobjects']) && !empty($data['dataobjects']) )
-            {
-                $search = $data['dataobjects'];
-            }
+
+            $this->setSerialized('search', $search);
         } else {
             throw new BadRequestException('Query parameter is required: q');
         }
-
-        $this->setSerialized('search', $search);
     }
 
     public function series() {
@@ -272,11 +270,11 @@ class BDLController extends AppController
             throw new BadRequestException('Query parameter is required: metric_id');
         }
 
-        $metric = $this->Dataobject->getObject('bdl_wskazniki', $metric_id, array(
-            'layers' => 'dimennsions',
+        $metric = $this->Dataobject->find('first', array(
             'conditions' => array(
-                'okres' => 'R',
-                'deleted' => '0'
+                'bdl_wskazniki.okres' => 'R',
+                'dataset' => 'bdl_wskazniki',
+                'id' => $metric_id,
             )
         ));
 
@@ -291,7 +289,7 @@ class BDLController extends AppController
             '5' => 'gmina',
         );
 
-        $dims = $metric['layers']['dimennsions'];
+        $dims = $this->Dataobject->getObjectLayer('bdl_wskazniki', $metric_id, 'dimennsions');
 
         // check if slices match metrics
         if ($slice != null) {
@@ -353,7 +351,12 @@ class BDLController extends AppController
                 }
 
                 $wojewodztwo_id = intval($wojewodztwo_id);
-                $region = $this->Dataobject->getObject('wojewodztwa', $wojewodztwo_id);
+                $region = $this->Dataobject->find('first', array(
+                    'conditions' => array(
+                        'dataset' => 'wojewodztwa',
+                        'id' => $wojewodztwo_id
+                    )
+                ));
                 if (!$region) {
                     throw new ApiException(API_BDL_INVALID_INPUT, array('param' => 'wojewodztwo_id'));
                 }
@@ -378,7 +381,12 @@ class BDLController extends AppController
                 }
 
                 $powiat_id = intval($powiat_id);
-                $region = $this->Dataobject->getObject('powiaty', $powiat_id);
+                $region = $this->Dataobject->find('first', array(
+                    'conditions' => array(
+                        'dataset' => 'powiaty',
+                        'id' => $powiat_id
+                    )
+                ));
                 if (!$region) {
                     throw new ApiException(API_BDL_INVALID_INPUT, array('param' => 'powiat_id'));
                 }
@@ -403,7 +411,12 @@ class BDLController extends AppController
                 }
 
                 $gmina_id = intval($gmina_id);
-                $region = $this->Dataobject->getObject('gminy', $gmina_id);
+                $region = $this->Dataobject->find('first', array(
+                    'conditions' => array(
+                        'dataset' => 'gminy',
+                        'id' => $gmina_id
+                    )
+                ));
                 if (!$region) {
                     throw new ApiException(API_BDL_INVALID_INPUT, array('param' => 'gmina_id'));
                 }
@@ -429,7 +442,6 @@ class BDLController extends AppController
                 $conditions['rocznik >='] = intval($time_ranges[1]);
                 $conditions['rocznik <='] = intval($time_ranges[2]);
             }
-            // TODO co z missing values?
         }
 
         // choose series
@@ -478,20 +490,20 @@ class BDLController extends AppController
         $slice_parts = array_slice(array('w1'=>0, 'w2'=>0, 'w3'=>0, 'w4'=>0, 'w5'=>0), 0, count($slices));
         $response = MpUtils::maptable2tree($data, array(
                    array('name' => 'slices', 'key' => function($r) use($model) {
-                           return $r[$model]['kombinacja_id'] . '-' . @$r[$model]['wojewodztwo_id']; // TODO rest regions
+                           return $r[$model]['kombinacja_id'] . '-' . @$r[$model]['wojewodztwo_id']. @$r[$model]['powiat_id'] . @$r[$model]['gmina_id'];
                        }, 'content' => function($r) use($model, $slice_parts, $units) {
                            $legend = array(
                                'slice' => array_values(array_intersect_key($r[$model], $slice_parts)),
                                'units' => $units[$r[$model]['kombinacja_id']]);
 
                            if (@$r[$model]['wojewodztwo_id'])
-                                $legend['wojewodztwo_id'] = Dataobject::apiUrlStd('wojewodztwa', $r[$model]['wojewodztwo_id']);
+                                $legend['wojewodztwo_id'] = $r[$model]['wojewodztwo_id'];
 
                            if (@$r[$model]['powiat_id'])
-                               $legend['powiat_id'] = Dataobject::apiUrlStd('powiaty', $r[$model]['powiat_id']);
+                               $legend['powiat_id'] = $r[$model]['powiat_id'];
 
                            if (@$r[$model]['gmina_id'])
-                               $legend['gmina_id'] = Dataobject::apiUrlStd('gminy', $r[$model]['gmina_id']);
+                               $legend['gmina_id'] = $r[$model]['gmina_id'];
 
                            return $legend;
                        }),
@@ -503,10 +515,10 @@ class BDLController extends AppController
         if ($meta !== '0') {
             // include meta by default
             $response['meta'] = array(
-                'metric_id' =>  Dataobject::apiUrl($metric),
+                'metric_id' =>  Dataobject::apiUrl($metric['dataset'], $metric['id']),
                 'metric_name' => $metric['data']['bdl_wskazniki.tytul'],
                 'metric_depth' => $metric_depths[$metric['data']['bdl_wskazniki.poziom_id']],
-                'metric_mpurl' => Dataobject::mpUrl($metric),
+                'metric_mpurl' => Dataobject::mpUrl($metric['dataset'], $metric['id']),
                 'group_name' => $metric['data']['bdl_wskazniki.grupa_tytul'],
                 'category_name' => $metric['data']['bdl_wskazniki.kategoria_tytul'],
                 'dimensions' => $dims,
@@ -520,7 +532,7 @@ class BDLController extends AppController
         $this->setSerialized('response', $response);
     }
     
-    
+    // TODO cleanup
     public function tree() {
 	    
 	    $this->loadModel('BDL.BDL');

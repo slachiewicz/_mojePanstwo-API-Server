@@ -31,10 +31,10 @@ class MPSearch {
 	
 	public function getLastReponse($field = '*')
 	{
-		
 		if( $field == '*' )
 			return $this->lastReponse;
-		
+
+		return null;
 	}
 	
     public function __construct($config)
@@ -50,17 +50,25 @@ class MPSearch {
     }
     
     public function doc2object($doc) {
-	    	    
+		$dataset = $doc['fields']['dataset'][0];
+		$id = $doc['fields']['id'][0];
+
+		if ($dataset == null or $id == null) {
+			throw new InternalErrorException("Empty dataset or id: " . $dataset . ' ' . $id);
+		}
+
 	    $output = array(
             'global_id' => $doc['_id'],
-            'dataset' => $doc['fields']['dataset'][0],
-    		'id' => $doc['fields']['id'][0],
+            'dataset' => $dataset,
+    		'id' => $id,
+			'url' => Dataobject::apiUrl($dataset, $id),
+			'mpurl' => Dataobject::mpUrl($dataset, $id),
     		'slug' => $doc['fields']['slug'][0],
             'score' => $doc['_score'],
-            'data' => $doc['fields']['source'][0]['data'],     
+            'data' => $doc['fields']['source'][0]['data'],
     	);
-    	
-    	
+
+
     	if( 
 	    	isset( $doc['fields']['source'][0]['static'] ) && 
 	    	!empty( $doc['fields']['source'][0]['static'] )

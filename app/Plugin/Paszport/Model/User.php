@@ -164,10 +164,10 @@ class User extends PaszportAppModel
     {
         foreach ($results as &$result) {
             if (isset($result['User']['photo']) && $result['User']['photo']) {
-                $result['User']['photo'] = FULL_BASE_URL . $result['User']['photo'];
+                $result['User']['photo'] = $result['User']['photo'];
             }
             if (isset($result['User']['photo_small']) && $result['User']['photo_small']) {
-                $result['User']['photo_small'] = FULL_BASE_URL . $result['User']['photo_small'];
+                $result['User']['photo_small'] = $result['User']['photo_small'];
             }
         }
         return $results;

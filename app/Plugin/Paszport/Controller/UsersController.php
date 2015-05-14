@@ -105,6 +105,8 @@ class UsersController extends PaszportAppController
     public function registerFromFacebook() {
         if($this->data && isset($this->data['id']) && isset($this->data['email']))
         {
+            $picture = isset($this->data['picture']['data']['url']) ? $this->data['picture']['data']['url'] : '';
+
             $errors = array();
             $user = $this->User->find('first', array(
                 'conditions' => array("User.email" => $this->data['email']))
@@ -127,11 +129,12 @@ class UsersController extends PaszportAppController
                 {
                     $this->User->data['User']['password'] = $this->Auth->password($this->User->data['User']['password']);
                     $this->User->data['User']['group_id'] = 1;
+                    $this->User->data['User']['photo_small'] = $picture;
 
                     $this->User->getDataSource()->begin();
 
                     $saved = $this->User->save($this->User->data, false, array(
-                        'id', 'email', 'password', 'username', 'group_id', 'facebook_id'
+                        'id', 'email', 'password', 'username', 'group_id', 'facebook_id', 'photo_small'
                     ));
 
                     if($saved) {
@@ -167,7 +170,10 @@ class UsersController extends PaszportAppController
                 $this->User->set(array('User' => array(
                     'facebook_id' => $this->data['id'],
                 )));
-                $this->User->save(array('facebook_id' => $this->data['id']));
+                $this->User->save(array(
+                    'facebook_id' => $this->data['id'],
+                    'photo_small' => $picture
+                ));
                 $user['User']['facebook_id'] = $this->data['id'];
                 $user = $user['User'];
                 $this->Auth->login(array(
@@ -176,6 +182,15 @@ class UsersController extends PaszportAppController
                 ));
             } else {
                 $user = $user['User'];
+
+                $this->User->id = $user['id'];
+                $this->User->set(array('User' => array(
+                    'photo_small' => $picture
+                )));
+                if($this->User->validates(array('fieldList' => array('photo_small')))) {
+                    $this->User->save(array('photo_small' => $picture));
+                }
+
                 $this->Auth->login(array(
                     'type' => 'account',
                     'id' => $user['id'],

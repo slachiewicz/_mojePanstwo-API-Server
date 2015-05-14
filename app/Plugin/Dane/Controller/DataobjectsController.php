@@ -12,6 +12,24 @@ class DataobjectsController extends AppController
 		));
 	}
 	
+	public function suggest() {
+		
+		$hits = array();
+		
+		if(
+			isset( $this->request->query['q'] ) && 
+			( $q = trim($this->request->query['q']) )
+		) {
+			
+			$hits = $this->Dataobject->getDataSource()->suggest($q);
+			
+		}
+		
+		$this->set('hits', $hits);
+		$this->set('_serialize', 'hits');
+		
+	}
+	
 	public function feed($dataset, $id = false)
     {	    
 		
@@ -110,6 +128,9 @@ class DataobjectsController extends AppController
 	        
 	    $object = $this->Dataobject->find('first', $query);
 	    
+	    
+	    
+	    
 	    if( !$object ) {
 		    
 		    throw new NotFoundException();
@@ -119,7 +140,13 @@ class DataobjectsController extends AppController
 	    $this->Dataobject->data = $object;
 	    
 	    $_serialize = array('Dataobject');
-	    	    
+	    
+	    if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
+			// debug($this->Dataobject->getDataSource()->Aggs); die();
+			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
+			$_serialize[] = 'Aggs';
+		}
+	     
 	    if(
 		    isset( $object['global_id'] ) && 
 	    	$this->Auth->user() && 

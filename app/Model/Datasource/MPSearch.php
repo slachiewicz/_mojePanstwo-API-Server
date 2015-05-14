@@ -17,6 +17,7 @@ class MPSearch {
 	    'nested' => array('path'),
 	    'aggs' => array(),
 	    'global' => array(),
+	    'filter' => array('term'),
     );
     
     public function query(){
@@ -300,33 +301,41 @@ class MPSearch {
 	                $this->Aggs[ '_channels' ][ 'global' ] = array();
 	            
 				} else {
-				
+										
 					foreach( $agg_data as $agg_type => $agg_params ) {
 						
-						if( in_array($agg_type, array_keys($this->aggs_allowed)) ) {
+						// if( in_array($agg_type, array_keys($this->aggs_allowed)) ) {
 							
 							$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
 							$es_params = array();
 							
-							foreach( $agg_params as $key => $value ) {
-								if( ($agg_type == 'aggs') || in_array($key, $this->aggs_allowed[$agg_type]) ) {
-									
-									if( 
-										( $key == 'field' ) && 
-										!in_array($value, array('date', 'dataset'))
-									) {
-										$value = 'data.' . $value;
-									}
-									
-									$es_params[ $key ] = $value;
+							if( $agg_type=='global' ) {
 								
+								$aggs[ $agg_id ]['global'] = new \stdClass();
+								
+							} else {
+							
+								foreach( $agg_params as $key => $value ) {
+									// if( ($agg_type == 'aggs') || in_array($key, $this->aggs_allowed[$agg_type]) ) {
+										
+										if( 
+											( $key == 'field' ) && 
+											!in_array($value, array('date', 'dataset'))
+										) {
+											$value = 'data.' . $value;
+										}
+										
+										$es_params[ $key ] = $value;
+									
+									// }
 								}
+							
 							}
 													
 							if( !empty($es_params) )
 								$aggs[ $agg_id ][ $agg_type ] = $es_params;
 						
-						}
+						// }
 						
 					}
 				
@@ -696,19 +705,43 @@ class MPSearch {
 		
 	}
 	
+	public function suggest($q) {
+		
+		$params = array(
+			'index' => $this->_index,
+			'body' => array(
+				'suggest' => array(
+					'text' => $q,
+					'completion' => array(
+						'field' => 'suggest_v6',
+						'fuzzy' => array(
+			                'fuzziness' => 2,
+			            ),
+						'context' => array(
+							'dataset' => '*',
+						),
+					),
+				),
+			),
+		);
+		
+		$response = $this->API->suggest($params);
+		return $response['suggest'][0];
+		
+	}
+	
     public function read(Model $model, $queryData = array()) {
 		
-		$params = $this->buildESQuery($queryData);
-		
-		// debug($params); die();
-		
+		$params = $this->buildESQuery($queryData);		
+		// var_export($params);
+
 		$this->lastReponse = false;
-		$response = $this->API->search( $params ); 
-				
+		$response = $this->API->search( $params );
+						
         $this->lastResponse = $response;
         if( isset($this->lastResponse['hits']) && isset($this->lastResponse['hits']['hits']) )
 	        unset( $this->lastResponse['hits']['hits'] );
-        
+                
         if( !empty($this->Aggs) ) {
 	        
 	        foreach( $this->Aggs as $agg_id => &$agg_data ) {

@@ -13,6 +13,12 @@ Router::connect('/dane/index', array(
 	'action' => 'index'
 ));
 
+Router::connect('/dane/suggest', array(
+	'plugin' => 'Dane', 
+	'controller' => 'Dataobjects',
+	'action' => 'suggest',
+));
+
 Router::connect('/dane/:alias', array(
 	'plugin' => 'Dane', 
 	'controller' => 'Datasets', 

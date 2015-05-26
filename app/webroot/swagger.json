@@ -1,0 +1,384 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "MojePanstwo API",
+    "description": "Dowiedz się jak uzyskać dostęp do największego zbioru otwartych danych w Polsce i jak zintegrować je w swojej aplikacji.",
+    "version": "3.0",
+    "termsOfService": "TODO",
+    "contact": {
+      "url": "https://github.com/epforgpl/_mojePanstwo-API-Server/issues"
+    },
+    "x-something": "TODO"
+  },
+  "externalDocs": {
+    "url": "mojepanstwo.pl/api"
+  },
+  "host": "api-v3.mojepanstwo.pl",
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "BDL",
+      "description": "Przeglądaj statystyki GUS zebrane w Banku Danych Lokalnych"
+    }
+  ],
+  "paths": {
+    "/dane/{dataset}": {
+      "get": {
+        "summary": "Wyszukuj obiekty w danym zbiorze danych",
+        "tags": [
+          "Dane"
+        ],
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "description": "Nazwa zbioru danych, pełna lista dostępna pod https://api-v3.mojepanstwo.pl/dane/zbiory",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stronicowana lista obiektów danego zbioru danych spełniająca kryteria",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Dataobject"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dane/{dataset}/{id}": {
+      "get": {
+        "summary": "Pobierz dane konkretnego obiektu",
+        "tags": [
+          "Dane"
+        ],
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "description": "Nazwa zbioru danych, pełna lista dostępna pod https://api-v3.mojepanstwo.pl/dane/zbiory",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique (in this dataset) identifier of the object",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "layers",
+            "in": "query",
+            "description": "TODO",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Obiekt danych",
+            "schema": {
+              "$ref": "#/definitions/Dataobject"
+            }
+          }
+        }
+      }
+    },
+    "/bdl/categories": {
+      "get": {
+        "summary": "Drzewo kategorii wskaźników",
+        "description": "Pobierz wszystkie wskaźniki Banku Danych Lokalnych zgrupowane w kategorie, grupy oraz podgrupy.\n",
+        "tags": [
+          "BDL"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista kategorii z grupami i podgrupami",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BDL_Category"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/bdl/search": {
+      "get": {
+        "summary": "Wyszukuj wskaźniki",
+        "description": "Wyszukuj wskaźniki w grupach i kategoriach  \n",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Fraza do wyszukania",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BDL"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista wskaźników pasujących do frazy",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Dataobject"
+              }
+            }
+          },
+          "400": {
+            "description": "Brak podanej frazy w parametrze `q`"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/bdl/series": {
+      "get": {
+        "summary": "Zwróć dane dla wybranego wskaźnika",
+        "description": "TODO copy desc",
+        "parameters": [
+          {
+            "name": "metric_id",
+            "in": "query",
+            "description": "ID wskaźnika zwrócone przez /bdl/search, np. 762",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "slice",
+            "in": "query",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "integer_or_wildcard"
+            },
+            "description": "Tablica id wymiarów, dla których przecięcia zostaną zwrócone dane. Format: [1,34,*]. \nUzyj gwiazdki, aby zwrócić serie dla wszystkich punktów wymiaru. \nBrak argumentów oznacza wszystkie możliwe przecięcia.\nIdentyfikatory przecięć opisane są na warstwie dimensions wskaźnika, np. https://api-v3.mojepanstwo.pl/dane/bdl_wskazniki/762?layers=dimensions\n"
+          },
+          {
+            "name": "time_range",
+            "in": "query",
+            "type": "string",
+            "format": "time_range",
+            "description": "Podaj rok lub zakres (np. 2000:2010), z którego zostaną zwrócone dane. Brak argumentu oznacza pełen dostępny przedział."
+          },
+          {
+            "name": "wojewodztwo_id",
+            "in": "query",
+            "type": "integer",
+            "description": "ID województwa, dla którego zostaną zwrócone dane lub * dla wszystkich. Województwa można wyszukać pod adresem https://api-v3.mojepanstwo.pl/dane/wojewodztwa/"
+          },
+          {
+            "name": "powiat_id",
+            "in": "query",
+            "type": "integer",
+            "description": "ID powiatu, dla którego zostaną zwrócone dane lub * dla wszystkich. Powiaty można wyszukać pod adresem https://api-v3.mojepanstwo.pl/dane/powiaty/"
+          },
+          {
+            "name": "gmina_id",
+            "in": "query",
+            "type": "integer",
+            "description": "ID gminy, dla którego zostaną zwrócone dane lub * dla wszystkich. Gminy można wyszukać pod adresem https://api-v3.mojepanstwo.pl/dane/gminy/"
+          },
+          {
+            "name": "meta",
+            "in": "query",
+            "type": "boolean",
+            "description": "Czy zwrać metadane odpowiedzi? Metadane są domyślnie zwracane. Podaj false, aby je usunąć."
+          }
+        ],
+        "tags": [
+          "BDL"
+        ],
+        "responses": {
+          "200": {
+            "description": "Dane Banku Danych Lokalnych"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Dataobject": {
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "url",
+          "description": "Unikalny identifykator obiektu, bedący zarówno URL pod jakim obiekt jest dostępny"
+        },
+        "global_id": {
+          "type": "integer",
+          "description": "Unikalny identyfikator wśród wszystkich obiektów Mojego Państwa"
+        },
+        "dataset": {
+          "type": "string",
+          "description": "Zbiór danych, z którego pochodzi obiekt"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Identifikator obiektu wewnątrz datasetu"
+        },
+        "mpurl": {
+          "type": "string",
+          "format": "url",
+          "description": "URL obiektu, pod którym jest widoczny w serwisie MojePanstwo.pl"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Nazwa obiektu"
+        },
+        "score": {
+          "type": "number",
+          "description": "Wartość dopasowania obiektu do kryteriów wyszukiwania"
+        }
+      },
+      "required": [
+        "url",
+        "global_id",
+        "dataset",
+        "id",
+        "mpurl",
+        "slug"
+      ]
+    },
+    "BDL_MetricGroup": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Dataobject"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "properties": {
+                "bdl_wskazniki_grupy.kategoria_id": {
+                  "type": "integer",
+                  "description": "ID kategorii, do której należy grupa wskaźników"
+                },
+                "bdl_wskazniki_grupy.kategoria_tytul": {
+                  "type": "string",
+                  "description": "Nazwa kategorii, do której należy grupa wskaźników"
+                },
+                "bdl_wskazniki_grupy.id": {
+                  "type": "integer"
+                },
+                "bdl_wskazniki_grupy.tytul": {
+                  "type": "string",
+                  "description": "Nazwa grupy wskaźników"
+                },
+                "bdl_wskazniki_grupy.liczba_podgrup": {
+                  "type": "integer",
+                  "description": "Ile podgrup zawiera ta grupa"
+                },
+                "bdl_wskazniki_grupy.okres": {
+                  "enum": [
+                    "R"
+                  ],
+                  "description": "Częstotliwość, dla jakiej zbierane są dane. R - zbieranie corocznee."
+                },
+                "bdl_wskazniki_grupy.slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "bdl_wskazniki_grupy.kategoria_id",
+                "bdl_wskazniki_grupy.kategoria_tytul",
+                "bdl_wskazniki_grupy.tytul",
+                "bdl_wskazniki_grupy.okres"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "BDL_Category": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Dataobject"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "properties": {
+                "bdl_wskazniki_grupy.kategoria_id": {
+                  "type": "integer",
+                  "description": "ID kategorii, do której należy grupa wskaźników"
+                },
+                "bdl_wskazniki_grupy.kategoria_tytul": {
+                  "type": "string",
+                  "description": "Nazwa kategorii, do której należy grupa wskaźników"
+                },
+                "bdl_wskazniki_grupy.id": {
+                  "type": "integer"
+                },
+                "bdl_wskazniki_grupy.tytul": {
+                  "type": "string",
+                  "description": "Nazwa grupy wskaźników"
+                },
+                "bdl_wskazniki_grupy.liczba_podgrup": {
+                  "type": "integer",
+                  "description": "Ile podgrup zawiera ta grupa"
+                },
+                "bdl_wskazniki_grupy.okres": {
+                  "enum": [
+                    "R"
+                  ],
+                  "description": "Częstotliwość, dla jakiej zbierane są dane. R - zbieranie corocznee."
+                },
+                "bdl_wskazniki_grupy.slug": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Error": {
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

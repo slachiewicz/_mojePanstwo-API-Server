@@ -77,7 +77,8 @@ class DataobjectsController extends AppController
 			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
 			isset( $lastResponse['took'] ) 
 		) ? $lastResponse['took'] : null;
-		
+
+		// TODO delete serialized
 		$_serialize = array('Dataobject', 'Count', 'Took');
 		
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
@@ -85,18 +86,13 @@ class DataobjectsController extends AppController
 			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
 			$_serialize[] = 'Aggs';
 		}
-		
-				
-		$this->set('Dataobject', $objects);
-		$this->set('Count', $count);
-		$this->set('Took', $took);
-        $this->set('_serialize', $_serialize);
-		
+
+        $this->setSerialized($objects);
 	}
 	
     public function view($dataset, $id)
     {
-
+		// TODO wyczyscic!!! jakie inne parametry tu mogą wskoczyć, czemu pozwalamy na pełne przekierowanie?
 	    $query = $this->request->query;
 	    	    
 	    $layers = array();

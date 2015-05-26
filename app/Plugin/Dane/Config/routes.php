@@ -7,18 +7,13 @@ Router::connect('/dane/subscriptions/transfer_anonymous', array(
 	'action' => 'transfer_anonymous'
 ));
 
-Router::connect('/dane/index', array(
-	'plugin' => 'Dane', 
+Router::connect('/dane/:dataset', array(
+	'plugin' => 'Dane',
 	'controller' => 'Dataobjects',
 	'action' => 'index'
-));
-
-Router::connect('/dane/:alias', array(
-	'plugin' => 'Dane', 
-	'controller' => 'Datasets', 
-	'action' => 'view'
 ), array(
-	'pass' => array('alias'),
+	'dataset' => '[a-zA-Z]+',
+	'pass' => array('dataset'),
 ));
 
 Router::connect('/dane/:dataset/:id', array(

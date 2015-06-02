@@ -1,3 +1,3 @@
 <?
 
-Router::connect("/bdl/declarations", array('plugin' => 'NGO', 'controller' => 'Declarations', 'action' => 'add'));
+Router::connect("/ngo/declarations", array('plugin' => 'NGO', 'controller' => 'Declarations', 'action' => 'add'));

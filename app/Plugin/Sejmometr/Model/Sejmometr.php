@@ -1,8 +1,10 @@
 <?php
 
+App::uses('ConnectionManager', 'Model');
+
 class Sejmometr extends AppModel
 {
-    
+
     public $useDbConfig = 'MPSearch';
     public $useTable = false;
 
@@ -203,6 +205,31 @@ class Sejmometr extends AppModel
 		    
 	    return $output;
 	    
+    }
+
+    public function getOkregi() {
+        try {
+            App::import('model','DB');
+            $db = new DB();
+            return $db->selectRows("
+                SELECT
+                  id,
+                  nr_okregu,
+                  granice_obwodu,
+                  enspat,
+                  AsText(centroid),
+                  s_zoom
+                FROM
+                  pkw_parl_okregi
+                WHERE
+                  instytucja_wybierana = 'Sejm' AND enspat != ''
+                ORDER BY
+                  nr_okregu ASC
+            ");
+        }
+        catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
     
 } 

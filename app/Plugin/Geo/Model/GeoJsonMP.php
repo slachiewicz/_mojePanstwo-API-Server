@@ -6,6 +6,36 @@ class GeoJsonMP extends AppModel
 {
     public $useTable = false;
 
+    private static $dataOptions = array(
+        'wojewodztwa' => array(
+            'table' => 'pl_wojewodztwa_obszary',
+            'id'    => 'wojewodztwo_id',
+            'join'  => 'wojewodztwa'
+        ),
+        'powiaty' => array(
+            'table' => 'pl_powiaty_obszary',
+            'id'    => 'powiat_id',
+            'join'  => 'pl_powiaty'
+        ),
+        'gminy' => array(
+            'table' => 'pl_gminy_obszary',
+            'id'    => 'gmina_id',
+            'join'  => 'pl_gminy'
+        ),
+        'parl_okregi_sejm' => array(
+            'table' => 'pl_parl_okregi_sejm_obszary',
+            'id'    => 'okrag_id',
+            'join'  => 'pkw_parl_okregi'
+        )
+    );
+
+    private static function getOptions($typeName) {
+        $options = array();
+        foreach(self::$dataOptions as $name => $option)
+            $options[$name] = $option[$typeName];
+        return $options;
+    }
+
     /**
      * @param int $quality jakość map
      * @param array $types typy (wojewodztwa, powiaty, gminy)
@@ -19,23 +49,9 @@ class GeoJsonMP extends AppModel
 
         $polygonName = $this->getPolygonName($quality);
 
-        $tables = array(
-            'wojewodztwa'   => 'pl_wojewodztwa_obszary',
-            'powiaty'       => 'pl_powiaty_obszary',
-            'gminy'         => 'pl_gminy_obszary'
-        );
-
-        $idNames = array(
-            'wojewodztwa'   => 'wojewodztwo_id',
-            'powiaty'       => 'powiat_id',
-            'gminy'         => 'gmina_id'
-        );
-
-        $joinTableNames = array(
-            'wojewodztwa'   => 'wojewodztwa',
-            'powiaty'       => 'pl_powiaty',
-            'gminy'         => 'pl_gminy'
-        );
+        $tables = self::getOptions('table');
+        $idNames = self::getOptions('id');
+        $joinTableNames = self::getOptions('join');
 
         $data = array();
 
@@ -97,6 +113,18 @@ class GeoJsonMP extends AppModel
     private function getPolygonName($quality) {
         $name = 'polygon';
         return $name.'_'.$quality;
+    }
+
+    function getLabel($params) {
+        $option = self::$dataOptions[$params['type']];
+        $id = (int) $params['id'];
+
+        App::import('model', 'DB');
+        $this->DB = new DB();
+        $query = "SELECT nazwa FROM `".$option['join']."` WHERE `id` = $id";
+        $label = $this->DB->selectValue($query);
+
+        return $label;
     }
     
     function getData($simplify = true) {

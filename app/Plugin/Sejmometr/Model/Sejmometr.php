@@ -1,8 +1,10 @@
 <?php
 
+App::uses('ConnectionManager', 'Model');
+
 class Sejmometr extends AppModel
 {
-    
+
     public $useDbConfig = 'MPSearch';
     public $useTable = false;
 

@@ -129,6 +129,18 @@ class GeoJsonMP extends AppModel
 
         return $label;
     }
+
+    function getLabel($params) {
+        $option = self::$dataOptions[$params['type']];
+        $id = (int) $params['id'];
+
+        App::import('model', 'DB');
+        $this->DB = new DB();
+        $query = "SELECT nazwa FROM `".$option['join']."` WHERE `id` = $id";
+        $label = $this->DB->selectValue($query);
+
+        return $label;
+    }
     
     function getData($simplify = true) {
 	    	    

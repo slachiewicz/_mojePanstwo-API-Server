@@ -7,6 +7,9 @@ class DataobjectsController extends AppController
 	
 	public function index($dataset = false) {
 		
+		if( $this->request->is('post') ) 
+			$this->request->query = array_merge($this->request->query, $this->request->data);
+		
 		$this->_index(array(
 			'dataset' => $dataset
 		));
@@ -21,7 +24,17 @@ class DataobjectsController extends AppController
 			( $q = trim($this->request->query['q']) )
 		) {
 			
-			$hits = $this->Dataobject->getDataSource()->suggest($q);
+			$params = array(
+				'dataset' => false,
+			);
+			
+			if(
+				isset($this->request->query['dataset']) &&
+	            ($dataset = $this->request->query['dataset'])
+			)
+				$params['dataset'] = $dataset;
+			
+			$hits = $this->Dataobject->getDataSource()->suggest($q, $params);
 			
 		}
 		
@@ -51,7 +64,7 @@ class DataobjectsController extends AppController
 				$feed_params['channel'] = $this->request->query['channel'];
 		
 		}
-		
+				
 	    $this->_index(array(
 		    '_feed' => $feed_params,
 	    ));
@@ -81,9 +94,7 @@ class DataobjectsController extends AppController
 			); 
 			
 		}
-		
-		// debug($query); die();
-		
+				
 		$objects = $this->Dataobject->find('all', $query);
 		$count = ( 
 			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
@@ -146,21 +157,6 @@ class DataobjectsController extends AppController
 			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
 			$_serialize[] = 'Aggs';
 		}
-	     
-	    if(
-		    isset( $object['global_id'] ) && 
-	    	$this->Auth->user() && 
-	    	( $subscribtion = $this->Dataobject->checkSubscribtion(array(
-		    	'global_id' => $object['global_id'],
-		    	'user_type' => $this->Auth->user('type'),
-		    	'user_id' => $this->Auth->user('id'),
-	    	)) )
-	    ) {
-		    
-		    $object['subscribtion'] = true;
-		    
-	    }
-	    
 	    			
 		if( !empty($layers) ) {
 			
@@ -168,6 +164,7 @@ class DataobjectsController extends AppController
 				$layers = array($layers);
 			
 			$this->loadModel('Dane.DatasetChannel');
+			$this->loadModel('Dane.Subscription');
 			
 			foreach( $layers as $layer ) {
 								
@@ -175,35 +172,23 @@ class DataobjectsController extends AppController
 				
 				} elseif( $layer=='channels' ) {
 										
-					$object['layers']['channels'] = $channels = $this->DatasetChannel->find('all', array(
+					$object['layers']['channels'] = $this->DatasetChannel->find('all', array(
 						'fields' => array('channel', 'title', 'subject_dataset'),
 						'conditions' => array(
 							'creator_dataset' => $object['dataset'],
 						),
 						'order' => 'ord asc',
 					));
-															
-				} elseif( $layer=='subscriptions' ) {
 					
-					$this->loadModel('Dane.Subscription');
-															
-					$subscriptions = array();
-					foreach( $this->Subscription->find('all', array(
-						'fields' => array(
-							'Subscription.id', 'Subscription.title', 'Subscription.url'
-						),
+					$object['layers']['subscription'] = $this->Subscription->find('first', array(
 						'conditions' => array(
 							'user_type' => $this->Auth->user('type'),
 							'user_id' => $this->Auth->user('id'),
-							'dataset' => $dataset,
-							'object_id' => $id,
-						),
-					)) as $sub )
-						$subscriptions[] = $sub['Subscription'];
-						
-					
-					$object['layers']['subscriptions'] = $subscriptions;
-														
+							'dataset' => $object['dataset'],
+							'object_id' => $object['id'],
+						)
+					));
+																									
 				} else {
 					$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 				}

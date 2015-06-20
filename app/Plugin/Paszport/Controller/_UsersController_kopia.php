@@ -1043,4 +1043,3 @@ class UsersController extends PaszportAppController
 	}
 
 }
-

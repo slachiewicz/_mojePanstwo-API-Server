@@ -82,6 +82,9 @@ CakePlugin::loadAll(array(
     'KRS' => array(
         'routes' => true,
     ),
+    'NGO' => array(
+        'routes' => true,
+    ),
     'Administracja' => array(
         'routes' => true,
     ),

@@ -236,6 +236,11 @@ class Document extends AppModel {
 	                        	'from_user_id' => $params['user_id'],
 	                        ),
 	                    ),
+	                    array(
+	                        'term' => array(
+	                        	'deleted' => false,
+	                        ),
+	                    ),
 	                ),
 	                '_cache' => true,
 	            ),
@@ -621,6 +626,7 @@ class Document extends AppModel {
 			'hash' => $doc['hash'],
 			'saved' => (boolean) $doc['saved'],
 			'sent' => (boolean) $doc['sent'],
+			'deleted' => (boolean) $doc['deleted'],
 		);
 		
 		$data['text'] = @$doc['name'] . "\n";
@@ -660,9 +666,7 @@ class Document extends AppModel {
 		} else {
 			$data['template_label'] = 'Bez szablonu';
 		}
-		
-		// debug( $data );
-				
+						
 		$response = $ES->API->index(array(
 			'index' => 'mojepanstwo_v1',
 			'type' => 'letters',

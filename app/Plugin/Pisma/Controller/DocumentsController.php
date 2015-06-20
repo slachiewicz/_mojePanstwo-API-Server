@@ -217,6 +217,11 @@ class DocumentsController extends AppController
         	$data['to_id']
         ) {
 	       	
+	       	if( $data['to_dataset']=='pisma_adresaci' ) {
+		       	$pisma_adresaci = $this->DB->selectAssoc("SELECT dataset, object_id FROM pisma_adresaci WHERE id='" . addslashes( $data['to_id'] ) . "' LIMIT 1");
+		       	$data['to_dataset'] = $pisma_adresaci['dataset'];
+		       	$data['to_id'] = $pisma_adresaci['object_id'];
+	       	}
 	       	
 	       	if(
 		       	( $data['to_dataset']=='instytucje' ) && 
@@ -236,8 +241,16 @@ class DocumentsController extends AppController
 	        	$data['to_name'] = 'Radny Miasta Kraków - ' . $to['nazwa'];
 	        	$data['to_email'] = $to['email'];
 	        	
+        	} elseif(
+	        	( $data['to_dataset']=='poslowie' ) && 
+	        	( $to = $DB->selectAssoc("SELECT s_poslowie_kadencje.id, s_poslowie_kadencje.nazwa, s_poslowie_kadencje.email FROM s_poslowie_kadencje LEFT JOIN s_kluby ON s_poslowie_kadencje.klub_id=s_kluby.id WHERE s_poslowie_kadencje.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	
+	        	$data['to_str'] = '<p>Poseł na Sejm RP</p><p>' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+	        	$data['to_name'] = 'Poseł - ' . $to['nazwa'];
+	        	$data['to_email'] = $to['email'];
+	        	
         	}
-
         	
         }
 	                

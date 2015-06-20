@@ -61,4 +61,10 @@ class SejmometrController extends AppController
         $this->set('data', $data);
         $this->set('_serialize', 'data');
     }
+
+    public function okregi() {
+        $this->set('data', $this->Sejmometr->getOkregi());
+        $this->set('_serialize', 'data');
+    }
+
 }

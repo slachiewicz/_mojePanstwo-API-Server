@@ -6,7 +6,14 @@ App::import('model', 'DB');
 class GeoJsonController extends AppController
 {
     public $uses = array('Dane.Dataobject', 'Geo.GeoJsonMP');
-	
+
+    private static $geoNames = array(
+        'wojewodztwa',
+        'gminy',
+        'powiaty',
+        'parl_okregi_sejm'
+    );
+
 	/*
     public function pl() {
         $this->viewClass = 'Media';
@@ -26,8 +33,8 @@ class GeoJsonController extends AppController
 
     private function getAggregatedGeojson($dataset, $table) {
         $this->DB = new DB();
-				
-		
+
+
 		/*
         // Try cache
         $cacheKey = "geojson/agg/$dataset";
@@ -65,7 +72,7 @@ class GeoJsonController extends AppController
             $cacheClient->set($cacheKey, json_encode($featc));
         }
         */
-        
+
 
         $this->setSerialized('featc', $featc);
     }
@@ -87,13 +94,18 @@ class GeoJsonController extends AppController
         $quality = $this->getQuality($params);
         $types = $this->getTypes($params);
         $elements = $this->getElements($params);
-
         $data = $this->GeoJsonMP->getMapData($quality, $types, $elements);
         $this->setSerialized('data', $data);
     }
 
+    public function getLabel() {
+        $params = (array) $this->request->query;
+        $data = $this->GeoJsonMP->getLabel($params);
+        $this->setSerialized('data', $data);
+    }
+
     private function getElements($params) {
-        $e = array('wojewodztwa', 'gminy', 'powiaty');
+        $e = self::$geoNames;
         $elements = array();
         foreach($e as $type) {
             $elements[$type] = array();
@@ -113,7 +125,7 @@ class GeoJsonController extends AppController
     }
 
     private function getTypes($params) {
-        $d = array('wojewodztwa', 'gminy', 'powiaty');
+        $d = self::$geoNames;
         if(!isset($params['types']))
             return array($d[0]);
         if(strpos('x'.$params['types'],',')) {
@@ -138,13 +150,13 @@ class GeoJsonController extends AppController
 
     private function getQuality($params) {
         $q = (int) @$params['quality'];
-        if($q >= 1 && $q <= 4)
+        if($q >= 0 && $q <= 4)
             return $q;
         return 4;
     }
 
     public function pl() {
-	    $data = $this->GeoJsonMP->getData();	    
+	    $data = $this->GeoJsonMP->getData();
 	    $this->setSerialized('data', $data);
     }
 } 

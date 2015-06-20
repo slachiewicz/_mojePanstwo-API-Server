@@ -151,7 +151,7 @@ class MPSearch {
 		    	
 		    	$output['inner_hits'][] = array(
 			    	'id' => $hit['_id'],
-			    	'title' => $hit['fields']['title'][0],
+			    	'title' => @$hit['fields']['title'][0],
 		    	);
 		    	
 	    	}	    	
@@ -255,6 +255,8 @@ class MPSearch {
 			
 		}
 		
+		// var_export( $queryData ); die();
+		
 		if( isset( $queryData['aggs'] ) ) {
 			
 			// debug( $queryData['aggs'] );
@@ -309,17 +311,23 @@ class MPSearch {
 	                $this->Aggs[ '_channels' ][ 'global' ] = array();
 	            
 				} else {
-										
+					
+					array_walk_recursive($agg_data, function(&$item, $key){
+						if( $item === '_empty' )
+							$item = new \stdClass();
+					});
+														
 					foreach( $agg_data as $agg_type => $agg_params ) {
 						
 						// if( in_array($agg_type, array_keys($this->aggs_allowed)) ) {
-							
+															
 							$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
 							$es_params = array();
 							
 							if( $agg_type=='global' ) {
 								
 								$aggs[ $agg_id ]['global'] = new \stdClass();
+								
 								
 							} else {
 							
@@ -357,7 +365,25 @@ class MPSearch {
 		
 				
 		$and_filters = array();
-                    
+        
+                
+        if(
+        	(
+        		!isset($queryData['conditions']['dataset']) || 
+				empty($queryData['conditions']['dataset'])
+			) &&
+        	(
+        		!isset($queryData['conditions']['_feed']) || 
+	        	empty($queryData['conditions']['_feed']) 
+	        )
+        ) {
+	        $and_filters[] = array(
+	    		'term' => array(
+	    			'weights.main.enabled' => true,
+	    		),
+	    	);
+    	}
+        
         foreach( $queryData['conditions'] as $key => $value ) {
         	      
         	if( in_array($key, array('dataset', 'id')) ) {
@@ -385,13 +411,29 @@ class MPSearch {
 	        	
 	        	}
         	
-        	} elseif( $key == '_main' ) {
-        	
-        		$and_filters[] = array(
-	        		'term' => array(
-	        			'weights.main.enabled' => true,
-	        		),
-	        	);
+        	} elseif( $key == '_object' ) {
+				
+				if( $value && ($parts = explode('.', $value)) && (count($parts)>1) ) {
+						
+					$and_filters[] = array(
+						'nested' => array(
+							'path' => 'dataobjects',
+							'filter' => array(
+								'bool' => array(
+									'must' => array(
+										array(
+											'term' => array('dataobjects.dataset' => $parts[0]),
+										),
+										array(
+											'term' => array('dataobjects.object_id' => $parts[1]),
+										),
+									),
+								),
+							),
+						),
+					);
+	        	
+	        	}        	
         	
         	} elseif( $key == 'feeds_channels' ) {
         		        		
@@ -423,7 +465,7 @@ class MPSearch {
 	        	);
 	        	        	        	
         	} elseif( $key == '_feed' ) {
-        		
+        		        		
         		if(
 	        		isset($value['user_type']) && 
         			isset($value['user_id']) && 
@@ -478,17 +520,31 @@ class MPSearch {
 		        			),
 	        			),
         			);
-        			
+        			        			
         			if (
 	        			isset($value['channel']) && 
-	        			$value['channel'] && 
-	        			is_numeric($value['channel'])
-	        		) 
-	        			$_and_filters[] = array(
-		        			'term' => array(
-			        			'feeds_channels.channel' => $value['channel'],
-		        			),
-	        			);
+	        			$value['channel'] 
+	        		) {
+	        			
+	        			if( is_numeric($value['channel']) ) {
+	        			
+		        			$_and_filters[] = array(
+			        			'term' => array(
+				        			'feeds_channels.channel' => $value['channel'],
+			        			),
+		        			);
+	        			
+	        			} elseif( is_array($value['channel']) ) {
+		        			
+		        			$_and_filters[] = array(
+			        			'terms' => array(
+				        			'feeds_channels.channel' => $value['channel'],
+			        			),
+		        			);
+		        			
+	        			}
+	        		
+	        		}
 	        		
         			$and_filters[] = array(
 	        			'nested' => array(
@@ -713,8 +769,8 @@ class MPSearch {
 		
 	}
 	
-	public function suggest($q) {
-		
+	public function suggest($q, $options = array()) {
+				
 		$params = array(
 			'index' => $this->_index,
 			'body' => array(
@@ -723,7 +779,7 @@ class MPSearch {
 					'completion' => array(
 						'field' => 'suggest_v6',
 						'fuzzy' => array(
-			                'fuzziness' => 2,
+			                'fuzziness' => 0,
 			            ),
 						'context' => array(
 							'dataset' => '*',
@@ -733,6 +789,9 @@ class MPSearch {
 			),
 		);
 		
+		if( isset($options['dataset']) )
+			$params['body']['suggest']['completion']['context']['dataset'] = $options['dataset'];
+						
 		$response = $this->API->suggest($params);
 		return $response['suggest'][0];
 		
@@ -741,7 +800,6 @@ class MPSearch {
     public function read(Model $model, $queryData = array()) {
 		
 		$params = $this->buildESQuery($queryData);		
-		// var_export($params);
 
 		$this->lastReponse = false;
 		$response = $this->API->search( $params );

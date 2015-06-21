@@ -402,7 +402,7 @@ class MPSearch {
 		        	$params['body']['query']['function_score']['query']['filtered']['query']['multi_match'] = array(
 			        	'query' => mb_convert_encoding($value, 'UTF-8', 'UTF-8'),
 					    'type' => "phrase",
-					    'fields' => array('title', 'title.suggest', "text"),
+					    'fields' => array('title', 'title.suggest', 'acronym', 'text'),
 						'analyzer' => 'pl',
 						'slop' => 5,
 		        	);

@@ -225,7 +225,7 @@ class DocumentsController extends AppController
 	       	
 	       	if(
 		       	( $data['to_dataset']=='instytucje' ) && 
-	        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM administracja_publiczna WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+	        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM instytucje WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
 	        ) {
 	       		       	 
 	        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['adres_str'] . '</p>';
@@ -352,7 +352,7 @@ class DocumentsController extends AppController
 	public function transfer_anonymous() {
 		
 		$status = false;
-		
+				
 		if(
 			( $user = $this->Auth->user() ) && 
 			isset($this->request->query['anonymous_user_id']) && 

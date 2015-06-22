@@ -554,26 +554,12 @@ class Document extends AppModel {
 			( $ids = $db->query("SELECT alphaid, saved FROM pisma_documents WHERE $where") ) 
 		) {
 			
-			$ES = ConnectionManager::getDataSource('MPSearch');
-			
-			foreach( $ids as $id ) {
-				if( $id['pisma_documents']['saved'] ) {
-				    $ES->API->update(array(
-					    'index' => 'mojepanstwo_v1',
-					    'type' => 'letters',
-					    'id' => $id['pisma_documents']['alphaid'],
-					    'body' => array(
-						    'doc' => array(
-							    'from_user_type' => 'account',
-						    	'from_user_id' => $user_id,
-						    ),
-					    ),
-				    ));
-			    }
-			}
 			
 			$db->query("UPDATE pisma_documents SET `from_user_type`='account', `from_user_id`='" . addslashes( $user_id ) . "' WHERE $where");
 			
+			foreach( $ids as $id )
+				$this->sync($id['pisma_documents']['alphaid']);
+						
 			return true;
 			
 		} else return false;

@@ -22,9 +22,9 @@ class BDLLegacyController extends AppController
         	$this->DB = new DB();
 
 		$type = $types[$type];
-
-		$query = "SELECT `rocznik` as 'y', `v` FROM `".$type[0]."` WHERE `".$type[1]."` = $type_id AND `kombinacja_id` = $dim_id";
-
+		
+		
+		$query = "SELECT `rocznik` as 'y', `v` FROM `".$type[0]."` WHERE `".$type[1]."` = $type_id AND `kombinacja_id` = $dim_id AND `deleted`='0'";		
 		$bdl = $this->DB->selectAssocs($query);
 
 		$data = $bdl;

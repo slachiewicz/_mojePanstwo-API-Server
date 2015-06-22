@@ -243,11 +243,36 @@ class DocumentsController extends AppController
 	        	
         	} elseif(
 	        	( $data['to_dataset']=='poslowie' ) && 
-	        	( $to = $DB->selectAssoc("SELECT s_poslowie_kadencje.id, s_poslowie_kadencje.nazwa, s_poslowie_kadencje.email FROM s_poslowie_kadencje LEFT JOIN s_kluby ON s_poslowie_kadencje.klub_id=s_kluby.id WHERE s_poslowie_kadencje.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+	        	( $to = $DB->selectAssoc("SELECT s_poslowie_kadencje.id, s_poslowie_kadencje.nazwa, s_poslowie_kadencje.email, s_poslowie_kadencje.pkw_plec FROM s_poslowie_kadencje LEFT JOIN s_kluby ON s_poslowie_kadencje.klub_id=s_kluby.id WHERE s_poslowie_kadencje.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
         	) {
+	        	        		
 	        	
-	        	$data['to_str'] = '<p>Poseł na Sejm RP</p><p>' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
-	        	$data['to_name'] = 'Poseł - ' . $to['nazwa'];
+	        	if( $to['pkw_plec']=='K' ) {
+	        	
+		        	$data['to_str'] = '<p>Posłanka na Sejm RP</p><p>' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+		        	$data['to_name'] = 'Posłanka - ' . $to['nazwa'];
+		        	$data['content'] = str_replace(array(
+		        		'{$szanowny_panie_posle}',
+		        		'{$pan_posel}',
+		        	), array(
+		        		'Szanowna Pani Posłanko',
+		        		'Pani Posłanka'
+		        	), $data['content']);
+	        	
+	        	} else {
+		        	
+		        	$data['to_str'] = '<p>Poseł na Sejm RP</p><p>' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+		        	$data['to_name'] = 'Poseł - ' . $to['nazwa'];
+		        	$data['content'] = str_replace(array(
+		        		'{$szanowny_panie_posle}',
+		        		'{$pan_posel}',
+		        	), array(
+		        		'Szanowny Panie Pośle',
+		        		'Pan Poseł'
+		        	), $data['content']);
+		        	
+	        	}
+	        	
 	        	$data['to_email'] = $to['email'];
 	        	
         	}

@@ -93,8 +93,8 @@ class DocumentsController extends AppController
 			));
 			
 		} elseif(
-			isset( $this->request->query['name'] ) && 
-			( $name = $this->request->query['name'] )
+			isset( $this->data['name'] ) && 
+			( $name = $this->data['name'] )
 		) {
 			
 			$status = $this->Document->rename($id, array(

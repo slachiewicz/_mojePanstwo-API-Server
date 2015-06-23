@@ -111,7 +111,7 @@ class DocumentsController extends AppController
 	}
 	
     public function save($id = null) {
-        
+                
         $this->Auth->deny();
         
         $map = array(
@@ -353,9 +353,20 @@ class DocumentsController extends AppController
 	        $status = $this->Document->send(array(
 		        'id' => $id,
 		        'user_id' => $this->Auth->user('id'),
+		        'user_type' => $this->Auth->user('type'),
 	        ));
 	        $this->setSerialized('status', $status);
-	        
+	    
+	    } elseif( isset($this->request->data['email']) ) {
+	    
+	    	$status = $this->Document->send(array(
+		        'id' => $id,
+		        'user_id' => $this->Auth->user('id'),
+		        'user_type' => $this->Auth->user('type'),
+		        'email' => $this->request->data['email'],
+	        ));
+	        $this->setSerialized('status', $status);
+	    	
         } else throw new BadRequestException();
         
     }

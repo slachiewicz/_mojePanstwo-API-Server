@@ -493,23 +493,36 @@ class Document extends AppModel {
 	}
 	
 	public function send($params) {
-		
+				
 		if(
 			($pismo = $this->find('first', array(
 		        'conditions' => array(
 			        'deleted' => '0',
 			        'id' => $params['id'],
-			        'from_user_type' => 'account',
+			        'from_user_type' => $params['user_type'],
 			        'from_user_id' => $params['user_id'],
 		        ),
-	        ))) && 
-			($user = $this->User->findById( $params['user_id'] ))
+	        )))
 		) {
-	        	        
+	       		       	
+	        if( $params['user_type']=='account' ) {
+		       	
+		       	$user = $this->User->findById( $params['user_id'] );
+		       	
+	       	} elseif( $params['user_type']=='anonymous' ) {
+		       	
+		       	$user = array(
+			       	'User' => array(
+				       	'username' => 'Użytkownik anonimowy',
+				       	'email' => $params['email'],
+			       	),
+		       	);
+		       	
+	       	}
+	       	 
 	    	$pismo = $pismo['Document'];	    		    	
 	    	App::uses('CakeEmail', 'Network/Email');
 	    		    	
-	    	
 			$Email = new CakeEmail('pisma');
 			$Email->viewVars(array('pismo' => $pismo));
 			

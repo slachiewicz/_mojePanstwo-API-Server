@@ -18,7 +18,7 @@ class User extends PaszportAppModel
                 'message' => __('LC_PASZPORT_USERNAME_MUST_BE_UNIQUE', true),
             ),
             'alphanumeric' => array(
-                'rule' => 'alphaNumeric',
+                'rule' => 'alphaNumericDashUnderscore',
                 'message' => __('LC_PASZPORT_ALPHANUMERIC', true)
             )
         ));
@@ -46,12 +46,12 @@ class User extends PaszportAppModel
             //'required' => true
         ));
 
-        $this->validator()->add('facebook_id', array(
+        /*$this->validator()->add('facebook_id', array(
             'unique' => array(
                 'rule' => 'isUnique',
                 'message' => __('LC_PASZPORT_FACEBOOK_ID_NOT_UNIQUE', true),
             )
-        ));
+        ));*/
 
         $this->validator()->add('twitter_id', array(
             'unique' => array(
@@ -171,5 +171,11 @@ class User extends PaszportAppModel
             }
         }
         return $results;
+    }
+
+    public function alphaNumericDashUnderscore($check) {
+        $value = array_values($check);
+        $value = $value[0];
+        return preg_match('|^[0-9a-zA-Z_-]*$|', $value);
     }
 }

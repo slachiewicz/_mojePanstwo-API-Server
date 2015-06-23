@@ -10,5 +10,6 @@
  */
 class PaszportAppModel extends AppModel
 {
-    public $useDbConfig = 'passport';
+    public $useDbConfig = 'default';
 }
+

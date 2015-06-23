@@ -8,9 +8,11 @@ Router::connect('/paszport/register', array('plugin' => 'Paszport', 'controller'
 Router::connect('/paszport/user/setUserName', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'setUserName'));
 Router::connect('/paszport/user/setEmail', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'setEmail'));
 Router::connect('/paszport/user/setPassword', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'setUserPassword'));
+Router::connect('/paszport/user/createNewPassword', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'createNewPassword'));
 Router::connect('/paszport/user/deletePaszport', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'deletePaszport'));
 Router::connect('/paszport/user/registerFromFacebook', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'registerFromFacebook'));
 Router::connect('/paszport/user/forgot', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'forgot'));
 Router::connect('/paszport/user/forgotToken', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'forgotToken'));
 Router::connect('/paszport/user/forgotNewPassword', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'forgotNewPassword'));
 Router::connect('/paszport/user/find', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'find'));
+Router::connect('/paszport/user/canCreatePassword', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'canCreatePassword'));

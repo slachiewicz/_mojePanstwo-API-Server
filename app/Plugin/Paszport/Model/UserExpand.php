@@ -3,5 +3,5 @@
 class UserExpand extends PaszportAppModel
 {
     public $belongsTo = array('Paszport.User');
-    public $useDbConfig = 'passport';
+    public $useDbConfig = 'default';
 }

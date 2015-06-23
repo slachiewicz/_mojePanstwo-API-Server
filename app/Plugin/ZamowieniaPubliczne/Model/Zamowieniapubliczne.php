@@ -194,5 +194,203 @@ class ZamowieniaPubliczne extends AppModel
 	    } else return false;
 	    		    
     }
+    
+    public function getAggs($params = array())
+    {
+	    	    
+	    App::Import('ConnectionManager');
+		$MPSearch = ConnectionManager::getDataSource('MPSearch');
+		
+		$filters = array(
+			array(
+				'term' => array(
+					'dataset' => 'zamowienia_publiczne_dokumenty',
+				),
+			),
+		);
+				
+		if( isset($params['instytucja_id']) )
+			$filters[] = array(
+				'nested' => array(
+					'path' => 'feeds_channels',
+					'filter' => array(
+						'bool' => array(
+							'must' => array(
+								array(
+									'term' => array(
+										'feeds_channels.dataset' => 'instytucje',
+									),
+								),
+								array(
+									'term' => array(
+										'feeds_channels.object_id' => $params['instytucja_id'],
+									),
+								),
+							),
+						),
+					),
+				),
+			);
+		
+		$query = array(
+			'index' => 'mojepanstwo_v1',
+			'type' => 'objects',
+			'body' => array(
+				'size' => 0, 
+				'query' => array(
+					'filtered' => array(
+						'filter' => array(
+							'bool' => array(
+								'must' => $filters,
+							),
+						),
+					),
+				),
+				'aggs' => array(
+					'wykonawcy' => array(
+						'nested' => array(
+							'path' => 'zamowienia_publiczne-wykonawcy',
+						),
+						'aggs' => array(
+							'wykonawca' => array(
+								'terms' => array(
+									'field' => 'zamowienia_publiczne-wykonawcy.id',
+									'order' => array(
+										'suma' => 'desc',
+									),
+									'size' => '5',
+								),
+								'aggs' => array(
+									'nazwa' => array(
+										'terms' => array(
+											'field' => 'zamowienia_publiczne-wykonawcy.nazwa',
+											'size' => 1,
+										),
+									),
+									'krs_id' => array(
+										'terms' => array(
+											'field' => 'zamowienia_publiczne-wykonawcy.krs_id',
+											'size' => 1,
+										),
+									),
+									'waluta' => array(
+										'terms' => array(
+											'field' => 'zamowienia_publiczne-wykonawcy.waluta',
+										),
+										'aggs' => array(
+											'suma' => array(
+												'sum' => array(
+													'field' => 'zamowienia_publiczne-wykonawcy.cena',
+												),
+											),
+										),
+									),
+									'suma' => array(
+										'sum' => array(
+											'field' => 'zamowienia_publiczne-wykonawcy.cena',
+										),
+									),
+ 								),
+							),
+						),
+					),
+					'dni' => array(
+						'date_histogram' => array(
+							'field' => 'date',
+							'interval' => 'day',
+						),
+						'aggs' => array(
+							'wykonawcy' => array(
+								'nested' => array(
+									'path' => 'zamowienia_publiczne-wykonawcy',
+								),
+								'aggs' => array(
+									'waluty' => array(
+										'terms' => array(
+											'field' => 'zamowienia_publiczne-wykonawcy.waluta',
+										),
+										'aggs' => array(
+											'suma' => array(
+												'sum' => array(
+													'field' => 'zamowienia_publiczne-wykonawcy.cena',
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);		
+        $response = $MPSearch->API->search($query);
+		
+		$output = array(
+			'aggs' => array(),
+			'took' => $response['took'],
+			'total' => $response['hits']['total'],
+		);
+		
+		if( isset($response['aggregations']) ) {
+			
+			if( 
+				isset($response['aggregations']['wykonawcy']) && 
+				isset($response['aggregations']['wykonawcy']['wykonawca']) && 
+				isset($response['aggregations']['wykonawcy']['wykonawca']['buckets']) && 
+				( $buckets = $response['aggregations']['wykonawcy']['wykonawca']['buckets'] )
+			) {
+								
+				foreach( $buckets as $b ) {
+					
+					$waluty = array();
+					foreach( @$b['waluta']['buckets'] as $w )
+						$waluty[ $w['key'] ] = $w['suma']['value'];
+					
+					$output['aggs']['wykonawcy'][] = array(
+						'id' => $b['key'],
+						'nazwa' => @$b['nazwa']['buckets'][0]['key'],
+						'krs_id' => @$b['krs_id']['buckets'][0]['key'],
+						'waluty' => $waluty,
+					);
+				
+				}
+				
+			}
+			
+			if( 
+				isset($response['aggregations']['dni']) && 
+				isset($response['aggregations']['dni']['buckets']) && 
+				( $buckets = $response['aggregations']['dni']['buckets'] )
+			) {
+												
+				foreach( $buckets as $b ) {
+										
+					if( 
+						isset($b['wykonawcy']['waluty']) && 
+						isset($b['wykonawcy']['waluty']['buckets']) && 
+						!empty($b['wykonawcy']['waluty']['buckets'])
+					) {
+						
+						$waluty = array();
+						foreach( @$b['wykonawcy']['waluty']['buckets'] as $w )
+							$waluty[ $w['key'] ] = $w['suma']['value'];
+						
+						if( isset($waluty['PLN']) )						
+							$output['aggs']['dni'][] = array(
+								$b['key'], $waluty['PLN'],
+							);						
+						
+					}
+									
+				}
+				
+			}
+			
+		}
+		
+		return $output;	    
+			    
+    }
 
 } 

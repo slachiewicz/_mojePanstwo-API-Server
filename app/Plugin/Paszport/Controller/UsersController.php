@@ -10,7 +10,7 @@ App::import('Vendor', 'Paszport.Encrypt');
 class UsersController extends PaszportAppController
 {
     public $uses = array('Paszport.User', 'Paszport.UserAdditionalData');
-    public $components = array('Session', 'Paszport.Image2');
+    public $components = array('Session', 'Paszport.Image2', 'Paszport.FacebookRegistration');
 	public $userFields = array('User.email', 'User.created', 'User.photo', 'User.photo_small', 'User.group_id', 'User.username');
 
     /**
@@ -102,110 +102,21 @@ class UsersController extends PaszportAppController
         $this->setSerialized($filtered_data);
     }
 
-    public function registerFromFacebook() {
-        if($this->data && isset($this->data['id']) && isset($this->data['email']))
-        {
-            $picture = isset($this->data['picture']['data']['url']) ? $this->data['picture']['data']['url'] : '';
+    public function registerFromFacebook()
+    {
+        $response = array();
 
-            $errors = array();
-            $user = $this->User->find('first', array(
-                'conditions' => array("User.email" => $this->data['email']))
-            );
-
-            if(!$user)
-            {
-                $password = md5($this->data['id'] . $this->data['email']);
-                $this->User->set(array(
-                    'User' => array(
-                        'email'         => $this->data['email'],
-                        'username'      => $this->data['first_name'] . '' . $this->data['last_name'] . rand(0, 9999),
-                        'password'      => $password,
-                        'repassword'    => $password,
-                        'facebook_id'   => $this->data['id']
-                    )
-                ));
-
-                if($this->User->validates())
-                {
-                    $this->User->data['User']['password'] = $this->Auth->password($this->User->data['User']['password']);
-                    $this->User->data['User']['group_id'] = 1;
-                    $this->User->data['User']['photo_small'] = $picture;
-
-                    $this->User->getDataSource()->begin();
-
-                    $saved = $this->User->save($this->User->data, false, array(
-                        'id', 'email', 'password', 'username', 'group_id', 'facebook_id', 'photo_small'
-                    ));
-
-                    if($saved) {
-
-                        try {
-                            $this->UserAdditionalData->save(array('id' => $this->User->id));
-                            $this->User->getDataSource()->commit();
-
-                        } catch (Exception $e) {
-                            $this->User->getDataSource()->rollback();
-                            throw $e;
-                        }
-
-                        if($user = $this->User->find('first', array(
-                            'fields' => $this->userFields,
-                            'conditions' => array(
-                                'User.id' =>  $this->User->id,
-                            ),
-                        ))) {
-                            $user = $user['User'];
-                            $this->Auth->login(array(
-                                'type' => 'account',
-                                'id' => $this->User->id,
-                            ));
-                        } else
-                            $errors = array('Internal error');
-                    } else
-                        $errors = $this->User->validationErrors;
-                } else
-                    $errors = $this->User->validationErrors;
-            } elseif($user['User']['facebook_id'] != $this->data['id']) {
-                $this->User->id = $user['User']['id'];
-                $this->User->set(array('User' => array(
-                    'facebook_id' => $this->data['id'],
-                )));
-                $this->User->save(array(
-                    'facebook_id' => $this->data['id'],
-                    'photo_small' => $picture
-                ));
-                $user['User']['facebook_id'] = $this->data['id'];
-                $user = $user['User'];
-                $this->Auth->login(array(
-                    'type' => 'account',
-                    'id' => $user['id'],
-                ));
-            } else {
-                $user = $user['User'];
-
-                $this->User->id = $user['id'];
-                $this->User->set(array('User' => array(
-                    'photo_small' => $picture
-                )));
-                if($this->User->validates(array('fieldList' => array('photo_small')))) {
-                    $this->User->save(array('photo_small' => $picture));
-                }
-
-                $this->Auth->login(array(
-                    'type' => 'account',
-                    'id' => $user['id'],
-                ));
-            }
-
-            $this->set(array(
-                'errors' => $errors,
-                'user' => $user,
-                '_serialize' => array('errors', 'user'),
-            ));
-
-        } else {
-            throw new BadRequestException();
+        try {
+            $this->FacebookRegistration->setFacebookUser($this->data);
+            $this->FacebookRegistration->register();
+            $response['user'] = $this->FacebookRegistration->getUser();
+        } catch (Exception $e) {
+            $response['errors'] = $e->getMessage();
         }
+
+        $this->set(array_merge($response, array(
+            '_serialize' => array_keys($response)
+        )));
     }
 
     public function findFacebook()
@@ -326,6 +237,24 @@ class UsersController extends PaszportAppController
         }
     }
 
+    public function canCreatePassword() {
+        $response = false;
+
+        $user = $this->User->find('first', array(
+            'conditions' => array(
+                'User.id' => (int) $this->Auth->user('id')
+            )
+        ));
+
+        if((int) $user['User']['facebook_id'] > 0 && $user['User']['password'] == '')
+            $response = true;
+
+        $this->set(array(
+            'response' => $response,
+            '_serialize' => 'response'
+        ));
+    }
+
     public function setUserName() {
         $this->Auth->deny();
         if($this->Auth->user('type') != 'account')
@@ -392,6 +321,31 @@ class UsersController extends PaszportAppController
                     $this->User->save(array('password' => $this->Auth->password($this->data['new_password'])));
                     $response = true;
                 }
+            }
+        }
+
+        $this->set(array(
+            'response' => $response,
+            '_serialize' => 'response',
+        ));
+    }
+
+    public function createNewPassword() {
+        $this->Auth->deny();
+        if($this->Auth->user('type') != 'account')
+            throw new ForbiddenException();
+
+        $response = false;
+        $id = (int) $this->Auth->user('id');
+        if($this->request->isPost() && isset($this->data['password']) && isset($this->data['confirm_password'])) {
+            $user = $this->User->find('first', array('conditions' => array('User.id' => $id)));
+            $this->User->id = $id;
+            $this->User->set(array('User' => array(
+                'password' => $this->data['password'],
+            )));
+            if($this->User->validates(array('fieldList' => array('password')))) {
+                $this->User->save(array('password' => $this->Auth->password($this->data['password'])));
+                $response = true;
             }
         }
 

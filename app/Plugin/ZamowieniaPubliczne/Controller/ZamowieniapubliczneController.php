@@ -18,5 +18,15 @@ class ZamowieniapubliczneController extends AppController
         $this->set('data', $data);
         $this->set('_serialize', 'data');
     }
+    
+    public function aggs()
+    {
+	    
+	    $data = $this->Zamowieniapubliczne->getAggs($this->request->query);
+	    	    
+	    $this->set('data', $data);
+        $this->set('_serialize', 'data');
+	    
+    }
 
 } 

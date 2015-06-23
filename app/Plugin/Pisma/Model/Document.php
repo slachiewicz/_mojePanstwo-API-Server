@@ -512,11 +512,20 @@ class Document extends AppModel {
 	    	
 			$Email = new CakeEmail('pisma');
 			$Email->viewVars(array('pismo' => $pismo));
+			
+			if( defined('PISMA_test_email') ) {
+				$to_email = PISMA_test_email;
+				$to_name = PISMA_test_name;
+			} else {
+				$to_email = $pismo['to_email'];
+				$to_name = $pismo['to_name'];
+			}
+						
 			$status = $Email->template('Pisma.pismo', 'Pisma.layout')
 				->addHeaders(array('X-Mailer' => 'mojePaństwo'))
 				->emailFormat('html')
 				->subject($pismo['title'])
-				->to($pismo['to_email'], $pismo['to_name'])
+				->to($to_email, $to_name)
 				->from('pisma@mojepanstwo.pl', 'Pisma | mojePaństwo')
 				->replyTo($user['User']['email'], $user['User']['username'])
 				->cc($user['User']['email'], $user['User']['username'])

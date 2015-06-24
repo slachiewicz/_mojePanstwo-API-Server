@@ -472,6 +472,13 @@ class MPSearch {
         			is_numeric($value['user_id'])
         		) {
 	        		
+	        		$and_filters[] = array(
+		        		'range' => array(
+			        		'date' => array(
+				        		'lte' => 'now',
+			        		),
+		        		),
+	        		);
 	        		
 	        		$and_filters[] = array(
 	        			'has_child' => array(

@@ -4,7 +4,7 @@ class User extends PaszportAppModel
 {
     public $belongsTo = array('Paszport.Language', 'Paszport.Group');
     public $hasAndBelongsToMany = array('Paszport.Service');
-    public $hasMany = array('Paszport.Key', 'Paszport.UserExpand');
+    public $hasMany = array('Paszport.Key', 'Paszport.UserExpand', 'Paszport.UserRole');
     public $actsAs = array('Containable', 'Expandable.Expandable' => array('with' => 'UserExpand'));
     public $name = 'Paszport.User';
     public $useTable = 'users';

@@ -11,7 +11,7 @@ class UsersController extends PaszportAppController
 {
     public $uses = array('Paszport.User', 'Paszport.UserAdditionalData');
     public $components = array('Session', 'Paszport.Image2', 'Paszport.FacebookRegistration');
-	public $userFields = array('User.email', 'User.created', 'User.photo', 'User.photo_small', 'User.group_id', 'User.username');
+    public $userFields = array('User.email', 'User.created', 'User.photo', 'User.photo_small', 'User.group_id', 'User.username');
 
     /**
      * Sets permissions
@@ -65,20 +65,20 @@ class UsersController extends PaszportAppController
 
     public function info()
     {
-    	$user = $this->user;
-			
+        $user = $this->user;
+
         if( $user )
         {
             $this->UserAdditionalData->id = $user['id'];
             $data = $this->UserAdditionalData->read(null, $user['id']);
-            
+
             if( !empty($data) )
-            { 
-	            $user['unread_count'] = $data['UserAdditionalData']['alerts_unread_count'];
-	            $user['group'] = $data['UserAdditionalData']['group'];
+            {
+                $user['unread_count'] = $data['UserAdditionalData']['alerts_unread_count'];
+                $user['group'] = $data['UserAdditionalData']['group'];
             }
         }
-        
+
         $this->set('user', $user);
         $this->set('_serialize', array('user', 'applications', 'streams'));
     }
@@ -123,10 +123,10 @@ class UsersController extends PaszportAppController
     {
         if($this->data && isset($this->data['facebook_id']) && isset($this->data['email'])) {
             $user = $this->User->find('first', array(
-                'conditions' => array(
-                    'User.facebook_id' => $this->data['facebook_id'],
-                    'User.email' => $this->data['email']
-                ))
+                    'conditions' => array(
+                        'User.facebook_id' => $this->data['facebook_id'],
+                        'User.email' => $this->data['email']
+                    ))
             );
             $this->set(array(
                 'user' => $this->data,
@@ -140,62 +140,62 @@ class UsersController extends PaszportAppController
     public function register()
     {
         if(
-        	isset($this->data) && 
-        	is_array($this->data) && 
-        	(
-	        	(
-	        		isset( $this->data['email'] ) && 
-		        	$this->data['email']
-		        ) || 
-		        (
-			        isset( $this->data['User']['email'] ) && 
-		        	$this->data['User']['email']
-		        )
-		    )
+            isset($this->data) &&
+            is_array($this->data) &&
+            (
+                (
+                    isset( $this->data['email'] ) &&
+                    $this->data['email']
+                ) ||
+                (
+                    isset( $this->data['User']['email'] ) &&
+                    $this->data['User']['email']
+                )
+            )
         ) {
-            
+
             $errors = array();
             $user = false;
             $this->User->set($this->data);
-            
+
             if($this->User->validates()) {
-            
-            	$this->User->data['User']['password'] = $this->Auth->password( $this->User->data['User']['password'] );
-	            $this->User->data['User']['group_id'] = 1;			
-				
-	            $this->User->getDataSource()->begin();
-	            
-	            $saved = $this->User->save($this->User->data, false, array(
-		            'id', 'email', 'password', 'username', 'group_id', 'language_id'
-	            ));
-	            	            
-	            if ($saved) {
-	                
-	                try {
-	                    $this->UserAdditionalData->save(array('id' => $this->User->id));
-	                    $this->User->getDataSource()->commit();
-	
-	                } catch (Exception $e) {
-	                    $this->User->getDataSource()->rollback();
-	                    throw $e;
-	                }
-					
-					if( $user = $this->User->find('first', array(
-						'fields' => $this->userFields,
-						'conditions' => array(
-							'User.id' =>  $this->User->id,
-						),
-					)) ) {
-						
-						$user = $user['User'];
-						$this->Auth->login(array(
-			                'type' => 'account',
-			                'id' => $this->User->id,
-		                ));
-						
-						
-					} else $errors = array('Internal error');
-	            } else $errors = $this->User->validationErrors; // email verification
+
+                $this->User->data['User']['password'] = $this->Auth->password( $this->User->data['User']['password'] );
+                $this->User->data['User']['group_id'] = 1;
+
+                $this->User->getDataSource()->begin();
+
+                $saved = $this->User->save($this->User->data, false, array(
+                    'id', 'email', 'password', 'username', 'group_id', 'language_id'
+                ));
+
+                if ($saved) {
+
+                    try {
+                        $this->UserAdditionalData->save(array('id' => $this->User->id));
+                        $this->User->getDataSource()->commit();
+
+                    } catch (Exception $e) {
+                        $this->User->getDataSource()->rollback();
+                        throw $e;
+                    }
+
+                    if( $user = $this->User->find('first', array(
+                        'fields' => $this->userFields,
+                        'conditions' => array(
+                            'User.id' =>  $this->User->id,
+                        ),
+                    )) ) {
+
+                        $user = $user['User'];
+                        $this->Auth->login(array(
+                            'type' => 'account',
+                            'id' => $this->User->id,
+                        ));
+
+
+                    } else $errors = array('Internal error');
+                } else $errors = $this->User->validationErrors; // email verification
             } else $errors = $this->User->validationErrors; // basic validation
 
             $this->set(array(
@@ -203,7 +203,7 @@ class UsersController extends PaszportAppController
                 'user' => $user,
                 '_serialize' => array('errors', 'user'),
             ));
-            
+
         } else {
             throw new BadRequestException();
         }
@@ -545,93 +545,93 @@ class UsersController extends PaszportAppController
             return 2; # english
         }
     }
-	
-	public function forgotNewPassword() {
-		$errors = array();
-		$success = false;
-		
-		if($this->data && $this->data['User']['password'] && $this->data['token']) {
-			$password = $this->Auth->password($this->data['User']['password']);
-			$token = urlencode($this->data['token']);
-			
-			$user = $this->User->find('first', array(
-				'conditions' => array(
-					'User.reset_hash' => $token
-				)
-			));
-			
-			if($user['User']) {
-				$this->User->id = $user['User']['id'];
-				$this->User->set(array('User' => array(
-					'password' => $password
-				)));
-				$this->User->save(array('password' => $password));
-				$success = true;
-			} else {
-				$errors[] = 'LC_PASZPORT_SECURITY_TOKEN_INVALID';
-			}
-			
-		} else {
-			$errors[] = 'BAD_REQUEST';
-		}
-		
-		$this->set(array(
-			'success' => $success,
-			'errors' => $errors,
-			'_serialize' => array('success', 'errors'),
-		));
-	}
-	
-	public function forgotToken() {
-		$errors = array();
-		$success = false;
-		
-		if($this->data && $this->data['token']) {
-				$hash = $this->data['token'];
-                $hash = str_replace(' ', '+', urldecode($hash));
-                $e = new Encryption(MCRYPT_BlOWFISH, MCRYPT_MODE_CBC);
 
-                $token_data = json_decode($e->decrypt(base64_decode($hash), Configure::read('Security.salt')), true);
-                $user_email = $token_data['email'];
-                $expires = $token_data['expires'];
-                if (time() > $expires) {
-					$errors[] = 'LC_PASZPORT_SECURITY_TOKEN_EXPIRED';
+    public function forgotNewPassword() {
+        $errors = array();
+        $success = false;
+
+        if($this->data && $this->data['User']['password'] && $this->data['token']) {
+            $password = $this->Auth->password($this->data['User']['password']);
+            $token = urlencode($this->data['token']);
+
+            $user = $this->User->find('first', array(
+                'conditions' => array(
+                    'User.reset_hash' => $token
+                )
+            ));
+
+            if($user['User']) {
+                $this->User->id = $user['User']['id'];
+                $this->User->set(array('User' => array(
+                    'password' => $password
+                )));
+                $this->User->save(array('password' => $password));
+                $success = true;
+            } else {
+                $errors[] = 'LC_PASZPORT_SECURITY_TOKEN_INVALID';
+            }
+
+        } else {
+            $errors[] = 'BAD_REQUEST';
+        }
+
+        $this->set(array(
+            'success' => $success,
+            'errors' => $errors,
+            '_serialize' => array('success', 'errors'),
+        ));
+    }
+
+    public function forgotToken() {
+        $errors = array();
+        $success = false;
+
+        if($this->data && $this->data['token']) {
+            $hash = $this->data['token'];
+            $hash = str_replace(' ', '+', urldecode($hash));
+            $e = new Encryption(MCRYPT_BlOWFISH, MCRYPT_MODE_CBC);
+
+            $token_data = json_decode($e->decrypt(base64_decode($hash), Configure::read('Security.salt')), true);
+            $user_email = $token_data['email'];
+            $expires = $token_data['expires'];
+            if (time() > $expires) {
+                $errors[] = 'LC_PASZPORT_SECURITY_TOKEN_EXPIRED';
+            } else {
+                $user = $this->User->find('first', array(
+                    'conditions' => array(
+                        'User.email' => $user_email,
+                        'User.reset_hash' => urlencode($this->data['token'])
+                    )
+                ));
+
+                $user = isset($user['User']) ? $user['User'] : false;
+                if ($user) {
+                    $success = true;
                 } else {
-                    $user = $this->User->find('first', array(
-                        'conditions' => array(
-                            'User.email' => $user_email,
-                            'User.reset_hash' => urlencode($this->data['token'])
-                        )
-                    ));
-											
-                    $user = isset($user['User']) ? $user['User'] : false;
-                    if ($user) {
-                        $success = true;
-                    } else {
-                        $errors[] = 'LC_PASZPORT_SECURITY_TOKEN_INVALID';
-                    }
+                    $errors[] = 'LC_PASZPORT_SECURITY_TOKEN_INVALID';
                 }
-		} else {
-			$errors[] = 'BAD_REQUEST';
-		}
-		
-		$this->set(array(
-			'success' => $success,
-			'errors' => $errors,
-			'_serialize' => array('success', 'errors'),
-		));
-	}
-	
-	public function forgot()
-	{
-		App::uses('CakeEmail', 'Network/Email');
-		$errors = array();
-		$success = false;
-		if($this->data && $this->data['User']['email']) {
-			$user = $this->User->find('first', array('conditions' => array('User.email' => $this->data['User']['email']), 'recursive' => -2));
-			if($user) {
-				$Email = new CakeEmail();
-				$Email->config('noreply');
+            }
+        } else {
+            $errors[] = 'BAD_REQUEST';
+        }
+
+        $this->set(array(
+            'success' => $success,
+            'errors' => $errors,
+            '_serialize' => array('success', 'errors'),
+        ));
+    }
+
+    public function forgot()
+    {
+        App::uses('CakeEmail', 'Network/Email');
+        $errors = array();
+        $success = false;
+        if($this->data && $this->data['User']['email']) {
+            $user = $this->User->find('first', array('conditions' => array('User.email' => $this->data['User']['email']), 'recursive' => -2));
+            if($user) {
+                $Email = new CakeEmail();
+                $Email->config('noreply');
                 $Email->to($user['User']['email'])
                     ->template('Paszport.reset')
                     ->emailFormat('html')
@@ -646,29 +646,29 @@ class UsersController extends PaszportAppController
                 $Email->viewVars(array('hash' => urlencode($hash)));
 
                 if($Email->send()) {
-					$this->User->id = $user['User']['id'];
-					$this->User->set(array('User' => array(
-						'reset_hash' => urlencode($hash)
-					)));
-					$this->User->save(array('reset_hash' => urlencode($hash)));
+                    $this->User->id = $user['User']['id'];
+                    $this->User->set(array('User' => array(
+                        'reset_hash' => urlencode($hash)
+                    )));
+                    $this->User->save(array('reset_hash' => urlencode($hash)));
                     //$this->User->field('users', $user['User']['id'], array('User' => array('reset_hash' => urlencode($hash))));
                     $success = true;
                 } else {
-					$errors[] = 'LC_MAIL_SEND_ERROR';
+                    $errors[] = 'LC_MAIL_SEND_ERROR';
                 }
-			} else {
-				$errors[] = 'LC_PASZPORT_USER_DOES_NOT_EXIST';
-			}
-		} else {
-			$errors[] = 'BAD_REQUEST';
-		}
-		
-		$this->set(array(
-			'success' => $success,
-			'errors' => $errors,
-			'_serialize' => array('success', 'errors'),
-		));
-	}
+            } else {
+                $errors[] = 'LC_PASZPORT_USER_DOES_NOT_EXIST';
+            }
+        } else {
+            $errors[] = 'BAD_REQUEST';
+        }
+
+        $this->set(array(
+            'success' => $success,
+            'errors' => $errors,
+            '_serialize' => array('success', 'errors'),
+        ));
+    }
 
     /**
      *
@@ -985,16 +985,44 @@ class UsersController extends PaszportAppController
         exit();
     }
 
-	public function find() {
-		if(!isset($this->data['type']) || !isset($this->data['conditions']))
-			throw new BadRequestException();
+    public function find() {
+        if(!isset($this->data['type']) || !isset($this->data['conditions']))
+            throw new BadRequestException();
 
-		$user = $this->User->find($this->data['type'], $this->data['conditions']);
-	    $this->set(array(
-	        'user' => $user,
-	        '_serialize' => 'user'
-	    ));
-	}
+        $user = $this->User->find($this->data['type'], $this->data['conditions']);
+        $this->set(array(
+            'user' => $user,
+            '_serialize' => 'user'
+        ));
+    }
+
+    public function getUsersByEmail() {
+        $suggestions = array();
+        $query = @$this->data['query'];
+
+        if($query) {
+            $results = $this->User->find('all', array(
+                'fields' => array(
+                    'User.id',
+                    'User.email'
+                ),
+                'limit' => 5,
+                'conditions' => array(
+                    'User.email LIKE' => "%$query%"
+                ),
+                'recursive' => 0
+            ));
+
+            foreach($results as $row) {
+                $suggestions[] = array(
+                    'id' => $row['User']['id'],
+                    'value' => $row['User']['email']
+                );
+            }
+        }
+
+        $this->set('suggestions', $suggestions);
+        $this->set('_serialize', array('suggestions'));
+    }
 
 }
-

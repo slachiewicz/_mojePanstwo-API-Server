@@ -165,15 +165,30 @@ class DataobjectsController extends AppController
 			
 			$this->loadModel('Dane.DatasetChannel');
 			$this->loadModel('Dane.Subscription');
-			
+						
 			foreach( $layers as $layer ) {
 								
 				if( $layer=='page' ) {
-				
-					$object['layers']['page'] = array(
+					
+					$page = array(
 						'cover' => true,
 						'logo' => false,
 					);
+					
+					if( $this->Auth->user('type')=='account' ) {
+						
+						$this->loadModel('Dane.ObjectUser');
+						$page['roles'] = $this->ObjectUser->find('first', array(
+							'fields' => 'role',
+							'conditions' => array(
+								'ObjectUser.dataset' => $dataset,
+								'ObjectUser.object_id' => $id,
+								'ObjectUser.user_id' => $this->Auth->user('id'),
+							),
+						));
+					}
+					
+					$object['layers']['page'] = $page;
 				
 				} elseif( $layer=='channels' ) {
 										

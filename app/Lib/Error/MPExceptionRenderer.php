@@ -14,10 +14,10 @@ class MPExceptionRenderer extends ExceptionRenderer {
             'error' => $error,
             'code' => $error->getApiCode(),
             'params' => $error->getParams(),
-            'error_description' => h($message),
+            'message' => h($message),
             '_serialize' => array('code', // kod błędu, opisany na konkretnym API
                 'params', // parametry błędu (niezależne od języka, specyficzne dla danego kodu błędu)
-                'error_description') // Długi opis po angielsku
+                'message') // Długi opis po angielsku
         ));
 
         $this->_outputMessage('error400');

@@ -384,8 +384,21 @@ class MPSearch {
 	    	);
     	}
         
+        // debug($queryData['conditions']);
+        
         foreach( $queryData['conditions'] as $key => $value ) {
-        	      
+        	
+        	$operator = '=';
+        	if(
+	        	( $key_length = strlen($key) ) && 
+	        	( @substr($key, -2) === '!=' )
+        	) {
+	        	
+	        	$operator = '!=';
+	        	$key = @substr($key, 0, $key_length-2);
+	        	
+        	}
+        	 
         	if( in_array($key, array('dataset', 'id')) ) {
         		
         		$filter_type = is_array($value) ? 'terms' : 'term';
@@ -730,12 +743,26 @@ class MPSearch {
 					);
 							        	
 	        	} else {
-	        			        	
-		        	$and_filters[] = array(
-			        	'term' => array(
-				        	'data.' . $key => $value,
-			        	),
-		        	);
+	        		
+	        		if( $operator==='=' ) {
+		        		 	
+		        		$and_filters[] = array(
+				        	'term' => array(
+					        	'data.' . $key => $value,
+				        	),
+			        	);
+		        	
+		        	} elseif( $operator==='!=' ) {
+			        	
+			        	$and_filters[] = array(
+				        	'not' => array(
+					        	'term' => array(
+						        	'data.' . $key => $value,
+					        	),
+				        	),
+			        	);
+			        	
+		        	}
 	        	
 	        	}
 	        	
@@ -807,7 +834,8 @@ class MPSearch {
     public function read(Model $model, $queryData = array()) {
 		
 		$params = $this->buildESQuery($queryData);		
-
+		// debug($params); die();
+		
 		$this->lastReponse = false;
 		$response = $this->API->search( $params );
 						

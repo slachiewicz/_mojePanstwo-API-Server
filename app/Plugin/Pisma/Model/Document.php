@@ -513,7 +513,7 @@ class Document extends AppModel {
 		       	
 		       	$user = array(
 			       	'User' => array(
-				       	'username' => 'Użytkownik anonimowy',
+				       	'username' => @$params['name'] ? $params['name'] : 'Użytkownik anonimowy',
 				       	'email' => $params['email'],
 			       	),
 		       	);

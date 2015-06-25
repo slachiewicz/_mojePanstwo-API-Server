@@ -168,7 +168,12 @@ class DataobjectsController extends AppController
 			
 			foreach( $layers as $layer ) {
 								
-				if( $layer=='dataset' ) {
+				if( $layer=='page' ) {
+				
+					$object['layers']['page'] = array(
+						'cover' => true,
+						'logo' => false,
+					);
 				
 				} elseif( $layer=='channels' ) {
 										

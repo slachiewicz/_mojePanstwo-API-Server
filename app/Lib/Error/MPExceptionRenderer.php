@@ -39,4 +39,44 @@ class MPExceptionRenderer extends ExceptionRenderer {
 
         $this->_outputMessage('error400');
     }
+
+    /**
+     */
+
+    /**
+     * Overriding _getController to use MPResponse instead of default one
+     *
+     * @see ExceptionRenderer::_getController
+     * @param Exception $exception
+     * @return CakeErrorController|Controller
+     */
+    protected function _getController($exception)
+    {
+        App::uses('AppController', 'Controller');
+        App::uses('CakeErrorController', 'Controller');
+        if (!$request = Router::getRequest(true)) {
+            $request = new CakeRequest();
+        }
+        $response = new MPResponse();
+
+        if (method_exists($exception, 'responseHeader')) {
+            $response->header($exception->responseHeader());
+        }
+
+        if (class_exists('AppController')) {
+            try {
+                $controller = new CakeErrorController($request, $response);
+                $controller->startupProcess();
+            } catch (Exception $e) {
+                if (!empty($controller) && $controller->Components->enabled('RequestHandler')) {
+                    $controller->RequestHandler->startup($controller);
+                }
+            }
+        }
+        if (empty($controller)) {
+            $controller = new Controller($request, $response);
+            $controller->viewPath = 'Errors';
+        }
+        return $controller;
+    }
 } 

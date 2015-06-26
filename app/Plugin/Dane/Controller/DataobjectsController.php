@@ -169,11 +169,29 @@ class DataobjectsController extends AppController
 			foreach( $layers as $layer ) {
 								
 				if( $layer=='page' ) {
-					
-					$page = array(
-						'cover' => true,
-						'logo' => false,
-					);
+
+                    $this->loadModel('Dane.ObjectPage');
+
+                    $objectPage = $this->ObjectPage->find('first', array(
+                        'conditions' => array(
+                            'ObjectPage.dataset' => $dataset,
+                            'ObjectPage.object_id' => $id
+                        )
+                    ));
+
+                    $page = array(
+                        'cover' => false,
+                        'logo' => false,
+                        'moderated' => false
+                    );
+
+                    if($objectPage) {
+                        $page = array(
+                            'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
+                            'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
+                            'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
+                        );
+                    }
 					
 					if( $this->Auth->user('type')=='account' ) {
 						

@@ -123,6 +123,29 @@ class DataobjectsController extends AppController
 		
 	}
 	
+	private $datasetUpdates = array(
+		'bdl_wskazniki' => 'BDL',
+		'bdl_wariacje' => 'BDL',
+	);
+	
+	public function update($dataset, $id)
+	{
+		
+		$datasets = array_keys($this->datasetUpdates);
+		$output = false;
+		
+		if( in_array($dataset, $datasets) ) {
+			
+			// if( $model = $this->model($this->datasetUpdates[$dataset] . '.' . $model) ) 
+			    // $output = $model->update($data);
+			
+		} else return $this->view($dataset, $id);
+				
+		$this->set('output', $output);
+		$this->set('_serialize', 'output');
+				
+	}
+	
     public function view($dataset, $id)
     {
 
@@ -171,7 +194,7 @@ class DataobjectsController extends AppController
 				if( $layer=='page' ) {
 					
 					$page = array(
-						'cover' => true,
+						'cover' => false,
 						'logo' => false,
 					);
 					

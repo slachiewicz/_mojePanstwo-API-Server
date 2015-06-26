@@ -30,6 +30,16 @@ Router::connect('/dane/:alias', array(
 Router::connect('/dane/:dataset/:id', array(
 	'plugin' => 'Dane', 
 	'controller' => 'Dataobjects',
+	'action' => 'update'
+), array(
+	'[method]' => 'POST',
+	'id' => '[0-9]+',
+	'pass' => array('dataset', 'id'),
+));
+
+Router::connect('/dane/:dataset/:id', array(
+	'plugin' => 'Dane', 
+	'controller' => 'Dataobjects',
 	'action' => 'view'
 ), array(
 	'id' => '[0-9]+',

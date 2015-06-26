@@ -122,28 +122,41 @@ class DataobjectsController extends AppController
         $this->set('_serialize', $_serialize);
 		
 	}
-	
-	private $datasetUpdates = array(
-		'bdl_wskazniki' => 'BDL',
-		'bdl_wariacje' => 'BDL',
-	);
+
+    private $enabledUpdateModels = array(
+        'bdl_wskazniki' => array(
+            'plugin' => 'BDL',
+            'name' => 'BdlPodgrupy'
+        ),
+        'bdl_wariacje' => array(
+            'plugin' => 'BDL',
+            'name' => 'BdlWariacje'
+        )
+    );
 	
 	public function update($dataset, $id)
 	{
-		
-		$datasets = array_keys($this->datasetUpdates);
+		$datasets = array_keys($this->enabledUpdateModels);
 		$output = false;
 		
 		if( in_array($dataset, $datasets) ) {
-			
-			// if( $model = $this->model($this->datasetUpdates[$dataset] . '.' . $model) ) 
-			    // $output = $model->update($data);
-			
+
+            $model = $this->enabledUpdateModels[$dataset];
+            $name = $model['name'];
+            $model = $model['plugin'] . '.' . $name;
+
+            try {
+                $this->loadModel($model);
+                $this->$name->setRequest($this->request);
+                $output = $this->$name->update($this->data);
+            } catch (MissingModelException $e) {
+
+            }
+
 		} else return $this->view($dataset, $id);
 				
 		$this->set('output', $output);
 		$this->set('_serialize', 'output');
-				
 	}
 	
     public function view($dataset, $id)

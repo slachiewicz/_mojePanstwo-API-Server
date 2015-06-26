@@ -62,7 +62,15 @@ Router::connect('/dane/:dataset/:action', array(
 	'pass' => array('dataset'),
 ));
 
+# ObjectUsersManagement
 Router::connect('/dane/:dataset/:object_id/users/index', array('plugin' => 'Dane', 'controller' => 'ObjectUsersManagement', 'action' => 'index', '[method]' => 'GET'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
 Router::connect('/dane/:dataset/:object_id/users/index', array('plugin' => 'Dane', 'controller' => 'ObjectUsersManagement', 'action' => 'add', '[method]' => 'POST'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
 Router::connect('/dane/:dataset/:object_id/users/:user_id', array('plugin' => 'Dane', 'controller' => 'ObjectUsersManagement', 'action' => 'edit', '[method]' => 'PUT'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+', 'user_id' => '[0-9]+'));
 Router::connect('/dane/:dataset/:object_id/users/:user_id', array('plugin' => 'Dane', 'controller' => 'ObjectUsersManagement', 'action' => 'delete', '[method]' => 'DELETE'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+', 'user_id' => '[0-9]+'));
+
+# ObjectPagesManagement
+Router::connect('/dane/:dataset/:object_id/pages/isEditable', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'isEditable', '[method]' => 'POST'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
+Router::connect('/dane/:dataset/:object_id/pages/setLogo', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'setLogo', '[method]' => 'POST'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
+Router::connect('/dane/:dataset/:object_id/pages/setCover', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'setCover', '[method]' => 'POST'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
+Router::connect('/dane/:dataset/:object_id/pages/deleteLogo', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'deleteLogo', '[method]' => 'DELETE'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
+Router::connect('/dane/:dataset/:object_id/pages/deleteCover', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'deleteCover', '[method]' => 'DELETE'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));

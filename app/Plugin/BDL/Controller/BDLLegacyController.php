@@ -51,7 +51,7 @@ class BDLLegacyController extends AppController
 
     public function dataForDimmesions()
     {
-
+			
         $data = array();
         $dims = isset( $this->request->query['dims'] ) ? $this->request->query['dims'] : array();
         $podgrupa_id = isset( $this->request->query['podgrupa_id'] ) ? $this->request->query['podgrupa_id'] : 0;
@@ -121,7 +121,8 @@ class BDLLegacyController extends AppController
     
     public function chartDataForDimmesions()
     {
-
+		
+		
         $data = array();
         $dim_ids = isset( $this->request->query['dims'] ) ? $this->request->query['dims'] : array();
                 
@@ -130,6 +131,7 @@ class BDLLegacyController extends AppController
         
         
         $q = "SELECT `kombinacja_id` as 'dim_id', `rocznik` as 'y', `v`, `a` FROM `BDL_data_pl` WHERE (`kombinacja_id`='" . implode("' OR `kombinacja_id`='", $dim_ids) . "') AND `deleted`='0' AND `zero`='0' ORDER BY kombinacja_id ASC, rocznik ASC";
+        // echo $q;
         $db_data = $this->DB->selectAssocs($q);
         
                 

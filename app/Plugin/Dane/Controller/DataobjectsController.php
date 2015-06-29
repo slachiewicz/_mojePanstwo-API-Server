@@ -125,36 +125,46 @@ class DataobjectsController extends AppController
 
     private $enabledUpdateModels = array(
         'bdl_wskazniki' => array(
-            'plugin' => 'BDL',
             'name' => 'BdlPodgrupy'
         ),
         'bdl_wariacje' => array(
-            'plugin' => 'BDL',
             'name' => 'BdlWariacje'
         )
     );
 	
-	public function update($dataset, $id)
+	public function post($dataset, $id)
 	{
-		$datasets = array_keys($this->enabledUpdateModels);
+	
 		$output = false;
+	
+		if( 
+			isset($this->request->data['_action']) && 
+			( $action = $this->request->data['_action'] )
+		) {
+			
+			unset( $this->request->data['_action'] );			
+			$datasets = array_keys($this->enabledUpdateModels);
+			
+			if( in_array($dataset, $datasets) ) {
+	
+	            $params = $this->enabledUpdateModels[$dataset];
+	            $name = $params['name'];
+	
+	            try {
+	                
+	                $this->loadModel('Dane.' . $name);
+	                	                
+	                if( method_exists($this->$name, $action) ) {
+		                $output = $this->$name->$action($this->data, $id);
+	                }
+
+	            } catch (MissingModelException $e) {
+	
+	            }
+	
+			} 
+		}
 		
-		if( in_array($dataset, $datasets) ) {
-
-            $model = $this->enabledUpdateModels[$dataset];
-            $name = $model['name'];
-            $model = $model['plugin'] . '.' . $name;
-
-            try {
-                $this->loadModel($model);
-                $this->$name->setRequest($this->request);
-                $output = $this->$name->update($this->data);
-            } catch (MissingModelException $e) {
-
-            }
-
-		} else return $this->view($dataset, $id);
-				
 		$this->set('output', $output);
 		$this->set('_serialize', 'output');
 	}

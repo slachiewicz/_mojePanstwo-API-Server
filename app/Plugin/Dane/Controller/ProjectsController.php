@@ -2,8 +2,8 @@
 
 class ProjectsController extends AppController {
 
-    public $uses = array('Dane.OrganizacjeDzialania');
-    public $components = array('RequestHandler');
+    public $uses = array('Dane.OrganizacjeDzialania', 'Paszport.User', 'Dane.ObjectUser');
+    public $components = array('RequestHandler', 'S3');
 
     public function beforeFilter() {
         parent::beforeFilter();
@@ -48,7 +48,7 @@ class ProjectsController extends AppController {
                 'tytul' => $this->data['tytul'],
                 'opis' => $this->data['opis'],
                 'cover_photo' => $this->isCoverPhoto($this->data['cover_photo']) ? '1' : '0',
-                'folder' => $this->data['folder'],
+                'folder' => isset($this->data['folder']) ? $this->data['folder'] : '1',
                 'geo_lat' => (float) $this->data['geo_lat'],
                 'geo_lng' => (float) $this->data['geo_lng']
             )
@@ -104,12 +104,12 @@ class ProjectsController extends AppController {
         if($object) {
 
             if (isset($this->data['cover_photo'])) {
-                $isPhoto = $this->isCoverPhoto($this->data['cover_photo']);
-                if (!$isPhoto) {
+                $coverPhoto = $this->data['cover_photo'];
+                if (!$this->isCoverPhoto($coverPhoto)) {
                     $this->removeCoverPhoto();
                     $photo = '0';
                 } else {
-                    $this->saveCoverPhoto($this->data['cover_photo'], $this->request['id']);
+                    $this->saveCoverPhoto($coverPhoto, $this->request['id']);
                     $photo = '1';
                 }
 

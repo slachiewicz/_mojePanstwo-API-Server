@@ -23,5 +23,24 @@ class BdlPodgrupy extends AppModel {
 
         return true;
     }
+    
+    public function wymiar($data, $id = false) {
+	    
+	    if(!$id)
+	    	return false;
+	    	
+	    $this->save(array(
+		    'i' => $data['i'],
+		    'id' => $id,
+	    ));
+	    
+	    $this->objectIndex(array(
+		    'dataset' => 'bdl_wskazniki',
+		    'object_id' => $id,
+	    ));
+	    
+	    return true;
+	    
+    }
 
 }

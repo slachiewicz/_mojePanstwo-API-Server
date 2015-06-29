@@ -123,6 +123,9 @@ class ProjectsController extends AppController {
                 $toUpdate[$name] = $value;
             }
 
+            $toUpdate['mts'] = date('Y-m-d H:i:s');
+            $toUpdate['user_id'] = (int) $this->Auth->user('id');
+
             $this->OrganizacjeDzialania->read(null, $object['OrganizacjeDzialania']['id']);
             $this->OrganizacjeDzialania->set($toUpdate);
             $this->OrganizacjeDzialania->save();
@@ -153,7 +156,10 @@ class ProjectsController extends AppController {
     }
 
     private function removeCoverPhoto() {
-
+        $this->S3->deleteObject(
+            'portal',
+            'pages/dzialania/' . $this->request['dataset'] . '/' . $this->request['object_id'] . '/' . $this->request['id'] . '.jpg'
+        );
     }
 
     private function saveCoverPhoto($photo, $id) {

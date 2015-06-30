@@ -218,7 +218,12 @@ class DataobjectsController extends AppController
 
                     $this->loadModel('Dane.Subscriptions');
 
-                    $object['layers']['subscribers'] = $this->Subscriptions->find('all', array(
+                    $subscribers = array(
+                        'list',
+                        'count'
+                    );
+
+                    $params = array(
                         'fields' => array(
                             'Users.username',
                             'Users.photo_small'
@@ -241,9 +246,16 @@ class DataobjectsController extends AppController
                         'group' => array(
                             'Subscriptions.user_id'
                         ),
-                        'order' => 'Subscriptions.cts',
-                        'limit' => 12
-                    ));
+                        'order' => 'Subscriptions.cts'
+                    );
+
+                    $subscribers['list'] = $this->Subscriptions->find('all', array_merge($params, array(
+                        'limit' => 20
+                    )));
+
+                    $subscribers['count'] = $this->Subscriptions->find('count', $params);
+
+                    $object['layers']['subscribers'] = $subscribers;
 
                 } elseif( $layer=='page' ) {
 

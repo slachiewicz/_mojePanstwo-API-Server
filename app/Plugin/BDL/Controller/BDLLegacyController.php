@@ -107,7 +107,7 @@ class BDLLegacyController extends AppController
 		    		'ply' => $db_data['ply'],
 		    		'dv' => $db_data['dv'],
 		    		'dim_str' => $db_data['w1'] . ',' . $db_data['w2'] . ',' . $db_data['w3'] . ',' . $db_data['w4'] . ',' . $db_data['w5'],
-		    		'levels' => $this->DB->selectAssocs("SELECT `BDL_ntss`.`tab_id` as 'id', `BDL_ntss`.`tab_name` as 'label' FROM `BDL_podgrupy-ntss` JOIN `BDL_ntss` ON `BDL_podgrupy-ntss`.`nts_id` = `BDL_ntss`.`id` WHERE `BDL_podgrupy-ntss`.`podgrupa_id`='" . $db_data['podgrupa_id'] . "' AND `BDL_podgrupy-ntss`.`deleted`='0' AND `BDL_podgrupy-ntss`.`csv_s3`='1' AND `BDL_ntss`.`tab_id`!='' GROUP BY `BDL_ntss`.`tab_id` ORDER BY `BDL_ntss`.`id`"),
+		    		'levels' => $this->DB->selectAssocs("SELECT `BDL_ntss`.`tab_id` as 'id', `BDL_ntss`.`tab_name` as 'label' FROM `BDL_podgrupy-ntss` JOIN `BDL_ntss` ON `BDL_podgrupy-ntss`.`nts_id` = `BDL_ntss`.`id` WHERE `BDL_podgrupy-ntss`.`podgrupa_id`='" . $db_data['podgrupa_id'] . "' AND `BDL_podgrupy-ntss`.`deleted`='0' AND `BDL_ntss`.`tab_id`!='' GROUP BY `BDL_ntss`.`tab_id` ORDER BY `BDL_ntss`.`id`"),
 		    	);
 								
 		    }

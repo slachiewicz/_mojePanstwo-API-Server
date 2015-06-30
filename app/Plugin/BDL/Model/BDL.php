@@ -38,4 +38,103 @@ class BDL extends AppModel {
 	    
     }
     
+    public function getLocalData($id, $level, $page = 1)
+    {
+	    
+	    $data = array();
+	    	    
+	    if( $id && $level && in_array($level, array('wojewodztwa', 'powiaty', 'gminy')) )
+	    {
+		    
+		    App::import('model', 'DB');
+	        $this->DB = new DB();
+		    
+		    
+		    
+		    $limit = 20;
+ 			$offset = ($page - 1) * $limit;
+		    
+		    
+		    if( $level == 'wojewodztwa' )
+		    {
+			    $data_table = 'BDL_data_wojewodztwa';
+				$data_table_field = 'wojewodztwo_id';
+				$units_table = 'wojewodztwa';
+		    }
+		    elseif( $level == 'powiaty' )
+		    {
+			    
+			    $data_table = 'BDL_data_powiaty';
+				$data_table_field = 'powiat_id';
+				$units_table = 'pl_powiaty';
+			    
+		    }
+		    elseif( $level == 'gminy' )
+		    {
+			    
+			    $data_table = 'BDL_data_gminy';
+				$data_table_field = 'gmina_id';
+				$units_table = 'pl_gminy';
+			    
+		    }
+		 		    
+		    		    
+					
+		
+			
+			$q_order = '1';
+			/*
+			if( isset($params['us']) ) {
+				if( $params['us']=='vd' ) $q_order = "`$data_table`.`v` DESC";
+				elseif( $params['us']=='va' ) $q_order = "`$data_table`.`v` ASC";
+				elseif( $params['us']=='na' ) $q_order = "`$units_table`.`nazwa` ASC";		
+				elseif( $params['us']=='nd' ) $q_order = "`$units_table`.`nazwa` DESC";		
+			}
+			*/
+			
+			$q_q = '1';
+			/*
+			if( isset($params['uq']) && $params['uq'] )
+				$q_q = "`$units_table`.`nazwa` LIKE '" . addslashes( $params['uq'] ) . "'";
+			*/
+			
+			$q = "SELECT `$data_table`.`$data_table_field`, `$units_table`.`nazwa`, GROUP_CONCAT(CONCAT(`$data_table`.`rocznik`, \"\t\", `$data_table`.`v`, \"\t\", `$data_table`.`a`) ORDER BY `$data_table`.`rocznik` ASC SEPARATOR \"\n\") as 'data' FROM `$data_table` JOIN `$units_table` ON `$data_table`.`$data_table_field` = `$units_table`.`id` WHERE `$data_table`.`kombinacja_id`='$id' AND `$data_table`.`deleted`='0' AND `$data_table`.`zero`='0' AND $q_q GROUP BY `$data_table`.`$data_table_field` ORDER BY $q_order LIMIT 3000";
+			
+			$data = $this->DB->query($q);
+			foreach( $data as &$d ) {
+				
+				$parts = explode("\n", $d[0]['data']);
+				foreach( $parts as &$part ) {
+					$p = explode("\t", $part);
+					$part = array(
+						'rocznik' => $p[0],
+						'v' => $p[1],
+						'a' => $p[2],
+					);
+				}
+				
+				
+				$d = array(
+					'dim_id' => $id,
+					'local_id' => $d[ $data_table ][ $data_table_field ],
+					'local_name' => $d[$units_table]['nazwa'],
+					// 'data' => $parts,
+				);	
+				
+				if( $part )
+					$d = array_merge($d, array(
+						'lv' => (float) $parts[ count($parts)-1 ]['v'],
+						'ly' => (int) $parts[ count($parts)-1 ]['rocznik'],
+					));
+				
+			}
+
+	
+		    
+	    } else return false;
+	    
+		return $data;
+	    
+    }
+    
 }

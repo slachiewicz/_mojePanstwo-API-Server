@@ -213,8 +213,39 @@ class DataobjectsController extends AppController
 			$this->loadModel('Dane.Subscription');
 						
 			foreach( $layers as $layer ) {
-								
-				if( $layer=='page' ) {
+
+                if ( $layer == 'subscribers' ) {
+
+                    $this->loadModel('Dane.Subscriptions');
+
+                    $object['layers']['subscribers'] = $this->Subscriptions->find('all', array(
+                        'fields' => array(
+                            'Users.username',
+                            'Users.photo_small'
+                        ),
+                        'conditions' => array(
+                            'Subscriptions.dataset' => $dataset,
+                            'Subscriptions.object_id' => $id,
+                            'Subscriptions.user_type' => 'account'
+                        ),
+                        'joins' => array(
+                            array(
+                                'table' => 'users',
+                                'alias' => 'Users',
+                                'type' => 'LEFT',
+                                'conditions' => array(
+                                    'Subscriptions.user_id = Users.id'
+                                )
+                            )
+                        ),
+                        'group' => array(
+                            'Subscriptions.user_id'
+                        ),
+                        'order' => 'Subscriptions.cts',
+                        'limit' => 12
+                    ));
+
+                } elseif( $layer=='page' ) {
 
                     $this->loadModel('Dane.ObjectPage');
 

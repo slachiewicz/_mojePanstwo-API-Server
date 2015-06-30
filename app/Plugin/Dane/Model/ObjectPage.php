@@ -44,8 +44,8 @@ class ObjectPage extends AppModel {
                     $name => $value ? '1' : '0'
                 );
 
-                if($credits != null)
-                    $data['cover_credits'] = $credits;
+                if(!is_null($credits))
+                    $data['credits'] = "'$credits'";
 
                 $this->updateAll($data, $conditions);
             }
@@ -57,8 +57,8 @@ class ObjectPage extends AppModel {
                 $name => $value ? '1': '0',
             );
 
-            if($credits != null)
-                $data['cover_credits'] = $credits;
+            if(!is_null($credits))
+                $data['credits'] = "'$credits'";
 
             $this->save(array(
                 'ObjectPage' => $data

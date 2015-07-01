@@ -48,7 +48,7 @@ class MPSearch {
 
     }
     
-    public function doc2object($doc) {
+    public function doc2object($doc, $fields = null) {
 		$dataset = $doc['fields']['dataset'][0];
 		$id = $doc['fields']['id'][0];
 
@@ -56,7 +56,7 @@ class MPSearch {
 			throw new InternalErrorException("Empty dataset or id: " . $dataset . ' ' . $id);
 		}
 
-	    $output = array(
+	    $output = array_merge(array(
             'global_id' => $doc['_id'],
             'dataset' => $dataset,
     		'id' => $id,
@@ -64,9 +64,12 @@ class MPSearch {
 			'mpurl' => Dataobject::mpUrl($dataset, $id),
     		'slug' => $doc['fields']['slug'][0],
             'score' => $doc['_score'],
-            'data' => $doc['fields']['source'][0]['data'],
-    	);
+    	), $doc['fields']['source'][0]['data']);
 
+		// filter fields
+		if ($fields != null) {
+			$output = array_intersect_key($output, array_flip($fields));
+		}
 
     	if( 
 	    	isset( $doc['fields']['source'][0]['static'] ) && 
@@ -707,9 +710,7 @@ class MPSearch {
     public function read(Model $model, $queryData = array()) {
 		
 		$params = $this->buildESQuery($queryData);
-		
-		// debug($params); die();
-		
+
 		$this->lastReponse = false;
 		$response = $this->API->search( $params ); 
 				
@@ -732,7 +733,7 @@ class MPSearch {
                 
         $hits = $response['hits']['hits'];
         for( $h=0; $h<count($hits); $h++ ) 
-        	$hits[$h] = $this->doc2object( $hits[$h] );
+        	$hits[$h] = $this->doc2object( $hits[$h], @$queryData['fields'] );
         
         return $hits;        
 

@@ -4,14 +4,17 @@ class DataobjectsController extends AppController
 {
     public $uses = array('Dane.Dataobject');
 	public $components = array('S3');
+
+	const MAX_RESULTS = 50; // TODO ile jest teraz?
 	
-	public function index($dataset = false) {
+	public function index($dataset) {
 		
 		$this->_index(array(
 			'dataset' => $dataset
 		));
 	}
-	
+
+	// TODO co zwraca feed?
 	public function feed($dataset, $id = false)
     {	    
 		
@@ -41,9 +44,20 @@ class DataobjectsController extends AppController
     }
 
 
-	private function _index($params = array()){
-		
-		$query = $this->request->query;
+	private function _index($params = array()) {
+
+		// TODO validate query before passing
+		// 'recursive', 'fields',  'order', 'callbacks', 'aggs' ?
+		$allowed_query_params = array('conditions', 'limit', 'page', 'fields');
+		$query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
+
+		if (!is_numeric($query['limit']) || intval($query['limit']) > self::MAX_RESULTS) {
+			$query['limit'] = self::MAX_RESULTS;
+		}
+		if (array_key_exists('fields', $query) and !is_array($query['fields'])) {
+			// specyfing one field without array notation is ok
+			$query['fields'] = array($query['fields']);
+		}
 				
 		if( isset($params['dataset']) && $params['dataset'] )
 			$query['conditions']['dataset'] = $params['dataset'];
@@ -64,30 +78,50 @@ class DataobjectsController extends AppController
 			
 		}
 		
-		// debug($query); die();
-		
-		$objects = $this->Dataobject->find('all', $query);
-		$count = ( 
+		$_items = $this->Dataobject->find('all', $query);
+
+		$processed_query = $this->Dataobject->buildQuery('all', $query);
+		$page = $processed_query['page']; // starts with 1
+
+		$count = (
 			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
 			isset( $lastResponse['hits'] ) && 
 			isset( $lastResponse['hits']['total'] ) 
 		) ? $lastResponse['hits']['total'] : null;
-		
-		$took = ( 
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['took'] ) 
+
+		$_meta = array(
+			'page' => $page,
+			'max_results' => self::MAX_RESULTS,
+			'total' => $count
+		);
+
+// HATEOAS TODO
+//		$_links = array();
+//		if ($page > 1) {
+//			$_links['first'] = 'TODO'; //TODO
+//			$_links['prev'] = 'TODO';
+//		}
+//
+//		$last_page = (int) (($count - 1) / $processed_query['limit']) + 1;
+//		if ($page < $last_page) {
+//			$_links['last'] = 'TODO'. $last_page; // TODO
+//			$_links['next'] = 'TODO'. ($page + 1);
+//		}
+
+		// TODO is took and aggs needed?
+		$took = (
+			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) &&
+			isset( $lastResponse['took'] )
 		) ? $lastResponse['took'] : null;
 
-		// TODO delete serialized
-		$_serialize = array('Dataobject', 'Count', 'Took');
-		
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
 			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();
 			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
 			$_serialize[] = 'Aggs';
 		}
 
-        $this->setSerialized($objects);
+		// TODO _items, _links (self, last, parent, next), _meta (page,max_results, total)
+        $this->setSerialized(compact('_items', '_links', '_meta'));
 	}
 	
     public function view($dataset, $id)

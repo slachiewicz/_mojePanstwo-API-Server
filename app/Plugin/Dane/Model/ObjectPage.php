@@ -18,6 +18,25 @@ class ObjectPage extends AppModel {
         $this->setLogoOrCover('cover', $value, $credits);
     }
 
+    public function whenUserWasAdded() {
+        $this->setModerated(true);
+    }
+
+    public function whenUsersWasDeleted() {
+        $this->setModerated(false);
+    }
+
+    private function setModerated($value = true) {
+        $conditions = array(
+            'ObjectPage.dataset' => $this->request['dataset'],
+            'ObjectPage.object_id' => (int) $this->request['object_id']
+        );
+
+        $this->updateAll(array(
+            'moderated' => $value ? '1' : '0'
+        ), $conditions);
+    }
+
     private function setLogoOrCover($name, $value, $credits = null) {
         $conditions = array(
             'ObjectPage.dataset' => $this->request['dataset'],
@@ -32,7 +51,7 @@ class ObjectPage extends AppModel {
             $remove = false;
             if($value == false) {
                 $sname = $name == 'logo' ? 'cover' : 'logo';
-                if($object['ObjectPage'][$sname] == '0') {
+                if($object['ObjectPage'][$sname] == '0' && $object['ObjectPage']['moderated'] == '0') {
                     $remove = true;
                 }
             }

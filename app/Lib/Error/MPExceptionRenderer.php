@@ -1,5 +1,6 @@
 <?php
 App::uses('ExceptionRenderer', 'Error');
+App::uses('MPResponse', 'Lib');
 
 class MPExceptionRenderer extends ExceptionRenderer {
     public function api($error)

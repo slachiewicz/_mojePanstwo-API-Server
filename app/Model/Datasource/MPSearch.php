@@ -1,12 +1,14 @@
 <?
 class MPSearch {
+	const RESULTS_COUNT_DEFAULT = 50;
+	const RESULTS_COUNT_MAX = 50;
 
     public $cacheSources = true;
     public $description = 'Serwer wyszukania platformy mojePaństwo';
 	private $_index = 'mojepanstwo_v1';    
 
 	public $API;
-    public $lastReponse = false;
+    public $lastResponseStats = false;
     
     public $Aggs = array();
     private $aggs_allowed = array(
@@ -27,14 +29,6 @@ class MPSearch {
     {
         return null;
     }
-	
-	public function getLastReponse($field = '*')
-	{
-		if( $field == '*' )
-			return $this->lastReponse;
-
-		return null;
-	}
 	
     public function __construct($config)
     {
@@ -68,6 +62,11 @@ class MPSearch {
 
 		// filter fields
 		if ($fields != null) {
+			if (!is_array($fields)) {
+				// specyfing one field without array notation is ok
+				$fields = array($fields);
+			}
+
 			$output = array_intersect_key($output, array_flip($fields));
 		}
 
@@ -164,17 +163,18 @@ class MPSearch {
     }	
 	
 	public function buildESQuery( $queryData = array() ) {
-		
-		// debug($queryData); die();
-		
 		if( !isset($queryData['conditions']) )
 			$queryData['conditions'] = array();
 		
 		if( !isset($queryData['page']) )
 			$queryData['page'] = 1;
-			
-		if( !isset($queryData['limit']) )
-			$queryData['limit'] = 50;
+
+		if( !isset($queryData['limit']) || !is_numeric(@$queryData['limit'])) {
+			$queryData['limit'] = self::RESULTS_COUNT_DEFAULT;
+
+		} else if ( intval($queryData['limit']) > self::RESULTS_COUNT_MAX) {
+			$queryData['limit'] = self::RESULTS_COUNT_MAX;
+		}
 		
 		$from = ( $queryData['page'] - 1 ) * $queryData['limit'];
 		$size = $queryData['limit'];
@@ -711,12 +711,16 @@ class MPSearch {
 		
 		$params = $this->buildESQuery($queryData);
 
-		$this->lastReponse = false;
+		$this->lastResponseStats = null;
 		$response = $this->API->search( $params ); 
 				
-        $this->lastResponse = $response;
-        if( isset($this->lastResponse['hits']) && isset($this->lastResponse['hits']['hits']) )
-	        unset( $this->lastResponse['hits']['hits'] );
+        $this->lastResponseStats = array();
+		if (isset($response['hits']['total'])) {
+			$this->lastResponseStats['count'] = $response['hits']['total'];
+		}
+		if (isset($response['took'])) {
+			$this->lastResponseStats['took_ms'] = $response['took'];
+		}
         
         if( !empty($this->Aggs) ) {
 	        
@@ -726,9 +730,6 @@ class MPSearch {
 		        	$agg_data = $response['aggregations'][$agg_id];
 			        			        
 	        }
-	        
-	        unset( $this->lastResponse['aggregations'] );
-	        
         }
                 
         $hits = $response['hits']['hits'];

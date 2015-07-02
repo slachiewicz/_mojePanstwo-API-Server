@@ -1,11 +1,11 @@
 <?
+App::uses('AppController', 'Controller');
+App::uses('MPSearch', 'Model/Datasource');
 
 class DataobjectsController extends AppController
 {
     public $uses = array('Dane.Dataobject');
 	public $components = array('S3');
-
-	const MAX_RESULTS = 50; // TODO ile jest teraz?
 	
 	public function index($dataset) {
 		
@@ -51,14 +51,6 @@ class DataobjectsController extends AppController
 		$allowed_query_params = array('conditions', 'limit', 'page', 'fields');
 		$query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
 
-		if (!is_numeric($query['limit']) || intval($query['limit']) > self::MAX_RESULTS) {
-			$query['limit'] = self::MAX_RESULTS;
-		}
-		if (array_key_exists('fields', $query) and !is_array($query['fields'])) {
-			// specyfing one field without array notation is ok
-			$query['fields'] = array($query['fields']);
-		}
-				
 		if( isset($params['dataset']) && $params['dataset'] )
 			$query['conditions']['dataset'] = $params['dataset'];
 		
@@ -83,15 +75,11 @@ class DataobjectsController extends AppController
 		$processed_query = $this->Dataobject->buildQuery('all', $query);
 		$page = $processed_query['page']; // starts with 1
 
-		$count = (
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['hits'] ) && 
-			isset( $lastResponse['hits']['total'] ) 
-		) ? $lastResponse['hits']['total'] : null;
+		$count = @$this->Dataobject->getDataSource()->lastResponseStats['count'];
 
 		$_meta = array(
 			'page' => $page,
-			'max_results' => self::MAX_RESULTS,
+			'max_results' => MPSearch::RESULTS_COUNT_MAX,
 			'total' => $count
 		);
 
@@ -109,10 +97,7 @@ class DataobjectsController extends AppController
 //		}
 
 		// TODO is took and aggs needed?
-		$took = (
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) &&
-			isset( $lastResponse['took'] )
-		) ? $lastResponse['took'] : null;
+		$took = @$this->Dataobject->getDataSource()->lastResponse['took_ms'];
 
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
 			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();

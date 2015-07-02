@@ -140,10 +140,21 @@ class CakeFixtureManager
             }
 
             $loaded = false;
+            $filesTried = array();
             foreach ($fixturePaths as $path) {
-                $className = Inflector::camelize($fixture);
-                if (is_readable($path . DS . $className . 'Fixture.php')) {
-                    $fixtureFile = $path . DS . $className . 'Fixture.php';
+                if (strpos($fixture, '/') !== false) {
+                    list($subdir, $className) = explode('/', $fixture, 2);
+                    $subdir = $subdir . DS;
+                } else {
+                    $subdir = '';
+                    $className = $fixture;
+                }
+
+                $className = Inflector::camelize($className);
+                $fixtureFile = $path . DS . $subdir . $className . 'Fixture.php';
+                array_push($filesTried, $fixtureFile);
+
+                if (is_readable($fixtureFile)) {
                     require_once $fixtureFile;
                     $fixtureClass = $className . 'Fixture';
                     $this->_loaded[$fixtureIndex] = new $fixtureClass();
@@ -154,8 +165,7 @@ class CakeFixtureManager
             }
 
             if (!$loaded) {
-                $firstPath = str_replace(array(APP, CAKE_CORE_INCLUDE_PATH, ROOT), '', $fixturePaths[0] . DS . $className . 'Fixture.php');
-                throw new UnexpectedValueException(__d('cake_dev', 'Referenced fixture class %s (%s) not found', $className, $firstPath));
+                throw new UnexpectedValueException(__d('cake_dev', 'Referenced fixture class %s (%s) not found', $className, join(', ', $filesTried)));
             }
         }
     }

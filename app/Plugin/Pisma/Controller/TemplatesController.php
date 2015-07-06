@@ -5,19 +5,16 @@ class TemplatesController extends AppController
     public $uses = array('Dane.Dataobject', 'Pisma.Template');
 		
     public function index() {
-        $conditions = array(
-            'dataset' => array('pisma_templates'),
+       
+        $query = $this->request->query;
+        $query['conditions']['Template.pisma_kategorie_id'] = 16;
+        $query['order'][] = 'Template.ord asc';
+        $query['fields'] = array(
+	        'Template.id',
+	        'Template.nazwa',
+	        'Template.opis',
         );
-
-        if (isset($this->request->query['q']) && !empty($this->request->query['q'])) {
-            $conditions['q'] = $this->request->query['q'];
-        }
-
-        $data = $this->Dataobject->find('all', array(
-            'conditions' => $conditions,
-            'limit' => 10,
-        ));
-
+        $data = $this->Template->find('all', $query);
         $this->setSerialized('data', $data);
     }
 

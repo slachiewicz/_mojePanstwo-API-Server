@@ -129,7 +129,10 @@ class DataobjectsController extends AppController
         ),
         'bdl_wariacje' => array(
             'name' => 'BdlWariacje'
-        )
+        ),
+        'prawo_hasla' => array(
+	        'name' => 'PrawoHasla',
+        ),
     );
 	
 	public function post($dataset, $id)

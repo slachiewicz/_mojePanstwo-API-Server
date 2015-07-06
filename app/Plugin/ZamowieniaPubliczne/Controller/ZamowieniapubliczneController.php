@@ -2,7 +2,7 @@
 
 class ZamowieniapubliczneController extends AppController
 {
-
+		
     public function stats()
     {
         $stats = $this->Zamowieniapubliczne->getStats();

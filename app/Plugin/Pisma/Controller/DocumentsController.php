@@ -373,6 +373,7 @@ class DocumentsController extends AppController
 		        'user_id' => $this->Auth->user('id'),
 		        'user_type' => $this->Auth->user('type'),
 		        'email' => $this->request->data['email'],
+		        'name' => @$this->request->data['name'],
 	        ));
 	        $this->setSerialized('status', $status);
 	    	

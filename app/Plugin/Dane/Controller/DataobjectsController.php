@@ -151,21 +151,27 @@ class DataobjectsController extends AppController
 			if( in_array($dataset, $datasets) ) {
 	
 	            $params = $this->enabledUpdateModels[$dataset];
-	            $name = $params['name'];
+	            $name = $params['name'];	            
 	
-	            try {
+			} else {
+				
+				$name = 'Dataobject';
+				
+			}
+			
+			try {
 	                
-	                $this->loadModel('Dane.' . $name);
-	                	                
-	                if( method_exists($this->$name, $action) ) {
-		                $output = $this->$name->$action($this->data, $id);
-	                }
+                $this->loadModel('Dane.' . $name);
+                	                
+                if( method_exists($this->$name, $action) ) {
+	                $output = $this->$name->$action($this->data, $id);
+                }
 
-	            } catch (MissingModelException $e) {
-	
-	            }
-	
-			} 
+            } catch (MissingModelException $e) {
+
+            }
+			
+			
 		}
 		
 		$this->set('output', $output);

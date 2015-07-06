@@ -274,7 +274,8 @@ class DataobjectsController extends AppController
                     $page = array(
                         'cover' => false,
                         'logo' => false,
-                        'moderated' => false
+                        'moderated' => false,
+                        'credits' => null
                     );
 
                     if($objectPage) {
@@ -282,6 +283,7 @@ class DataobjectsController extends AppController
                             'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
                             'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
                             'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
+                            'credits' => $objectPage['ObjectPage']['credits']
                         );
                     }
 					

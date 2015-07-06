@@ -4,7 +4,7 @@
 
 Router::connect("/bdl/localDataForDimension/:dim_id", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'localDataForDimension'), array('dim_id' => '[0-9]+'));
 
-
+Router::connect("/bdl/getLocalDataForDimension", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'getLocalDataForDimension'));
 /*
 Router::connect("/bdl/chartDataForDimmesions", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'chartDataForDimmesions'));
 Router::connect("/bdl/getLocalDataForDimension", array('plugin' => 'BDL', 'controller' => 'BDLLegacy', 'action' => 'getLocalDataForDimension'));

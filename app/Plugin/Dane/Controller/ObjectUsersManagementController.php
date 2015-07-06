@@ -2,7 +2,7 @@
 
 class ObjectUsersManagementController extends AppController {
 
-    public $uses = array('Dane.ObjectUser', 'Paszport.User');
+    public $uses = array('Dane.ObjectUser', 'Dane.ObjectPage', 'Paszport.User');
     public $components = array('RequestHandler');
 
     public function __construct($request, $response) {
@@ -13,6 +13,8 @@ class ObjectUsersManagementController extends AppController {
         parent::beforeFilter();
         if(!$this->isAuthorized())
             throw new ForbiddenException();
+
+        $this->ObjectPage->setRequest($this->request);
     }
 
     public function index() {
@@ -73,6 +75,7 @@ class ObjectUsersManagementController extends AppController {
                 )
             ));
 
+            $this->ObjectPage->whenUserWasAdded();
             $success = true;
         }
 
@@ -116,6 +119,18 @@ class ObjectUsersManagementController extends AppController {
 
         if($object) {
             $this->ObjectUser->delete($object['ObjectUser']['id']);
+
+            $count = (int) $this->ObjectUser->find('count', array(
+                'conditions' => array(
+                    'ObjectUser.dataset' => $this->request['dataset'],
+                    'ObjectUser.object_id' => $this->request['object_id']
+                )
+            ));
+
+            if(!$count)
+                $this->ObjectPage->whenUsersWasDeleted();
+
+
             $success = true;
         }
 

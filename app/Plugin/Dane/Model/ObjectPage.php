@@ -14,11 +14,30 @@ class ObjectPage extends AppModel {
         $this->setLogoOrCover('logo', $value);
     }
 
-    public function setCover($value) {
-        $this->setLogoOrCover('cover', $value);
+    public function setCover($value, $credits = null) {
+        $this->setLogoOrCover('cover', $value, $credits);
     }
 
-    private function setLogoOrCover($name, $value) {
+    public function whenUserWasAdded() {
+        $this->setModerated(true);
+    }
+
+    public function whenUsersWasDeleted() {
+        $this->setModerated(false);
+    }
+
+    private function setModerated($value = true) {
+        $conditions = array(
+            'ObjectPage.dataset' => $this->request['dataset'],
+            'ObjectPage.object_id' => (int) $this->request['object_id']
+        );
+
+        $this->updateAll(array(
+            'moderated' => $value ? '1' : '0'
+        ), $conditions);
+    }
+
+    private function setLogoOrCover($name, $value, $credits = null) {
         $conditions = array(
             'ObjectPage.dataset' => $this->request['dataset'],
             'ObjectPage.object_id' => (int) $this->request['object_id']
@@ -32,7 +51,7 @@ class ObjectPage extends AppModel {
             $remove = false;
             if($value == false) {
                 $sname = $name == 'logo' ? 'cover' : 'logo';
-                if($object['ObjectPage'][$sname] == '0') {
+                if($object['ObjectPage'][$sname] == '0' && $object['ObjectPage']['moderated'] == '0') {
                     $remove = true;
                 }
             }
@@ -40,17 +59,28 @@ class ObjectPage extends AppModel {
             if($remove) {
                 $this->deleteAll($conditions, false);
             } else {
-                $this->updateAll(array(
+                $data = array(
                     $name => $value ? '1' : '0'
-                ), $conditions);
+                );
+
+                if(!is_null($credits))
+                    $data['credits'] = "'$credits'";
+
+                $this->updateAll($data, $conditions);
             }
         } else {
+
+            $data = array(
+                'dataset' => $this->request['dataset'],
+                'object_id' => (int) $this->request['object_id'],
+                $name => $value ? '1': '0',
+            );
+
+            if(!is_null($credits))
+                $data['credits'] = "'$credits'";
+
             $this->save(array(
-                'ObjectPage' => array(
-                    'dataset' => $this->request['dataset'],
-                    'object_id' => (int) $this->request['object_id'],
-                    $name => $value ? '1': '0',
-                )
+                'ObjectPage' => $data
             ));
         }
     }

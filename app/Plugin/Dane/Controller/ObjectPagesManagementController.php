@@ -23,7 +23,7 @@ class ObjectPagesManagementController extends AppController {
     }
 
     public function setCover() {
-        $this->ObjectPage->setCover(true);
+        $this->ObjectPage->setCover(true, $this->data['credits']);
         $this->setSerialized('success', true);
     }
 

@@ -201,15 +201,41 @@ class ZamowieniaPubliczne extends AppModel
 	    App::Import('ConnectionManager');
 		$MPSearch = ConnectionManager::getDataSource('MPSearch');
 		
+		$request = isset($params['request']) ? $params['request'] : array();
+		$_aggs = isset($params['aggs']) ? $params['aggs'] : array();
+		
 		$filters = array(
 			array(
 				'term' => array(
 					'dataset' => 'zamowienia_publiczne_dokumenty',
 				),
 			),
+			array(
+				'term' => array(
+					'data.zamowienia_publiczne_dokumenty.typ_id' => '3',
+				),
+			),
 		);
-				
-		if( isset($params['instytucja_id']) )
+		
+		if( isset($request['date_min']) )
+			$filters[] = array(
+				'range' => array(
+					'date' => array(
+						'gte' => $request['date_min'],
+					),
+				),
+			);
+			
+		if( isset($request['date_max']) )
+			$filters[] = array(
+				'range' => array(
+					'date' => array(
+						'lte' => $request['date_max'],
+					),
+				),
+			);
+						
+		if( isset($request['instytucja_id']) )
 			$filters[] = array(
 				'nested' => array(
 					'path' => 'feeds_channels',
@@ -223,7 +249,7 @@ class ZamowieniaPubliczne extends AppModel
 								),
 								array(
 									'term' => array(
-										'feeds_channels.object_id' => $params['instytucja_id'],
+										'feeds_channels.object_id' => $request['instytucja_id'],
 									),
 								),
 							),
@@ -231,6 +257,101 @@ class ZamowieniaPubliczne extends AppModel
 					),
 				),
 			);
+			
+		if( isset($request['gmina_id']) )
+			$filters[] = array(
+				'term' => array(
+					'data.zamowienia_publiczne_dokumenty.gmina_id' => $request['gmina_id'],
+				),
+			);
+					
+		if( array_key_exists('dokumenty', $_aggs) ) {
+			
+			$size = (
+				isset( $_aggs['dokumenty']['size'] ) && 
+				is_numeric( $_aggs['dokumenty']['size'] )
+			) ? $_aggs['dokumenty']['size'] : 3;
+						
+			$aggs['dokumenty'] = array(
+				'top_hits' => array(
+					'size' => $size,
+					'fielddata_fields' => array('dataset', 'id', 'source'),
+                    'sort' => array(
+                        'data.zamowienia_publiczne_dokumenty.wartosc_cena' => array(
+	                        'order' => 'desc',
+                        ),
+                    ),
+				),
+			);
+			
+		}
+		
+		if( array_key_exists('stats', $_aggs) ) {
+			
+			$aggs['stats'] = array(
+				'stats' => array(
+					'field' => 'data.zamowienia_publiczne_dokumenty.wartosc_cena',
+				),
+			);
+			
+		}
+		
+		if( array_key_exists('wykonawcy', $_aggs) ) {
+			
+			$size = (
+				isset( $_aggs['wykonawcy']['size'] ) && 
+				is_numeric( $_aggs['wykonawcy']['size'] )
+			) ? $_aggs['wykonawcy']['size'] : 5;
+			
+			$aggs['wykonawcy'] = array(
+				'nested' => array(
+					'path' => 'zamowienia_publiczne-wykonawcy',
+				),
+				'aggs' => array(
+					'wykonawca' => array(
+						'terms' => array(
+							'field' => 'zamowienia_publiczne-wykonawcy.id',
+							'order' => array(
+								'suma' => 'desc',
+							),
+							'size' => $size,
+						),
+						'aggs' => array(
+							'nazwa' => array(
+								'terms' => array(
+									'field' => 'zamowienia_publiczne-wykonawcy.nazwa',
+									'size' => 1,
+								),
+							),
+							'krs_id' => array(
+								'terms' => array(
+									'field' => 'zamowienia_publiczne-wykonawcy.krs_id',
+									'size' => 1,
+								),
+							),
+							'waluta' => array(
+								'terms' => array(
+									'field' => 'zamowienia_publiczne-wykonawcy.waluta',
+								),
+								'aggs' => array(
+									'suma' => array(
+										'sum' => array(
+											'field' => 'zamowienia_publiczne-wykonawcy.cena',
+										),
+									),
+								),
+							),
+							'suma' => array(
+								'sum' => array(
+									'field' => 'zamowienia_publiczne-wykonawcy.cena',
+								),
+							),
+						),
+					),
+				),
+			);
+			
+		}
 		
 		$query = array(
 			'index' => 'mojepanstwo_v1',
@@ -246,85 +367,13 @@ class ZamowieniaPubliczne extends AppModel
 						),
 					),
 				),
-				'aggs' => array(
-					'wykonawcy' => array(
-						'nested' => array(
-							'path' => 'zamowienia_publiczne-wykonawcy',
-						),
-						'aggs' => array(
-							'wykonawca' => array(
-								'terms' => array(
-									'field' => 'zamowienia_publiczne-wykonawcy.id',
-									'order' => array(
-										'suma' => 'desc',
-									),
-									'size' => '5',
-								),
-								'aggs' => array(
-									'nazwa' => array(
-										'terms' => array(
-											'field' => 'zamowienia_publiczne-wykonawcy.nazwa',
-											'size' => 1,
-										),
-									),
-									'krs_id' => array(
-										'terms' => array(
-											'field' => 'zamowienia_publiczne-wykonawcy.krs_id',
-											'size' => 1,
-										),
-									),
-									'waluta' => array(
-										'terms' => array(
-											'field' => 'zamowienia_publiczne-wykonawcy.waluta',
-										),
-										'aggs' => array(
-											'suma' => array(
-												'sum' => array(
-													'field' => 'zamowienia_publiczne-wykonawcy.cena',
-												),
-											),
-										),
-									),
-									'suma' => array(
-										'sum' => array(
-											'field' => 'zamowienia_publiczne-wykonawcy.cena',
-										),
-									),
- 								),
-							),
-						),
-					),
-					'dni' => array(
-						'date_histogram' => array(
-							'field' => 'date',
-							'interval' => 'day',
-						),
-						'aggs' => array(
-							'wykonawcy' => array(
-								'nested' => array(
-									'path' => 'zamowienia_publiczne-wykonawcy',
-								),
-								'aggs' => array(
-									'waluty' => array(
-										'terms' => array(
-											'field' => 'zamowienia_publiczne-wykonawcy.waluta',
-										),
-										'aggs' => array(
-											'suma' => array(
-												'sum' => array(
-													'field' => 'zamowienia_publiczne-wykonawcy.cena',
-												),
-											),
-										),
-									),
-								),
-							),
-						),
-					),
-				),
+				'aggs' => $aggs,
 			),
-		);		
+		);
+
         $response = $MPSearch->API->search($query);
+        
+        return $response;
 		
 		$output = array(
 			'aggs' => array(),

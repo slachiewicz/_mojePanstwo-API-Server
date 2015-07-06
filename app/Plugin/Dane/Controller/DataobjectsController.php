@@ -129,7 +129,10 @@ class DataobjectsController extends AppController
         ),
         'bdl_wariacje' => array(
             'name' => 'BdlWariacje'
-        )
+        ),
+        'prawo_hasla' => array(
+	        'name' => 'PrawoHasla',
+        ),
     );
 	
 	public function post($dataset, $id)
@@ -213,8 +216,51 @@ class DataobjectsController extends AppController
 			$this->loadModel('Dane.Subscription');
 						
 			foreach( $layers as $layer ) {
-								
-				if( $layer=='page' ) {
+
+                if ( $layer == 'subscribers' ) {
+
+                    $this->loadModel('Dane.Subscriptions');
+
+                    $subscribers = array(
+                        'list',
+                        'count'
+                    );
+
+                    $params = array(
+                        'fields' => array(
+                            'Users.username',
+                            'Users.photo_small'
+                        ),
+                        'conditions' => array(
+                            'Subscriptions.dataset' => $dataset,
+                            'Subscriptions.object_id' => $id,
+                            'Subscriptions.user_type' => 'account'
+                        ),
+                        'joins' => array(
+                            array(
+                                'table' => 'users',
+                                'alias' => 'Users',
+                                'type' => 'LEFT',
+                                'conditions' => array(
+                                    'Subscriptions.user_id = Users.id'
+                                )
+                            )
+                        ),
+                        'group' => array(
+                            'Subscriptions.user_id'
+                        ),
+                        'order' => 'Subscriptions.cts'
+                    );
+
+                    $subscribers['list'] = $this->Subscriptions->find('all', array_merge($params, array(
+                        'limit' => 20
+                    )));
+
+                    $subscribers['count'] = $this->Subscriptions->find('count', $params);
+
+                    $object['layers']['subscribers'] = $subscribers;
+
+                } elseif( $layer=='page' ) {
 
                     $this->loadModel('Dane.ObjectPage');
 
@@ -228,7 +274,8 @@ class DataobjectsController extends AppController
                     $page = array(
                         'cover' => false,
                         'logo' => false,
-                        'moderated' => false
+                        'moderated' => false,
+                        'credits' => null
                     );
 
                     if($objectPage) {
@@ -236,6 +283,7 @@ class DataobjectsController extends AppController
                             'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
                             'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
                             'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
+                            'credits' => $objectPage['ObjectPage']['credits']
                         );
                     }
 					

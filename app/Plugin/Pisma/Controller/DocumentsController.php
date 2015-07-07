@@ -284,6 +284,33 @@ class DocumentsController extends AppController
 	        	$data['to_name'] = $to['nazwa_urzedu'];
 	        	$data['to_email'] = $to['email'];
 	        	
+        	} elseif(
+	        	( $data['to_dataset']=='zamowienia_publiczne_zamawiajacy' ) && 
+	        	( $to = $DB->selectAssoc("SELECT uzp_zamawiajacy.id, uzp_zamawiajacy.nazwa, uzp_zamawiajacy.email, uzp_zamawiajacy.ulica, uzp_zamawiajacy.nr_domu, uzp_zamawiajacy.nr_miesz, uzp_zamawiajacy.miejscowosc, uzp_zamawiajacy.kod_poczt FROM uzp_zamawiajacy WHERE uzp_zamawiajacy.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	
+	        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['ulica'] . ' ' . $to['nr_domu'] . ' ' . $to['nr_miesz'] . '</p><p>' . $to['kod_poczt'] . ' ' . $to['miejscowosc'] . '</p><p>' . $to['email'] . '</p>';
+	        	$data['to_name'] = $to['nazwa'];
+	        	$data['to_email'] = $to['email'];
+	        	
+        	} elseif(
+	        	( $data['to_dataset']=='krs_podmioty' ) && 
+	        	( $to = $DB->selectAssoc("SELECT id, nazwa_pelna, adres_ulica, adres_numer, adres_lokal, adres_miejscowosc, adres_kod_pocztowy, adres_poczta, adres_kraj, email FROM krs_pozycje WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	
+	        	$data['to_str'] = '<p>' . $to['nazwa_pelna'] . '</p><p>' . $to['adres_ulica'] . ' ' . $to['adres_numer'];
+	        	
+	        	if( $to['adres_lokal'] )
+		        	$data['to_str'] .= ' ' . $to['adres_lokal'];
+	        	
+	        	$data['to_str'] .= '</p><p>' . $to['adres_kod_pocztowy'] . ' ' . $to['adres_poczta'] . '</p>';
+	        	
+	        	if( $to['email'] )
+		        	$data['to_str'] .= '<p>' . $to['email'] . '</p>';
+	        	
+	        	$data['to_name'] = $to['nazwa_pelna'];
+	        	$data['to_email'] = $to['email'];
+	        	
         	}
         	
         }

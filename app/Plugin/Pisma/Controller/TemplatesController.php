@@ -8,6 +8,7 @@ class TemplatesController extends AppController
        
         $query = $this->request->query;
         $query['conditions']['Template.pisma_kategorie_id'] = 16;
+        $query['conditions']['Template.enabled'] = true;
         $query['order'][] = 'Template.ord asc';
         $query['fields'] = array(
 	        'Template.id',

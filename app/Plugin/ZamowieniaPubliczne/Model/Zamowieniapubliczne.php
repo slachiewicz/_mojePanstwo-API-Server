@@ -264,6 +264,13 @@ class ZamowieniaPubliczne extends AppModel
 					'data.zamowienia_publiczne_dokumenty.gmina_id' => $request['gmina_id'],
 				),
 			);
+			
+		if( isset($request['zamawiajacy_id']) )
+			$filters[] = array(
+				'term' => array(
+					'data.zamowienia_publiczne_dokumenty.zamawiajacy_id' => $request['zamawiajacy_id'],
+				),
+			);
 					
 		if( array_key_exists('dokumenty', $_aggs) ) {
 			

@@ -117,19 +117,10 @@ class ProjectsController extends AppController {
                 $toUpdate['cover_photo'] = $photo;
             }
 
-            foreach($this->data as $name => $value) {
-                if($name == 'cover_photo')
-                    continue;
-
-                $toUpdate[$name] = $value;
-            }
-
             $toUpdate['mts'] = date('Y-m-d H:i:s');
-            $toUpdate['user_id'] = (int) $this->Auth->user('id');
+            $toUpdate['id'] = $object['OrganizacjeDzialania']['id'];
 
-            $this->OrganizacjeDzialania->read(null, $object['OrganizacjeDzialania']['id']);
-            $this->OrganizacjeDzialania->set($toUpdate);
-            $this->OrganizacjeDzialania->save();
+            $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'folder', 'geo_lat', 'geo_lng'));
 
             $success = true;
         }

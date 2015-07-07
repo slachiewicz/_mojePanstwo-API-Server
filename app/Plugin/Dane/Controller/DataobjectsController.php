@@ -164,7 +164,7 @@ class DataobjectsController extends AppController
                 $this->loadModel('Dane.' . $name);
                 	                
                 if( method_exists($this->$name, $action) ) {
-	                $output = $this->$name->$action($this->data, $id);
+	                $output = $this->$name->$action($this->data, $id, $dataset);
                 }
 
             } catch (MissingModelException $e) {

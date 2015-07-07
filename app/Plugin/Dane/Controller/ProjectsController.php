@@ -54,8 +54,9 @@ class ProjectsController extends AppController {
             )
         ));
 
-        $this->saveCoverPhoto($this->data['cover_photo'], $this->OrganizacjeDzialania->getLastInsertId());
-        $this->setSerialized('success', true);
+        $id = $this->OrganizacjeDzialania->getLastInsertId();
+        $this->saveCoverPhoto($this->data['cover_photo'], $id);
+        $this->setSerialized('id', $id);
     }
 
     public function view() {

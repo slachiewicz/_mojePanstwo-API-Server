@@ -136,6 +136,9 @@ CakePlugin::loadAll(array(
     'WydatkiPoslow' => array(
         'routes' => true,
     ),
+    'Admin' => array(
+        'routes' => true
+    )
 ));
 
 /**

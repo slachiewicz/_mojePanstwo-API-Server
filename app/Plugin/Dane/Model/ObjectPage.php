@@ -26,6 +26,31 @@ class ObjectPage extends AppModel {
         $this->setModerated(false);
     }
 
+    public function markAsModerated($dataset, $object_id) {
+        $conditions = array(
+            'ObjectPage.dataset' => $dataset,
+            'ObjectPage.object_id' => (int) $object_id
+        );
+
+        $object = $this->find('first', array(
+            'conditions' => $conditions
+        ));
+
+        if($object) {
+            $this->updateAll(array(
+                'moderated' => '1'
+            ), $conditions);
+        } else {
+            $this->save(array(
+                'ObjectPage' => array(
+                    'dataset' => $dataset,
+                    'object_id' => (int) $object_id,
+                    'moderated' => '1'
+                )
+            ));
+        }
+    }
+
     private function setModerated($value = true) {
         $conditions = array(
             'ObjectPage.dataset' => $this->request['dataset'],

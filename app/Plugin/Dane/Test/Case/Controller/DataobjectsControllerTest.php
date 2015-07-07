@@ -68,13 +68,13 @@ class DataobjectsControllerTest extends ControllerTestCase {
         $this->dataobjectExpectsFind(array(
             'conditions' => array(
                 'dataset' => 'wojewodztwa'
-            )
+            ),
+            'limit' => MPSearch::RESULTS_COUNT_DEFAULT
         ), $this->defaultResponse, 3);
 
         $this->testAction('/dane/wojewodztwa');
 
-        $this->assertSame(array(
-            '_serialize' => array('_items', '_meta'),
+        $this->assertArrayMatchingKeysSame(array(
             '_items' => $this->defaultResponse,
             '_meta' => array('page' => 1, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3)
         ), $this->vars);
@@ -100,7 +100,15 @@ class DataobjectsControllerTest extends ControllerTestCase {
         $actual = parse_url($actual);
 
         foreach($fields as $fld) {
-            $this->assertSame($expected[$fld], $actual[$fld]);
+            if ($fld == 'query' and array_key_exists('query', $expected) and array_key_exists('query', $actual)) {
+                $a1 = array(); $a2 = array();
+                parse_str($expected['query'], $a1);
+                parse_str($actual['query'], $a2);
+
+                $this->assertArraySameValues($a1, $a2);
+            } else {
+                $this->assertSame(@$expected[$fld], @$actual[$fld]);
+            }
         }
     }
 
@@ -153,9 +161,9 @@ class DataobjectsControllerTest extends ControllerTestCase {
         ), $this->vars);
 
         $links = $this->vars['_links'];
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1', $links['self']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', $links['last']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=2', $links['next']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1', @$links['self']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', @$links['last']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=2', @$links['next']);
 
         $this->assertArrayNotHasKey('first', $links);
         $this->assertArrayNotHasKey('prev', $links);
@@ -178,11 +186,11 @@ class DataobjectsControllerTest extends ControllerTestCase {
         ), $this->vars);
 
         $links = $this->vars['_links'];
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=2', $links['self']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', $links['last']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', $links['next']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=1', $links['prev']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=1', $links['first']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=2', @$links['self']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', @$links['last']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', @$links['next']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=1', @$links['prev']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=1', @$links['first']);
     }
 
     public function testIndexHateoasLast() {
@@ -203,9 +211,9 @@ class DataobjectsControllerTest extends ControllerTestCase {
         ), $this->vars);
 
         $links = $this->vars['_links'];
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', $links['self']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=1', $links['first']);
-        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=2', $links['prev']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=3', @$links['self']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=1', @$links['first']);
+        $this->assertUrlSamePathAndQuery('/dane/wojewodztwa?limit=1&page=2', @$links['prev']);
 
         $this->assertArrayNotHasKey('last', $links);
         $this->assertArrayNotHasKey('next', $links);

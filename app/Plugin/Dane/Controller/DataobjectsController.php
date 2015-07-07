@@ -1,6 +1,7 @@
 <?
 App::uses('AppController', 'Controller');
 App::uses('MPSearch', 'Model/Datasource');
+App::uses('MpUtils\Url', 'Lib');
 
 class DataobjectsController extends AppController
 {
@@ -66,10 +67,18 @@ class DataobjectsController extends AppController
 			$query['conditions']['subscribtions'] = array(
 				'user_type' => $this->Auth->user('type'),
 				'user_id' => $this->Auth->user('id'),
-			); 
-			
+			);
 		}
-		
+
+		// TODO move RESULTS_COUNT_MAX here
+		if (isset($query['limit'])) {
+			if ($query['limit'] > MPSearch::RESULTS_COUNT_MAX) {
+				$query['limit'] = MPSearch::RESULTS_COUNT_MAX;
+			}
+		} else {
+			$query['limit'] = MPSearch::RESULTS_COUNT_DEFAULT;
+		}
+
 		$_items = $this->Dataobject->find('all', $query);
 
 		$processed_query = $this->Dataobject->buildQuery('all', $query);
@@ -83,18 +92,29 @@ class DataobjectsController extends AppController
 			'total' => $count
 		);
 
-// HATEOAS TODO
-//		$_links = array();
-//		if ($page > 1) {
-//			$_links['first'] = 'TODO'; //TODO
-//			$_links['prev'] = 'TODO';
-//		}
-//
-//		$last_page = (int) (($count - 1) / $processed_query['limit']) + 1;
-//		if ($page < $last_page) {
-//			$_links['last'] = 'TODO'. $last_page; // TODO
-//			$_links['next'] = 'TODO'. ($page + 1);
-//		}
+		// HATEOS
+		$current_url = Router::url(null, true);
+		$_links = array(
+			'self' => $current_url
+		);
+
+		$url = new MpUtils\Url($current_url);
+		if ($page > 1) {
+			$url->setParam('page', 1);
+			$_links['first'] = $url->buildUrl();
+
+			$url->setParam('page', $page - 1);
+			$_links['prev'] = $url->buildUrl();
+		}
+
+		$lastPage = (int) (($count - 1) / $processed_query['limit']) + 1;
+		if ($page < $lastPage) {
+			$url->setParam('page', $lastPage);
+			$_links['last'] = $url->buildUrl();
+
+			$url->setParam('page', $page + 1);
+			$_links['next'] = $url->buildUrl();
+		}
 
 		// TODO is took and aggs needed?
 		$took = @$this->Dataobject->getDataSource()->lastResponse['took_ms'];
@@ -105,7 +125,6 @@ class DataobjectsController extends AppController
 			$_serialize[] = 'Aggs';
 		}
 
-		// TODO _items, _links (self, last, parent, next), _meta (page,max_results, total)
         $this->setSerialized(compact('_items', '_links', '_meta'));
 	}
 	

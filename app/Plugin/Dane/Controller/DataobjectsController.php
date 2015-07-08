@@ -127,7 +127,8 @@ class DataobjectsController extends AppController
 
         $this->setSerialized(compact('_items', '_links', '_meta'));
 	}
-	
+
+	// TODO testy
     public function view($dataset, $id)
     {
 		// TODO wyczyscic!!! jakie inne parametry tu mogą wskoczyć, czemu pozwalamy na pełne przekierowanie?
@@ -225,7 +226,8 @@ class DataobjectsController extends AppController
 			'_serialize' => $_serialize,
 		));
     }
-    
+
+	// TODO testy
     public function view_layer()
     {
 	    $this->loadModel('Dane.Dataset');
@@ -246,25 +248,6 @@ class DataobjectsController extends AppController
         $this->setSerialized('layer', $layer);
     }
 
-    public function layer()
-    {
-
-        $alias = $this->request->params['alias'];
-        $id = $this->request->params['object_id'];
-        $layer = $this->request->params['layer'];
-        $params = array_merge($this->request->query, $this->data);
-
-        if (!$alias || !$id || !$layer)
-            return false;
-
-        $layer = $this->Dataobject->getObjectLayer($alias, $id, $layer, $params);
-
-        $this->set(array(
-            'layer' => $layer,
-            '_serialize' => 'layer',
-        ));
-    }
-	
 	/*
     public function alertsQueries()
     {
@@ -278,7 +261,8 @@ class DataobjectsController extends AppController
         ));
     }
     */
-	
+
+	// TODO testy
 	public function subscribe()
 	{
 		
@@ -295,7 +279,8 @@ class DataobjectsController extends AppController
 		$this->set('_serialize', array('status'));
 		
 	}
-	
+
+	// TODO testy
 	public function unsubscribe()
 	{
 		
@@ -312,5 +297,4 @@ class DataobjectsController extends AppController
 		$this->set('_serialize', array('status'));
 		
 	}
-
 }

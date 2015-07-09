@@ -31,15 +31,15 @@ class TemplatesController extends AppController
                     break;
                 }
                 case 'krakow_rada_miasta': {
-                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 73);
+                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 74);
                     break;
                 }
                 case 'dzielnice': {
-                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 73);
+                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 74);
                     break;
                 }
                 case 'gminy': {
-                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 73);
+                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 74);
                     break;
                 }
             }

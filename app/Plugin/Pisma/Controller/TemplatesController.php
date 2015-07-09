@@ -39,7 +39,7 @@ class TemplatesController extends AppController
                     break;
                 }
                 case 'gminy': {
-                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 74);
+                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 74);
                     break;
                 }
             }

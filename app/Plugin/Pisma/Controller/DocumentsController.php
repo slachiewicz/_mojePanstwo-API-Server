@@ -153,7 +153,7 @@ class DocumentsController extends AppController
         if(
 	        $adresat_id && 
 	        ( $parts = explode(':', $adresat_id) ) && 
-	        ( count($parts)===2 )
+	        ( count($parts)>1 )
         ) 
         	$data = array_merge($data, array(
 	        	'to_dataset' => $parts[0],

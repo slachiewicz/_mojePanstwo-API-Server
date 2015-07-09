@@ -222,8 +222,13 @@ class DataobjectsController extends AppController
 			$this->loadModel('Dane.Subscription');
 						
 			foreach( $layers as $layer ) {
-
-                if ( $layer == 'subscribers' ) {
+				
+				if ( $layer == 'dataset' ) {
+					
+					$this->loadModel('MPCache');
+					$object['layers']['dataset'] = $this->MPCache->getDataset($dataset);
+               
+                } elseif ( $layer == 'subscribers' ) {
 
                     $this->loadModel('Dane.Subscriptions');
 

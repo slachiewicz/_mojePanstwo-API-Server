@@ -7,8 +7,45 @@ class TemplatesController extends AppController
     public function index() {
        
         $query = $this->request->query;
-        $query['conditions']['Template.pisma_kategorie_id'] = 16;
         $query['conditions']['Template.enabled'] = true;
+                        
+        if( 
+	        isset( $this->request->query['adresat'] ) && 
+	        $this->request->query['adresat']
+	    ) {
+        	        
+	        $parts = explode(':', $this->request->query['adresat']);
+	        $preset = @$parts[0];
+	        $preset_params = @$parts[2];
+	        
+	        switch( $preset ) {
+		        
+		        case 'radni_gmin': {
+			        
+			        if( $preset_params=='K' )
+				        $query['conditions']['Template.id'] = 70;
+				    else
+				        $query['conditions']['Template.id'] = 69;
+			        
+			        break;
+			        
+		        }
+		        case 'krakow_rada_miasta': {
+			        
+			        $query['conditions']['Template.id'] = array(1,2,3);
+			        
+		        }
+		        
+	        }
+	        
+	        
+	        
+        } else {
+	        
+	        $query['conditions']['Template.pisma_kategorie_id'] = 16;
+	        
+        }        
+        
         $query['order'][] = 'Template.ord asc';
         $query['fields'] = array(
 	        'Template.id',

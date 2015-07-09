@@ -30,7 +30,7 @@ class TemplatesController extends AppController
 
                     break;
                 }
-                case 'krakow_rada_miasta': {
+                case 'rada_gminy': {
                     $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 74);
                     break;
                 }

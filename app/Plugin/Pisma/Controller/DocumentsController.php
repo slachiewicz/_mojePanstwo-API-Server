@@ -152,9 +152,9 @@ class DocumentsController extends AppController
         
         if(
 	        $adresat_id && 
-	        ( $parts = explode(':', $adresat_id) ) && 
+	        ( $parts = explode(':', $adresat_id) ) &&
 	        ( count($parts)>1 )
-        ) 
+        )
         	$data = array_merge($data, array(
 	        	'to_dataset' => $parts[0],
 	        	'to_id' => $parts[1],
@@ -274,17 +274,41 @@ class DocumentsController extends AppController
 	        	}
 	        	
 	        	$data['to_email'] = $to['email'];
-	        	
-        	} elseif(
-	        	( $data['to_dataset']=='gminy' ) && 
-	        	( $to = $DB->selectAssoc("SELECT pl_gminy.id, pl_gminy.nazwa, pl_gminy.email, pl_gminy.nazwa_urzedu, pl_gminy.adres FROM pl_gminy WHERE pl_gminy.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
-        	) {
-	        	
-	        	$data['to_str'] = '<p>' . $to['nazwa_urzedu'] . '</p><p>' . $to['adres'] . '</p><p>' . $to['email'] . '</p>';
-	        	$data['to_name'] = $to['nazwa_urzedu'];
-	        	$data['to_email'] = $to['email'];
-	        	
-        	} elseif(
+
+            } elseif(
+                ( $data['to_dataset']=='gminy' ) &&
+                ( $to = $DB->selectAssoc("SELECT pl_gminy.id, pl_gminy.nazwa, pl_gminy.email, pl_gminy.szef_stanowisko, pl_gminy.adres FROM pl_gminy WHERE pl_gminy.id='" . addslashes( $data['to_id'] ) . "'" ) )
+            ) {
+
+                $data['to_str'] = '<p>' . $to['szef_stanowisko'] . ' ';
+                switch ($to['szef_stanowisko']) {
+                    case 'Wójt': {
+                        $data['to_str'].='Gminy';
+                        break;
+                    }
+                    case 'Burmistrz': {
+                        $data['to_str'].='Miasta';
+                        break;
+                    }
+                    case 'Prezydent': {
+                        $data['to_str'].='Miasta';
+                        break;
+                    }
+                }
+
+                    $data['to_str'].= ' ' . $to['nazwa'] . '</p><p>' . $to['adres'] . '</p><p>' . $to['email'] . '</p>';
+                $data['to_name'] = $to['szef_stanowisko'] . ' ' . $to['nazwa'];
+                $data['to_email'] = $to['email'];
+
+            } elseif(
+                ( $data['dataset']=='rada_gminy' ) &&
+                ( $to = $DB->selectAssoc("SELECT pl_gminy.id, pl_gminy.nazwa, pl_gminy.email, pl_gminy.rada_nazwa, pl_gminy.adres FROM pl_gminy WHERE pl_gminy.id='". addslashes( $data['to_id'] ) ."'" ) )
+            ) {
+                $data['to_str'] = '<p>' . $to['rada_nazwa'] . '</p><p>' . $to['adres'] . '</p><p>' . $to['email'] . '</p>';
+                $data['to_name'] = $to['rada_nazwa'];
+                $data['to_email'] = $to['email'];
+
+            } elseif(
 	        	( $data['to_dataset']=='zamowienia_publiczne_zamawiajacy' ) && 
 	        	( $to = $DB->selectAssoc("SELECT uzp_zamawiajacy.id, uzp_zamawiajacy.nazwa, uzp_zamawiajacy.email, uzp_zamawiajacy.ulica, uzp_zamawiajacy.nr_domu, uzp_zamawiajacy.nr_miesz, uzp_zamawiajacy.miejscowosc, uzp_zamawiajacy.kod_poczt FROM uzp_zamawiajacy WHERE uzp_zamawiajacy.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
         	) {

@@ -120,9 +120,13 @@ class ProjectsController extends AppController {
             $toUpdate['mts'] = date('Y-m-d H:i:s');
             $toUpdate['id'] = $object['OrganizacjeDzialania']['id'];
 
-            $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'folder', 'geo_lat', 'geo_lng'));
+            $fields = array('tytul', 'opis', 'folder', 'geo_lat', 'geo_lng');
+            foreach($fields as $field) {
+                if(isset($this->data[$field]))
+                    $toUpdate[$field] = $this->data[$field];
+            }
 
-            $success = true;
+            $success = $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'folder', 'geo_lat', 'geo_lng'));
         }
 
         $this->setSerialized('success', $success);

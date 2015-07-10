@@ -50,7 +50,7 @@ class DataobjectsController extends AppController
 		// TODO validate query before passing
 		// 'recursive', 'fields',  'order', 'callbacks', 'aggs' ?
 		$allowed_query_params = array('conditions', 'limit', 'page', 'fields');
-		$query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
+		$original_query = $query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
 
 		if( isset($params['dataset']) && $params['dataset'] )
 			$query['conditions']['dataset'] = $params['dataset'];
@@ -84,12 +84,14 @@ class DataobjectsController extends AppController
 		$processed_query = $this->Dataobject->buildQuery('all', $query);
 		$page = $processed_query['page']; // starts with 1
 
-		$count = @$this->Dataobject->getDataSource()->lastResponseStats['count'];
+		$lr_stats = @$this->Dataobject->getDataSource()->lastResponseStats;
+		$count = $lr_stats['count'];
 
 		$_meta = array(
 			'page' => $page,
 			'max_results' => MPSearch::RESULTS_COUNT_MAX,
-			'total' => $count
+			'total' => $count,
+			'took_ms' => $lr_stats['took_ms']
 		);
 
 		// HATEOS
@@ -99,6 +101,8 @@ class DataobjectsController extends AppController
 		);
 
 		$url = new MpUtils\Url($current_url);
+		$url->setParams($original_query);
+
 		if ($page > 1) {
 			$url->setParam('page', 1);
 			$_links['first'] = $url->buildUrl();
@@ -116,9 +120,7 @@ class DataobjectsController extends AppController
 			$_links['next'] = $url->buildUrl();
 		}
 
-		// TODO is took and aggs needed?
-		$took = @$this->Dataobject->getDataSource()->lastResponse['took_ms'];
-
+		// TODO is aggs needed?
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
 			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();
 			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
@@ -128,33 +130,23 @@ class DataobjectsController extends AppController
         $this->setSerialized(compact('_items', '_links', '_meta'));
 	}
 
-	// TODO testy
     public function view($dataset, $id)
     {
-		// TODO wyczyscic!!! jakie inne parametry tu mogą wskoczyć, czemu pozwalamy na pełne przekierowanie?
-	    $query = $this->request->query;
-	    	    
-	    $layers = array();
-	    if( isset($query['layers']) ) {
-		    $layers = $query['layers'];
-		    unset( $query['layers'] );
-	    }
-					    	    
-	    $query['conditions']['dataset'] = $dataset;
-	    $query['conditions']['id'] = $id;
+		$doquery = array(
+			'conditions' => array(
+				'dataset' => $dataset,
+				'id' => $id
+			)
+		);
 	        
-	    $object = $this->Dataobject->find('first', $query);
+	    $object = $this->Dataobject->find('first', $doquery);
 	    
 	    if( !$object ) {
-		    
 		    throw new NotFoundException();
-		    
 	    }
 	    
 	    $this->Dataobject->data = $object;
-	    
-	    $_serialize = array('Dataobject');
-	    	    
+
 	    if(
 		    isset( $object['global_id'] ) && 
 	    	$this->Auth->user() && 
@@ -164,39 +156,56 @@ class DataobjectsController extends AppController
 		    	'user_id' => $this->Auth->user('id'),
 	    	)) )
 	    ) {
-		    
+		    // TODO czy to wykorzystywane?
 		    $object['subscribtion'] = true;
 		    
 	    }
-	    
-	    			
-		if( !empty($layers) ) {
-			
-			if( is_string($layers) )
-				$layers = array($layers);
+
+
+		// LAYERS
+		// load list of layers
+		// TODO
+
+
+		// what should we load?
+		$query = $this->request->query;
+		$layers_to_load = array();
+		if( isset($query['layers']) ) {
+			$layers_to_load = $query['layers'];
+		}
+
+		if( !empty($layers_to_load) ) {
+			if( is_string($layers_to_load) ) {
+				$layers_to_load = array($layers_to_load);
+			}
 			
 			$this->loadModel('Dane.DatasetChannel');
 			
-			foreach( $layers as $layer ) {
-								
-				if( $layer=='dataset' ) {
-				
-				} elseif( $layer=='channels' ) {
-										
-					$object['layers']['channels'] = $channels = $this->DatasetChannel->find('all', array(
+			foreach( $layers_to_load as $layer ) {
+				// ToDO tych layers standardowych nie rozpoznaje
+
+				if ($layer == 'dataset') {
+					// TODO zaciągnąć obsługę, zrobic mockowanego redisa
+
+				} elseif ($layer == 'channels') {
+
+					$object['layers']['channels'] = array_map(function ($ch) {
+						return $ch['DatasetChannel'];
+					},
+						$this->DatasetChannel->find('all', array(
 						'fields' => array('channel', 'title', 'subject_dataset'),
 						'conditions' => array(
 							'creator_dataset' => $object['dataset'],
 						),
 						'order' => 'ord asc',
-					));
-															
-				} elseif( $layer=='subscriptions' ) {
-					
+					)));
+
+				} elseif ($layer == 'subscriptions') {
+
 					$this->loadModel('Dane.Subscription');
-															
+
 					$subscriptions = array();
-					foreach( $this->Subscription->find('all', array(
+					foreach ($this->Subscription->find('all', array(
 						'fields' => array(
 							'Subscription.id', 'Subscription.title', 'Subscription.url'
 						),
@@ -206,25 +215,19 @@ class DataobjectsController extends AppController
 							'dataset' => $dataset,
 							'object_id' => $id,
 						),
-					)) as $sub )
+					)) as $sub)
 						$subscriptions[] = $sub['Subscription'];
-						
-					
+
+
 					$object['layers']['subscriptions'] = $subscriptions;
-														
+
 				} else {
-					$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
+					$object['layers'][$layer] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 				}
 			}
-			
 		}
-			
-	    	    
-	    
-		$this->set(array(
-			'Dataobject' => $object,
-			'_serialize' => $_serialize,
-		));
+
+		$this->setSerialized('object', $object);
     }
 
 	// TODO testy
@@ -247,54 +250,4 @@ class DataobjectsController extends AppController
 
         $this->setSerialized('layer', $layer);
     }
-
-	/*
-    public function alertsQueries()
-    {
-
-        $id = $this->request->params['id'];
-        $queries = $this->Dataobject->getAlertsQueries($id, $this->user_id);
-
-        $this->set(array(
-            'queries' => $queries,
-            '_serialize' => 'queries',
-        ));
-    }
-    */
-
-	// TODO testy
-	public function subscribe()
-	{
-		
-		$this->Auth->deny();
-		
-		$status = $this->Dataobject->subscribe(array(
-			'dataset' => $this->request->params['dataset'],
-			'id' => $this->request->params['id'],
-			'user_type' => $this->Auth->user('type'),
-			'user_id' => $this->Auth->user('id'),
-		));
-		
-		$this->set('status', $status);
-		$this->set('_serialize', array('status'));
-		
-	}
-
-	// TODO testy
-	public function unsubscribe()
-	{
-		
-		$this->Auth->deny();
-		
-		$status = $this->Dataobject->unsubscribe(array(
-			'dataset' => $this->request->params['dataset'],
-			'id' => $this->request->params['id'],
-			'user_type' => $this->Auth->user('type'),
-			'user_id' => $this->Auth->user('id'),
-		));
-		
-		$this->set('status', $status);
-		$this->set('_serialize', array('status'));
-		
-	}
 }

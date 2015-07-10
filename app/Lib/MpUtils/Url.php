@@ -140,7 +140,12 @@ class Url {
             if (isset($parts['query'])) {
                 $q = array();
                 foreach ($parts['query'] as $k => $v) {
-                    $q[rawurlencode($k)] = rawurlencode($v);
+                    if (is_array($v)) {
+                        $q[rawurlencode($k)] = array_map(function ($v) {
+                            return rawurlencode($v);}, $v);
+                    } else {
+                        $q[rawurlencode($k)] = rawurlencode($v);
+                    }
                 }
 
                 // if this function is undefined do `pecl install pecl_http-1.7.6` and add extension=http.so to php.ini
@@ -186,5 +191,13 @@ class Url {
         if (isset($parts['fragment']))
             $url .= '#' . $parts['fragment'];
         return $url;
+    }
+
+    public function setParams($query) {
+        if (!array_key_exists('query', $this->parts)) {
+            $this->parts['query'] = array();
+        }
+
+        $this->parts['query'] = array_merge($this->parts['query'], $query);
     }
 }

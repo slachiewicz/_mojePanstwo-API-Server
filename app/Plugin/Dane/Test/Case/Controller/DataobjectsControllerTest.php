@@ -60,9 +60,16 @@ class DataobjectsControllerTest extends ControllerTestCase {
             ->method('getDataSource')
             ->will($this->returnValue((object)array(
                 'lastResponseStats' => array(
-                    'count' => $count
+                    'count' => $count,
+                    'took_ms' => 123
                 )
             )));
+    }
+
+    private function dataobjectExpectsFindFirst($params, $response) {
+        $this->controller->Dataobject->expects($this->once())
+            ->method('find')->with($this->equalTo('first'), $this->equalTo($params))
+            ->will($this->returnValue($response));
     }
 
     public function testIndexSimple() {
@@ -77,9 +84,11 @@ class DataobjectsControllerTest extends ControllerTestCase {
 
         MpAssertions::assertArrayMatchingKeysSame(array(
             '_items' => $this->defaultResponse,
-            '_meta' => array('page' => 1, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3)
+            '_meta' => array('page' => 1, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3, 'took_ms' => 123)
         ), $this->vars);
     }
+
+    // TODO test conditions[]
 
     public function testIndexHateoasFirst() {
         $this->dataobjectExpectsFind(array(
@@ -94,7 +103,7 @@ class DataobjectsControllerTest extends ControllerTestCase {
 
         MpAssertions::assertArrayMatchingKeysSame(array(
             '_items' => array($this->defaultResponse[0]),
-            '_meta' => array('page' => 1, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3),
+            '_meta' => array('page' => 1, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3, 'took_ms' => 123),
         ), $this->vars);
 
         $links = $this->vars['_links'];
@@ -119,7 +128,7 @@ class DataobjectsControllerTest extends ControllerTestCase {
 
         MpAssertions::assertArrayMatchingKeysSame(array(
             '_items' => array($this->defaultResponse[0]),
-            '_meta' => array('page' => 2, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3),
+            '_meta' => array('page' => 2, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3, 'took_ms' => 123),
         ), $this->vars);
 
         $links = $this->vars['_links'];
@@ -144,7 +153,7 @@ class DataobjectsControllerTest extends ControllerTestCase {
 
         MpAssertions::assertArrayMatchingKeysSame(array(
             '_items' => array($this->defaultResponse[0]),
-            '_meta' => array('page' => 3, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3),
+            '_meta' => array('page' => 3, 'max_results' => MPSearch::RESULTS_COUNT_MAX, 'total' => 3, 'took_ms' => 123),
         ), $this->vars);
 
         $links = $this->vars['_links'];
@@ -154,5 +163,180 @@ class DataobjectsControllerTest extends ControllerTestCase {
 
         $this->assertArrayNotHasKey('last', $links);
         $this->assertArrayNotHasKey('next', $links);
+    }
+
+    public function testViewSimple() {
+        $this->dataobjectExpectsFindFirst(array(
+            'conditions' => array(
+                'dataset' => 'wojewodztwa',
+                'id' => 1
+            ),
+        ), $this->defaultResponse[0]);
+
+        $this->testAction('/dane/wojewodztwa/1');
+
+        $this->assertEquals($this->vars['object'], $this->defaultResponse[0]);
+    }
+
+    public function testViewLayerDataset() {
+        $this->dataobjectExpectsFindFirst(array(
+            'conditions' => array(
+                'dataset' => 'wojewodztwa',
+                'id' => 1
+            ),
+        ), $this->defaultResponse[0]);
+
+        $this->controller->Dataobject->expects($this->never())
+            ->method('getObjectLayer');
+
+
+        $this->testAction('/dane/wojewodztwa/1?layers=dataset');
+
+        $response = $this->defaultResponse[0];
+        $response['layers']['channels'] = array();
+
+        $this->fail(); // TODO
+    }
+
+    public function testViewIncorrectLayer() {
+
+    }
+
+    public function testViewOneLayer() {
+        $this->dataobjectExpectsFindFirst(array(
+            'conditions' => array(
+                'dataset' => 'wojewodztwa',
+                'id' => 1
+            ),
+        ), $this->defaultResponse[0]);
+
+        $fakeLayer = array('type' => 'FeatureCollectionFake');
+        $this->controller->Dataobject->expects($this->once())
+            ->method('getObjectLayer')->with($this->equalTo('wojewodztwa'), $this->equalTo(1), $this->equalTo('geojson'))
+            ->will($this->returnValue($fakeLayer));
+
+
+        $this->testAction('/dane/wojewodztwa/1?layers=geojson');
+
+        $response = $this->defaultResponse[0];
+        $response['layers']['geojson'] = $fakeLayer;
+
+        $this->assertEquals($this->vars['object'], $response);
+    }
+
+    public function testViewFewLayers() {
+        $this->dataobjectExpectsFindFirst(array(
+            'conditions' => array(
+                'dataset' => 'wojewodztwa',
+                'id' => 1
+            ),
+        ), $this->defaultResponse[0]);
+
+        $this->controller->Dataobject->expects($this->at(0))
+            ->method('getObjectLayer')->with($this->equalTo('wojewodztwa'), $this->equalTo(1),
+                $this->logicalOr($this->equalTo('geojson'), $this->equalTo('geojson_simplified')))
+            ->will($this->returnCallback(function ($dataset, $id, $layer) {
+                return array('layer' => $layer);
+            }));
+        ;
+
+        $this->testAction('/dane/wojewodztwa/1?layers[]=geojson&layers[]=geojson_simplified');
+
+
+        $response = $this->defaultResponse[0];
+        $response['layers']['geojson'] = array('type' => 'geojson');
+        $response['layers']['geojson_simplified'] = array('type' => 'geojson_simplified');
+
+        $this->assertEquals($this->vars['object'], $response);
+    }
+
+    public function testLayerStandalone() {
+        $this->dataobjectExpectsFindFirst(array(
+            'conditions' => array(
+                'dataset' => 'wojewodztwa',
+                'id' => 1
+            ),
+        ), $this->defaultResponse[0]);
+
+        $fakeLayer = array('type' => 'FeatureCollectionFake');
+        $this->controller->Dataobject->expects($this->once())
+            ->method('getObjectLayer')->with($this->equalTo('wojewodztwa'), $this->equalTo(1), $this->equalTo('geojson'))
+            ->will($this->returnValue($fakeLayer));
+
+
+        $this->testAction('/dane/wojewodztwa/1/geojson');
+
+        $this->fail(); // TODO
+    }
+
+    public function testLayerStandaloneIncorrect() {
+        $this->fail(); // TODO 404
+    }
+
+    public function testViewLayerChannels() {
+        $this->dataobjectExpectsFindFirst(array(
+            'conditions' => array(
+                'dataset' => 'wojewodztwa',
+                'id' => 1
+            ),
+        ), $this->defaultResponse[0]);
+
+        $this->controller->Dataobject->expects($this->never())
+            ->method('getObjectLayer');
+
+        $this->controller->DatasetChannel->expects($this->once())
+            ->method('find')->with($this->equalTo('all'), $this->equalTo(array(
+                'fields' => array('channel', 'title', 'subject_dataset'),
+                'conditions' => array(
+                    'creator_dataset' => 'wojewodztwa',
+                ),
+                'order' => 'ord asc',
+            )))
+            ->will($this->returnValue(array(
+                array('DatasetChannel' => array(
+                    "channel" => "1",
+                    "title" => "Wystąpienia",
+                    "subject_dataset" => "sejm_wystapienia"
+                )),
+                array('DatasetChannel' => array(
+                    "channel" => "2",
+                    "title" => "Wysłane interpelacje",
+                    "subject_dataset" => "sejm_interpelacje_pisma"
+                ))
+            )));
+
+        $this->testAction('/dane/wojewodztwa/1?layers=channels');
+
+        $response = $this->defaultResponse[0];
+        $response['layers']['channels'] = array(
+            array(
+                "channel" => "1",
+                "title" => "Wystąpienia",
+                "subject_dataset" => "sejm_wystapienia"
+            ),
+            array(
+                "channel" => "2",
+                "title" => "Wysłane interpelacje",
+                "subject_dataset" => "sejm_interpelacje_pisma"
+            )
+        );
+
+        $this->assertEquals($this->vars['object'], $response);
+    }
+
+    public function testViewLayerSubscriptions() {
+        $this->dataobjectExpectsFindFirst(array(
+            'conditions' => array(
+                'dataset' => 'wojewodztwa',
+                'id' => 1
+            ),
+        ), $this->defaultResponse[0]);
+
+        $this->controller->Dataobject->expects($this->never())
+            ->method('getObjectLayer');
+
+        $this->testAction('/dane/wojewodztwa/1?layers=subscriptions');
+
+        $this->fail(); // TODO
     }
 }

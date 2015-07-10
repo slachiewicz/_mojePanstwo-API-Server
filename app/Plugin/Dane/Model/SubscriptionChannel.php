@@ -1,0 +1,10 @@
+<?
+
+class SubscriptionChannel extends AppModel
+{
+    
+
+
+}
+
+

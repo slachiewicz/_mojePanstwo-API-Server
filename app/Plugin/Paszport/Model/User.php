@@ -4,7 +4,7 @@ class User extends PaszportAppModel
 {
     public $belongsTo = array('Paszport.Language', 'Paszport.Group');
     public $hasAndBelongsToMany = array('Paszport.Service');
-    public $hasMany = array('Paszport.Key', 'Paszport.UserExpand');
+    public $hasMany = array('Paszport.Key', 'Paszport.UserExpand', 'Paszport.UserRole');
     public $actsAs = array('Containable', 'Expandable.Expandable' => array('with' => 'UserExpand'));
     public $name = 'Paszport.User';
     public $useTable = 'users';
@@ -18,7 +18,7 @@ class User extends PaszportAppModel
                 'message' => __('LC_PASZPORT_USERNAME_MUST_BE_UNIQUE', true),
             ),
             'alphanumeric' => array(
-                'rule' => 'alphaNumeric',
+                'rule' => 'alphaNumericDashUnderscore',
                 'message' => __('LC_PASZPORT_ALPHANUMERIC', true)
             )
         ));
@@ -46,12 +46,12 @@ class User extends PaszportAppModel
             //'required' => true
         ));
 
-        $this->validator()->add('facebook_id', array(
+        /*$this->validator()->add('facebook_id', array(
             'unique' => array(
                 'rule' => 'isUnique',
                 'message' => __('LC_PASZPORT_FACEBOOK_ID_NOT_UNIQUE', true),
             )
-        ));
+        ));*/
 
         $this->validator()->add('twitter_id', array(
             'unique' => array(
@@ -164,12 +164,18 @@ class User extends PaszportAppModel
     {
         foreach ($results as &$result) {
             if (isset($result['User']['photo']) && $result['User']['photo']) {
-                $result['User']['photo'] = FULL_BASE_URL . $result['User']['photo'];
+                $result['User']['photo'] = $result['User']['photo'];
             }
             if (isset($result['User']['photo_small']) && $result['User']['photo_small']) {
-                $result['User']['photo_small'] = FULL_BASE_URL . $result['User']['photo_small'];
+                $result['User']['photo_small'] = $result['User']['photo_small'];
             }
         }
         return $results;
+    }
+
+    public function alphaNumericDashUnderscore($check) {
+        $value = array_values($check);
+        $value = $value[0];
+        return preg_match('|^[0-9a-zA-Z_-]*$|', $value);
     }
 }

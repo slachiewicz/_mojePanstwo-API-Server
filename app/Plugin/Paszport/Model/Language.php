@@ -2,5 +2,5 @@
 
 class Language extends PaszportAppModel
 {
-    public $useDbConfig = 'passport';
+    public $useDbConfig = 'default';
 }

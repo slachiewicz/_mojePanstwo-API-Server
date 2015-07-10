@@ -93,8 +93,8 @@ class DocumentsController extends AppController
 			));
 			
 		} elseif(
-			isset( $this->request->query['name'] ) && 
-			( $name = $this->request->query['name'] )
+			isset( $this->data['name'] ) && 
+			( $name = $this->data['name'] )
 		) {
 			
 			$status = $this->Document->rename($id, array(
@@ -111,7 +111,7 @@ class DocumentsController extends AppController
 	}
 	
     public function save($id = null) {
-        
+                
         $this->Auth->deny();
         
         $map = array(
@@ -152,9 +152,9 @@ class DocumentsController extends AppController
         
         if(
 	        $adresat_id && 
-	        ( $parts = explode(':', $adresat_id) ) && 
-	        ( count($parts)===2 )
-        ) 
+	        ( $parts = explode(':', $adresat_id) ) &&
+	        ( count($parts)>1 )
+        )
         	$data = array_merge($data, array(
 	        	'to_dataset' => $parts[0],
 	        	'to_id' => $parts[1],
@@ -217,10 +217,15 @@ class DocumentsController extends AppController
         	$data['to_id']
         ) {
 	       	
+	       	if( $data['to_dataset']=='pisma_adresaci' ) {
+		       	$pisma_adresaci = $this->DB->selectAssoc("SELECT dataset, object_id FROM pisma_adresaci WHERE id='" . addslashes( $data['to_id'] ) . "' LIMIT 1");
+		       	$data['to_dataset'] = $pisma_adresaci['dataset'];
+		       	$data['to_id'] = $pisma_adresaci['object_id'];
+	       	}
 	       	
 	       	if(
 		       	( $data['to_dataset']=='instytucje' ) && 
-	        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM administracja_publiczna WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+	        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, adres_str FROM instytucje WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
 	        ) {
 	       		       	 
 	        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['adres_str'] . '</p>';
@@ -236,8 +241,101 @@ class DocumentsController extends AppController
 	        	$data['to_name'] = 'Radny Miasta Kraków - ' . $to['nazwa'];
 	        	$data['to_email'] = $to['email'];
 	        	
-        	}
+        	} elseif(
+	        	( $data['to_dataset']=='poslowie' ) && 
+	        	( $to = $DB->selectAssoc("SELECT s_poslowie_kadencje.id, s_poslowie_kadencje.nazwa, s_poslowie_kadencje.email, s_poslowie_kadencje.pkw_plec FROM s_poslowie_kadencje LEFT JOIN s_kluby ON s_poslowie_kadencje.klub_id=s_kluby.id WHERE s_poslowie_kadencje.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	        		
+	        	
+	        	if( $to['pkw_plec']=='K' ) {
+	        	
+		        	$data['to_str'] = '<p>Posłanka na Sejm RP</p><p>' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+		        	$data['to_name'] = 'Posłanka - ' . $to['nazwa'];
+		        	$data['content'] = str_replace(array(
+		        		'{$szanowny_panie_posle}',
+		        		'{$pan_posel}',
+		        	), array(
+		        		'Szanowna Pani Posłanko',
+		        		'Pani Posłanka'
+		        	), $data['content']);
+	        	
+	        	} else {
+		        	
+		        	$data['to_str'] = '<p>Poseł na Sejm RP</p><p>' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+		        	$data['to_name'] = 'Poseł - ' . $to['nazwa'];
+		        	$data['content'] = str_replace(array(
+		        		'{$szanowny_panie_posle}',
+		        		'{$pan_posel}',
+		        	), array(
+		        		'Szanowny Panie Pośle',
+		        		'Pan Poseł'
+		        	), $data['content']);
+		        	
+	        	}
+	        	
+	        	$data['to_email'] = $to['email'];
 
+            } elseif(
+                ( $data['to_dataset']=='gminy' ) &&
+                ( $to = $DB->selectAssoc("SELECT pl_gminy.id, pl_gminy.nazwa, pl_gminy.email, pl_gminy.szef_stanowisko, pl_gminy.adres FROM pl_gminy WHERE pl_gminy.id='" . addslashes( $data['to_id'] ) . "'" ) )
+            ) {
+
+                $data['to_str'] = '<p>' . $to['szef_stanowisko'] . ' ';
+                switch ($to['szef_stanowisko']) {
+                    case 'Wójt': {
+                        $data['to_str'].='Gminy';
+                        break;
+                    }
+                    case 'Burmistrz': {
+                        $data['to_str'].='Miasta';
+                        break;
+                    }
+                    case 'Prezydent': {
+                        $data['to_str'].='Miasta';
+                        break;
+                    }
+                }
+
+                    $data['to_str'].= ' ' . $to['nazwa'] . '</p><p>' . $to['adres'] . '</p><p>' . $to['email'] . '</p>';
+                $data['to_name'] = $to['szef_stanowisko'] . ' ' . $to['nazwa'];
+                $data['to_email'] = $to['email'];
+
+            } elseif(
+                ( $data['to_dataset']=='rada_gminy' ) &&
+                ( $to = $DB->selectAssoc("SELECT pl_gminy.id, pl_gminy.nazwa, pl_gminy.email, pl_gminy.rada_nazwa, pl_gminy.adres FROM pl_gminy WHERE pl_gminy.id='". addslashes( $data['to_id'] ) ."'" ) )
+            ) {
+                $data['to_str'] = '<p>' . $to['rada_nazwa'] . '</p><p>' . $to['adres'] . '</p><p>' . $to['email'] . '</p>';
+                $data['to_name'] = $to['rada_nazwa'];
+                $data['to_email'] = $to['email'];
+
+            } elseif(
+	        	( $data['to_dataset']=='zamowienia_publiczne_zamawiajacy' ) && 
+	        	( $to = $DB->selectAssoc("SELECT uzp_zamawiajacy.id, uzp_zamawiajacy.nazwa, uzp_zamawiajacy.email, uzp_zamawiajacy.ulica, uzp_zamawiajacy.nr_domu, uzp_zamawiajacy.nr_miesz, uzp_zamawiajacy.miejscowosc, uzp_zamawiajacy.kod_poczt FROM uzp_zamawiajacy WHERE uzp_zamawiajacy.id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	
+	        	$data['to_str'] = '<p>' . $to['nazwa'] . '</p><p>' . $to['ulica'] . ' ' . $to['nr_domu'] . ' ' . $to['nr_miesz'] . '</p><p>' . $to['kod_poczt'] . ' ' . $to['miejscowosc'] . '</p><p>' . $to['email'] . '</p>';
+	        	$data['to_name'] = $to['nazwa'];
+	        	$data['to_email'] = $to['email'];
+	        	
+        	} elseif(
+	        	( $data['to_dataset']=='krs_podmioty' ) && 
+	        	( $to = $DB->selectAssoc("SELECT id, nazwa_pelna, adres_ulica, adres_numer, adres_lokal, adres_miejscowosc, adres_kod_pocztowy, adres_poczta, adres_kraj, email FROM krs_pozycje WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	
+	        	$data['to_str'] = '<p>' . $to['nazwa_pelna'] . '</p><p>' . $to['adres_ulica'] . ' ' . $to['adres_numer'];
+	        	
+	        	if( $to['adres_lokal'] )
+		        	$data['to_str'] .= ' ' . $to['adres_lokal'];
+	        	
+	        	$data['to_str'] .= '</p><p>' . $to['adres_kod_pocztowy'] . ' ' . $to['adres_poczta'] . '</p>';
+	        	
+	        	if( $to['email'] )
+		        	$data['to_str'] .= '<p>' . $to['email'] . '</p>';
+	        	
+	        	$data['to_name'] = $to['nazwa_pelna'];
+	        	$data['to_email'] = $to['email'];
+	        	
+        	}
         	
         }
 	                
@@ -315,9 +413,21 @@ class DocumentsController extends AppController
 	        $status = $this->Document->send(array(
 		        'id' => $id,
 		        'user_id' => $this->Auth->user('id'),
+		        'user_type' => $this->Auth->user('type'),
 	        ));
 	        $this->setSerialized('status', $status);
-	        
+	    
+	    } elseif( isset($this->request->data['email']) ) {
+	    
+	    	$status = $this->Document->send(array(
+		        'id' => $id,
+		        'user_id' => $this->Auth->user('id'),
+		        'user_type' => $this->Auth->user('type'),
+		        'email' => $this->request->data['email'],
+		        'name' => @$this->request->data['name'],
+	        ));
+	        $this->setSerialized('status', $status);
+	    	
         } else throw new BadRequestException();
         
     }
@@ -339,7 +449,7 @@ class DocumentsController extends AppController
 	public function transfer_anonymous() {
 		
 		$status = false;
-		
+				
 		if(
 			( $user = $this->Auth->user() ) && 
 			isset($this->request->query['anonymous_user_id']) && 

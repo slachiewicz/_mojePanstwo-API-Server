@@ -14,10 +14,94 @@ App::import('model', 'MPCache');
 class BDLController extends AppController
 {
 
-    public $uses = array('Dane.Dataobject', 'BDL.Podgrupa', 'BDL.DataPl',
+    public $uses = array('BDL.BDL', 'Dane.Dataobject', 'BDL.Podgrupa', 'BDL.DataPl',
         'BDL.DataWojewodztwa', 'BDL.DataGminy', 'BDL.DataPowiaty', 'BDL.WymiaryKombinacje',
     );
-
+	
+	public function data()
+	{
+		
+		$data = array();
+		
+		if(
+			isset( $this->request->query['dims'] ) && 
+			isset( $this->request->query['wskaznik_id'] ) 
+		) {
+		
+			$conditions = array(
+				'WymiaryKombinacje.podgrupa_id' => $this->request->query['wskaznik_id'],
+			);
+						
+			for( $i=0; $i<5; $i++ ) {
+				if( is_numeric($this->request->query['dims'][ $i ]) ) {
+					$j = $i + 1;
+					$conditions[ 'WymiaryKombinacje.w' . $j ] = $this->request->query['dims'][ $i ];
+				}
+			}
+							
+			$contain = array();
+			if( isset( $this->request->query['years'] ) )
+				$contain['DataPl'] = array(
+					'fields' => array(
+						'DataPl.rocznik', 'DataPl.v', 'DataPl.a'
+					),
+				);
+			
+			$data = $this->WymiaryKombinacje->find('all', array(
+				'fields' => array('WymiaryKombinacje.id', 'WymiaryKombinacje.jednostka', 'WymiaryKombinacje.ly', 'WymiaryKombinacje.lv', 'WymiaryKombinacje.ply', 'WymiaryKombinacje.dv', 'WymiaryKombinacje.w1', 'WymiaryKombinacje.w2', 'WymiaryKombinacje.w3', 'WymiaryKombinacje.w4', 'WymiaryKombinacje.w5'),
+				'conditions' => $conditions,
+				'contain' => $contain,
+			));
+					
+		}
+				
+		$this->set('data', $data);
+		$this->set('_serialize', 'data');
+		
+	}
+	
+	public function combinations()
+	{
+		
+		$data = false;
+		
+		if( 
+			isset($this->request->query['id']) && 
+			( $id = $this->request->query['id'] ) && 
+			is_numeric($id) 
+		) {
+			
+			$data = $this->WymiaryKombinacje->find('first', array(
+				'fields' => array('WymiaryKombinacje.id', 'WymiaryKombinacje.jednostka', 'WymiaryKombinacje.ly', 'WymiaryKombinacje.lv', 'WymiaryKombinacje.ply', 'WymiaryKombinacje.dv', 'WymiaryKombinacje.w1', 'WymiaryKombinacje.w2', 'WymiaryKombinacje.w3', 'WymiaryKombinacje.w4', 'WymiaryKombinacje.w5'),
+				'conditions' => array(
+					'WymiaryKombinacje.id' => $id,
+				),
+				'contain' => array(
+					'DataPl' => array(
+						'fields' => array(
+							'DataPl.rocznik', 'DataPl.v', 'DataPl.a'
+						),
+					),
+				),
+			));
+			
+			if(
+				isset( $this->request->query['local'] ) &&
+				in_array($this->request->query['local'], array('wojewodztwa', 'powiaty', 'gminy'))
+			) {
+				
+				$data['local'] = $this->BDL->getLocalData($id, $this->request->query['local'], @$this->request->query['page']);
+				
+			}
+			
+		}
+		
+		$this->set('data', $data);
+		$this->set('_serialize', 'data');
+		
+	}
+	
+	
     // TODO cleanup
     /**
      * Pobiera dane dla danej konfiguracji ustawień

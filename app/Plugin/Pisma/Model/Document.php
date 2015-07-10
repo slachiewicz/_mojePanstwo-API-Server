@@ -236,6 +236,11 @@ class Document extends AppModel {
 	                        	'from_user_id' => $params['user_id'],
 	                        ),
 	                    ),
+	                    array(
+	                        'term' => array(
+	                        	'deleted' => false,
+	                        ),
+	                    ),
 	                ),
 	                '_cache' => true,
 	            ),
@@ -488,30 +493,52 @@ class Document extends AppModel {
 	}
 	
 	public function send($params) {
-		
+				
 		if(
 			($pismo = $this->find('first', array(
 		        'conditions' => array(
 			        'deleted' => '0',
 			        'id' => $params['id'],
-			        'from_user_type' => 'account',
+			        'from_user_type' => $params['user_type'],
 			        'from_user_id' => $params['user_id'],
 		        ),
-	        ))) && 
-			($user = $this->User->findById( $params['user_id'] ))
+	        )))
 		) {
-	        	        
+	       		       	
+	        if( $params['user_type']=='account' ) {
+		       	
+		       	$user = $this->User->findById( $params['user_id'] );
+		       	
+	       	} elseif( $params['user_type']=='anonymous' ) {
+		       	
+		       	$user = array(
+			       	'User' => array(
+				       	'username' => @$params['name'] ? $params['name'] : 'Użytkownik anonimowy',
+				       	'email' => $params['email'],
+			       	),
+		       	);
+		       	
+	       	}
+	       	 
 	    	$pismo = $pismo['Document'];	    		    	
 	    	App::uses('CakeEmail', 'Network/Email');
 	    		    	
-	    	
 			$Email = new CakeEmail('pisma');
 			$Email->viewVars(array('pismo' => $pismo));
+			
+			if( defined('PISMA_test_email') ) {
+				$to_email = PISMA_test_email;
+				$to_name = PISMA_test_name;
+			} else {
+				$to_email = $pismo['to_email'];
+				$to_name = $pismo['to_name'];
+			}
+						
 			$status = $Email->template('Pisma.pismo', 'Pisma.layout')
 				->addHeaders(array('X-Mailer' => 'mojePaństwo'))
 				->emailFormat('html')
 				->subject($pismo['title'])
-				->to($pismo['to_email'], $pismo['to_name'])
+				->to($to_email, $to_name)
 				->from('pisma@mojepanstwo.pl', 'Pisma | mojePaństwo')
 				->replyTo($user['User']['email'], $user['User']['username'])
 				->cc($user['User']['email'], $user['User']['username'])
@@ -549,26 +576,12 @@ class Document extends AppModel {
 			( $ids = $db->query("SELECT alphaid, saved FROM pisma_documents WHERE $where") ) 
 		) {
 			
-			$ES = ConnectionManager::getDataSource('MPSearch');
-			
-			foreach( $ids as $id ) {
-				if( $id['pisma_documents']['saved'] ) {
-				    $ES->API->update(array(
-					    'index' => 'mojepanstwo_v1',
-					    'type' => 'letters',
-					    'id' => $id['pisma_documents']['alphaid'],
-					    'body' => array(
-						    'doc' => array(
-							    'from_user_type' => 'account',
-						    	'from_user_id' => $user_id,
-						    ),
-					    ),
-				    ));
-			    }
-			}
 			
 			$db->query("UPDATE pisma_documents SET `from_user_type`='account', `from_user_id`='" . addslashes( $user_id ) . "' WHERE $where");
 			
+			foreach( $ids as $id )
+				$this->sync($id['pisma_documents']['alphaid']);
+						
 			return true;
 			
 		} else return false;
@@ -621,6 +634,7 @@ class Document extends AppModel {
 			'hash' => $doc['hash'],
 			'saved' => (boolean) $doc['saved'],
 			'sent' => (boolean) $doc['sent'],
+			'deleted' => (boolean) $doc['deleted'],
 		);
 		
 		$data['text'] = @$doc['name'] . "\n";
@@ -660,9 +674,7 @@ class Document extends AppModel {
 		} else {
 			$data['template_label'] = 'Bez szablonu';
 		}
-		
-		// debug( $data );
-				
+						
 		$response = $ES->API->index(array(
 			'index' => 'mojepanstwo_v1',
 			'type' => 'letters',

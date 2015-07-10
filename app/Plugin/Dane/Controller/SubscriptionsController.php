@@ -2,7 +2,7 @@
 		
 	class SubscriptionsController extends AppController {
 	
-		public $uses = array('Dane.Subscription');
+		public $uses = array('Dane.Subscription', 'Dane.SubscriptionChannel');
 	    public $components = array('RequestHandler');
 	
 	    public function index() {
@@ -23,80 +23,22 @@
 	
 	    public function add() {
 		    
-		    $this->loadModel('Dane.Subscription');
-	        $this->Subscription->create();
-
-			$_serialize = array('message');
-	        	        
-	        $data = array(
+		    $data = array(
 		        'dataset' => $this->request->data['dataset'],
 		        'object_id' => $this->request->data['object_id'],
-	        );
-	        
-	        if( isset( $this->request->data['q'] ) && $this->request->data['q'] )
-	        	$data['q'] = $this->request->data['q'];
-	        	
-	        if( isset( $this->request->data['channel'] ) && $this->request->data['channel'] )
-	        	$data['channel'] = $this->request->data['channel'];
-	        	
-	        if( isset( $this->request->data['conditions'] ) && $this->request->data['conditions'] )
-	        	$data['conditions'] = json_encode( $this->request->data['conditions'] );
-	        
-	        $data['hash'] = md5(json_encode($data));
-	        	        
-	        $data = array_merge($data, array(
 		        'user_type' => $this->Auth->user('type'),
 		        'user_id' => $this->Auth->user('id'),
-			   	'cts' => date('Y-m-d h:i:j'),			   	
-	        ));
-	        
-	        
-	        if( $sub = $this->Subscription->find('first', array(
-		        'conditions' => array(
-			        'user_type' => $data['user_type'],
-			        'user_id' => $data['user_id'],
-			        'hash' => $data['hash'],
-		        ),
-	        )) ) {
-		        	
-		        	$url = $sub['Subscription']['url'];
-		        	$this->set('url', $url);
-		        	$_serialize[] = 'url';
-		        	$message = 'Already Exists';
-		        
-	        } else {       
-	
-	        		        			        
-		        if ($this->Subscription->save($data)) {
-		        	
-		        	$data['id'] = $this->Subscription->getInsertID();
-		        	$add_data = $this->Subscription->generateData($data);		        	
-		        	$data = array_merge($data, $add_data);
-		        	$parent_id = $this->Subscription->index($data);
-		        	
-		        	$this->Subscription->save(array(
-			        	'id' => $data['id'],
-			        	'url' => $add_data['url'],
-			        	'title' => $add_data['title'],
-			        	'autotitle' => $add_data['title'],
-			        	'parent_id' => $parent_id,
-		        	));
-		        	
-		        	$this->set('url', $add_data['url']);
-		        	$_serialize[] = 'url';
-		        	
-		            $message = 'Saved';
-		        
-		        } else {
-		            $message = 'Error';
-		        }
-		        
-		    }
-		    
+			   	'channel' => isset( $this->request->data['channel'] ) ? $this->request->data['channel'] : array(),
+	        );
+	        		
+	            
+		    $message = $this->Subscription->add($data);
+		    		    
 	        $this->set(array(
 	            'message' => $message,
-	            '_serialize' => $_serialize,
+	            '_serialize' => 'message',
 	        ));
+	        
 	    }
 	
 	    public function edit($id) {

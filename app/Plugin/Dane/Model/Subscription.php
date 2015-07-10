@@ -3,8 +3,140 @@
 class Subscription extends AppModel
 {
     
-    public function index($data) {
-	    	    
+    public $hasMany = array(
+	    'SubscriptionChannel' => array(),
+    );
+    
+    public function afterSave($created, $options) {
+	    
+	    $this->syncByData($this->data);
+	    
+    }
+    
+    public function add($data = array()) {
+	    
+	    $this->create();
+        
+        $sub = array(
+	        'dataset' => $data['dataset'],
+	        'object_id' => $data['object_id'],
+	        'user_type' => $data['user_type'],
+	        'user_id' => $data['user_id'],
+		   	'cts' => date('Y-m-d h:i:j'),
+        );
+        	        
+        if( $_sub = $this->find('first', array(
+	        'fields' => array('id'),
+	        'conditions' => array(
+		        'user_type' => $sub['user_type'],
+		        'user_id' => $sub['user_id'],
+		        'dataset' => $sub['dataset'],
+		        'object_id' => $sub['object_id'],
+	        ),
+        )) ) {
+	    	
+	    	$sub['id'] = $_sub['Subscription']['id'];
+	        
+	    }	        
+        
+        $channels = array();
+    	foreach( $data['channel'] as $ch )
+    		$channels[] = array(
+        		'channel' => $ch,
+    		);
+        
+		$data = array(
+			'Subscription' => $sub,
+			'SubscriptionChannel' => $channels,
+		);
+		
+		
+		if( isset($sub['id']) ) {
+			$this->query("DELETE FROM `subscription_channels` WHERE `subscription_id`='" . addslashes( $sub['id'] ) . "'");
+		}
+				
+		$return = $this->saveAssociated($data, array('deep' => true));
+		return $return;
+		
+		
+		/*
+		$_serialize = array('message');
+        	        
+        
+        
+        if( isset( $this->request->data['q'] ) && $this->request->data['q'] )
+        	$data['q'] = $this->request->data['q'];
+        	
+        if( isset( $this->request->data['channel'] ) && $this->request->data['channel'] )
+        	$data['channel'] = $this->request->data['channel'];
+        	
+        if( isset( $this->request->data['conditions'] ) && $this->request->data['conditions'] )
+        	$data['conditions'] = json_encode( $this->request->data['conditions'] );
+        
+        
+        
+        
+        if( $sub = $this->Subscription->find('first', array(
+	        'conditions' => array(
+		        'user_type' => $data['user_type'],
+		        'user_id' => $data['user_id'],
+		        'hash' => $data['hash'],
+	        ),
+        )) ) {
+	        	
+	        	$url = $sub['Subscription']['url'];
+	        	$this->set('url', $url);
+	        	$_serialize[] = 'url';
+	        	$message = 'Already Exists';
+	        
+        } else {       
+
+        		        			        
+	        if ($this->Subscription->save($data)) {
+	        	
+	        	$data['id'] = $this->Subscription->getInsertID();
+	        	$add_data = $this->Subscription->generateData($data);		        	
+	        	$data = array_merge($data, $add_data);
+	        	$parent_id = $this->Subscription->index($data);
+	        	
+	        	$this->Subscription->save(array(
+		        	'id' => $data['id'],
+		        	'url' => $add_data['url'],
+		        	'title' => $add_data['title'],
+		        	'autotitle' => $add_data['title'],
+		        	'parent_id' => $parent_id,
+	        	));
+	        	
+	        	$this->set('url', $add_data['url']);
+	        	$_serialize[] = 'url';
+	        	
+	            $message = 'Saved';
+	        
+	        } else {
+	            $message = 'Error';
+	        }
+	        
+	    }
+	    */
+	    
+    }
+    
+    
+    public function syncByData($data = array()) {
+	    
+	    if( empty($data) || !isset($data['Subscription']) || !isset($data['SubscriptionChannel']) )
+	    	return false;
+	    
+	    $sub = $data['Subscription'];
+	    $channels = array();
+	    foreach( $data['SubscriptionChannel'] as &$ch ) {
+	    	$ch['qs'] = array();
+	    	$ch['channel'] = (int) $ch['channel'];
+	    	$channels[] = (int) $ch['channel'];
+	    }
+	    
+	    $channels = array_unique($channels);
+	    		    
 	    $ES = ConnectionManager::getDataSource('MPSearch');	    
 	    
 	    $parent_doc = $ES->API->search(array(
@@ -16,12 +148,12 @@ class Subscription extends AppModel
 					    'must' => array(
 						    array(
 							    'term' => array(
-								    'dataset' => $data['dataset'],
+								    'dataset' => $sub['dataset'],
 							    ),
 						    ),
 						    array(
 							    'term' => array(
-								    'id' => $data['object_id'],
+								    'id' => $sub['object_id'],
 							    ),
 						    ),
 					    ),
@@ -34,18 +166,18 @@ class Subscription extends AppModel
 	    	( $parent_doc['hits']['total'] === 1 ) && 
 	    	( $_id = $parent_doc['hits']['hits'][0]['_id'] )
 	    ) {
-		    		    
+		    		    	    
 		    $params = array();
 			$params['index'] = 'mojepanstwo_v1';
 			$params['type']  = '.percolator';
-			$params['id']    = $data['id'];
+			$params['id']    = $sub['id'];
 			$params['parent'] = $_id;
 			
-			$cts = strtotime( $data['cts'] );
+			$cts = strtotime( $sub['cts'] );
 			$mask = "Ymd\THis\Z";
 			
 			
-			
+			/*
 			if(
 				isset( $data['conditions'] ) && 
 				$data['conditions'] && 
@@ -55,42 +187,48 @@ class Subscription extends AppModel
 			} else {
 				$es_conditions = array();
 			}
+			*/
 			
+			$es_conditions = array();
 			$es_conditions['_feed'] = array (
-				'dataset' => $data['dataset'],
-				'object_id' => $data['object_id'],
+				'dataset' => $sub['dataset'],
+				'object_id' => $sub['object_id'],
 			);
 			
+			/*
 			if( isset($data['q']) && $data['q'] )
 				$es_conditions['q'] = $data['q'];
 				
 			if( isset($data['channel']) && $data['channel'] )
 				$es_conditions['_feed']['channel'] = $data['channel'];
-				
+			*/
+						
+			if( !empty($channels) )
+				$es_conditions['_feed']['channel'] = $channels;
+			
 			$es_query = $ES->buildESQuery(array(
 				'conditions' => $es_conditions,
 			));
-			
+						
 			$params['body']  = array(
-				'id' => $data['id'],
+				'id' => $sub['id'],
 				'query' => $es_query['body']['query']['function_score']['query'],
 				'cts' => date($mask, $cts),
-				'hash' => $data['hash'],
-				'user_type' => $data['user_type'],
-				'user_id' => $data['user_id'],
-				'url' => $data['url'],
-				'title' => $data['title'],
+				'user_type' => $sub['user_type'],
+				'user_id' => $sub['user_id'],
+				'channels' => $data['SubscriptionChannel'],
 			);
 			
+			/*
 			if( isset($data['q']) && $data['q'] )
 				$params['body']['q'] = $data['q'];
 				
 			if( isset($data['channel']) && $data['channel'] )
 				$params['body']['channel'] = $data['channel'];
-				
+			*/
 			
 			$ret = $ES->API->index($params);	
-			
+			// debug( $ret );
 			return $_id;	    
 		    
 		}

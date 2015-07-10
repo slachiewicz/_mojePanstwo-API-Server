@@ -52,4 +52,30 @@ class AppModel extends Model
 		} else return false;
 	
 	}
+	
+	public function objectIndex($data) {
+		
+		$results = false;
+		
+		if(
+			isset( $data['dataset'] ) && 
+			( $data['dataset'] ) && 
+			isset( $data['object_id'] ) && 
+			( $data['object_id'] ) 
+		) {
+		
+			App::uses('HttpSocket', 'Network/Http');
+			$HttpSocket = new HttpSocket();
+			$results = $HttpSocket->post(objectIndexUrl, array(
+				'_pass' => objectIndexPass,
+				'dataset' => $data['dataset'],
+				'object_id' => $data['object_id'],
+			));
+		
+		}
+				
+		return $results;
+		
+	}
+	
 }

@@ -2,6 +2,7 @@
 
 App::uses('Dataset', 'Dane.Model');
 App::uses('Layer', 'Dane.Model');
+App::uses('PageRequest','Dane.Model');
 
 class Dataobject extends AppModel
 {
@@ -458,6 +459,28 @@ class Dataobject extends AppModel
 		    
 	    } else return false;
 	    
+    }
+
+    public function moderate_request($data, $object_id, $dataset) {
+        $request = new PageRequest();
+        $user_id = (int) $this->getCurrentUser('id');
+
+        if(!$user_id)
+            return false;
+
+        $form = array();
+        $form_fields = array('firstname', 'lastname', 'position', 'email', 'phone');
+        foreach($form_fields as $field)
+            if(isset($data[$field]))
+                $form[$field] = $data[$field];
+
+        return $request->save(array(
+            'PageRequest' => array_merge($form, array(
+                'dataset' => $dataset,
+                'object_id' => $object_id,
+                'user_id' => $user_id
+            ))
+        ));
     }
 
 }

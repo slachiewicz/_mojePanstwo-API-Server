@@ -3,27 +3,68 @@
 class TemplatesController extends AppController
 {
     public $uses = array('Dane.Dataobject', 'Pisma.Template');
-		
-    public function index() {
-        $conditions = array(
-            'dataset' => array('pisma_templates'),
-        );
 
-        if (isset($this->request->query['q']) && !empty($this->request->query['q'])) {
-            $conditions['q'] = $this->request->query['q'];
+    public function index()
+    {
+
+        $query = $this->request->query;
+        $query['conditions']['Template.enabled'] = true;
+
+        if (
+            isset($this->request->query['adresat']) &&
+            $this->request->query['adresat']
+        ) {
+
+            $parts = explode(':', $this->request->query['adresat']);
+            $preset = @$parts[0];
+            $preset_params = @$parts[2];
+
+            switch ($preset) {
+
+                case 'radni_gmin': {
+
+                    if ($preset_params == 'K')
+                        $query['conditions']['Template.id'] = 70;
+                    else
+                        $query['conditions']['Template.id'] = 69;
+
+                    break;
+                }
+                case 'rada_gminy': {
+                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 74);
+                    break;
+                }
+                case 'dzielnice': {
+                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 72, 74);
+                    break;
+                }
+                case 'gminy': {
+                    $query['conditions']['Template.id'] = array(35, 36, 37, 38, 39, 40, 41, 42, 43, 74);
+                    break;
+                }
+            }
+
+
+        } else {
+
+            $query['conditions']['Template.pisma_kategorie_id'] = 16;
+
         }
 
-        $data = $this->Dataobject->find('all', array(
-            'conditions' => $conditions,
-            'limit' => 10,
-        ));
-
+        $query['order'][] = 'Template.ord asc';
+        $query['fields'] = array(
+            'Template.id',
+            'Template.nazwa',
+            'Template.opis',
+        );
+        $data = $this->Template->find('all', $query);
         $this->setSerialized('data', $data);
     }
 
-    public function view() {
+    public function view()
+    {
         $object = $this->Template->findById($this->request->params['id'], array(
-	        'fields' => 'Template.id,Template.nazwa,Template.tresc,Template.adresat_opis'
+            'fields' => 'Template.id,Template.nazwa,Template.tresc,Template.adresat_opis'
         )); //$this->Dataobject->getObject('pisma_documents', $this->request->params['id']);
 
         if (!isset($object['Template']) || empty($object['Template'])) {
@@ -32,12 +73,13 @@ class TemplatesController extends AppController
 
         $this->setSerialized('object', $object['Template']);
     }
-    
-    public function grouped() {
-        
+
+    public function grouped()
+    {
+
         App::import('model', 'DB');
         $DB = new DB();
-        
+
         $temp = $DB->selectAssocs("
         	SELECT `pisma_szablony`.`id`, `pisma_szablony`.`nazwa`, `pisma_szablony`.`opis`, `pisma_kategorie`.`id` as `kategoria_id`, `pisma_kategorie`.`nazwa` as `kategoria_nazwa`
 			FROM `pisma_szablony` 
@@ -46,21 +88,21 @@ class TemplatesController extends AppController
 			WHERE pisma_szablony.akcept='1' AND `pisma_szablony`.`pisma_kategorie_id`='16' 
 			ORDER BY pisma_kategorie.ord ASC, pisma_szablony.ord ASC
 		");
-		
-		$data = array();
-		foreach( $temp as $t ) {
-			
-			$data[ $t['kategoria_id'] ]['id'] = $t['kategoria_id'];
-			$data[ $t['kategoria_id'] ]['nazwa'] = $t['kategoria_nazwa'];		
-			$data[ $t['kategoria_id'] ]['templates'][] = array(
-				'id' => $t['id'],
-				'nazwa' => $t['nazwa'],
-				'opis' => $t['opis'],
-			);
-			
-		}
-		unset( $temp );
-		$data = array_values($data);
+
+        $data = array();
+        foreach ($temp as $t) {
+
+            $data[$t['kategoria_id']]['id'] = $t['kategoria_id'];
+            $data[$t['kategoria_id']]['nazwa'] = $t['kategoria_nazwa'];
+            $data[$t['kategoria_id']]['templates'][] = array(
+                'id' => $t['id'],
+                'nazwa' => $t['nazwa'],
+                'opis' => $t['opis'],
+            );
+
+        }
+        unset($temp);
+        $data = array_values($data);
 
         $this->setSerialized('data', $data);
     }

@@ -22,12 +22,14 @@ class DocsController extends AppController
 	        $_serialize = array('Document');
 	        $document = $document['Doc'];
 	        
+	        $path = 'htmlex/' . $document_id . '/' . $document_id . '_1.html';	        	        
+	        
 	        if(
 	        	isset($this->request->query['package']) && 
 	        	( is_numeric( $this->request->query['package'] ) ) && 
 	        	( $package = $this->request->query['package'] ) && 
-	        	( $s3_response = @$this->S3->getObject('docs.sejmometr.pl', preg_replace('/{id}/', $document_id, '/htmlex/{id}/{id}_' . $package . '.html')) ) && 
-	        	( $html = $s3_response->body )
+	        	( $s3_response = @$this->S3->getObject('docs.sejmometr.pl', $path) ) && 
+	        	( $html = @$s3_response->body )
 	        ) {
 		        		        
 		        $this->set('Package', $html);

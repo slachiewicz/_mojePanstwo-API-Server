@@ -10,5 +10,8 @@ Router::connect('/oauth/access_tokens/:action/:type', array('plugin' => 'OAuth',
 Router::connect('/oauth/refresh_tokens/:action', array('plugin' => 'OAuth', 'controller' => 'refresh_tokens'));
 Router::connect('/oauth/refresh_tokens/:action/:type', array('plugin' => 'OAuth', 'controller' => 'refresh_tokens'), array('pass' => array('type')));
 
+Router::connect('/oauth/admin_users_group/:action', array('plugin' => 'OAuth', 'controller' => 'admin_users_group'));
+
+
 //Router::connect('/oauth/:action/*', array('plugin' => 'OAuth', 'controller' => 'o_auth'));
 

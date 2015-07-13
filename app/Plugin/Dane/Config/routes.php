@@ -1,5 +1,7 @@
 <?
 
+Router::connect('/dane/tematy', array('plugin' => 'Dane', 'controller' => 'Projects', 'action' => 'tematy', '[method]' => 'GET'));
+
 Router::mapResources('Dane.subscriptions', array('prefix' => '/dane/'));
 Router::connect('/dane/subscriptions/transfer_anonymous', array(
 	'plugin' => 'Dane', 

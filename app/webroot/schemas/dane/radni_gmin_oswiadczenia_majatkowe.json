@@ -1,0 +1,73 @@
+{
+	"title": "Radni gmin \/ O\u015bwiadczenia maj\u0105tkowe",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"radni_gmin_oswiadczenia_majatkowe.dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.komitet_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.avatar": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.komitet": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.krs_osoba_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.plec": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin_oswiadczenia_majatkowe.rok": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"radni_gmin.nazwa_odwrocona": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin_oswiadczenia_majatkowe.radny_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin_oswiadczenia_majatkowe.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.gmina_id": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "O\u015bwiadczenia maj\u0105tkowe radnych gmin."
+}

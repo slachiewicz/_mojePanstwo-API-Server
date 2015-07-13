@@ -1,0 +1,90 @@
+{
+	"title": "Rady gmin \/ debaty",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"rady_gmin_posiedzenia.gmina_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_posiedzenia.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_posiedzenia.yt_playlist_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty.yt_video_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty.tag": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty._ord": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"rady_gmin_posiedzenia.tag": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_posiedzenia.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"gminy.rada_nazwa_dopelniacz": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty.posiedzenie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_posiedzenia.numer": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty.numer_punktu": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"rady_gmin_debaty.opis": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Debaty prowadzone na posiedzeniach rad gmin."
+}

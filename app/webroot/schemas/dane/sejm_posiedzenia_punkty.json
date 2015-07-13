@@ -1,0 +1,110 @@
+{
+	"title": "Sejm \/ Punkty porz\u0105dku dziennego",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"sejm_posiedzenia_punkty.liczba_debat": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.numer": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.liczba_wystapien": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.druk_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.stats_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.liczba_glosowan": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.opis": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.stats_str_pl": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.video": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.numer_int": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.kolejnosc": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.promo_wystapienie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"sejm_posiedzenia_punkty.posiedzenie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.liczba_slow": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.stats_str_en": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia_punkty.typ_id": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Punkty porz\u0105dku dziennego na posiedzeniach Sejmu 7-mej kadencji."
+}

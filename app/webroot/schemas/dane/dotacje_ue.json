@@ -1,0 +1,117 @@
+{
+	"title": "Dotacje unijne",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"dotacje_ue.dzialanie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.wartosc_wydatki_kwalifikowane": {
+							"type": "number",
+							"description": "TODO"
+						},
+						"dotacje_ue.beneficjent_nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.data_zakonczenia": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"dotacje_ue.program_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.os_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.symbol": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.liczba_czesci": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"dotacje_ue.data_rozpoczecia": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"dotacje_ue.forma_prawna_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.beneficjent_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.wartosc_dofinansowanie": {
+							"type": "number",
+							"description": "TODO"
+						},
+						"dotacje_ue.forma_prawna_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.projekt_zakonczony": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.wartosc_dofinansowanie_ue": {
+							"type": "number",
+							"description": "TODO"
+						},
+						"dotacje_ue.data_utworzenia_ksi": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"dotacje_ue.poddzialanie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.umowa_nr": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.wartosc_ogolem": {
+							"type": "number",
+							"description": "TODO"
+						},
+						"dotacje_ue.poziom_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dotacje_ue.data_podpisania": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Dotacje udzielone z program\u00f3w Unii Europejskiej w Polsce."
+}

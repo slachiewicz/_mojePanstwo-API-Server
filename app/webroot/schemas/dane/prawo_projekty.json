@@ -1,0 +1,119 @@
+{
+	"title": "Projekty akt\u00f3w prawnych",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"prawo_projekty.status_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.nadrzedny": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.druk_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.autorzy_html": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.autor_typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.opis_skrocony": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.druki_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.opis": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.nadrzedny_projekt_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.przebieg_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.ilosc_podpisow": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.tytul_skrocony": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.faza_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.autorzy_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.status_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.prawo_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.podrzedny": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.druk_nr": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"prawo_projekty.data_start": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"prawo_projekty.data_status": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Projekty akt\u00f3w prawnych, rozpatrywane przez Sejm i Rad\u0119 Ministr\u00f3w."
+}

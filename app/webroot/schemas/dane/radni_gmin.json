@@ -1,0 +1,214 @@
+{
+	"title": "Radni gmin",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"radni_gmin.imie": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.obywatelstwo": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.oswiadczenie": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.liczba_interpelacji": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"radni_gmin.avatar_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.komitet_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.imie_nazwisko": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.rezygnacja_podstawa_prawna": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.liczba_powiazan_krs": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"radni_gmin.osoba_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.funkcja_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.liczba_glosow": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"radni_gmin.komitet": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.data_wybrania": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"radni_gmin.krs_osoba_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.miejsce_zamieszkania": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.wybranie_akcja_wyborcza_link": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.okreg_nr": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.gmina_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.pozycja": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"gminy.rada_nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.procent_glosow_w_okregu": {
+							"type": "number",
+							"description": "TODO"
+						},
+						"radni_gmin.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.liczba_wystapien": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"radni_gmin.wybranie_akcja_wyborcza": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.bez_wyborow": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.rok_urodzenia": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"gminy.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.lista_nr": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.aktywny": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.avatar": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.kadencja_6": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.poparcie": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.kadencja_7": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.powiat_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.liczba_oswiadczen": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"gminy.wojewodztwo_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.okreg_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.plec": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.wybrany": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.nazwisko": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.kandydat_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.kadencja_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.nazwa_odwrocona": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"radni_gmin.imiona": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Radni gmin w Polsce."
+}

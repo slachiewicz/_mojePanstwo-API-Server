@@ -1,0 +1,49 @@
+{
+  "title": "BDL \/ Kategorie wska\u017anikow",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "bdl_wskazniki_grupy.kategoria_id": {
+              "type": "integer",
+              "description": "ID kategorii, do której należy grupa wskaźników"
+            },
+            "bdl_wskazniki_grupy.kategoria_tytul": {
+              "type": "string",
+              "description": "Nazwa kategorii, do której należy grupa wskaźników"
+            },
+            "bdl_wskazniki_grupy.id": {
+              "type": "integer"
+            },
+            "bdl_wskazniki_grupy.tytul": {
+              "type": "string",
+              "description": "Nazwa grupy wskaźników"
+            },
+            "bdl_wskazniki_grupy.liczba_podgrup": {
+              "type": "integer",
+              "description": "Ile podgrup zawiera ta grupa"
+            },
+            "bdl_wskazniki_grupy.okres": {
+              "enum": [
+                "R"
+              ],
+              "description": "Częstotliwość, dla jakiej zbierane są dane. R - zbieranie corocznee."
+            },
+            "bdl_wskazniki_grupy.slug": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "description": "Kategorie wska\u017anik\u00f3w w Banku Danych Lokalnych (GUS)."
+}

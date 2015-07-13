@@ -1,0 +1,59 @@
+{
+  "title": "BDL \/ Grupy wska\u017anik\u00f3w",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "bdl_wskazniki_grupy.kategoria_id": {
+              "_TODO": "czemu nie bdl_wskazniki_kategorie.id?",
+              "type": "integer",
+              "description": "ID kategorii, do której należy grupa wskaźników"
+            },
+            "bdl_wskazniki_grupy.kategoria_tytul": {
+              "_TODO": "j.w.",
+              "type": "string",
+              "description": "Nazwa kategorii, do której należy grupa wskaźników"
+            },
+            "bdl_wskazniki_grupy.id": {
+              "_TODO": "zdublowane",
+              "type": "integer"
+            },
+            "bdl_wskazniki_grupy.tytul": {
+              "type": "string",
+              "description": "Nazwa grupy wskaźników"
+            },
+            "bdl_wskazniki_grupy.liczba_podgrup": {
+              "type": "integer",
+              "description": "Ile podgrup zawiera ta grupa"
+            },
+            "bdl_wskazniki_grupy.okres": {
+              "enum": [
+                "R"
+              ],
+              "description": "Częstotliwość, dla jakiej zbierane są dane. R - zbieranie corocznie."
+            },
+            "bdl_wskazniki_grupy.slug": {
+              "_TODO": "zdublowane",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bdl_wskazniki_grupy.kategoria_id",
+            "bdl_wskazniki_grupy.kategoria_tytul",
+            "bdl_wskazniki_grupy.tytul",
+            "bdl_wskazniki_grupy.okres"
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "description": "Grupy wska\u017anik\u00f3w w Banku Danych Lokalnych (GUS)."
+}

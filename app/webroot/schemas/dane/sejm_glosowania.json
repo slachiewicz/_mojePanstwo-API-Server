@@ -1,0 +1,117 @@
+{
+	"title": "Sejm \/ G\u0142osowania",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"sejm_glosowania.g": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.wb": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.l": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.posiedzenie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_posiedzenia.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.kluby_za": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.debata_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.czas": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.numer": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_glosowania.w": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.wynik_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.wystapienie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.dzien_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.z": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.p": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.n": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania_typy.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania_typy.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.kluby_przeciw": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.punkt_id": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "G\u0142osowania przeprowadzone w Sejmie 7-mej kadencji."
+}

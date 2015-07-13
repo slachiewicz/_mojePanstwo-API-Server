@@ -1,0 +1,60 @@
+{
+	"title": "Biura poselskie",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"poslowie.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_biura.email": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_biura.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_biura.adres": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_biura.telefon": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie.klub_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_biura.posel_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie.nazwa_odwrocona": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_biura.podstawowe": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false
+}

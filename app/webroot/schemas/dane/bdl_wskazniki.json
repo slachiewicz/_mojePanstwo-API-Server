@@ -1,0 +1,92 @@
+{
+  "title": "BDL \/ Wska\u017aniki",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "bdl_wskazniki.id": {
+              "_TODO": "zdublowane",
+              "type": "string"
+            },
+            "bdl_wskazniki.tytul": {
+              "type": "string"
+            },
+            "bdl_wskazniki.grupa_tytul": {
+              "_TODO": "czemu nie bdl_wskazniki_grupy.tytul?",
+              "type": "string"
+            },
+            "bdl_wskazniki.grupa_id": {
+              "_TODO": "j.w.",
+              "type": "integer"
+            },
+            "bdl_wskazniki.kategoria_tytul": {
+              "_TODO": "j.w.",
+              "type": "string"
+            },
+            "bdl_wskazniki.kategoria_id": {
+              "_TODO": "j.w.",
+              "type": "integer"
+            },
+            "bdl_wskazniki.liczba_wymiarow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.okres": {
+              "_TODO": "reuse tego co jest w kategorii",
+              "type": "string"
+            },
+            "bdl_wskazniki.yearsCount": {
+              "_TODO": "obecnie string",
+              "type": "number",
+              "description": "Ile roczników dostępnych"
+            },
+            "bdl_wskazniki.liczba_rocznikow": {
+              "type": "number",
+              "description": "TODO tu coś dziwnego się kryje, chyba to ostatni rocznik"
+            },
+            "bdl_wskazniki.archiwum": {
+              "_TODO": "co to?",
+              "type": "string"
+            },
+            "bdl_wskazniki.i": {
+              "_TODO": "co to?",
+              "type": "string"
+            },
+            "bdl_wskazniki.data_aktualizacji": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.poziom_id": {
+              "type": "string"
+            },
+            "bdl_wskazniki.poziom_str": {
+              "type": "string"
+            },
+            "bdl_wskazniki.geo_szczegolowosc": {
+              "_TODO": "zamienic poziom_id i poziom_str na taki enum",
+              "enum": [
+                "0-PL",
+                "1-W",
+                "2-P",
+                "3-G"
+              ],
+              "description": "dane PL - ogólnopolskie, W - per województwo, P - per powiat, G - per gmina. Dane dostępne dla danego poziomu są też dostępne dla wszystkich ogólniejszych poziomów."
+            }
+          },
+          "required": [
+            "bdl_wskazniki.liczba_wymiarow"
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "description": "Bank Danych Lokalnych (GUS). Wska\u017aniki dotycz\u0105ce sytuacji ekonomicznej i spo\u0142ecznej Polski."
+}

@@ -6,7 +6,9 @@ App::uses('MpUtils\Url', 'Lib');
 
 class DataobjectsController extends AppController
 {
-    public $uses = array('Dane.Dataobject');
+	// TODO czemu jest Dane.Subscription i Dane.Subscriptions?
+    public $uses = array('Dane.Dataobject', 'Dane.DatasetChannel',
+		'Dane.Subscription', 'Dane.Subscriptions', 'Dane.ObjectPage', 'MPCache');
 	public $components = array('S3');
 
 	const RESULTS_COUNT_DEFAULT = 50;
@@ -241,146 +243,158 @@ class DataobjectsController extends AppController
 		}
 
 		$query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
-	    	    
-	    $layers = array();
-	    if( isset($query['layers']) ) {
-		    $layers = $query['layers'];
-		    unset( $query['layers'] );
-	    }
-					    	    
-	    $query['conditions']['dataset'] = $dataset;
-	    $query['conditions']['id'] = $id;
-	        
-	    $object = $this->Dataobject->find('first', $query);
 
+		$dataobject_query = array(
+			'conditions' => array(
+				'dataset' => $dataset,
+				'id' => $id
+			)
+		);
+
+		if (isset($query['aggs'])) {
+			$dataobject_query['aggs'] = $query['aggs'];
+		}
+	        
+	    $object = $this->Dataobject->find('first', $dataobject_query);
 	    if( !$object ) {
 		    throw new NotFoundException();
 	    }
 	    
 	    $this->Dataobject->data = $object;
 
-		if( !empty($layers) ) {
-			
-			if( is_string($layers) )
-				$layers = array($layers);
-			
-			$this->loadModel('Dane.DatasetChannel');
-			$this->loadModel('Dane.Subscription');
-						
-			foreach( $layers as $layer ) {
-				
-				if ( $layer == 'dataset' ) {
-					
-					$this->loadModel('MPCache');
-					$object['layers']['dataset'] = $this->MPCache->getDataset($dataset);
-               
-                } elseif ( $layer == 'subscribers' ) {
+		// LAYERS
+		// load list of layers
+		$object['layers'] = array(
+			'dataset' => null,
+			'channels' => null,
+			'page' => null,
+			'subscribers' => null
+		);
+		$dataset_info = $this->MPCache->getDataset($dataset);
+		foreach($dataset_info['Layer'] as $layer) {
+			$object['layers'][$layer['layer']] = null;
+		}
 
-                    $this->loadModel('Dane.Subscriptions');
+		// what should we load?
+		$layers_to_load = array();
+		if( isset($query['layers']) ) {
+			$layers_to_load = $query['layers'];
 
-                    $subscribers = array(
-                        'list',
-                        'count'
-                    );
+			if (is_string($layers_to_load)) {
+				$layers_to_load = array($layers_to_load);
+			}
 
-                    $params = array(
-                        'fields' => array(
-                            'Users.username',
-                            'Users.photo_small'
-                        ),
-                        'conditions' => array(
-                            'Subscriptions.dataset' => $dataset,
-                            'Subscriptions.object_id' => $id,
-                            'Subscriptions.user_type' => 'account'
-                        ),
-                        'joins' => array(
-                            array(
-                                'table' => 'users',
-                                'alias' => 'Users',
-                                'type' => 'LEFT',
-                                'conditions' => array(
-                                    'Subscriptions.user_id = Users.id'
-                                )
-                            )
-                        ),
-                        'group' => array(
-                            'Subscriptions.user_id'
-                        ),
-                        'order' => 'Subscriptions.cts'
-                    );
+			// load only available layers
+			$layers_to_load = array_intersect($layers_to_load, array_keys($object['layers']));
+		}
 
-                    $subscribers['list'] = $this->Subscriptions->find('all', array_merge($params, array(
-                        'limit' => 20
-                    )));
+		// load layers
+		foreach( $layers_to_load as $layer ) {
 
-                    $subscribers['count'] = $this->Subscriptions->find('count', $params);
+			if ( $layer == 'dataset' ) {
+				$object['layers']['dataset'] = $dataset_info;
 
-                    $object['layers']['subscribers'] = $subscribers;
+			} elseif ( $layer == 'subscribers' ) {
+				$subscribers = array(
+					'list',
+					'count'
+				);
 
-                } elseif( $layer=='page' ) {
-
-                    $this->loadModel('Dane.ObjectPage');
-
-                    $objectPage = $this->ObjectPage->find('first', array(
-                        'conditions' => array(
-                            'ObjectPage.dataset' => $dataset,
-                            'ObjectPage.object_id' => $id
-                        )
-                    ));
-
-                    $page = array(
-                        'cover' => false,
-                        'logo' => false,
-                        'moderated' => false,
-                        'credits' => null
-                    );
-
-                    if($objectPage) {
-                        $page = array(
-                            'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
-                            'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
-                            'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
-                            'credits' => $objectPage['ObjectPage']['credits']
-                        );
-                    }
-					
-					if( $this->Auth->user('type')=='account' ) {
-						
-						$this->loadModel('Dane.ObjectUser');
-						$page['roles'] = $this->ObjectUser->find('first', array(
-							'fields' => 'role',
+				$params = array(
+					'fields' => array(
+						'Users.username',
+						'Users.photo_small'
+					),
+					'conditions' => array(
+						'Subscriptions.dataset' => $dataset,
+						'Subscriptions.object_id' => $id,
+						'Subscriptions.user_type' => 'account'
+					),
+					'joins' => array(
+						array(
+							'table' => 'users',
+							'alias' => 'Users',
+							'type' => 'LEFT',
 							'conditions' => array(
-								'ObjectUser.dataset' => $dataset,
-								'ObjectUser.object_id' => $id,
-								'ObjectUser.user_id' => $this->Auth->user('id'),
-							),
-						));
-					}
-					
-					$object['layers']['page'] = $page;
-				
-				} elseif( $layer=='channels' ) {
-										
-					$object['layers']['channels'] = $this->DatasetChannel->find('all', array(
-						'fields' => array('channel', 'title', 'subject_dataset'),
-						'conditions' => array(
-							'creator_dataset' => $object['dataset'],
-						),
-						'order' => 'ord asc',
-					));
-					
-					$object['layers']['subscription'] = $this->Subscription->find('first', array(
-						'conditions' => array(
-							'user_type' => $this->Auth->user('type'),
-							'user_id' => $this->Auth->user('id'),
-							'dataset' => $object['dataset'],
-							'object_id' => $object['id'],
+								'Subscriptions.user_id = Users.id'
+							)
 						)
-					));
-																									
-				} else {
-					$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
+					),
+					'group' => array(
+						'Subscriptions.user_id'
+					),
+					'order' => 'Subscriptions.cts'
+				);
+
+				$subscribers['list'] = $this->Subscriptions->find('all', array_merge($params, array(
+					'limit' => 20
+				)));
+
+				$subscribers['count'] = $this->Subscriptions->find('count', $params);
+
+				$object['layers']['subscribers'] = $subscribers;
+
+			} elseif( $layer=='page' ) {
+				$objectPage = $this->ObjectPage->find('first', array(
+					'conditions' => array(
+						'ObjectPage.dataset' => $dataset,
+						'ObjectPage.object_id' => $id
+					)
+				));
+
+				$page = array(
+					'cover' => false,
+					'logo' => false,
+					'moderated' => false,
+					'credits' => null
+				);
+
+				if($objectPage) {
+					$page = array(
+						'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
+						'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
+						'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
+						'credits' => $objectPage['ObjectPage']['credits']
+					);
 				}
+
+				if( $this->Auth->user('type')=='account' ) {
+
+					$this->loadModel('Dane.ObjectUser');
+					$page['roles'] = $this->ObjectUser->find('first', array(
+						'fields' => 'role',
+						'conditions' => array(
+							'ObjectUser.dataset' => $dataset,
+							'ObjectUser.object_id' => $id,
+							'ObjectUser.user_id' => $this->Auth->user('id'),
+						),
+					));
+				}
+
+				$object['layers']['page'] = $page;
+
+			} elseif( $layer=='channels' ) {
+
+				$object['layers']['channels'] = $this->DatasetChannel->find('all', array(
+					'fields' => array('channel', 'title', 'subject_dataset'),
+					'conditions' => array(
+						'creator_dataset' => $object['dataset'],
+					),
+					'order' => 'ord asc',
+				));
+
+				// TODO to powinno iść jako zapytanie o osobną warstwę raczej.. czy to nie literówka?
+				$object['layers']['subscription'] = $this->Subscription->find('first', array(
+					'conditions' => array(
+						'user_type' => $this->Auth->user('type'),
+						'user_id' => $this->Auth->user('id'),
+						'dataset' => $object['dataset'],
+						'object_id' => $object['id'],
+					)
+				));
+
+			} else {
+				$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 			}
 		}
 

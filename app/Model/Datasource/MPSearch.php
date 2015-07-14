@@ -250,6 +250,9 @@ class MPSearch {
 		// var_export( $queryData ); die();
 		
 		if( isset( $queryData['aggs'] ) ) {
+			if (!is_array($queryData['aggs'])) {
+				throw new BadRequestException();
+			}
 			
 			// debug( $queryData['aggs'] );
 			$aggs = array();
@@ -303,6 +306,9 @@ class MPSearch {
 	                $this->Aggs[ '_channels' ][ 'global' ] = array();
 	            
 				} else {
+					if (!is_array($agg_data)) {
+						throw new BadRequestException();
+					}
 					
 					array_walk_recursive($agg_data, function(&$item, $key){
 						if( $item === '_empty' )

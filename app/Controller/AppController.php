@@ -40,6 +40,8 @@ class AppController extends Controller
 
     // serve only json
     public $viewClass = 'Json';
+
+    protected $isPortalCalling = false;
     
     public $components = array('RequestHandler',
         'Auth' => array(
@@ -77,7 +79,7 @@ class AppController extends Controller
 	        isset( $this->request->query['apiKey'] ) && 
 	        ( $this->request->query['apiKey'] == ROOT_API_KEY )
         ) {
-            // TODO rethink authorization!
+            $this->isPortalCalling = true;
 	        
 	        if( isset($this->request->query['user_id']) ) {
 	        	$this->Auth->login(array(
@@ -99,22 +101,6 @@ class AppController extends Controller
                 return true; // results in $this->request->is('ajax') == true
             }
         ));
-
-
-        /*
-
-        if (MpUtils::is_trusted_client($_SERVER['REMOTE_ADDR'])) {
-            if (env('HTTP_X_USER_ID')) {
-                $user_id = Sanitize::paranoid(env('HTTP_X_USER_ID'));
-                $user = $this->User->find('first', array('conditions' => array('User.id' => $user_id)));                
-                $this->actAsUser($user);
-            }
-
-        } else {
-            // @TU BEDZIE PELNA AUTORYZACJA (OAuth) DLA IP INNYCH NIZ KLIENCKIE
-            // throw new ForbiddenException();
-        }
-        */
         
         $this->Auth->allow();        
         

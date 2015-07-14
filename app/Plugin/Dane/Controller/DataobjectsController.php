@@ -81,9 +81,11 @@ class DataobjectsController extends AppController
 
 
 	private function _index($params = array()){
+		$allowed_query_params = array('conditions', 'limit', 'page', 'order');
+		if ($this->isPortalCalling) {
+			array_push($allowed_query_params, 'aggs');
+		}
 
-		// TODO verify aggs with https://github.com/epforgpl/_mojePanstwo-API-Server/issues/16
-		$allowed_query_params = array('conditions', 'limit', 'page', 'aggs', 'order');
 		$original_query = $query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
 
 		if( isset($params['dataset']) && $params['dataset'] )
@@ -233,7 +235,12 @@ class DataobjectsController extends AppController
 	
     public function view($dataset, $id)
     {
-	    $query = $this->request->query;
+		$allowed_query_params = array('layers');
+		if ($this->isPortalCalling) {
+			array_push($allowed_query_params, 'aggs');
+		}
+
+		$query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
 	    	    
 	    $layers = array();
 	    if( isset($query['layers']) ) {
@@ -379,7 +386,6 @@ class DataobjectsController extends AppController
 
 		// agregacje na obiekcie
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
-			// TODO walidacja agregacji
 			$object['Aggs'] = $this->Dataobject->getDataSource()->Aggs;
 		}
 

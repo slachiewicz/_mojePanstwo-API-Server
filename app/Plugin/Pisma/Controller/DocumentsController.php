@@ -296,7 +296,8 @@ class DocumentsController extends AppController
                     }
                 }
 
-                    $data['to_str'].= ' ' . $to['nazwa'] . '</p><p>' . $to['adres'] . '</p><p>' . $to['email'] . '</p>';
+                $addr=preg_replace('~(\d{2})-(\d{3})~', '</p><p>${1}-${2}', $to['adres']);
+                    $data['to_str'].= ' ' . $to['nazwa'] . '</p><p>' . $addr . '</p><p>' . $to['email'] . '</p>';
                 $data['to_name'] = $to['szef_stanowisko'] . ' ' . $to['nazwa'];
                 $data['to_email'] = $to['email'];
 
@@ -304,7 +305,8 @@ class DocumentsController extends AppController
                 ( $data['to_dataset']=='rada_gminy' ) &&
                 ( $to = $DB->selectAssoc("SELECT pl_gminy.id, pl_gminy.nazwa, pl_gminy.email, pl_gminy.rada_nazwa, pl_gminy.adres FROM pl_gminy WHERE pl_gminy.id='". addslashes( $data['to_id'] ) ."'" ) )
             ) {
-                $data['to_str'] = '<p>' . $to['rada_nazwa'] . '</p><p>' . $to['adres'] . '</p><p>' . $to['email'] . '</p>';
+                $addr=preg_replace('~(\d{2})-(\d{3})~', '</p><p>${1}-${2}', $to['adres']);
+                $data['to_str'] = '<p>' . $to['rada_nazwa'] . '</p><p>' . $addr . '</p><p>' . $to['email'] . '</p>';
                 $data['to_name'] = $to['rada_nazwa'];
                 $data['to_email'] = $to['email'];
 

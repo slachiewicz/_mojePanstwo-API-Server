@@ -1,0 +1,37 @@
+{
+	"title": "S\u0119dziowie s\u0105d\u00f3w administracyjnych",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"sa_sedziowie.orzeczenie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sa_sedziowie.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sa_sedziowie.stanowisko_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sa_sedziowie.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "S\u0119dziowie, kt\u00f3rzy wydawali orzeczenia w s\u0105dach administracyjnych."
+}

@@ -1,0 +1,49 @@
+{
+  "properties": {
+    "url": {
+      "type": "string",
+      "format": "url",
+      "description": "Unikalny identifykator obiektu, bedący zarówno URL pod jakim obiekt jest dostępny"
+    },
+    "global_id": {
+      "type": "integer",
+      "description": "Unikalny identyfikator wśród wszystkich obiektów Mojego Państwa"
+    },
+    "dataset": {
+      "type": "string",
+      "description": "Zbiór danych, z którego pochodzi obiekt"
+    },
+    "id": {
+      "type": "integer",
+      "description": "Identifikator obiektu wewnątrz datasetu"
+    },
+    "mpurl": {
+      "type": "string",
+      "format": "url",
+      "description": "URL obiektu, pod którym jest widoczny w serwisie MojePanstwo.pl"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Nazwa obiektu"
+    },
+    "schema": {
+      "_TODO": "zrealizować to w API",
+      "type": "string",
+      "format": "uri",
+      "description": "Link do JSON-schema opisującej dany obiekt."
+    },
+    "score": {
+      "type": "number",
+      "description": "Wartość dopasowania obiektu do kryteriów wyszukiwania"
+    }
+  },
+  "discriminator": "schema",
+  "required": [
+    "url",
+    "global_id",
+    "dataset",
+    "id",
+    "mpurl",
+    "schema"
+  ]
+}

@@ -4,3 +4,6 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+Header add Access-Control-Allow-Origin "*"
+

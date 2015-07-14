@@ -1,0 +1,57 @@
+{
+	"title": "Rz\u0105d \/ Etapy prac legislacyjnych",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"rcl_etapy.dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rcl_etapy.typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rcl_etapy.projekt_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rcl_etapy.lista_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rcl_etapy.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"rcl_etapy.tytul_projektu": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rcl_etapy_typy.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"rcl_etapy.liczba_dokumentow": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"rcl_etapy.id": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false
+}

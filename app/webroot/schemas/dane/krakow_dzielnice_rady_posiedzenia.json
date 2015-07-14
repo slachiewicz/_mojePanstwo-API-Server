@@ -1,0 +1,69 @@
+{
+	"title": "Krak\u00f3w \/ Posiedzenia rad dzielnic",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"dzielnice.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.numer_str": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.dzielnica_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dzielnice.gmina_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.protokol_liczba_zalacznikow": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.protokol_dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.opis": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dzielnice.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.yt_video_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"krakow_dzielnice_rady_posiedzenia.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krakow_dzielnice_rady_posiedzenia.przedmiot_dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false
+}

@@ -1,0 +1,48 @@
+{
+	"title": "Dzielnice",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"gminy.powiat_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dzielnice.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.wojewodztwo_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dzielnice.gmina_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"dzielnice.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"gminy.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false
+}

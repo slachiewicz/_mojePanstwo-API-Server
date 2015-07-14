@@ -1,0 +1,206 @@
+{
+	"title": "Zmiany we wpisach do KRS",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"krs_podmioty.adres_miejscowosc": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.adres_kraj": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.knf_ostrzezenie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_dzialy.dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.wpis_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.nip": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.nr_rub": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"msig_zmiany.opis_sub": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.nr_sub": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"msig_zmiany.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"msig_zmiany.label": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.nr_rejestr": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"msig_zmiany.tresc": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.tresc_poprzednia": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.deleted_on_request": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.mode": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.typ_sub": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.nazwa_skrocona": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.nr_dz": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"msig.nr": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"krs_podmioty.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.tresc_html": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.gmina_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.krs": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.dzial_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_dzialy.msig_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.miejscowosc_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.regon": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.numer_label": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"krs_podmioty.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_dzialy.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"msig.rocznik": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.wykreslony": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.forma_prawna_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.forma_prawna_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.tresc_przed": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.rozdzial_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.nr_prub_sub": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"msig_zmiany._ord": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"msig_zmiany.pozycja_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.forma_prawna_typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig_zmiany.opis": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"krs_podmioty.firma": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig.id": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false
+}

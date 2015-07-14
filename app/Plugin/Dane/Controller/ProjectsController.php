@@ -2,13 +2,33 @@
 
 class ProjectsController extends AppController {
 
-    public $uses = array('Dane.OrganizacjeDzialania', 'Paszport.User', 'Dane.ObjectUser');
+    public $uses = array('Dane.OrganizacjeDzialania', 'Paszport.User', 'Dane.ObjectUser', 'Dane.Temat');
     public $components = array('RequestHandler', 'S3');
 
     public function beforeFilter() {
         parent::beforeFilter();
         if(!$this->isAuthorized())
             throw new ForbiddenException();
+    }
+
+    public function tematy() {
+        $term = isset($this->request->query['term']) ? $this->request->query['term'] : false;
+        if(!$term)
+            throw new NotFoundException;
+
+        $results = $this->Temat->find('all', array(
+            'conditions' => array(
+                'Temat.q LIKE' => '%' . $term . '%'
+            ),
+            'limit' => 5
+        ));
+
+        $tematy = [];
+        foreach($results as $row)
+            $tematy[] = $row['Temat'];
+
+
+        $this->setSerialized('tematy', $tematy);
     }
 
     public function index() {
@@ -120,9 +140,13 @@ class ProjectsController extends AppController {
             $toUpdate['mts'] = date('Y-m-d H:i:s');
             $toUpdate['id'] = $object['OrganizacjeDzialania']['id'];
 
-            $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'folder', 'geo_lat', 'geo_lng'));
+            $fields = array('tytul', 'opis', 'folder', 'geo_lat', 'geo_lng');
+            foreach($fields as $field) {
+                if(isset($this->data[$field]))
+                    $toUpdate[$field] = $this->data[$field];
+            }
 
-            $success = true;
+            $success = $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'folder', 'geo_lat', 'geo_lng'));
         }
 
         $this->setSerialized('success', $success);

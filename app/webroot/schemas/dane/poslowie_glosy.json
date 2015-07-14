@@ -1,0 +1,125 @@
+{
+	"title": "Sejm \/ Wyniki g\u0142osowa\u0144",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"poslowie_glosy.glosowanie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_glosy.bunt": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.posiedzenie_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie.nazwa_odwrocona": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_glosy.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.czas": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.numer": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_glosowania.w": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.z": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_kluby.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.p": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.n": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_glosy.klub_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_glosy.posel_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_glosy.glos_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.g": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.wb": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.l": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie_glosy.mowca_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"poslowie.nazwa": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania.wynik_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_kluby.skrot": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_glosowania_glosy.id": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Wyniki g\u0142osowa\u0144 pos\u0142\u00f3w na Sejm RP."
+}

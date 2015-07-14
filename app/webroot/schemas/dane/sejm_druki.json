@@ -1,0 +1,70 @@
+{
+	"title": "Sejm \/ druki",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"sejm_druki.tytul_skrocony": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.sprawozdawca_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.numer": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_druki.opis": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.typ_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.autorzy_str": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						},
+						"sejm_druki.numer_int": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"sejm_druki.tytul": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"sejm_druki.druk_typ_nazwa": {
+							"type": "string",
+							"description": "TODO"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Druki sejmowe to materia\u0142y urz\u0119dowe dokumentuj\u0105ce prace Sejmu."
+}

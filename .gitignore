@@ -50,5 +50,3 @@ app/Vendor/bin/swagger
 app/Vendor/predis
 app/webroot/swagger/api-docs.json
 app/webroot/swagger/index.php
-
-app/composer.lock

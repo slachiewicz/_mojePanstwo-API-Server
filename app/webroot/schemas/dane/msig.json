@@ -1,0 +1,42 @@
+{
+	"title": "Monitor S\u0105dowy i Gospodarczy",
+	"allOf": [
+		{
+			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+		},
+		{
+			"properties": {
+				"data": {
+					"properties": {
+						"msig.dokument_id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig.rocznik": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig.nr": {
+							"type": "integer",
+							"description": "TODO"
+						},
+						"msig.id": {
+							"type": "string",
+							"description": "TODO"
+						},
+						"msig.data": {
+							"type": "string",
+							"description": "TODO",
+							"format": "date-time"
+						}
+					}
+				}
+			},
+			"required": [
+				"data"
+			]
+		}
+	],
+	"additionalProperties": false,
+	"description": "Wydania publikatora zawieraj\u0105cego informacje dotycz\u0105ce przedsi\u0119biorstw zarejestrowanych w KRS."
+}

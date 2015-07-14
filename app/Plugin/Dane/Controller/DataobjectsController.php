@@ -233,7 +233,6 @@ class DataobjectsController extends AppController
 	
     public function view($dataset, $id)
     {
-
 	    $query = $this->request->query;
 	    	    
 	    $layers = array();
@@ -246,26 +245,13 @@ class DataobjectsController extends AppController
 	    $query['conditions']['id'] = $id;
 	        
 	    $object = $this->Dataobject->find('first', $query);
-	    
-	    
-	    
-	    
+
 	    if( !$object ) {
-		    
 		    throw new NotFoundException();
-		    
 	    }
 	    
 	    $this->Dataobject->data = $object;
-	    
-	    $_serialize = array('Dataobject');
-	    
-	    if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
-			// debug($this->Dataobject->getDataSource()->Aggs); die();
-			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
-			$_serialize[] = 'Aggs';
-		}
-	    			
+
 		if( !empty($layers) ) {
 			
 			if( is_string($layers) )
@@ -389,15 +375,15 @@ class DataobjectsController extends AppController
 					$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 				}
 			}
-			
 		}
-			
-	    	    
-	    
-		$this->set(array(
-			'Dataobject' => $object,
-			'_serialize' => $_serialize,
-		));
+
+		// agregacje na obiekcie
+		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
+			// TODO walidacja agregacji
+			$object['Aggs'] = $this->Dataobject->getDataSource()->Aggs;
+		}
+
+		$this->setSerialized('object', $object);
     }
     
     public function view_layer()

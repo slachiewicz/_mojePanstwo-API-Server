@@ -80,12 +80,8 @@ class DataobjectsController extends AppController
 	private function _index($params = array()){
 
 		// TODO verify aggs with https://github.com/epforgpl/_mojePanstwo-API-Server/issues/16
-		// TODO Daniel: aggs allowed?
-		// 'recursive', 'fields',  'order', 'callbacks', 'aggs' ?
-		//$allowed_query_params = array('conditions', 'limit', 'page', 'aggs');
-		//$original_query = $query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
-
-		$original_query = $query = $this->request->query;
+		$allowed_query_params = array('conditions', 'limit', 'page', 'aggs', 'order');
+		$original_query = $query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
 
 		if( isset($params['dataset']) && $params['dataset'] )
 			$query['conditions']['dataset'] = $params['dataset'];

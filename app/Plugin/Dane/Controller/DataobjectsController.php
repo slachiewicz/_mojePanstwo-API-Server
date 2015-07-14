@@ -1,15 +1,20 @@
 <?
 
+App::uses('AppController', 'Controller');
+App::uses('MPSearch', 'Model/Datasource');
+App::uses('MpUtils\Url', 'Lib');
+
 class DataobjectsController extends AppController
 {
     public $uses = array('Dane.Dataobject');
 	public $components = array('S3');
 	
 	public function index($dataset = false) {
-		
-		if( $this->request->is('post') ) 
+		// obsługa danych przekazywanych przez POST params, tak jakby to był GET
+		if( $this->request->is('post') ) {
 			$this->request->query = array_merge($this->request->query, $this->request->data);
-		
+		}
+
 		$this->_index(array(
 			'dataset' => $dataset
 		));
@@ -73,13 +78,18 @@ class DataobjectsController extends AppController
 
 
 	private function _index($params = array()){
-		
-		$query = $this->request->query;
-				
+
+		// TODO verify aggs with https://github.com/epforgpl/_mojePanstwo-API-Server/issues/16
+		// TODO Daniel: aggs allowed?
+		// 'recursive', 'fields',  'order', 'callbacks', 'aggs' ?
+		//$allowed_query_params = array('conditions', 'limit', 'page', 'aggs');
+		//$original_query = $query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
+
+		$original_query = $query = $this->request->query;
+
 		if( isset($params['dataset']) && $params['dataset'] )
 			$query['conditions']['dataset'] = $params['dataset'];
-		
-		
+
 		if( isset($params['_main']) && $params['_main'] )
 			$query['conditions']['_main'] = true;
 			
@@ -91,26 +101,55 @@ class DataobjectsController extends AppController
 			$query['conditions']['subscribtions'] = array(
 				'user_type' => $this->Auth->user('type'),
 				'user_id' => $this->Auth->user('id'),
-			); 
-			
+			);
 		}
 				
 		$objects = $this->Dataobject->find('all', $query);
-		$count = ( 
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['hits'] ) && 
-			isset( $lastResponse['hits']['total'] ) 
-		) ? $lastResponse['hits']['total'] : null;
-		
-		$took = ( 
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['took'] ) 
-		) ? $lastResponse['took'] : null;
-		
-		$_serialize = array('Dataobject', 'Count', 'Took');
+
+		$lr_stats = @$this->Dataobject->getDataSource()->lastResponseStats;
+		$count = @$lr_stats['count'];
+		$took = @$lr_stats['took_ms'];
+
+		// HATEOS
+		$processed_query = $this->Dataobject->buildQuery('all', $query);
+		$page = $processed_query['page']; // starts with 1
+
+		$url = new MpUtils\Url(Router::url(null, true));
+		$url->setParams($original_query);
+
+		$_links = array(
+			'self' => $url->buildUrl()
+		);
+
+		$lastPage = (int) (($count - 1) / $processed_query['limit']) + 1;
+		if ($page > 1 && $page <= $lastPage) {
+			$url->setParam('page', 1);
+			$_links['first'] = $url->buildUrl();
+
+			$url->setParam('page', $page - 1);
+			$_links['prev'] = $url->buildUrl();
+		}
+
+		if ($page < $lastPage) {
+			$url->setParam('page', $page + 1);
+			$_links['next'] = $url->buildUrl();
+
+			$url->setParam('page', $lastPage);
+			$_links['last'] = $url->buildUrl();
+		}
+
+		// page out of bounds
+		if ($page > $lastPage or $page < 1) {
+			$url->setParam('page', 1);
+			$_links['first'] = $url->buildUrl();
+
+			$url->setParam('page', $lastPage);
+			$_links['last'] = $url->buildUrl();
+		}
+
+		$_serialize = array('Dataobject', 'Count', 'Took', 'Links');
 		
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
-			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();
 			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
 			$_serialize[] = 'Aggs';
 		}
@@ -119,8 +158,8 @@ class DataobjectsController extends AppController
 		$this->set('Dataobject', $objects);
 		$this->set('Count', $count);
 		$this->set('Took', $took);
+		$this->set('Links', $_links);
         $this->set('_serialize', $_serialize);
-		
 	}
 
     private $enabledUpdateModels = array(

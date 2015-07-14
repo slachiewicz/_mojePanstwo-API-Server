@@ -9,24 +9,26 @@ Router::connect('/dane/subscriptions/transfer_anonymous', array(
 	'action' => 'transfer_anonymous'
 ));
 
-Router::connect('/dane/index', array(
+Router::connect('/dane', array(
 	'plugin' => 'Dane', 
 	'controller' => 'Dataobjects',
 	'action' => 'index'
 ));
 
+// TODO namespace /dane/utils/ ?
 Router::connect('/dane/suggest', array(
 	'plugin' => 'Dane', 
 	'controller' => 'Dataobjects',
 	'action' => 'suggest',
 ));
 
-Router::connect('/dane/:alias', array(
-	'plugin' => 'Dane', 
-	'controller' => 'Datasets', 
-	'action' => 'view'
+Router::connect('/dane/:dataset', array(
+	'plugin' => 'Dane',
+	'controller' => 'Dataobjects',
+	'action' => 'index'
 ), array(
-	'pass' => array('alias'),
+	'dataset' => '[a-zA-Z_]+',
+	'pass' => array('dataset'),
 ));
 
 Router::connect('/dane/:dataset/:id', array(
@@ -56,12 +58,13 @@ Router::connect('/dane/:dataset/:id/:action', array(
 	'pass' => array('dataset', 'id'),
 ));
 
-Router::connect('/dane/:dataset/:action', array(
-	'plugin' => 'Dane', 
+Router::connect('/dane/:dataset/:id/:layer', array(
+	'plugin' => 'Dane',
 	'controller' => 'Dataobjects',
+	'action' => 'view_layer'
 ), array(
-	'id' => '![0-9]+',
-	'pass' => array('dataset'),
+	'id' => '[0-9]+',
+	'pass' => array('dataset', 'id', 'layer'),
 ));
 
 # ObjectUsersManagement

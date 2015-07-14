@@ -2,7 +2,7 @@
 
 class ProjectsController extends AppController {
 
-    public $uses = array('Dane.OrganizacjeDzialania', 'Paszport.User', 'Dane.ObjectUser', 'Dane.Temat');
+    public $uses = array('Dane.OrganizacjeDzialania', 'Paszport.User', 'Dane.ObjectUser', 'Dane.Temat', 'Dane.OrganizacjeDzialaniaTematy');
     public $components = array('RequestHandler', 'S3');
 
     public function beforeFilter() {
@@ -75,6 +75,7 @@ class ProjectsController extends AppController {
         ));
 
         $id = $this->OrganizacjeDzialania->getLastInsertId();
+        $this->updateTags($id, @$this->data['tagi']);
         $this->saveCoverPhoto($this->data['cover_photo'], $id);
         $this->setSerialized('id', $id);
     }
@@ -146,6 +147,7 @@ class ProjectsController extends AppController {
                     $toUpdate[$field] = $this->data[$field];
             }
 
+            $this->updateTags($object['OrganizacjeDzialania']['id'], @$this->data['tagi']);
             $success = $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'folder', 'geo_lat', 'geo_lng'));
         }
 
@@ -165,10 +167,51 @@ class ProjectsController extends AppController {
 
         if($object) {
             $this->OrganizacjeDzialania->delete($object['OrganizacjeDzialania']['id']);
+            $this->updateTags($object['OrganizacjeDzialania']['id'], false);
             $success = true;
         }
 
         $this->setSerialized('success', $success);
+    }
+
+    private function updateTags($id, $tags = false) {
+        $tags = explode(',', $tags);
+
+        $this->OrganizacjeDzialaniaTematy->deleteAll(array(
+            'OrganizacjeDzialaniaTematy.dzialanie_id' => $id
+        ), false);
+
+        $update = array();
+
+        foreach($tags as $tag) {
+            $q = trim($tag);
+            $temat = $this->Temat->find('first', array(
+                'conditions' => array(
+                    'Temat.q' => $q
+                )
+            ));
+
+            if(!$temat) {
+                $this->Temat->clear();
+                $this->Temat->save(array(
+                    'q' => $q,
+                ));
+
+                $update[] = (int) $this->Temat->getLastInsertId();
+            } else {
+                $update[] = (int) $temat['Temat']['id'];
+            }
+        }
+
+        $update = array_unique($update);
+
+        foreach($update as $temat_id) {
+            $this->OrganizacjeDzialaniaTematy->clear();
+            $this->OrganizacjeDzialaniaTematy->save(array(
+                'dzialanie_id' => $id,
+                'temat_id' => $temat_id
+            ));
+        }
     }
 
     private function removeCoverPhoto() {

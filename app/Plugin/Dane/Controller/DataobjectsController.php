@@ -8,6 +8,9 @@ class DataobjectsController extends AppController
 {
     public $uses = array('Dane.Dataobject');
 	public $components = array('S3');
+
+	const RESULTS_COUNT_DEFAULT = 50;
+	const RESULTS_COUNT_MAX = 500;
 	
 	public function index($dataset = false) {
 		// obsługa danych przekazywanych przez POST params, tak jakby to był GET
@@ -99,6 +102,15 @@ class DataobjectsController extends AppController
 				'user_id' => $this->Auth->user('id'),
 			);
 		}
+
+		// ograniczenie limit
+		if (isset($query['limit'])) {
+			if ($query['limit'] > DataobjectsController::RESULTS_COUNT_MAX) {
+				$query['limit'] = DataobjectsController::RESULTS_COUNT_MAX;
+			}
+		} else {
+			$query['limit'] = DataobjectsController::RESULTS_COUNT_DEFAULT;
+		}
 				
 		$objects = $this->Dataobject->find('all', $query);
 
@@ -106,44 +118,51 @@ class DataobjectsController extends AppController
 		$count = @$lr_stats['count'];
 		$took = @$lr_stats['took_ms'];
 
+		$_serialize = array('Dataobject', 'Count', 'Took');
+
 		// HATEOS
-		$processed_query = $this->Dataobject->buildQuery('all', $query);
-		$page = $processed_query['page']; // starts with 1
+		if( $this->request->is('get') ) {
+			// using post, aggregated arrays are failing on MpUrils/Url.php:145
 
-		$url = new MpUtils\Url(Router::url(null, true));
-		$url->setParams($original_query);
+			$processed_query = $this->Dataobject->buildQuery('all', $query);
+			$page = $processed_query['page']; // starts with 1
 
-		$_links = array(
-			'self' => $url->buildUrl()
-		);
+			$url = new MpUtils\Url(Router::url(null, true));
+			$url->setParams($original_query);
 
-		$lastPage = (int) (($count - 1) / $processed_query['limit']) + 1;
-		if ($page > 1 && $page <= $lastPage) {
-			$url->setParam('page', 1);
-			$_links['first'] = $url->buildUrl();
+			$_links = array(
+				'self' => $url->buildUrl()
+			);
 
-			$url->setParam('page', $page - 1);
-			$_links['prev'] = $url->buildUrl();
+			$lastPage = (int)(($count - 1) / $processed_query['limit']) + 1;
+			if ($page > 1 && $page <= $lastPage) {
+				$url->setParam('page', 1);
+				$_links['first'] = $url->buildUrl();
+
+				$url->setParam('page', $page - 1);
+				$_links['prev'] = $url->buildUrl();
+			}
+
+			if ($page < $lastPage) {
+				$url->setParam('page', $page + 1);
+				$_links['next'] = $url->buildUrl();
+
+				$url->setParam('page', $lastPage);
+				$_links['last'] = $url->buildUrl();
+			}
+
+			// page out of bounds
+			if ($page > $lastPage or $page < 1) {
+				$url->setParam('page', 1);
+				$_links['first'] = $url->buildUrl();
+
+				$url->setParam('page', $lastPage);
+				$_links['last'] = $url->buildUrl();
+			}
+
+			array_push($_serialize, 'Links');
+			$this->set('Links', $_links);
 		}
-
-		if ($page < $lastPage) {
-			$url->setParam('page', $page + 1);
-			$_links['next'] = $url->buildUrl();
-
-			$url->setParam('page', $lastPage);
-			$_links['last'] = $url->buildUrl();
-		}
-
-		// page out of bounds
-		if ($page > $lastPage or $page < 1) {
-			$url->setParam('page', 1);
-			$_links['first'] = $url->buildUrl();
-
-			$url->setParam('page', $lastPage);
-			$_links['last'] = $url->buildUrl();
-		}
-
-		$_serialize = array('Dataobject', 'Count', 'Took', 'Links');
 		
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
 			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
@@ -154,7 +173,6 @@ class DataobjectsController extends AppController
 		$this->set('Dataobject', $objects);
 		$this->set('Count', $count);
 		$this->set('Took', $took);
-		$this->set('Links', $_links);
         $this->set('_serialize', $_serialize);
 	}
 

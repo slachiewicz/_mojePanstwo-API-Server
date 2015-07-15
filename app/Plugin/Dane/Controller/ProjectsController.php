@@ -23,7 +23,7 @@ class ProjectsController extends AppController {
             'limit' => 5
         ));
 
-        $tematy = [];
+        $tematy = array();
         foreach($results as $row)
             $tematy[] = $row['Temat'];
 

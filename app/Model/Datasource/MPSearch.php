@@ -6,7 +6,7 @@ class MPSearch {
 	private $_index = 'mojepanstwo_v1';    
 
 	public $API;
-    public $lastReponse = false;
+    public $lastResponseStats = null;
     
     public $Aggs = array();
     private $aggs_allowed = array(
@@ -28,14 +28,6 @@ class MPSearch {
     {
         return null;
     }
-	
-	public function getLastReponse($field = '*')
-	{
-		if( $field == '*' )
-			return $this->lastReponse;
-
-		return null;
-	}
 	
     public function __construct($config)
     {
@@ -258,6 +250,9 @@ class MPSearch {
 		// var_export( $queryData ); die();
 		
 		if( isset( $queryData['aggs'] ) ) {
+			if (!is_array($queryData['aggs'])) {
+				throw new BadRequestException();
+			}
 			
 			// debug( $queryData['aggs'] );
 			$aggs = array();
@@ -311,6 +306,9 @@ class MPSearch {
 	                $this->Aggs[ '_channels' ][ 'global' ] = array();
 	            
 				} else {
+					if (!is_array($agg_data)) {
+						throw new BadRequestException();
+					}
 					
 					array_walk_recursive($agg_data, function(&$item, $key){
 						if( $item === '_empty' )
@@ -832,16 +830,18 @@ class MPSearch {
 	}
 	
     public function read(Model $model, $queryData = array()) {
+		$params = $this->buildESQuery($queryData);
 		
-		$params = $this->buildESQuery($queryData);		
-		// debug($params); die();
-		
-		$this->lastReponse = false;
+		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );
-						
-        $this->lastResponse = $response;
-        if( isset($this->lastResponse['hits']) && isset($this->lastResponse['hits']['hits']) )
-	        unset( $this->lastResponse['hits']['hits'] );
+
+		$this->lastResponseStats = array();
+		if (isset($response['hits']['total'])) {
+			$this->lastResponseStats['count'] = $response['hits']['total'];
+		}
+		if (isset($response['took'])) {
+			$this->lastResponseStats['took_ms'] = $response['took'];
+		}
                 
         if( !empty($this->Aggs) ) {
 	        
@@ -851,9 +851,6 @@ class MPSearch {
 		        	$agg_data = $response['aggregations'][$agg_id];
 			        			        
 	        }
-	        
-	        unset( $this->lastResponse['aggregations'] );
-	        
         }
                 
         $hits = $response['hits']['hits'];

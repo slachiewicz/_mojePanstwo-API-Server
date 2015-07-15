@@ -1,15 +1,25 @@
 <?
 
+App::uses('AppController', 'Controller');
+App::uses('MPSearch', 'Model/Datasource');
+App::uses('MpUtils\Url', 'Lib');
+
 class DataobjectsController extends AppController
 {
-    public $uses = array('Dane.Dataobject');
+	// TODO czemu jest Dane.Subscription i Dane.Subscriptions?
+    public $uses = array('Dane.Dataobject', 'Dane.DatasetChannel',
+		'Dane.Subscription', 'Dane.Subscriptions', 'Dane.ObjectPage', 'MPCache');
 	public $components = array('S3');
+
+	const RESULTS_COUNT_DEFAULT = 50;
+	const RESULTS_COUNT_MAX = 500;
 	
 	public function index($dataset = false) {
-		
-		if( $this->request->is('post') ) 
+		// obsługa danych przekazywanych przez POST params, tak jakby to był GET
+		if( $this->request->is('post') ) {
 			$this->request->query = array_merge($this->request->query, $this->request->data);
-		
+		}
+
 		$this->_index(array(
 			'dataset' => $dataset
 		));
@@ -73,13 +83,16 @@ class DataobjectsController extends AppController
 
 
 	private function _index($params = array()){
-		
-		$query = $this->request->query;
-				
+		$allowed_query_params = array('conditions', 'limit', 'page', 'order');
+		if ($this->isPortalCalling) {
+			array_push($allowed_query_params, 'aggs');
+		}
+
+		$original_query = $query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
+
 		if( isset($params['dataset']) && $params['dataset'] )
 			$query['conditions']['dataset'] = $params['dataset'];
-		
-		
+
 		if( isset($params['_main']) && $params['_main'] )
 			$query['conditions']['_main'] = true;
 			
@@ -91,26 +104,71 @@ class DataobjectsController extends AppController
 			$query['conditions']['subscribtions'] = array(
 				'user_type' => $this->Auth->user('type'),
 				'user_id' => $this->Auth->user('id'),
-			); 
-			
+			);
+		}
+
+		// ograniczenie limit
+		if (isset($query['limit'])) {
+			if ($query['limit'] > DataobjectsController::RESULTS_COUNT_MAX) {
+				$query['limit'] = DataobjectsController::RESULTS_COUNT_MAX;
+			}
+		} else {
+			$query['limit'] = DataobjectsController::RESULTS_COUNT_DEFAULT;
 		}
 				
 		$objects = $this->Dataobject->find('all', $query);
-		$count = ( 
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['hits'] ) && 
-			isset( $lastResponse['hits']['total'] ) 
-		) ? $lastResponse['hits']['total'] : null;
-		
-		$took = ( 
-			( $lastResponse = $this->Dataobject->getDataSource()->lastResponse ) && 
-			isset( $lastResponse['took'] ) 
-		) ? $lastResponse['took'] : null;
-		
+
+		$lr_stats = @$this->Dataobject->getDataSource()->lastResponseStats;
+		$count = @$lr_stats['count'];
+		$took = @$lr_stats['took_ms'];
+
 		$_serialize = array('Dataobject', 'Count', 'Took');
+
+		// HATEOS
+		if( $this->request->is('get') ) {
+			// using post, aggregated arrays are failing on MpUrils/Url.php:145
+
+			$processed_query = $this->Dataobject->buildQuery('all', $query);
+			$page = $processed_query['page']; // starts with 1
+
+			$url = new MpUtils\Url(Router::url(null, true));
+			$url->setParams($original_query);
+
+			$_links = array(
+				'self' => $url->buildUrl()
+			);
+
+			$lastPage = (int)(($count - 1) / $processed_query['limit']) + 1;
+			if ($page > 1 && $page <= $lastPage) {
+				$url->setParam('page', 1);
+				$_links['first'] = $url->buildUrl();
+
+				$url->setParam('page', $page - 1);
+				$_links['prev'] = $url->buildUrl();
+			}
+
+			if ($page < $lastPage) {
+				$url->setParam('page', $page + 1);
+				$_links['next'] = $url->buildUrl();
+
+				$url->setParam('page', $lastPage);
+				$_links['last'] = $url->buildUrl();
+			}
+
+			// page out of bounds
+			if ($page > $lastPage or $page < 1) {
+				$url->setParam('page', 1);
+				$_links['first'] = $url->buildUrl();
+
+				$url->setParam('page', $lastPage);
+				$_links['last'] = $url->buildUrl();
+			}
+
+			array_push($_serialize, 'Links');
+			$this->set('Links', $_links);
+		}
 		
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
-			// debug($this->Dataobject->getDataSource()->Aggs['typ_id']); die();
 			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
 			$_serialize[] = 'Aggs';
 		}
@@ -120,7 +178,6 @@ class DataobjectsController extends AppController
 		$this->set('Count', $count);
 		$this->set('Took', $took);
         $this->set('_serialize', $_serialize);
-		
 	}
 
     private $enabledUpdateModels = array(
@@ -180,171 +237,173 @@ class DataobjectsController extends AppController
 	
     public function view($dataset, $id)
     {
+		$allowed_query_params = array('layers');
+		if ($this->isPortalCalling) {
+			array_push($allowed_query_params, 'aggs');
+		}
 
-	    $query = $this->request->query;
-	    	    
-	    $layers = array();
-	    if( isset($query['layers']) ) {
-		    $layers = $query['layers'];
-		    unset( $query['layers'] );
-	    }
-					    	    
-	    $query['conditions']['dataset'] = $dataset;
-	    $query['conditions']['id'] = $id;
+		$query = array_intersect_key($this->request->query, array_flip($allowed_query_params));
+
+		$dataobject_query = array(
+			'conditions' => array(
+				'dataset' => $dataset,
+				'id' => $id
+			)
+		);
+
+		if (isset($query['aggs'])) {
+			$dataobject_query['aggs'] = $query['aggs'];
+		}
 	        
-	    $object = $this->Dataobject->find('first', $query);
-	    
-	    
-	    
-	    
+	    $object = $this->Dataobject->find('first', $dataobject_query);
 	    if( !$object ) {
-		    
 		    throw new NotFoundException();
-		    
 	    }
 	    
 	    $this->Dataobject->data = $object;
-	    
-	    $_serialize = array('Dataobject');
-	    
-	    if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
-			// debug($this->Dataobject->getDataSource()->Aggs); die();
-			$this->set('Aggs', $this->Dataobject->getDataSource()->Aggs);
-			$_serialize[] = 'Aggs';
+
+		// LAYERS
+		// load list of layers
+		$object['layers'] = array(
+			'dataset' => null,
+			'channels' => null,
+			'page' => null,
+			'subscribers' => null
+		);
+		$dataset_info = $this->MPCache->getDataset($dataset);
+		foreach($dataset_info['Layer'] as $layer) {
+			$object['layers'][$layer['layer']] = null;
 		}
-	    			
-		if( !empty($layers) ) {
-			
-			if( is_string($layers) )
-				$layers = array($layers);
-			
-			$this->loadModel('Dane.DatasetChannel');
-			$this->loadModel('Dane.Subscription');
-						
-			foreach( $layers as $layer ) {
-				
-				if ( $layer == 'dataset' ) {
-					
-					$this->loadModel('MPCache');
-					$object['layers']['dataset'] = $this->MPCache->getDataset($dataset);
-               
-                } elseif ( $layer == 'subscribers' ) {
 
-                    $this->loadModel('Dane.Subscriptions');
+		// what should we load?
+		$layers_to_load = array();
+		if( isset($query['layers']) ) {
+			$layers_to_load = $query['layers'];
 
-                    $subscribers = array(
-                        'list',
-                        'count'
-                    );
-
-                    $params = array(
-                        'fields' => array(
-                            'Users.username',
-                            'Users.photo_small'
-                        ),
-                        'conditions' => array(
-                            'Subscriptions.dataset' => $dataset,
-                            'Subscriptions.object_id' => $id,
-                            'Subscriptions.user_type' => 'account'
-                        ),
-                        'joins' => array(
-                            array(
-                                'table' => 'users',
-                                'alias' => 'Users',
-                                'type' => 'LEFT',
-                                'conditions' => array(
-                                    'Subscriptions.user_id = Users.id'
-                                )
-                            )
-                        ),
-                        'group' => array(
-                            'Subscriptions.user_id'
-                        ),
-                        'order' => 'Subscriptions.cts'
-                    );
-
-                    $subscribers['list'] = $this->Subscriptions->find('all', array_merge($params, array(
-                        'limit' => 20
-                    )));
-
-                    $subscribers['count'] = $this->Subscriptions->find('count', $params);
-
-                    $object['layers']['subscribers'] = $subscribers;
-
-                } elseif( $layer=='page' ) {
-
-                    $this->loadModel('Dane.ObjectPage');
-
-                    $objectPage = $this->ObjectPage->find('first', array(
-                        'conditions' => array(
-                            'ObjectPage.dataset' => $dataset,
-                            'ObjectPage.object_id' => $id
-                        )
-                    ));
-
-                    $page = array(
-                        'cover' => false,
-                        'logo' => false,
-                        'moderated' => false,
-                        'credits' => null
-                    );
-
-                    if($objectPage) {
-                        $page = array(
-                            'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
-                            'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
-                            'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
-                            'credits' => $objectPage['ObjectPage']['credits']
-                        );
-                    }
-					
-					if( $this->Auth->user('type')=='account' ) {
-						
-						$this->loadModel('Dane.ObjectUser');
-						$page['roles'] = $this->ObjectUser->find('first', array(
-							'fields' => 'role',
-							'conditions' => array(
-								'ObjectUser.dataset' => $dataset,
-								'ObjectUser.object_id' => $id,
-								'ObjectUser.user_id' => $this->Auth->user('id'),
-							),
-						));
-					}
-					
-					$object['layers']['page'] = $page;
-				
-				} elseif( $layer=='channels' ) {
-										
-					$object['layers']['channels'] = $this->DatasetChannel->find('all', array(
-						'fields' => array('channel', 'title', 'subject_dataset'),
-						'conditions' => array(
-							'creator_dataset' => $object['dataset'],
-						),
-						'order' => 'ord asc',
-					));
-					
-					$object['layers']['subscription'] = $this->Subscription->find('first', array(
-						'conditions' => array(
-							'user_type' => $this->Auth->user('type'),
-							'user_id' => $this->Auth->user('id'),
-							'dataset' => $object['dataset'],
-							'object_id' => $object['id'],
-						)
-					));
-																									
-				} else {
-					$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
-				}
+			if (is_string($layers_to_load)) {
+				$layers_to_load = array($layers_to_load);
 			}
-			
+
+			// load only available layers
+			$layers_to_load = array_intersect($layers_to_load, array_keys($object['layers']));
 		}
-			
-	    	    
-	    
-		$this->set(array(
-			'Dataobject' => $object,
-			'_serialize' => $_serialize,
-		));
+
+		// load layers
+		foreach( $layers_to_load as $layer ) {
+
+			if ( $layer == 'dataset' ) {
+				$object['layers']['dataset'] = $dataset_info;
+
+			} elseif ( $layer == 'subscribers' ) {
+				$subscribers = array(
+					'list',
+					'count'
+				);
+
+				$params = array(
+					'fields' => array(
+						'Users.username',
+						'Users.photo_small'
+					),
+					'conditions' => array(
+						'Subscriptions.dataset' => $dataset,
+						'Subscriptions.object_id' => $id,
+						'Subscriptions.user_type' => 'account'
+					),
+					'joins' => array(
+						array(
+							'table' => 'users',
+							'alias' => 'Users',
+							'type' => 'LEFT',
+							'conditions' => array(
+								'Subscriptions.user_id = Users.id'
+							)
+						)
+					),
+					'group' => array(
+						'Subscriptions.user_id'
+					),
+					'order' => 'Subscriptions.cts'
+				);
+
+				$subscribers['list'] = $this->Subscriptions->find('all', array_merge($params, array(
+					'limit' => 20
+				)));
+
+				$subscribers['count'] = $this->Subscriptions->find('count', $params);
+
+				$object['layers']['subscribers'] = $subscribers;
+
+			} elseif( $layer=='page' ) {
+				$objectPage = $this->ObjectPage->find('first', array(
+					'conditions' => array(
+						'ObjectPage.dataset' => $dataset,
+						'ObjectPage.object_id' => $id
+					)
+				));
+
+				$page = array(
+					'cover' => false,
+					'logo' => false,
+					'moderated' => false,
+					'credits' => null
+				);
+
+				if($objectPage) {
+					$page = array(
+						'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
+						'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
+						'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
+						'credits' => $objectPage['ObjectPage']['credits']
+					);
+				}
+
+				if( $this->Auth->user('type')=='account' ) {
+
+					$this->loadModel('Dane.ObjectUser');
+					$page['roles'] = $this->ObjectUser->find('first', array(
+						'fields' => 'role',
+						'conditions' => array(
+							'ObjectUser.dataset' => $dataset,
+							'ObjectUser.object_id' => $id,
+							'ObjectUser.user_id' => $this->Auth->user('id'),
+						),
+					));
+				}
+
+				$object['layers']['page'] = $page;
+
+			} elseif( $layer=='channels' ) {
+
+				$object['layers']['channels'] = $this->DatasetChannel->find('all', array(
+					'fields' => array('channel', 'title', 'subject_dataset'),
+					'conditions' => array(
+						'creator_dataset' => $object['dataset'],
+					),
+					'order' => 'ord asc',
+				));
+
+				// TODO to powinno iść jako zapytanie o osobną warstwę raczej.. czy to nie literówka?
+				$object['layers']['subscription'] = $this->Subscription->find('first', array(
+					'conditions' => array(
+						'user_type' => $this->Auth->user('type'),
+						'user_id' => $this->Auth->user('id'),
+						'dataset' => $object['dataset'],
+						'object_id' => $object['id'],
+					)
+				));
+
+			} else {
+				$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
+			}
+		}
+
+		// agregacje na obiekcie
+		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
+			$object['Aggs'] = $this->Dataobject->getDataSource()->Aggs;
+		}
+
+		$this->setSerialized('object', $object);
     }
     
     public function view_layer()

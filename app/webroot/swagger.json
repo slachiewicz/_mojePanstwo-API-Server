@@ -265,6 +265,36 @@
         "Took": {
           "type": "integer",
           "description": "Długość trwania zapytania w milisekundach"
+        },
+        "Links": {
+          "properties": {
+            "self": {
+              "type": "string",
+              "format": "uri",
+              "description": "Link do bieżacej strony wyników"
+            },
+            "first": {
+              "type": "string",
+              "format": "uri",
+              "description": "Link do pierwszej strony wyników"
+            },
+            "prev": {
+              "type": "string",
+              "format": "uri",
+              "description": "Link do poprzedniej strony wyników"
+            },
+            "next": {
+              "type": "string",
+              "format": "uri",
+              "description": "Link do następnej strony wyników"
+            },
+            "last": {
+              "type": "string",
+              "format": "uri",
+              "description": "Link do ostatniej strony wyników"
+            }
+          },
+          "required": ["self"]
         }
       }
     },

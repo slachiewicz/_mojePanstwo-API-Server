@@ -76,7 +76,7 @@ class ProjectsController extends AppController {
 
         $id = $this->OrganizacjeDzialania->getLastInsertId();
         $this->updateTags($id, @$this->data['tagi']);
-        $this->saveCoverPhoto($this->data['cover_photo'], $id);
+        //$this->saveCoverPhoto($this->data['cover_photo'], $id);
         $this->setSerialized('id', $id);
     }
 
@@ -91,7 +91,7 @@ class ProjectsController extends AppController {
             )
         ));
 
-        if($object) {
+        if($object && $object['OrganizacjeDzialania']['deleted'] == '0') {
 
             $dzialanie = array(
                 'id' => $object['OrganizacjeDzialania']['id'],
@@ -131,7 +131,7 @@ class ProjectsController extends AppController {
                     $this->removeCoverPhoto();
                     $photo = '0';
                 } else {
-                    $this->saveCoverPhoto($coverPhoto, $this->request['id']);
+                    //$this->saveCoverPhoto($coverPhoto, $this->request['id']);
                     $photo = '1';
                 }
 
@@ -166,7 +166,11 @@ class ProjectsController extends AppController {
         ));
 
         if($object) {
-            $this->OrganizacjeDzialania->delete($object['OrganizacjeDzialania']['id']);
+            $this->OrganizacjeDzialania->save(array(
+                'id' => $object['OrganizacjeDzialania']['id'],
+                'deleted' => '1'
+            ), false, array('deleted'));
+
             $this->updateTags($object['OrganizacjeDzialania']['id'], false);
             $success = true;
         }
@@ -182,6 +186,9 @@ class ProjectsController extends AppController {
         ), false);
 
         $update = array();
+
+        if(!$tags)
+            return true;
 
         foreach($tags as $tag) {
             $q = trim($tag);

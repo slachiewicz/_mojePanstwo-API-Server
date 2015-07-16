@@ -23,157 +23,41 @@ class BdlTempItemsController extends ApplicationsController
     public function index()
     {
         $BdlTempItems = $this->BdlTempItem->find('all');
-        $this->set(array(
-            'BdlTempItems' => $BdlTempItems,
-            '_serialize' => array('BdlTempItems')
-        ));
-    }
-
-    public function view($id)
-    {
-        $BdlTempItem = $this->BdlTempItem->findById($id);
-        $this->set(array(
-            'BdlTempItem' => $BdlTempItem,
-            '_serialize' => array('BdlTempItem'),
-            'id' => $id
-        ));
-
-        if ($BdlTempItem == false) {
-            $this->redirect(array('action' => 'index'));
-        }
-    }
-
-    public function add()
-    {
-        $this->BdlTempItem->create();
-        if ($this->BdlTempItem->save($this->request->data)) {
-            $message = 'Saved';
-        } else {
-            $message = 'Error';
-        }
-        $this->set(array(
-            'message' => $message,
-            '_serialize' => array('message')
-        ));
-
-        $this->redirect($this->referer());
-    }
-
-    public function edit($id)
-    {
-        $this->BdlTempItem->id = $id;
-        if ($this->BdlTempItem->save($this->request->data)) {
-            $message = 'Saved';
-        } else {
-            $message = 'Error';
-        }
-        $this->set(array(
-            'message' => $message,
-            '_serialize' => array('message')
-        ));
-
-        $this->redirect($this->referer());
-    }
-
-    public function delete($id)
-    {
-        if ($this->BdlTempItem->delete($id)) {
-            $message = 'Deleted';
-        } else {
-            $message = 'Error';
-        }
-        $this->set(array(
-            'message' => $message,
-            '_serialize' => array('message')
-        ));
-
-        $this->redirect($this->referer());
-    }
-
-    public function listall()
-    {
-        $this->autoRender = false;
-        $data = $this->BdlTempItem->find('list');
-        // Tu musi zwracac stringa
-
-        $this->json($data);
-    }
-
-    public function getone()
-    {
-        $src = $this->request->data;
-        $this->autoRender = false;
-        $data = $this->BdlTempItem->findById($src['id']);
-
-        $this->json($data);
-    }
-
-    public function addIngredients($item_id = false)
-    {
-        $data = $this->request->data;
-        $old = $this->BdlTempItem->findById($data['id']);
-
-        $data = array_merge($old, $data);
-
-        if ($this->BdlTempItem->save($data)) {
-            $this->json(true);
-        } else {
-            $this->json(false);
-        }
-
-        $this->autoRender = false;
-    }
-
-    public function getMenu()
-    {
-
-        $menu = array(
-            'items' => array(
-                array(
-                    'id' => '',
-                    'label' => 'Wskaźniki',
-                    'icon' => array(
-                        'src' => 'glyphicon',
-                        'id' => 'home',
-                    ),
-                ),
-            ),
-            'base' => '/bdl',
+        $BdlImportItems = $this->BdlImportItem->find('all');
+        $temp=array(
+            'BdlTempItems'=>$BdlTempItems,
+            'BdlImportItems'=>$BdlImportItems
         );
+        $this->setSerialized('object', $temp);
+    }
 
-        if ($this->hasUserRole('3')) {
-
-            $menu['items'][] = array(
-                'id' => 'bdl_temp_items',
-                'label' => 'Tworzenie wskaźników',
-            );
-
+    public function view($id, $type)
+    {
+        if($type=='BDL'){
+            $temp= $this->BdlTempItem->findById($id);
+        }elseif($type=='import'){
+            $temp= $this->BdlImportItem->findById($id);
         }
-
-        if (count($menu['items']) === 1)
-            return array();
-        else
-            return $menu;
-
+        $object=array(
+            'id'=>$id,
+            'BdlTempItem' => $temp
+        );
+        $this->setSerialized('object', $object);
     }
 
 
-    public function saveimport()
+    public function save()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+        if($this->request->type=='BDL'){
+            $this->BdlTempItem->create();
+            if ($this->BdlTempItem->save($this->request->data)) {
+                $message = 1;
+            } else {
+                $message = 0;
+            }
+        }elseif($this->request->type=='import'){
             $wskaznik = array();
 
-            /*  if ($_POST['tytul_skr'] !== '') {
-                  $table_name = trim($_POST['tytul_skr']);
-                  $table_name = preg_replace('/[^a-z0-9 -]+/', '', $table_name);
-                  $table_name = str_replace(' ', '_', $table_name);
-                  $table_name = strtolower($table_name);
-                  //$this->PanelWskazniki->tableCreate($table_name);
-              } else {
-                  $this->json('Nie podano nazwy skróconej');
-                  return;
-              }*/
 
             if ($_POST['id'] !== '') {
                 $wskaznik['ImportedWskzaniki']['id'] = $_POST['id'];
@@ -205,8 +89,8 @@ class BdlTempItemsController extends ApplicationsController
                     }
                 }
 
-                $this->ImportedWskazniki->saveMany($wskaznik, array('atomic'=>false));
-                $wskaznik_id=$this->ImportedWskazniki->getLastInsertId();
+                $this->BdlImportItem->saveMany($wskaznik, array('atomic'=>false));
+                $wskaznik_id=$this->BdlImportItem->getLastInsertId();
                 $index = 0;
                 if(preg_match('wart',$data[0][1])) {
                     unset($data[0]);
@@ -237,47 +121,46 @@ class BdlTempItemsController extends ApplicationsController
                 }
 
 
-                if ($this->ImportedWskaznikiCzesci->saveMany($toDb, array('atomic'=>false))) {
-                    $this->json($wskaznik_id);
+                if ($this->BdlImportItemParts->saveMany($toDb, array('atomic'=>false))) {
+                    $message=1;
                 } else {
-                    $this->json('Wystapił błąd przy zapisie');
-                    return;
+                    $message=0;
                 }
 
 
             } else {
-                $this->json('Nie podano adresu skoroszytu');
-                return;
+                $message=0;
             }
-            /*
-                        ;
-            */
-
-
         }
-        $this->autoRender = false;
+        $this->setSerialized('object', $message);
+
     }
 
-    public function delete()
+    public function listall()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $id_list = $_POST['delete_ids'];
-            if (sizeof($id_list) == 1) {
-                $this->PanelWskazniki->updateAll(
-                    array('deleted' => "1"),
-                    array("id" => $id_list[0])
-                );
-            } else {
-                $this->PanelWskazniki->updateAll(
-                    array('deleted' => "1"),
-                    array("id IN" => $id_list)
-                );
-            }
-
-            $this->json($id_list);
-        } else {
-            $this->json(false);
-        }
         $this->autoRender = false;
+        $BdlTempItems = $this->BdlTempItem->find('list');
+        $BdlImportItems = $this->BdlImportItem->find('list');
+        $data=array(
+            'BdlTempItems'=>$BdlTempItems,
+            'BdlImportItems'=>$BdlImportItems
+        );
+        $this->setSerialized('object', $data);
+
     }
+
+    public function delete($id)
+    {
+       if($this->request->type=='import') {
+           $this->BdlTempItem->save(array(
+               'id'=>$id,
+               'deleted'=>1));
+       }elseif($this->request->type=='BDL'){
+           $this->BdlImportItem->save(array(
+               'id'=>$id,
+               'deleted'=>1));
+       }
+
+    }
+
 }

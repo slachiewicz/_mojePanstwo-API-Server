@@ -14,6 +14,11 @@ class BdlTempItemsController extends ApplicationsController
 
     public $components = array('RequestHandler');
 
+    public $uses = array(
+        'BDL.BdlTempItem',
+        'BDL.BdlImportItem',
+    );
+
     public $settings = array(
         'id' => 'bdl',
         'title' => 'Bdl',
@@ -22,7 +27,10 @@ class BdlTempItemsController extends ApplicationsController
 
     public function index()
     {
+
+        $this->BdlTempItem->contain();
         $BdlTempItems = $this->BdlTempItem->find('all');
+        $this->BdlImportItem->contain();
         $BdlImportItems = $this->BdlImportItem->find('all');
         $temp=array(
             'BdlTempItems'=>$BdlTempItems,

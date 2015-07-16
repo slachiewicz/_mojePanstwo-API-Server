@@ -146,14 +146,9 @@ class BdlTempItemsController extends ApplicationsController
 
     public function listall()
     {
-        $this->autoRender = false;
-        $BdlTempItems = $this->BdlTempItem->find('list');
-        $BdlImportItems = $this->BdlImportItem->find('list');
-        $data=array(
-            'BdlTempItems'=>$BdlTempItems,
-            'BdlImportItems'=>$BdlImportItems
-        );
-        $this->setSerialized('object', $data);
+        $this->BdlTempItem->contain();
+        $temp = $this->BdlTempItem->find('list');
+        $this->setSerialized('object', $temp);
 
     }
 

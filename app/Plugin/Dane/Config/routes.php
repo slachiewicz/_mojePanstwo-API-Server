@@ -50,6 +50,15 @@ Router::connect('/dane/:dataset/:id', array(
 	'pass' => array('dataset', 'id'),
 ));
 
+Router::connect('/dane/:dataset/feed', array(
+	'plugin' => 'Dane', 
+	'controller' => 'Dataobjects',
+	'action' => 'feed',
+), array(
+	'id' => '[0-9]+',
+	'pass' => array('dataset'),
+));
+
 Router::connect('/dane/:dataset/:id/:action', array(
 	'plugin' => 'Dane', 
 	'controller' => 'Dataobjects',

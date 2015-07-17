@@ -190,6 +190,9 @@ class DataobjectsController extends AppController
         'prawo_hasla' => array(
 	        'name' => 'PrawoHasla',
         ),
+        'krs_podmioty' => array(
+            'name' => 'KrsPodmioty'
+        )
     );
 	
 	public function post($dataset, $id)

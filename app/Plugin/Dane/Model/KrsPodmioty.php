@@ -18,12 +18,13 @@ class KrsPodmioty extends AppModel {
                 OR
                 (
                   complete = '1' AND
-                  TIMESTAMPDIFF(DAY, complete_ts, NOW()) >= 1
+                  TIMESTAMPDIFF(HOUR, complete_ts, NOW()) <= 24
                 )
               )
+            ORDER BY complete_ts DESC 
             LIMIT 1
         ");
-
+        
         if($results[0]['krs_files']) {
             $row = $results[0]['krs_files'];
             if($row['complete'] == '1') {

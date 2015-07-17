@@ -39,8 +39,13 @@ class BdlTempItemsController extends ApplicationsController
         $this->setSerialized('object', $temp);
     }
 
-    public function view($id, $type)
+    public function view()
     {
+	 	
+	 	$id = $this->request->params['id'];
+	 	$type = 'BDL';
+	 	
+	 	   	    
         if($type=='BDL'){
             $temp= $this->BdlTempItem->findById($id);
         }elseif($type=='import'){

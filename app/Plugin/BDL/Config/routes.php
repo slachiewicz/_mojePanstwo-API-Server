@@ -33,4 +33,5 @@ Router::connect("/BDL/user_items/", array('plugin' => 'BDL', 'controller' => 'BD
 Router::connect("/BDL/user_items/:id", array('plugin' => 'BDL', 'controller' => 'BDLTempItems', 'action' => 'view', '[method]' => 'GET'), array('id' => '[0-9]*'));
 Router::connect("/BDL/user_items/:id", array('plugin' => 'BDL', 'controller' => 'BDLTempItems', 'action' => 'delete', '[method]' => 'DELETE'), array('id' => '[0-9]*', 'pass' => array('id')));
 
-Router::connect("/BDL/user_items/list/", array('plugin' => 'BDL', 'controller' => 'BDLTempItems', 'action' => 'listall', '[method]' => 'GET'));
+Router::connect("/BDL/user_items/list", array('plugin' => 'BDL', 'controller' => 'BDLTempItems', 'action' => 'listall', '[method]' => 'GET'));
+Router::connect("/BDL/user_items/list", array('plugin' => 'BDL', 'controller' => 'BDLTempItems', 'action' => 'listall', '[method]' => 'POST'));

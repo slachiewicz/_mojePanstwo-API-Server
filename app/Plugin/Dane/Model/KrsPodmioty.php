@@ -25,6 +25,8 @@ class KrsPodmioty extends AppModel {
                 'user_id' => (int) CakeSession::read('Auth.User.id'),
                 'tytul' => $data['tytul'],
                 'opis' => $data['opis'],
+                'status' => $data['status'],
+                'podsumowanie' => $data['podsumowanie'],
                 'cover_photo' => $data['cover_photo'] ? '1' : '0',
                 'folder' => isset($data['folder']) ? $data['folder'] : '1',
                 'geo_lat' => (float) $data['geo_lat'],
@@ -43,6 +45,7 @@ class KrsPodmioty extends AppModel {
 
     public function edit_activity($data, $id, $dataset) {
 
+        $success = false;
         $this->OrganizacjeDzialania = new OrganizacjeDzialania();
         $this->OrganizacjeDzialaniaTematy = new OrganizacjeDzialaniaTematy();
         $this->Temat = new Temat();
@@ -60,18 +63,22 @@ class KrsPodmioty extends AppModel {
             $toUpdate['mts'] = date('Y-m-d H:i:s');
             $toUpdate['id'] = $object['OrganizacjeDzialania']['id'];
 
-            $fields = array('tytul', 'opis', 'folder', 'geo_lat', 'geo_lng');
+            $fields = array('tytul', 'opis', 'folder', 'status', 'podsumowanie', 'geo_lat', 'geo_lng');
             foreach($fields as $field) {
                 if(isset($data[$field]))
                     $toUpdate[$field] = $data[$field];
             }
 
             $this->_update_activity_tags($object['OrganizacjeDzialania']['id'], @$data['tagi']);
-            $success = $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'folder', 'geo_lat', 'geo_lng'));
+            $success = $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng'));
         }
 
         return array(
-            'flash_message' => 'Działanie zostało poprawnie zaktualizowane'
+            'flash_message' =>
+                $success ?
+                    'Działanie zostało poprawnie zaktualizowane'
+                :
+                    'Wystąpił błąd podczas aktualizacji'
         );
     }
 

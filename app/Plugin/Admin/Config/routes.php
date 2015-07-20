@@ -5,3 +5,6 @@ Router::connect('/admin/model/call', array(
     'controller' => 'Admin',
     'action' => 'modelCall'
 ));
+
+
+Router::connect("/admin/analyzers/id::name", array('plugin' => 'Admin', 'controller' => 'Analyzer', 'action' => 'view', '[method]' => 'GET'), array('pass' => array('name')));

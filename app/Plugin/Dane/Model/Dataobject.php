@@ -461,6 +461,98 @@ class Dataobject extends AppModel
 	    
     }
 
+    public function accept_moderate_request($data, $object_id, $dataset) {
+        $dataset = $data['dataset'];
+        $object_id = $data['object_id'];
+        $user_id = (int) $data['user_id'];
+        $username = $data['username'];
+        $title = $data['title'];
+        $role = (int) $data['role'];
+        $page_request_id = (int) $data['page_request_id'];
+        $send_email = (bool) $data['send_email'];
+        $success = true;
+
+        App::import('model', 'DB');
+        $this->DB = new DB();
+
+        if($user_id == 0) {
+            $user_id = $this->DB->selectValue("SELECT id FROM users WHERE username = '$username'");
+        }
+
+        if(!$user_id) {
+            $success = false;
+        } else {
+
+            if ($page_request_id > 0) {
+                $this->DB->q("UPDATE pages_requests SET status = 1 WHERE id = $page_request_id");
+            }
+
+            $this->DB->q("INSERT INTO `objects-users` (dataset, object_id, user_id, role) VALUES ('$dataset', $object_id, $user_id, $role)");
+
+            if ($send_email && false) {
+                $email = $this->DB->selectValue("SELECT email FROM users WHERE id = $user_id");
+                App::uses('CakeEmail', 'Network/Email');
+                $Email = new CakeEmail('noreply');
+                $Email->viewVars(array(
+                    'username' => $username,
+                    'title' => $title
+                ));
+
+                if( defined('MODERATE_REQUEST_test_email') ) {
+                    $to_email = MODERATE_REQUEST_test_email;
+                    $to_name = MODERATE_REQUEST_test_name;
+                } else {
+                    $to_email = $email;
+                    $to_name = $username;
+                }
+
+                $status = $Email->template('Dane.moderate_request')
+                    ->addHeaders(array('X-Mailer' => 'mojePaństwo'))
+                    ->emailFormat('html')
+                    ->subject('Zarządzanie profilem | _mojePaństwo')
+                    ->to($to_email, $to_name)
+                    ->from('no-reply@mojepanstwo.pl', 'Zarządzanie profilem | _mojePaństwo')
+                    ->send();
+
+                if(!$status)
+                    $success = false;
+            }
+        }
+
+        return array(
+            'success' => $success
+        );
+    }
+
+    public function before_accept_moderate_request($data, $object_id, $dataset)
+    {
+        $dataset = $data['dataset'];
+        $object_id = $data['object_id'];
+        $user_id = (int) $data['user_id'];
+        $user_email = $data['user_email'];
+
+        App::import('model', 'DB');
+        $this->DB = new DB();
+
+        if($user_id > 0) {
+            $username = $this->DB->selectValue("SELECT username FROM users WHERE id = $user_id");
+        } else {
+            $username = $this->DB->selectValue("SELECT username FROM users WHERE email = '$user_email'");
+        }
+
+        $dataobject = (array) $this->find('first', array(
+            'conditions' => array(
+                'dataset' => $dataset,
+                'id' => $object_id
+            )
+        ));
+
+        return array(
+            'username' => $username,
+            'title' => $dataobject['data'][$dataset . '.nazwa']
+        );
+    }
+
     public function moderate_request($data, $object_id, $dataset) {
         $request = new PageRequest();
         $user_id = (int) $this->getCurrentUser('id');
@@ -469,7 +561,7 @@ class Dataobject extends AppModel
             return false;
 
         $form = array();
-        $form_fields = array('firstname', 'lastname', 'position', 'email', 'phone');
+        $form_fields = array('firstname', 'lastname', 'position', 'organization', 'email', 'phone');
         foreach($form_fields as $field)
             if(isset($data[$field]))
                 $form[$field] = $data[$field];

@@ -489,7 +489,7 @@ class Dataobject extends AppModel
 
             $this->DB->q("INSERT INTO `objects-users` (dataset, object_id, user_id, role) VALUES ('$dataset', $object_id, $user_id, $role)");
 
-            if ($send_email && false) {
+            if ($send_email) {
                 $email = $this->DB->selectValue("SELECT email FROM users WHERE id = $user_id");
                 App::uses('CakeEmail', 'Network/Email');
                 $Email = new CakeEmail('noreply');
@@ -511,7 +511,7 @@ class Dataobject extends AppModel
                     ->emailFormat('html')
                     ->subject('Zarządzanie profilem | _mojePaństwo')
                     ->to($to_email, $to_name)
-                    ->from('no-reply@mojepanstwo.pl', 'Zarządzanie profilem | _mojePaństwo')
+                    ->from('noreply@mojepanstwo.pl', 'Zarządzanie profilem | _mojePaństwo')
                     ->send();
 
                 if(!$status)

@@ -142,7 +142,7 @@ class Url {
                 foreach ($parts['query'] as $k => $v) {
                     if (is_array($v)) {
                         $q[rawurlencode($k)] = array_map(function ($v) {
-                            return rawurlencode($v);}, $v);
+                            return @rawurlencode($v);}, $v);
                     } else {
                         $q[rawurlencode($k)] = rawurlencode($v);
                     }

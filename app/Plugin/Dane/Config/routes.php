@@ -41,6 +41,15 @@ Router::connect('/dane/:dataset/:id', array(
 	'pass' => array('dataset', 'id'),
 ));
 
+Router::connect('/dane/zbiory/:id', array(
+	'plugin' => 'Dane', 
+	'controller' => 'Datasets',
+	'action' => 'view'
+), array(
+	'id' => '[a-zA-Z_]+',
+	'pass' => array('id'),
+));
+
 Router::connect('/dane/:dataset/:id', array(
 	'plugin' => 'Dane', 
 	'controller' => 'Dataobjects',

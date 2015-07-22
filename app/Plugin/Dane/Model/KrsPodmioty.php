@@ -13,6 +13,37 @@ class KrsPodmioty extends AppModel {
 
     public function save_edit_data_form($data, $id, $dataset) {
 
+        App::uses('ObjectPage', 'Dane.Model');
+        $this->ObjectPage = new ObjectPage();
+
+        $conditions = array(
+            'ObjectPage.dataset' => $dataset,
+            'ObjectPage.object_id' => (int) $id
+        );
+
+        $object = $this->ObjectPage->find('first', array(
+            'conditions' => $conditions
+        ));
+
+        $fields = array('description');
+        $toUpdate = array();
+        foreach($data as $field => $value) {
+            if(in_array($field, $fields))
+                $toUpdate[$field] = $value;
+        }
+
+        if($object) {
+            #foreach($toUpdate as $f => $v)
+            #    $toUpdate[$f] = "'".$v."'";
+            $this->ObjectPage->save($toUpdate);
+        } else {
+            $this->ObjectPage->save(array(
+                'ObjectPage' => array_merge($conditions, $toUpdate, array(
+                    'moderated' => '1'
+                ))
+            ));
+        }
+
         return array(
             'flash_message' => 'Dane zostały poprawnie zapisane'
         );

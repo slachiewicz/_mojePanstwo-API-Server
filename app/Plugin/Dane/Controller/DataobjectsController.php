@@ -344,7 +344,7 @@ class DataobjectsController extends AppController
 						'ObjectPage.object_id' => $id
 					)
 				));
-
+				
 				$page = array(
 					'cover' => false,
 					'logo' => false,
@@ -358,7 +358,7 @@ class DataobjectsController extends AppController
 						'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
 						'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
 						'credits' => $objectPage['ObjectPage']['credits'],
-                        'description' => $objectPage['ObjectPage']['description']
+                        'description' => @$objectPage['ObjectPage']['description']
 					);
 				}
 

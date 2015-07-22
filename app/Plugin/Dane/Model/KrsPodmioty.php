@@ -87,8 +87,7 @@ class KrsPodmioty extends AppModel {
                 $toUpdateFields[] = 'deleted';
 
             $success = $this->OrganizacjeDzialania->save($toUpdate, false, $toUpdateFields);
-            if($deleted)
-                $this->OrganizacjeDzialania->sync($object['OrganizacjeDzialania']['id']);
+
         }
 
         $response = array(
@@ -103,7 +102,7 @@ class KrsPodmioty extends AppModel {
         );
 
         if($deleted)
-            $response['redirect_url'] = "/dane/$dataset/$id";
+            $response['redirect_url'] = "/dane/$dataset/$id/dzialania";
 
         return $response;
     }

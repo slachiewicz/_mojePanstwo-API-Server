@@ -87,6 +87,7 @@ class KrsPodmioty extends AppModel {
                 $toUpdateFields[] = 'deleted';
 
             $success = $this->OrganizacjeDzialania->save($toUpdate, false, $toUpdateFields);
+            $this->OrganizacjeDzialania->sync($object['OrganizacjeDzialania']['id']);
         }
 
         $response = array(

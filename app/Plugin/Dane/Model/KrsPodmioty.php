@@ -11,6 +11,13 @@ class KrsPodmioty extends AppModel {
 
     public $useTable = false;
 
+    public function save_edit_data_form($data, $id, $dataset) {
+
+        return array(
+            'flash_message' => 'Dane zostały poprawnie zapisane'
+        );
+    }
+
     public function add_activity($data, $id, $dataset) {
 
         $this->OrganizacjeDzialania = new OrganizacjeDzialania();
@@ -58,28 +65,45 @@ class KrsPodmioty extends AppModel {
             )
         ));
 
+        $deleted = isset($data['deleted']) && $data['deleted'] == '1';
+
         if($object) {
 
             $toUpdate['mts'] = date('Y-m-d H:i:s');
             $toUpdate['id'] = $object['OrganizacjeDzialania']['id'];
 
             $fields = array('tytul', 'opis', 'folder', 'status', 'podsumowanie', 'geo_lat', 'geo_lng');
+            if($deleted)
+                $fields[] = 'deleted';
+
             foreach($fields as $field) {
                 if(isset($data[$field]))
                     $toUpdate[$field] = $data[$field];
             }
 
             $this->_update_activity_tags($object['OrganizacjeDzialania']['id'], @$data['tagi']);
-            $success = $this->OrganizacjeDzialania->save($toUpdate, false, array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng'));
+            $toUpdateFields = array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng');
+            if($deleted)
+                $toUpdateFields[] = 'deleted';
+
+            $success = $this->OrganizacjeDzialania->save($toUpdate, false, $toUpdateFields);
         }
 
-        return array(
+        $response = array(
             'flash_message' =>
                 $success ?
-                    'Działanie zostało poprawnie zaktualizowane'
-                :
+                    $deleted ?
+                        'Działanie zostało poprawnie usunięte'
+                        :
+                        'Działanie zostało poprawnie zaktualizowane'
+                    :
                     'Wystąpił błąd podczas aktualizacji'
         );
+
+        if($deleted)
+            $response['redirect_url'] = "/dane/$dataset/$id";
+
+        return $response;
     }
 
     private function _update_activity_photo($id, $data) {

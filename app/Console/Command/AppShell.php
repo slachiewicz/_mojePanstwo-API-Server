@@ -47,9 +47,14 @@ class AppShell extends Shell
     public function projectsSyncAll() {
 
 	    $this->loadModel('Dane.OrganizacjeDzialania');
-	    	    
-	    // foreach( ... as $id )
-		   // $this->OrganizacjeDzialania->sync($id);
-	    
+
+        $projects = $this->OrganizacjeDzialania->find('all', array(
+            'fields' => 'id'
+        ));
+
+        foreach($projects as $project) {
+            echo "\nsync " . $project['OrganizacjeDzialania']['id'];
+            $this->OrganizacjeDzialania->sync($project['OrganizacjeDzialania']['id']);
+        }
     }
 }

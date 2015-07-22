@@ -386,17 +386,18 @@ class DataobjectsController extends AppController
 					'order' => 'ord asc',
 				));
 
-				// TODO to powinno iść jako zapytanie o osobną warstwę raczej.. czy to nie literówka?
-				$object['layers']['subscription'] = $this->Subscription->find('first', array(
-					'conditions' => array(
-						'user_type' => $this->Auth->user('type'),
-						'user_id' => $this->Auth->user('id'),
-						'dataset' => $object['dataset'],
-						'object_id' => $object['id'],
-					)
-				));
+			} elseif( $layer == 'subscription' ) {
 
-			} else {
+                $object['layers']['subscription'] = $this->Subscription->find('first', array(
+                    'conditions' => array(
+                        'user_type' => $this->Auth->user('type'),
+                        'user_id' => $this->Auth->user('id'),
+                        'dataset' => $object['dataset'],
+                        'object_id' => $object['id'],
+                    )
+                ));
+
+            } else {
 				$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 			}
 		}

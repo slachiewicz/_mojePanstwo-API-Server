@@ -27,8 +27,4 @@ class OrganizacjeDzialania extends AppModel {
 	
 	}
 
-	public function syncAll() {
-	
-	}
-
 }

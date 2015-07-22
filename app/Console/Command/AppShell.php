@@ -43,4 +43,13 @@ class AppShell extends Shell
         $this->Document->sync( $this->args[0] );
         
     }
+    
+    public function projectsSyncAll() {
+
+	    $this->loadModel('Dane.OrganizacjeDzialania');
+	    	    
+	    // foreach( ... as $id )
+		   // $this->OrganizacjeDzialania->sync($id);
+	    
+    }
 }

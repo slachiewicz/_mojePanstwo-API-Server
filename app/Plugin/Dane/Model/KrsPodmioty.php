@@ -46,8 +46,9 @@ class KrsPodmioty extends AppModel {
         $this->_update_activity_photo($dzialanie_id, $data);
 
         return array(
-            'flash_message' => 'Działanie zostało poprawnie dodane'
-        );
+            'flash_message' => 'Działanie zostało poprawnie dodane',
+            'redirect_url' => '/dane/' . $dataset . '/' . $id . '/dzialania/' . $dzialanie_id,
+       );
     }
 
     public function edit_activity($data, $id, $dataset) {

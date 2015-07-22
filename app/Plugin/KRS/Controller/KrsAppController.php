@@ -3,6 +3,8 @@
 class KrsAppController extends AppController
 {
 
+    public $uses = array('Dane.KrsPodmioty');
+
 	public function search()
 	{
 		$search = array();
@@ -80,5 +82,24 @@ class KrsAppController extends AppController
 
         $this->set('search', $data);
         $this->set('_serialize', array('search'));
+    }
+
+    public function odpisy() {
+        $id = (int) @ $this->request->params['id'];
+        $url = false;
+
+        App::uses('S3', 'Vendor');
+        $S3 = new S3(S3_LOGIN, S3_SECRET, null, S3_ENDPOINT);
+        $bucket = 'resources';
+        $file = 'KRS/' . $id . '.pdf';
+        $url = $S3->getAuthenticatedURL($bucket, $file, 60);
+
+        if( $url ) {
+            $url = str_replace('s3.amazonaws.com/' . $bucket, $bucket . '.sds.tiktalik.com', $url);
+            $success = true;
+        }
+
+        $this->set('url', $url);
+        $this->set('_serialize', array('url'));
     }
 }

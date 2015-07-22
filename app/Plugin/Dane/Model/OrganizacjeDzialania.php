@@ -16,7 +16,7 @@ class OrganizacjeDzialania extends AppModel {
 	
 		if( $id ) {
 	   	  
-		    $this->query("INSERT IGNORE INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES ('dzialania', '199', '" . addslashes( $id ) . "')");
+		    $this->query("INSERT IGNORE INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES ('dzialania', '199', '" . addslashes( $id ) . "') ON DUPLICATE KEY UPDATE `a`='1', `a_ts` = NOW()");
 			    
 		    $this->objectIndex(array(
 			    'dataset' => 'dzialania',

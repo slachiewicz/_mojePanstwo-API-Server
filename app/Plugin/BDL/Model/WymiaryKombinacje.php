@@ -15,6 +15,17 @@ class WymiaryKombinacje extends AppModel {
             'order' => 'DataPl.rocznik ASC',
         ),
     );
+
+    public $hasAndBelongsToMany = array(
+        'BdlTempItem' =>
+            array(
+                'className' => 'BDL.BdlTempItem',
+                'joinTable' => 'BDL_kombiancje_user_item',
+                'with' => 'BDL.BDL_kombiancje_user_item',
+                'foreignKey' => 'dim_id',
+                'associationForeignKey' => 'useritem_id',
+            )
+    );
     
     public function afterFind($results, $primary = false) {
 	    

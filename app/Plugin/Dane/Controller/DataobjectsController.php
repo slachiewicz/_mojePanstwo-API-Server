@@ -19,7 +19,7 @@ class DataobjectsController extends AppController
 		if( $this->request->is('post') ) {
 			$this->request->query = array_merge($this->request->query, $this->request->data);
 		}
-
+				
 		$this->_index(array(
 			'dataset' => $dataset
 		));
@@ -83,7 +83,7 @@ class DataobjectsController extends AppController
 
 
 	private function _index($params = array()){
-		$allowed_query_params = array('conditions', 'limit', 'page', 'order');
+		$allowed_query_params = array('conditions', 'limit', 'page', 'order', 'highlight');
 		if ($this->isPortalCalling) {
 			array_push($allowed_query_params, 'aggs');
 		}
@@ -190,6 +190,9 @@ class DataobjectsController extends AppController
         'prawo_hasla' => array(
 	        'name' => 'PrawoHasla',
         ),
+        'krs_podmioty' => array(
+            'name' => 'KrsPodmioty'
+        )
     );
 	
 	public function post($dataset, $id)
@@ -347,7 +350,7 @@ class DataobjectsController extends AppController
 						'ObjectPage.object_id' => $id
 					)
 				));
-
+				
 				$page = array(
 					'cover' => false,
 					'logo' => false,
@@ -360,7 +363,8 @@ class DataobjectsController extends AppController
 						'cover' => $objectPage['ObjectPage']['cover'] == '1' ? true : false,
 						'logo' => $objectPage['ObjectPage']['logo'] == '1' ? true : false,
 						'moderated' => $objectPage['ObjectPage']['moderated'] == '1' ? true : false,
-						'credits' => $objectPage['ObjectPage']['credits']
+						'credits' => $objectPage['ObjectPage']['credits'],
+                        'description' => @$objectPage['ObjectPage']['description']
 					);
 				}
 
@@ -389,17 +393,18 @@ class DataobjectsController extends AppController
 					'order' => 'ord asc',
 				));
 
-				// TODO to powinno iść jako zapytanie o osobną warstwę raczej.. czy to nie literówka?
-				$object['layers']['subscription'] = $this->Subscription->find('first', array(
-					'conditions' => array(
-						'user_type' => $this->Auth->user('type'),
-						'user_id' => $this->Auth->user('id'),
-						'dataset' => $object['dataset'],
-						'object_id' => $object['id'],
-					)
-				));
+			} elseif( $layer == 'subscription' ) {
 
-			} else {
+                $object['layers']['subscription'] = $this->Subscription->find('first', array(
+                    'conditions' => array(
+                        'user_type' => $this->Auth->user('type'),
+                        'user_id' => $this->Auth->user('id'),
+                        'dataset' => $object['dataset'],
+                        'object_id' => $object['id'],
+                    )
+                ));
+
+            } else {
 				$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 			}
 		}

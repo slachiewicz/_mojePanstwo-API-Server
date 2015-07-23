@@ -13,6 +13,7 @@
 							"description": "TODO"
 						},
 						"budzet_wydatki_czesci.instytucja_id": {
+						  	"_TODO": "dodac instytucja_url",
 							"type": "string",
 							"description": "TODO"
 						},

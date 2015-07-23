@@ -1,0 +1,93 @@
+{
+  "title": "Senatorowie",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senatorowie.opis": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie.zdjecie_url": {
+              "_TODO": "Dodać http://resources.sejmometr.pl/senatorowie/src/{$id}.jpg TODO czemu resources?",
+              "type": "string",
+              "format": "uri",
+              "description": "Link do zdjęcia senatora"
+            },
+            "senatorowie.www": {
+              "type": "string",
+              "description": "Oficjalna strona internetowa"
+            },
+            "senatorowie.nazwa": {
+              "type": "string",
+              "description": "Pełne imię i nazwisko"
+            },
+            "senatorowie.email": {
+              "type": "string",
+              "description": "Oficjalny e-mail"
+            },
+            "senatorowie.imie": {
+              "type": "string",
+              "description": "Imię senatora"
+            },
+            "senatorowie.nazwisko": {
+              "type": "string",
+              "description": "Nazwisko senatora"
+            },
+            "senatorowie.bio": {
+              "type": "string",
+              "description": "Biografia"
+            },
+            "senatorowie.okw_str": {
+              "type": "string",
+              "description": "Okręg wyborczy, z którego został wybrany senator TODO link do okręgów?"
+            },
+            "senatorowie.sid": {
+              "type": "string",
+              "description": "ID senatora w danych źródłowych (strona senat.gov.pl)"
+            },
+            "senatorowie.klub_id": {
+              "type": "string",
+              "description": "ID klubu, do którego aktualnie należy senator"
+            },
+            "senatorowie.klub_url": {
+              "_TODO": "dodac",
+              "type": "string",
+              "description": "Url klubu, do którego aktualnie należy senator"
+            },
+            "senatorowie.plec": {
+              "enum": ["M", "K"],
+              "description": "Płeć senatora. M - mężczyzna, K - kobieta TODO cos jeszcze"
+            },
+            "senatorowie.id": {
+              "type": "string",
+              "description": "TODO zdublowane"
+            },
+            "senat_kluby.nazwa": {
+              "type": "string",
+              "description": "Nazwa klubu senackiego, do którego obecnie należy senator"
+            },
+            "senat_kluby.id": {
+              "type": "string",
+              "description": "TODO zdublowane, dodac url"
+            },
+            "_TODO": "a przynaleznosc do komisji senackich? generalny mechanizm wiele-do-wielu?"
+          }
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

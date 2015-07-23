@@ -1,48 +1,139 @@
 {
-	"title": "Zbiory danych portalu _mojePa\u0144stwo",
-	"allOf": [
-		{
-			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
-		},
-		{
-			"properties": {
-				"data": {
-					"properties": {
-						"zbiory.id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zbiory.liczba_dokumentow": {
-							"type": "integer",
-							"description": "TODO"
-						},
-						"zbiory.aplikacja_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zbiory.slug": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zbiory.nazwa": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zbiory.katalog": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zbiory.opis": {
-							"type": "string",
-							"description": "TODO"
-						}
-					}
-				}
-			},
-			"required": [
-				"data"
-			]
-		}
-	],
-	"additionalProperties": false
+  "title": "Zbiory danych portalu _mojePa\u0144stwo",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "zbiory.liczba_dokumentow": {
+              "type": "integer",
+              "description": "Liczba obiektów, które zawiera ten zbiór danych"
+            },
+            "zbiory.aplikacja_id": {
+              "_TODO": "Co to znaczy?",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zbiory.slug": {
+              "_TODO": "KONIECZNIE powinnismy unormowac te slugi (SEO to przezyje?)",
+              "type": "string",
+              "description": "Identyfikator zbioru danych wykorzystywany w całym API. Wejdź na adres /dane/:slug, aby zobaczyć wszystkie obiekty zawarte w tym zbiorze."
+            },
+            "zbiory.nazwa": {
+              "type": "string",
+              "description": "Pełnotekstowa nazwa tego zbioru danych"
+            },
+            "zbiory.katalog": {
+              "_TODO": "Czy to jeszcze wykorzystywane?",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zbiory.opis": {
+              "type": "string",
+              "description": "Pełnotekstowy opis tego zbioru danych"
+            },
+            "zbiory.index_url": {
+              "_TODO": "Dodać",
+              "type": "string",
+              "format": "uri",
+              "description": "Adres, pod którym są wylistowane wszystkie obiekty zawarte w tym zbiorze danych"
+            },
+            "zbiory.schema_url": {
+              "_TODO": "Dodać",
+              "type": "string",
+              "format": "uri",
+              "description": "Adres JSON Schema dokumentującej ten zbiór"
+            }
+          }
+        },
+        "static": {
+          "_TODO": "Dodac liste warstw, zeby bylo latwiej wyjac niz z json-schema",
+          "properties": {
+            "layers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Nazwa warstwy. Można ją załadować oglądając obiekt używając parametru '?layers[]=warstwa'"
+              }
+            }
+          }
+        },
+        "layers": {
+          "TODO": "standardowe warstwy umiescic w osobnym pliku lub w Dataobject",
+          "properties": {
+            "dataset": {
+              "_TODO": "Powinien się odwolywac nazewnictwem do dane.zbiory. Czym się rózni Datachannel od layers[channels]. App potrzebne? Pusty layer nie powinien byc []?",
+              "properties": {
+                "_TODO": "Czy to potrzebne? Zawsze mozna odpytac /dane/:zbiory"
+                //                                "Dataset": {
+                ////                                    "id": "185",
+                ////                                    "name": "Zbiory danych portalu _mojePa\u0144stwo",
+                ////                                    "count": "110",
+                ////                                    "channel_id": "0",
+                ////                                    "default_sort": "",
+                ////                                    "alias": "zbiory",
+                ////                                    "class": "Zbior_Danych",
+                ////                                    "app_id": "0",
+                ////                                    "version": "v3"
+                //                                },
+                //                                "Datachannel": null,
+                //                                "App": null,
+                //                                "Layer": [
+                //                                ]
+              }
+            },
+            "channels": {
+              "_TODO": "Jak jest puste to zwraca pusty array [] zamiast pustego obiektu??"
+            },
+            "page": {
+              "description": "TODO",
+              "properties": {
+                "_TODO": "Jak brak to zwracac null, nie false w cover, logo, moderated. Uzupelnic schematy tych properties",
+                "cover": {
+                  "description": "TODO"
+                },
+                "logo": {
+                  "description": "TODO"
+                },
+                "moderated": {
+                  "description": "TODO"
+                },
+                "credits": {
+                  "description": "TODO"
+                }
+              }
+            },
+            "subscribers": {
+              "_TODO": "przebudować wg. tej schemy",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "_TODO": "uzupelnic"
+                    }
+                  }
+                },
+                "count": {
+                  "_TODO": "Jak puste to powino byc rowne 0, czy potrzebne skoro mozna wziac size z list?",
+                  "type": "integer",
+                  "description": "TODO"
+                }
+              }
+            },
+            "subscription": {
+              "_TODO": "ustalic z danielem co to jest i czy nie powinno poleciec?"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
 }

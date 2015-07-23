@@ -11,7 +11,7 @@
   "externalDocs": {
     "url": "https://mojepanstwo.pl/api"
   },
-  "host": "api-v2.mojepanstwo.pl",
+  "host": "api-v3.mojepanstwo.pl",
   "schemes": [
     "https"
   ],
@@ -28,9 +28,9 @@
     "dataset": {
       "name": "dataset",
       "in": "path",
-      "description": "Nazwa zbioru danych, pełna lista dostępna pod https://api-v2.mojepanstwo.pl/dane/zbiory",
+      "description": "Nazwa zbioru danych, pełna lista dostępna pod https://api-v3.mojepanstwo.pl/dane/zbiory",
       "required": true,
-      "type": "string"
+      "type": "string",
     }
   },
   "paths": {
@@ -251,11 +251,12 @@
   },
   "definitions": {
     "DataobjectsList": {
+      "required": ["Dataobject", "Count", "Took", "Links"],
       "properties": {
         "Dataobject": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Dataobject"
+            "$ref": "https://api-v3.mojepanstwo.pl/schemas/dane/dataobject.json"
           }
         },
         "Count": {
@@ -267,6 +268,7 @@
           "description": "Długość trwania zapytania w milisekundach"
         },
         "Links": {
+          "title": "Links HATEOAS",
           "properties": {
             "self": {
               "type": "string",

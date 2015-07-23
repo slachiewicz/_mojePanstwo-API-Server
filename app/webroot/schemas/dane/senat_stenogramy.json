@@ -1,0 +1,55 @@
+{
+  "title": "",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_stenogramy.posiedzenie_id": {
+              "_TODO": "url i prefiks",
+              "type": "string",
+              "description": "URL posiedzenia senatu"
+            },
+            "senat_stenogramy.posiedzenie_sid": {
+              "type": "string",
+              "description": "TODO po co to?"
+            },
+            "senat_stenogramy.data": {
+              "type": "string",
+              "description": "Data danego posiedzenia TODO przeciez sa wielodniowe..",
+              "format": "date-time"
+            },
+            "senat_stenogramy.id": {
+              "_TODO": "usunac",
+              "type": "string",
+              "description": "TODO zdublowane"
+            }
+          }
+        },
+        "layers": {
+          "properties": {
+            "html": {
+              "description": "TODO czy potrzebne? tresc nie wyglada na html",
+              "error": false,
+              "code": 200,
+              "headers": {
+                "hash": "178c4a65f52543524864d77aad8c0de4",
+                "time": 1437563861,
+                "type": "application\/octet-stream",
+                "size": 1311965
+              },
+              "body": "(Pocz\u0105tek posiedzenia o godzinie 11 minut 02)\r\n(Posi
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,59 @@
+{
+  "title": "Pracownicy Senator\u00f3w",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senatorowie.id": {
+              "type": "string",
+              "description": "ID senatora zatrudniającego pracownika"
+            },
+            "senatorowie.url": {
+              "_TODO": "dodac",
+              "type": "string",
+              "description": "URL senatora zatrudniającego pracownika"
+            },
+
+            "senatorowie_pracownicy.nazwa": {
+              "type": "string",
+              "description": "Pełne imię i nazwisko pracownika"
+            },
+            "senatorowie_pracownicy.dokument_id": {
+              "type": "string",
+              "description": "TODO co to jest?"
+            },
+            "senatorowie_pracownicy.url": {
+              "_TODO": "details_url byłby odpowiedniejszą nazwą",
+              "type": "string",
+              "description": "Link do źródłowego dokumentu zawierającego szczegóły (miejsce zatrudnienia, data urodzenia, źródła dochodów przed zatrudnieniem, wykonywana działalność gospodarcza"
+            },
+            "senatorowie_pracownicy.id": {
+              "type": "string",
+              "description": "TODO zdubliowane"
+            },
+            "senatorowie_pracownicy.senator_id": {
+              "type": "string",
+              "description": "TODO zdublowane"
+            }
+          },
+          "patternProperties": {
+            "^senatorowie\\.": {}
+          }
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,52 @@
+{
+  "title": "",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_glosowania.day": {
+              "type": "string",
+              "description": "TODO, nie lepiej jakby podawać konkretną datę?"
+            },
+            "senat_glosowania.id": {
+              "type": "string",
+              "description": "TODO zdublowane"
+            },
+            "senat_glosowania.action": {
+              "type": "string",
+              "description": "Przedmiot głosowania, np. 'Poprawka 2'"
+            },
+            "senat_glosowania.sid": {
+              "type": "string",
+              "description": "TODO na co to komu?"
+            },
+            "senat_glosowania.motion": {
+              "type": "string",
+              "description": "Projekt będący przedmiotem głosowania, np. 'Ustawa o zmianie ustawy X'"
+            },
+            "senat_glosowania.posiedzenie_id": {
+              "_TODO": "zmiana prefiksu na posiedzenia",
+              "type": "string",
+              "description": "ID posiedzenia, na którym odbyło się głosowanie"
+            },
+            "senat_posiedzenia.url": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL posiedzenia, na którym odbyło się głosowanie",
+              "_TODO": "dodac pole"
+            }
+          }
+        },
+        "layers": {}
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

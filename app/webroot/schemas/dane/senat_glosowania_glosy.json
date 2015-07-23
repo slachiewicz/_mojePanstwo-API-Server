@@ -1,0 +1,55 @@
+{
+  "title": "",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_glosowania_glosy.voting_id": {
+              "_TODO": "zmienic na senat_glosowania.id lub usunac",
+              "type": "string",
+              "description": "ID danego głosowania"
+            },
+            "senat_glosowania.url": {
+              "_TODO": "dodac",
+              "type": "string",
+              "description": "URL danego głosowania"
+            },
+            "senat_glosowania_glosy.vote": {
+              "enum": ["za", "przeciw", "wstrzymal sie"],
+              "description": "Głos"
+            },
+            "senat_glosowania_glosy.senator_id": {
+              "_TODO": "zmienic prefiks",
+              "type": "string",
+              "description": "ID głosującego senatora"
+            },
+            "senat_glosowania_glosy.voting_sid": {
+              "type": "string",
+              "description": "TODO czy ktoś to potrzebuje? gdy juz to url"
+            },
+            "senat_glosowania_glosy.id": {
+              "_TODO": "usunac",
+              "type": "string",
+              "description": "TODO zdublowane"
+            },
+            "senatorzy.url": {
+              "_TODO": "dodać pole",
+              "type": "string",
+              "format": "uri",
+              "description": "URL głosującego senatora"
+            }
+          }
+        },
+        "layers": {}
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

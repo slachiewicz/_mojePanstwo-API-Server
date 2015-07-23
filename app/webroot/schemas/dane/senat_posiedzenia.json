@@ -1,0 +1,47 @@
+{
+  "title": "Posiedzenia Senatu",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_posiedzenia.data_str": {
+              "type": "string",
+              "description": "Daty posiedzenia w formie tekstowej np. '1, 2 i 3 czerwca 2014 roku'"
+            },
+            "senat_posiedzenia.id": {
+              "type": "string",
+              "description": "TODO zdublowane"
+            },
+            "senat_posiedzenia.sid": {
+              "type": "string",
+              "description": "ID w danych źródłowych senatu  TODO, to nie ma sensu dla odbiorców API, sources bardziej"
+            },
+            "senat_posiedzenia.data_start": {
+              "type": "string",
+              "description": "Data rozpoczęcia posiedzenia",
+              "format": "date-time"
+            },
+            "senat_posiedzenia.data_stop": {
+              "type": "string",
+              "description": "Data zakończenia posiedzenia",
+              "format": "date-time"
+            },
+            "senat_posiedzenia.nazwa": {
+              "type": "string",
+              "description": "Pełna nazwa posiedzenia"
+            }
+          }
+        },
+        "layers": {}
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

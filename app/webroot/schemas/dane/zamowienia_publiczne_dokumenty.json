@@ -1,113 +1,135 @@
 {
-	"title": "Zam\u00f3wienia publiczne \/ Dokumenty",
-	"allOf": [
-		{
-			"$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
-		},
-		{
-			"properties": {
-				"data": {
-					"properties": {
-						"zamowienia_publiczne_dokumenty.parent_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.nazwa": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.gmina_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.status_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.wojewodztwo_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.childsCount": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.tryb_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.zamawiajacy_nazwa": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.zamowienie_nr": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.paczka_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.powiat_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.child": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.cpv1c": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.ogloszenie": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.wartosc_cena": {
-							"type": "number",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.wykonawca_str": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.typ_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.zamowienie_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.data_publikacji": {
-							"type": "string",
-							"description": "TODO",
-							"format": "date-time"
-						},
-						"zamowienia_publiczne_dokumenty.instytucja_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.rodzaj_id": {
-							"type": "string",
-							"description": "TODO"
-						},
-						"zamowienia_publiczne_dokumenty.zamawiajacy_id": {
-							"type": "string",
-							"description": "TODO"
-						}
-					}
-				}
-			},
-			"required": [
-				"data"
-			]
-		}
-	],
-	"additionalProperties": false
+  "title": "Zam\u00f3wienia publiczne \/ Dokumenty",
+  "description": "TODO wspomniec o hierarchicznej strukturze dokumentow, przez kogo moze byc skladane? Moze wojeowdztwo_id itp. zastapic url zamawiajacego..",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "zamowienia_publiczne_dokumenty.parent_id": {
+              "_TODO": "Dodac url",
+              "type": "string",
+              "description": "ID dokumentu nadrzędnego do tego. TODO czy tak?"
+            },
+            "zamowienia_publiczne_dokumenty.nazwa": {
+              "type": "string",
+              "description": "Nazwa dokumentu"
+            },
+            "zamowienia_publiczne_dokumenty.gmina_id": {
+              "type": "string",
+              "description": "ID obiektu gminy, jeżeli zamówienie realizowane jest przez gminęTODO"
+            },
+            "zamowienia_publiczne_dokumenty.gmina_url": {
+              "_TODO": "Dodac",
+              "type": "string",
+              "format": "uri",
+              "description": "Link do obiektu gminy, jeżeli zamówienie realizowane jest przez gminęTODO"
+            },
+            "zamowienia_publiczne_dokumenty.powiat_id": {
+              "_TODO": "Funkcja podobna jak wyzej? Dodac url",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.wojewodztwo_id": {
+              "_TODO": "Funkcja podobna jak wyzej? Dodac url",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.status_id": {
+              "type": "string",
+              "description": "TODO - czy statusy są stałe? Jakie? Zrobić enum jeśli tak."
+            },
+            "zamowienia_publiczne_dokumenty.childsCount": {
+              "_TODO": "to powinniec byc integer liczba_dokumentow_podrzednych, ile zaglebien? czy to liczba dzieci bezposrednich?",
+              "type": "string",
+              "description": "Liczba dokumentów podrzędnych. Wyszukaj je poprzez '?conditions[zamowienia_publiczne_dokumenty.parent_id]=XX'"
+            },
+            "zamowienia_publiczne_dokumenty.tryb_id": {
+              "_TODO": "Zrobić z tego zrozumiały enum",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.zamawiajacy_nazwa": {
+              "_TODO": "Kto moze skladac? Czy to mozna sprefiksowac innym datasetem? Moze usunac _dokumenty",
+              "type": "string",
+              "description": "Nazwa instytucji składającej zamówienie"
+            },
+            "zamowienia_publiczne_dokumenty.zamawiajacy_url": {
+              "_TODO": "Dodac, chyba ze dac to wyzej",
+              "type": "string",
+              "format": "uri",
+              "description": "Link do obiektu reprezentującego zamawiającego"
+            },
+            "zamowienia_publiczne_dokumenty.zamowienie_nr": {
+              "type": "string",
+              "description": "TODO co to jest?"
+            },
+            "zamowienia_publiczne_dokumenty.paczka_id": {
+              "type": "string",
+              "description": "TODO co to?"
+            },
+            "zamowienia_publiczne_dokumenty.child": {
+              "type": "string",
+              "description": "TODO co to?"
+            },
+            "zamowienia_publiczne_dokumenty.cpv1c": {
+              "type": "string",
+              "description": "TODO co to?"
+            },
+            "zamowienia_publiczne_dokumenty.ogloszenie": {
+              "type": "string",
+              "description": "TODO co to za numer?"
+            },
+            "zamowienia_publiczne_dokumenty.wartosc_cena": {
+              "type": "number",
+              "description": "Cena zamówienia publicznego. TODO w sensie wygranej oferty?"
+            },
+            "zamowienia_publiczne_dokumenty.wykonawca_str": {
+              "_TODO": "chyba wykonawca_nazwa, dac takze url",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.zamowienie_id": {
+              "type": "string",
+              "description": "ID zamówienia, które dokument opisuje"
+            },
+            "zamowienia_publiczne_dokumenty.zamowienie_url": {
+              "_TODO": "dodac",
+              "type": "string",
+              "description": "Link do zamówienia, które dokument opisuje"
+            },
+            "zamowienia_publiczne_dokumenty.data_publikacji": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "zamowienia_publiczne_dokumenty.instytucja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.rodzaj_id": {
+              "_TODO": "Tutaj jakiś enum powinein wejsc?",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.zamawiajacy_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
 }

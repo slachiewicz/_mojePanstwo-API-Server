@@ -1,0 +1,403 @@
+{
+  "title": "Zam\u00f3wienia Publiczne",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "zamowienia_publiczne.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.kod_pocztowy_id": {
+              "type": "string",
+              "description": "TODO czyj to kod pocztowy?"
+            },
+            "zamowienia_publiczne.kod_pocztowy_url": {
+              "_TODO": "dodac pole",
+              "type": "string",
+              "format": "uri",
+              "description": "TODO czyj to kod pocztowy?"
+            },
+            "zamowienia_publiczne.zamawiajacy_id": {
+              "_TODO": "usunac bo zdublowane",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.id": {
+              "type": "string",
+              "description": "ID podmiotu zamawiającego"
+            },
+            "zamowienia_publiczne_zamawiajacy.url": {
+              "type": "string",
+              "description": "URL podmiotu zamawiającego"
+            },
+            "zamowienia_publiczne.aukcja": {
+              "type": "string",
+              "description": "TODO 0/1 ? co to? https://aukcje.uzp.gov.pl/?"
+            },
+            "zamowienia_publiczne.rodzaj_id": {
+              "type": "string",
+              "description": "TODO jakie tu wystepuja rodzaje?"
+            },
+            "zamowienia_publiczne_rodzaje.id": {
+              "type": "string",
+              "description": "TODO enum tu?"
+            },
+            "zamowienia_publiczne_rodzaje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_ulica": {
+              "_TODO": "zmienic prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.dsz_www": {
+              "type": "string",
+              "format": "uri",
+              "description": "TODO ?? dynamiczny system zakupów?"
+            },
+            "zamowienia_publiczne.typ_id": {
+              "type": "string",
+              "description": "TODO to inny typ niz te nizej.."
+            },
+            "zamowienia_publiczne_typy.symbol": {
+              "type": "string",
+              "description": "TODO nie wystawione w katalogu, nie ma tam zadnych obiektow. dlaczego to sie odwoluje?"
+            },
+            "zamowienia_publiczne_typy.nazwa": {
+              "type": "string",
+              "description": "TODO jw. czy to sie wiaze?"
+            },
+            "zamowienia_publiczne_typy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_tryby.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_tryby.id": {
+              "type": "string",
+              "description": "TODO co to za id? nie ma takiego datasetu"
+            },
+            "zamowienia_publiczne.tryb_id": {
+              "type": "string",
+              "description": "TODO zduplikowane?"
+            },
+            "zamowienia_publiczne.zamawiajacy_nazwa": {
+              "_TODO": "usunac, jest juz zamowienia_publiczne_zamawiajacy.nazwa",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wartosc_cena_max": {
+              "type": "number",
+              "description": "Cena najdroższej złożonej oferty"
+            },
+            "zamowienia_publiczne.wartosc_cena_min": {
+              "type": "number",
+              "description": "Cena najtańszej złożonej oferty"
+            },
+            "zamowienia_publiczne.pozycja": {
+              "type": "integer",
+              "description": "TODO to wyglada na jakis nasz id"
+            },
+            "zamowienia_publiczne.sprawozdanie_lata_obrotowe": {
+              "type": "string",
+              "description": "TODO ?"
+            },
+            "zamowienia_publiczne.zmiana_umowy": {
+              "type": "string",
+              "description": "TODO ?"
+            },
+            "zamowienia_publiczne.dialog": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zaliczka": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_nr_miesz": {
+              "_TODO": "zmienic prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.projekt_ue": {
+              "type": "string",
+              "description": "TODO ??"
+            },
+            "zamowienia_publiczne.zamowienie_ue": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.akcept": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_wojewodztwo": {
+              "_TODO": "zmienic prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.powiat_id": {
+              "_TODO": "zmienic prefiks pewnie..",
+              "type": "string",
+              "description": "TODO zamawiajacego czy wykonawcy?"
+            },
+            "zamowienia_publiczne.sprawozdanie_calosc": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_miejscowosc": {
+              "_TODO": "zmienic prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.kryterium_kod": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.status_id": {
+              "type": "string",
+              "description": "TODO rozwinac na enum, czy to gdzies linkuje?"
+            },
+            "zamowienia_publiczne.wykonawca_str": {
+              "_TODO": "zmienic prefiks, czy to wykonawca.nazwa",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_regon": {
+              "_TODO": "zmienic prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.czas": {
+              "type": "string",
+              "description": "TODO goni nas"
+            },
+            "zamowienia_publiczne.numer_biuletynu": {
+              "type": "integer",
+              "description": "TODO nie ma sensu: Numer porządkowy Biuletynu Informacyjnego UZP, w którym pojawiło się zamówienie. Zobacz http://www.uzp.gov.pl/cmsws/page/?F;290"
+            },
+            "zamowienia_publiczne.publikacja_obowiazkowa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.dyn_www": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_miesiecy": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.instytucja_id": {
+              "_TODO": "zmienić prefiks pewnie",
+              "type": "string",
+              "description": "TODO zamawiajacy czy wykonawca? "
+            },
+            "zamowienia_publiczne.zamawiajacy_email": {
+              "_TODO": "zmienić prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.ogloszenie_bzp": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.oferty_czesciowe": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_rodzaj_inny": {
+              "_TODO": "zmienić prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.termin": {
+              "type": "string",
+              "description": "TODO co tu? obstawialbym date a nie '0'"
+            },
+            "zamowienia_publiczne.wartosc_szacunkowa": {
+              "type": "number",
+              "description": "Szacunkowa wartość zamówienia"
+            },
+            "zamowienia_publiczne.wartosc_szacowana": {
+              "type": "number",
+              "description": "TODO czym sie rozni od wyzszej?"
+            },
+            "zamowienia_publiczne.numer_zamowienia": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.uniewaznienie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wojewodztwo_id": {
+              "_TODO": "prefiks, zamawiajcego czy wykonawcy?",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_tel": {
+              "_TODO": "prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_fax": {
+              "_TODO": "prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_wykonawcow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_www": {
+              "_TODO": "prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_dni_oferty": {
+              "type": "integer",
+              "description": "TODO jest w details?"
+            },
+            "zamowienia_publiczne.liczba_dni": {
+              "type": "integer",
+              "description": "TODO jest w details?"
+            },
+            "zamowienia_publiczne.data_publikacji": {
+              "type": "string",
+              "description": "Data publikacji zamówienia",
+              "format": "date-time"
+            },
+            "zamowienia_publiczne.data_stop": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "zamowienia_publiczne.zamawiajacy_nr_domu": {
+              "_TODO": "prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.gmina_id": {
+              "_TODO": "prefiks zamawiajcy czy wykonawca?",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zmiana_ogloszenia": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.uzupelniajace": {
+              "type": "string",
+              "description": "TODO boolean?"
+            },
+            "zamowienia_publiczne.zamawiajacy_kod_poczt": {
+              "_TODO": "prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.id": {
+              "type": "string",
+              "description": "TODO usunac zdublowane"
+            },
+            "zamowienia_publiczne.wariant": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_rodzaj": {
+              "_TODO": "prefiks",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_czesci": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.oferty_godz": {
+              "_TODO": "usunac, jest juz w details",
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wartosc_cena": {
+              "type": "number",
+              "description": "Cena oferty, która wygrała"
+            }
+          },
+          "patternProperties": {
+            "^zamowienia_publiczne_zamawiajacy\\.": {},
+            "^zamowienia_publiczne_wykonawcy\\.": {}
+          }
+        },
+        "layers": {
+          "properties": {
+            "details": {
+              "description": "Szczegółowe dane oferty"
+//              "data_start": "0000-00-00",
+//              "data_stop": "2011-08-31",
+//              "oferty_data_stop": "2010-08-27",
+//              "oferty_godz": "10:00",
+//              "czas_miesiace": "0",
+//              "czas_dni": "0",
+//              "oferty_liczba_dni": "30",
+//              "le_adres_aukcja": "",
+//              "le_adres_opis": "",
+//              "le_data_skl": "0000-00-00",
+//              "le_godz_skl": "",
+//              "le_term_otw": "",
+//              "le_term_war_zam": "",
+//              "kryteria": [],
+//              "le_wymagania": "",
+//              "le_postapien": "",
+//              "le_miejsce_skl": "",
+//              "przedmiot": "Przedmiotem  zamówienia  jest dostawa do Zespołu Szkół Centrum Kształcenia Rolniczego im. Wincentego Witosa w Leśnej Podlaskiej oleju opałowego ilości do 160000 l, spełniającego co najmniej następujące wymagania:\r\n\r\n1)\tgęstość w temperaturze 150C - nie większa niż 0,860g/ml,\r\n2)\tlepkość kinematyczna w temperaturze 200C - nie większa niż 6,00 mm2/s,\r\n3)\twartość opałowa - nie mniejsza niż 42,6 MJ/kg,\r\n4)\ttemperatura zapłonu - nie niższa niż 560C,\r\n5)\tzawartość siarki - nie większa niż 0,20%.",
+//              "uprawnienie": "Posiadanie uprawnień do wykonywania określonej działalności lub czynności, jeżeli przepisy prawa nakładają obowiązek ich posiadania - ocena spełniania w/w warunku dokonana zostanie zgodnie z formułą spełnia - nie spełnia, w oparciu o informacje zawarte w złożonym oświadczeniu, oraz wykazanie że: wykonawca posiada koncesję na obrót paliwami ciekłymi.",
+//              "wiedza": "Posiadanie wiedzy i doświadczenia - ocena spełniania w/w warunku dokonana zostanie zgodnie z formułą spełnia - nie spełnia, w oparciu o informacje zawarte w złożonym oświadczeniu, oraz wykazanie że: wykonawca w  okresie  ostatnich trzech  lat przed upływem terminu składania ofert, a jeżeli okres prowadzenia działalności jest krótszy - w tym okresie, wykonał co najmniej 1 dostawę oleju opałowego o wartości co najmniej 300000 zł (słownie: trzysta tysięcy zł).",
+//              "potencjal": "Dysponowanie odpowiednim potencjałem technicznym - ocena spełniania w/w warunku dokonana zostanie zgodnie z formułą spełnia - nie spełnia, w oparciu o informacje zawarte w złożonym oświadczeniu.",
+//              "osoby_zdolne": "Dysponowanie osobami zdolnymi do wykonania zamówienia - ocena spełniania w/w warunku dokonana zostanie zgodnie z formułą spełnia - nie spełnia, w oparciu o informacje zawarte w złożonym oświadczeniu.",
+//              "sytuacja_ekonomiczna": "Sytuacja ekonomiczna i finansowa - ocena spełniania w/w warunku dokonana zostanie zgodnie z formułą spełnia - nie spełnia, w oparciu o informacje zawarte w złożonym oświadczeniu.",
+//              "zal_pprawna": "",
+//              "zal_uzasadnienie": "",
+//              "zamowienie_uzupelniajace": "",
+//              "wadium": "6000 PLN",
+//              "wybor_wykonawcow": "",
+//              "zmieniona_umowa": "",
+//              "aukcja_www": "",
+//              "siwz_www": "www.zsckr.edu.pl",
+//              "siwz_adres": "Zespół Szkół Centrum Kształcenia Rolniczego w Leśnej Podlaskiej 21-542 Leśna Podlaska ul. Bialska 7, pokój nr 20.",
+//              "dk_potrzeby": "",
+//              "dk_nagrody": "",
+//              "oferty_miejsce": "Zespół Szkół Centrum Kształcenia Rolniczego w Leśnej Podlaskiej 21-542 Leśna Podlaska ul. Bialska 7, pokój nr 16.",
+//              "umowa_zabezpieczenia": "",
+//              "umowa_istotne_postanowienia": "",
+//              "info": "",
+//              "inne_dokumenty": "",
+//              "inne_dok_potw": "",
+//              "zal_pprawna_hid": "",
+//              "zamowienie_pprawna": "",
+//              "zamowienie_pprawna_hid": "",
+//              "zamowienie_uzasadnienie": ""
+            },
+            "czesci": {
+              "description": "TODO"
+            },
+            "sources": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

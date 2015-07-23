@@ -3,27 +3,53 @@
 require_once("Vendor/functions.php");
 
 $output_directory = 'webroot/schemas/dane/';
-$api_root = 'https://api-v2.mojepanstwo.pl/';
+$api_root = 'http://api-server.dev/';
 
-$datasets = file_get_contents($api_root . 'dane/zbiory/index');
-$datasets = json_decode($datasets, true);
+$response = file_get_contents($api_root . 'dane/zbiory');
+$response = json_decode($response, true);
+
+$datasets = $response['Dataobject'];
+
+// pobrać wszystkie strony wyników
+while(isset($response['Links']['next'])) {
+    $response = file_get_contents($response['Links']['next']);
+    $response = json_decode($response, true);
+
+    $datasets = array_merge($datasets, $response['Dataobject']);
+}
 
 $definitions = array();
 
-foreach ($datasets['Dataobject'] as $dataset) {
+foreach ($response['Dataobject'] as $dataset) {
     $data = $dataset['data'];
     $slug = $data['zbiory.slug'];
     $title = $data['zbiory.nazwa'];
     $description = $data['zbiory.opis'];
 
+    if (!$description) {
+        $def['description'] = 'TODO';
+    }
+
     print("Processing " . $slug . "..\n");
+
+    $out_schema = $output_directory . $slug . '.json';
+
+    if (file_exists($out_schema)) {
+        print("  Skipping..\n");
+        continue;
+    }
 
     $properties = array();
 
     // get fields based on sample object
-    $sample_object = file_get_contents($api_root . 'dane/' . $slug . '/index?limit=1');
+    $sample_object = file_get_contents($api_root . 'dane/' . $slug . '?limit=1');
     $sample_object = json_decode($sample_object, true);
     $sample_object = $sample_object['Dataobject'][0];
+
+    $sample_object = file_get_contents($api_root . 'dane/' . $slug . '/' . $sample_object['id'] .'?layers=*');
+    $sample_object = json_decode($sample_object, true);
+
+    file_put_contents($output_directory . $slug . '_example.json', json_format($sample_object));
 
     foreach ($sample_object['data'] as $field => $v) {
         list($dataset, $fld) = preg_split('/\\./', $field);
@@ -57,6 +83,15 @@ foreach ($datasets['Dataobject'] as $dataset) {
         $properties[$field] = $fdef;
     }
 
+    $layers_properties = array();
+    if (isset($sample_object['layers']) and $sample_object['layers']) {
+        foreach ($sample_object['layers'] as $name => $layer_data) {
+            if (!in_array($name, array("dataset", "channels", "page", "subscribers", "uczestnicy", "subscription"))) {
+                $layers_properties[$name] = array("description" => "TODO");
+            }
+        }
+    }
+
     // save definition
     $def = array(
         'title' => $title,
@@ -66,22 +101,22 @@ foreach ($datasets['Dataobject'] as $dataset) {
                 'properties' => array(
                     'data' => array(
                         'properties' => $properties,
+                        'additionalProperties' => 'false'
 //                        'required' => array()
+                    ),
+                    'layers' => array(
+                        'properties' => $layers_properties
                     )
-                ,
                 ),
                 'required' => array('data')
             )
         ),
         'additionalProperties' => false
     );
-    if ($description) {
-        $def['description'] = $description;
-    }
 
     $definitions[$slug] = $def;
 
-    file_put_contents($output_directory . $slug . '.json', json_format($def));
+    file_put_contents($out_schema, json_format($def));
 }
 
 // original code: http://www.daveperrett.com/articles/2008/03/11/format-json-with-php/
@@ -104,7 +139,7 @@ function json_format($json) {
     $result      = '';
     $pos         = 0;               // indentation level
     $strLen      = strlen($json);
-    $indentStr   = "\t";
+    $indentStr   = "  ";
     $newLine     = "\n";
     $prevChar    = '';
     $outOfQuotes = true;

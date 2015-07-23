@@ -281,7 +281,13 @@ class DataobjectsController extends AppController
 			$layers_to_load = $query['layers'];
 
 			if (is_string($layers_to_load)) {
-				$layers_to_load = array($layers_to_load);
+				// load all layers?
+				if ($layers_to_load = '*') {
+					$layers_to_load = array_keys($object['layers']);
+
+				} else {
+					$layers_to_load = array($layers_to_load);
+				}
 			}
 
 			// load only available layers

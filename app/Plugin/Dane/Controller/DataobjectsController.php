@@ -19,7 +19,7 @@ class DataobjectsController extends AppController
 		if( $this->request->is('post') ) {
 			$this->request->query = array_merge($this->request->query, $this->request->data);
 		}
-
+				
 		$this->_index(array(
 			'dataset' => $dataset
 		));
@@ -83,7 +83,7 @@ class DataobjectsController extends AppController
 
 
 	private function _index($params = array()){
-		$allowed_query_params = array('conditions', 'limit', 'page', 'order');
+		$allowed_query_params = array('conditions', 'limit', 'page', 'order', 'highlight');
 		if ($this->isPortalCalling) {
 			array_push($allowed_query_params, 'aggs');
 		}

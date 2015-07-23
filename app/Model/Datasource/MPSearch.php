@@ -154,9 +154,7 @@ class MPSearch {
     }	
 	
 	public function buildESQuery( $queryData = array() ) {
-		
-		// debug($queryData); die();
-		
+				
 		if( !isset($queryData['conditions']) )
 			$queryData['conditions'] = array();
 		
@@ -774,7 +772,6 @@ class MPSearch {
 		
 		
 		
-		
 		if( 
 			isset($queryData['highlight']) && 
 			$queryData['highlight'] && 
@@ -787,7 +784,7 @@ class MPSearch {
 	    			'text' => array(
 	    				'index_options' => 'offsets',
 	    				'number_of_fragments' => 1,
-	    				'fragment_size' => 160,
+	    				'fragment_size' => 200,
 	    			),
 	    		),
 	    		
@@ -831,6 +828,8 @@ class MPSearch {
 	
     public function read(Model $model, $queryData = array()) {
 		$params = $this->buildESQuery($queryData);
+		
+		// debug($params); die();
 		
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );

@@ -10,6 +10,35 @@ class ObjectPage extends AppModel {
         $this->request = $request;
     }
 
+    public function setData($data, $id, $dataset)
+    {
+        $conditions = array(
+            'ObjectPage.dataset' => $dataset,
+            'ObjectPage.object_id' => (int) $id
+        );
+
+        $object = $this->find('first', array(
+            'conditions' => $conditions
+        ));
+
+        if($object) {
+            $success = $this->updateAll(array(
+                'description' => "'".Sanitize::escape($data['description'])."'"
+            ), $conditions);
+        } else {
+            $success = $this->save(array(
+                'ObjectPage' => array(
+                    'dataset' => $dataset,
+                    'object_id' => (int) $id,
+                    'moderated' => '1',
+                    'description' => $data['description']
+                )
+            ));
+        }
+
+        return (bool) $success;
+    }
+
     public function setLogo($value) {
         $this->setLogoOrCover('logo', $value);
     }

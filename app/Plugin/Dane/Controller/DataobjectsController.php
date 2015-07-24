@@ -180,25 +180,35 @@ class DataobjectsController extends AppController
         $this->set('_serialize', $_serialize);
 	}
 
-    private $enabledUpdateModels = array(
+    private $postRequestConfig = array(
+
         'bdl_wskazniki' => array(
-            'name' => 'BdlPodgrupy'
+            'name' => 'BdlPodgrupy',
+            'roles' => array()
         ),
+
         'bdl_wariacje' => array(
-            'name' => 'BdlWariacje'
+            'name' => 'BdlWariacje',
+            'roles' => array()
         ),
+
         'prawo_hasla' => array(
-	        'name' => 'PrawoHasla',
+            'name' => 'PrawoHasla',
+            'roles' => array()
         ),
+
         'krs_podmioty' => array(
-            'name' => 'KrsPodmioty'
+            'name' => 'KrsPodmioty',
+            'roles' => array('superuser', 'owner', 'admin')
         )
+
     );
 	
 	public function post($dataset, $id)
 	{
 	
 		$output = false;
+        $roles = array();
 	
 		if( 
 			isset($this->request->data['_action']) && 
@@ -206,18 +216,22 @@ class DataobjectsController extends AppController
 		) {
 			
 			unset( $this->request->data['_action'] );			
-			$datasets = array_keys($this->enabledUpdateModels);
+			$datasets = array_keys($this->postRequestConfig);
 			
 			if( in_array($dataset, $datasets) ) {
 	
-	            $params = $this->enabledUpdateModels[$dataset];
-	            $name = $params['name'];	            
+	            $params = $this->postRequestConfig[$dataset];
+	            $name = $params['name'];
+                $roles = $params['roles'];
 	
 			} else {
 				
 				$name = 'Dataobject';
 				
 			}
+
+            if(!$this->hasAccessToDatasetObject($dataset, $id, $roles))
+                throw new ForbiddenException;
 			
 			try {
 	                
@@ -237,6 +251,62 @@ class DataobjectsController extends AppController
 		$this->set('output', $output);
 		$this->set('_serialize', 'output');
 	}
+
+    /*
+     * @todo przenieść funkcje "wyżej" tak żeby można jej było użyć też w
+     * ObjectPagesManagementController oraz ObjectUsersManagementController
+     * (usuniecie powielania kodu w 3 miejsach)
+     */
+    private function hasAccessToDatasetObject($dataset, $id, $roles) {
+
+        if(!count($roles))
+            return true;
+
+        if($this->Auth->user('type') != 'account')
+            return false;
+
+        $this->loadModel('Paszport.User');
+
+        $this->User->recursive = 2;
+        $user = $this->User->findById(
+            $this->Auth->user('id')
+        );
+
+        if(!$user)
+            return false;
+
+        foreach($user['UserRole'] as $role) {
+            if(in_array($role['Role']['name'], $roles))
+                return true;
+        }
+
+        $this->loadModel('Dane.ObjectUser');
+
+        $object = $this->ObjectUser->find('first', array(
+            'conditions' => array(
+                'ObjectUser.dataset' => $dataset,
+                'ObjectUser.object_id' => $id,
+                'ObjectUser.user_id' => $user['User']['id']
+            )
+        ));
+
+        if($object) {
+
+            $names = array(
+                '1' => 'owner',
+                '2' => 'admin'
+            );
+
+            if(
+                isset($names[$object['ObjectUser']['role']]) &&
+                in_array($names[$object['ObjectUser']['role']], $roles)
+            )
+                return true;
+
+        }
+
+        return false;
+    }
 	
     public function view($dataset, $id)
     {

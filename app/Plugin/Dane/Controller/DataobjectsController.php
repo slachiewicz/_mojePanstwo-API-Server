@@ -230,8 +230,8 @@ class DataobjectsController extends AppController
 				
 			}
 
-            if(!$this->hasAccessToDatasetObject($dataset, $id, $roles))
-                throw new ForbiddenException;
+            #if(!$this->hasAccessToDatasetObject($dataset, $id, $roles))
+            #    throw new ForbiddenException;
 			
 			try {
 	                

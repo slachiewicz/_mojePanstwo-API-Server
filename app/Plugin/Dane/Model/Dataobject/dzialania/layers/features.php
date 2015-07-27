@@ -9,3 +9,5 @@ $features = array(
     ")
 
 );
+
+return $features;

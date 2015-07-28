@@ -87,6 +87,7 @@ class KrsPodmioty extends AppModel {
             }
 
             $this->_update_activity_tags($object['OrganizacjeDzialania']['id'], @$data['tagi']);
+            $this->_update_activity_photo($object['OrganizacjeDzialania']['id'], $data);
             $toUpdateFields = array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng');
             if($deleted)
                 $toUpdateFields[] = 'deleted';

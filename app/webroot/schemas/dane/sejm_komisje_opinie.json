@@ -1,0 +1,67 @@
+{
+  "title": "Sejm \/ Opinie komisji sejmowych",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_komisje_opinie.adresat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_opinie.adresat": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_opinie.komisja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_opinie.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje.dopelniacz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_opinie.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_opinie.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sejm_komisje_opinie.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

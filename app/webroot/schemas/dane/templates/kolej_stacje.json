@@ -1,0 +1,44 @@
+{
+  "title": "Koleje \/ Stacje",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "kolej_stacje.loc_lat": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "kolej_stacje.loc_lng": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "kolej_stacje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "kolej_stacje.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "linie": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,34 @@
+{
+  "title": "S\u0119dziowie S\u0105du Najwy\u017cszego",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sn_sedziowie.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sn_sedziowie.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

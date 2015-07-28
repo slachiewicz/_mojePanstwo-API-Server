@@ -1,0 +1,86 @@
+{
+  "title": "Sejm \/ Interpelacje",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_interpelacje.typ_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.data_wplywu": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sejm_interpelacje.adresaci_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.numer": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.ogloszenie_posiedzenie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.tytul_skrocony": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.data_status": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sejm_interpelacje.poslowie_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.skrot": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.liczba_poslow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_interpelacje.mowca_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "dane": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

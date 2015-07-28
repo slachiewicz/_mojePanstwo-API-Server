@@ -1,0 +1,332 @@
+{
+  "title": "Zam\u00f3wienia Publiczne",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "zamowienia_publiczne.kod_pocztowy_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.aukcja": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.rodzaj_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_ulica": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.dsz_www": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_typy.symbol": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wartosc_cena_max": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.pozycja": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.sprawozdanie_lata_obrotowe": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zmiana_umowy": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.dialog": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_tryby.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zaliczka": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_nr_miesz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_typy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.projekt_ue": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.akcept": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_wojewodztwo": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.powiat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.sprawozdanie_calosc": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_miejscowosc": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.kod_pocztowy_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.kryterium_kod": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.status_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wykonawca_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_regon": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.czas": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.tryb_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.numer_biuletynu": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.publikacja_obowiazkowa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.dyn_www": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_miesiecy": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.instytucja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_email": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.ogloszenie_bzp": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.oferty_czesciowe": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_rodzaje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_rodzaj_inny": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.termin": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wartosc_szacunkowa": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.numer_zamowienia": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.uniewaznienie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wojewodztwo_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_tel": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_fax": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_wykonawcow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_www": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_dni_oferty": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.data_publikacji": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "zamowienia_publiczne_tryby.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.data_stop": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "zamowienia_publiczne.zamawiajacy_nr_domu": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zmiana_ogloszenia": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.uzupelniajace": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_rodzaje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_dni": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_kod_poczt": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wartosc_szacowana": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wariant": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_typy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamawiajacy_rodzaj": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wartosc_cena_min": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.liczba_czesci": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.oferty_godz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.wartosc_cena": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne.zamowienie_ue": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "details": {
+              "description": "TODO"
+            },
+            "czesci": {
+              "description": "TODO"
+            },
+            "sources": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

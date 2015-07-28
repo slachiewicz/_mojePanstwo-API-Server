@@ -1,0 +1,40 @@
+{
+  "title": "Towary",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "handel_zagraniczny_towary.symbol": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "handel_zagraniczny_towary.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "handel_zagraniczny_towary.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "stats": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,101 @@
+{
+  "title": "Rady gmin \/ Interpelacje",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "rady_gmin_interpelacje.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_gmin_interpelacje.odp1_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.komitet_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.aktywny": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.avatar": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_gmin_interpelacje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_gmin_interpelacje.posiedzenie_nr": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_gmin_interpelacje.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.komitet": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_gmin_interpelacje.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "radni_gmin.krs_osoba_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.plec": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_gmin_interpelacje.radny_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.nazwa_odwrocona": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_gmin_interpelacje.odp2_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "neighbours": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

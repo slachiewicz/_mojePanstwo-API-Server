@@ -1,0 +1,86 @@
+{
+  "title": "Sejm \/ Kluby",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_kluby.srednia_liczba_projektow_uchwal": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.liczba_mezczyzn": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_kluby.srednia_frekfencja": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.srednia_liczba_wnioskow": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.avatar": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.liczba_poslow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_kluby.srednia_udzial_w_obradach": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.srednia_zbuntowanie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.srednia_liczba_projektow_ustaw": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.srednia_liczba_wystapien": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.srednia_poparcie_w_okregu": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.liczba_kobiet": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_kluby.skrot": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_kluby.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

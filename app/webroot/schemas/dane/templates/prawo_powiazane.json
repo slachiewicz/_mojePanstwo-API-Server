@@ -1,0 +1,149 @@
+{
+  "title": "Prawo \/ Powi\u0105zania",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "prawo.tytul_skrocony": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.pierwotny": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.isap_organ_zobowiazany_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.sygnatura": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_powiazane.parent_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.nr": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "prawo.isap_organ_wydajacy_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.poz": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "prawo_powiazane.prawo_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.typ_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.data_wejscia_w_zycie": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "prawo.rok": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "prawo.autorzy_html": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.status_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.autor_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.opis_skrot": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_powiazane.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.label_html": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.data_publikacji": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "prawo_powiazane.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.label": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.data_wydania": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "prawo.opis": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.autor_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.projekt_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo.isap_organ_uprawniony_str": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

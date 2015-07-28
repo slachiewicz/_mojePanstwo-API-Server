@@ -1,0 +1,81 @@
+{
+  "title": "Sejm \/ druki",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_druki.tytul_skrocony": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.sprawozdawca_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.numer": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_druki_typy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki_typy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.opis": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.autorzy_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_druki.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sejm_druki.numer_int": {
+              "type": "integer",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "related": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

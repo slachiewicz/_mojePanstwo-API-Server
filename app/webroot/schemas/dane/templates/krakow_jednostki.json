@@ -1,0 +1,34 @@
+{
+  "title": "Krak\u00f3w \/ Jednostki administracyjne",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krakow_jednostki.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_jednostki.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

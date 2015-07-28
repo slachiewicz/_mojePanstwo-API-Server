@@ -1,0 +1,121 @@
+{
+  "title": "Zam\u00f3wienia publiczne \/ Dokumenty",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "zamowienia_publiczne_dokumenty.parent_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.status_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.wojewodztwo_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.childsCount": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.tryb_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.zamawiajacy_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.zamowienie_nr": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.paczka_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.powiat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.child": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.cpv1c": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.ogloszenie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.wartosc_cena": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.wykonawca_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.zamowienie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.data_publikacji": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "zamowienia_publiczne_dokumenty.instytucja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.rodzaj_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_dokumenty.zamawiajacy_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "details": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

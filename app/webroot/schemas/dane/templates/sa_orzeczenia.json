@@ -1,0 +1,125 @@
+{
+  "title": "Orzeczenia s\u0105d\u00f3w administracyjnych",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sa_orzeczenia.data_orzeczenia": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sa_orzeczenia.uzasadnienie_status": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.tezy_status": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.sad_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.hasla_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.sad_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.typ_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.skarzony_organ_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.sad_dopelniacz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.sentencja_status": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.prawomocne": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.skarzony_organ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.odrebne_status": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.uzo_status": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.sygnatura": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.data_wplywu": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sa_orzeczenia.wynik_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.nsa_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.dlugosc_rozpatrywania": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sa_orzeczenia.tytul_skrocony": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "html": {
+              "description": "TODO"
+            },
+            "text": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,96 @@
+{
+  "title": "BDL \/ Wska\u017aniki",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "bdl_wskazniki.opis": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.archiwum": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.liczba_wymiarow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.grupa_tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.grupa_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.okres": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.kategoria_tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.i": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.data_aktualizacji": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "bdl_wskazniki.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.yearsCount": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.liczba_rocznikow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.kategoria_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.poziom_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki.poziom_str": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "dimennsions": {
+              "description": "TODO"
+            },
+            "levels": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

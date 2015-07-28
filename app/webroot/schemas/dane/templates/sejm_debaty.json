@@ -1,0 +1,116 @@
+{
+  "title": "Sejm \/ debaty",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_debaty.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.stop_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.promo_wystapienie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.stats_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.dzien_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.start_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.video": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.debata": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.dlugosc_int": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_debaty.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sejm_debaty.posiedzenie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.liczba_glosowan": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_debaty.liczba_wystapien": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_debaty.punkt_i": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.kolejnosc": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_debaty.tytul_prefix": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.punkt": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_debaty.liczba_slow": {
+              "type": "integer",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "stenogram": {
+              "description": "TODO"
+            },
+            "nav": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

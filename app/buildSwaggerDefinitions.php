@@ -2,7 +2,7 @@
 
 require_once("Vendor/functions.php");
 
-$output_directory = 'webroot/schemas/dane/';
+$output_directory = 'webroot/schemas/dane/templates/';
 $api_root = 'http://api-server.dev/';
 
 $response = file_get_contents($api_root . 'dane/zbiory');
@@ -19,8 +19,9 @@ while(isset($response['Links']['next'])) {
 }
 
 $definitions = array();
+$dataset_slugs = array();
 
-foreach ($response['Dataobject'] as $dataset) {
+foreach ($datasets as $dataset) {
     $data = $dataset['data'];
     $slug = $data['zbiory.slug'];
     $title = $data['zbiory.nazwa'];
@@ -29,6 +30,8 @@ foreach ($response['Dataobject'] as $dataset) {
     if (!$description) {
         $def['description'] = 'TODO';
     }
+
+    array_push($dataset_slugs, $slug);
 
     print("Processing " . $slug . "..\n");
 
@@ -118,6 +121,9 @@ foreach ($response['Dataobject'] as $dataset) {
 
     file_put_contents($out_schema, json_format($def));
 }
+
+sort($dataset_slugs);
+print(json_format($dataset_slugs));
 
 // original code: http://www.daveperrett.com/articles/2008/03/11/format-json-with-php/
 // adapted to allow native functionality in php version >= 5.4.0

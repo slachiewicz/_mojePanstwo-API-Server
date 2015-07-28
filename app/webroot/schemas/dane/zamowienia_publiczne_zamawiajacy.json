@@ -1,0 +1,113 @@
+{
+  "title": "Zam\u00f3wienia Publiczne \/ Zamawiaj\u0105cy",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "zamowienia_publiczne_zamawiajacy.regon": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.miejscowosc": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.rodzaj": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.kod_pocztowy": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.www": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.wojewodztwo": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.email": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.rodzaj_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.fax": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.kod_pocztowy_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.ulica": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.dom_numer": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.rodzaj_inny": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.mieszkanie_numer": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.telefon": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "zamowienia_publiczne_zamawiajacy.instytucja_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          }
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

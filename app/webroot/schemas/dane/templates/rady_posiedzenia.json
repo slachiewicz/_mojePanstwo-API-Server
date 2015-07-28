@@ -1,0 +1,65 @@
+{
+  "title": "Rady gmin \/ Posiedzenia",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "gminy.rada_nazwa_dopelniacz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_posiedzenia.liczba_debat": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "rady_posiedzenia.preview_yt_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_posiedzenia.yt_playlist_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.rada_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_posiedzenia.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_posiedzenia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "rady_posiedzenia.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "rady_posiedzenia.numer": {
+              "type": "integer",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "neighbours": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

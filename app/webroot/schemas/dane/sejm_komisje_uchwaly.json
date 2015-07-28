@@ -1,0 +1,82 @@
+{
+  "title": "Sejm \/ Uchwa\u0142y komisji",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_komisje_uchwaly.date": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_uchwaly.komisja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "ludzie_poslowie.mowca_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "poslowie.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "poslowie.nazwa_odwrocona": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_uchwaly.posel_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "poslowie.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_uchwaly.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje.dopelniacz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "poslowie.klub_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_uchwaly.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komisje_uchwaly.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

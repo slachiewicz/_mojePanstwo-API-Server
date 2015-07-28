@@ -1,0 +1,70 @@
+{
+  "title": "Pracownicy Senator\u00f3w",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senatorowie.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie.plec": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie_pracownicy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie.imie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie_pracownicy.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie_pracownicy.url": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie_pracownicy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie.klub_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie_pracownicy.senator_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senatorowie.nazwisko": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

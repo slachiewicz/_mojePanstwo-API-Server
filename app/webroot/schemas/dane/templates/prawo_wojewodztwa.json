@@ -1,0 +1,87 @@
+{
+  "title": "Prawo w dziennikach wojew\u00f3dzkich",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "prawo_wojewodztwa.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.organ_wydajacy_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.rocznik": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.wojewodztwo_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.numer": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.tytul_skrocony": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.forma_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "wojewodztwa.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.data_wydania": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "wojewodztwa.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.powiat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "prawo_wojewodztwa.pozycja": {
+              "type": "integer",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

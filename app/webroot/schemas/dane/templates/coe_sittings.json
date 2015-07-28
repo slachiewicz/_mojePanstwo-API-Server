@@ -1,0 +1,60 @@
+{
+  "title": "Posiedzenia Rady Europy",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "coe_sittings.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "coe_sittings.time_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "coe_sittings.date": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "coe_sittings.url": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "coe_sittings.session_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "coe_sittings.size": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "coe_sessions.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "coe_sessions.title": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "text": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

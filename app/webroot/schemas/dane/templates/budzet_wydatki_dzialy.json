@@ -1,0 +1,74 @@
+{
+  "title": "Bud\u017cet \/ Dzia\u0142y",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "budzet_wydatki_dzialy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_srodki_wlasne_ue": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_wydatki_na_obsluge_dlugu": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_wydatki_majatkowe": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_wydatki_biezace_jednostek_budzetowych": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.src": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_dotacje_i_subwencje": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_wspolfinansowanie_ue": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.liczba_pozycji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_plan": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "budzet_wydatki_dzialy.wartosc_swiadczenia_na_rzecz_osob_fizycznych": {
+              "type": "number",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

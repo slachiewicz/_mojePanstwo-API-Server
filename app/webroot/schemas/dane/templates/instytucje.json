@@ -1,0 +1,144 @@
+{
+  "title": "Instytucje publiczne",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "instytucje.liczba_instytucji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "instytucje.budzet_wydatki_na_obsluge_dlugu": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.phone": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.budzet_wspolfinansowanie_ue": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.budzet_plan": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.budzet_wydatki_majatkowe": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.gender": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.email": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.opis_html": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.avatar": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.kod_pocztowy_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.budzet_srodki_wlasne_ue": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.budzet_swiadczenia_na_rzecz_osob_fizycznych": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.budzet_dotacje_i_subwencje": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.liczba_pozycji_budzetowych": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "instytucje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.parent_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.twitter_account_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.adres_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.budzet_wydatki_biezace_jednostek_budzetowych": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "instytucje.www": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.liczba_instytucji_bezposrednio": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "instytucje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.fax": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.kod_pocztowy_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "tree": {
+              "description": "TODO"
+            },
+            "menu": {
+              "description": "TODO"
+            },
+            "info": {
+              "description": "TODO"
+            },
+            "budzet": {
+              "description": "TODO"
+            },
+            "instytucja_nadrzedna": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

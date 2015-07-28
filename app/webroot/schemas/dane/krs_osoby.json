@@ -1,0 +1,95 @@
+{
+  "title": "Osoby",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krs_osoby.liczba_nadzorcow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.nazwisko": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.liczba_akcjonariusze": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.liczba_reprezentanci": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.privacy": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.liczba_zalozyciele": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.plec": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.imie_drugie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.imie_pierwsze": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.data_urodzenia": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krs_osoby.liczba_wspolnicy": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.imiona": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "powiazania": {
+              "description": "TODO"
+            },
+            "organizacje": {
+              "description": "TODO"
+            },
+            "graph": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

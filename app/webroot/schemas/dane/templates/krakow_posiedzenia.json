@@ -1,0 +1,109 @@
+{
+  "title": "Krak\u00f3w \/ Posiedzenia rady miasta",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krakow_posiedzenia.numer": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.kadencja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.porzadek_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krakow_posiedzenia.zwolanie_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.href": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.yt_playlist_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.stenogram_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.protokol_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_sesje.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krakow_sesje.liczba_posiedzen": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krakow_sesje.str_numer": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_sesje.href": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.liczba_punktow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.sesja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.wyniki_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_sesje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_posiedzenia.podsumowanie_dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "terms": {
+              "description": "TODO"
+            },
+            "neighbours": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

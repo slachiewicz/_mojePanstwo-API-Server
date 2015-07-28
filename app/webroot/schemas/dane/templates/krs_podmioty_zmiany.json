@@ -1,0 +1,105 @@
+{
+  "title": "KRS \/ Zmiany w organizacjach",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krs_podmioty_zmiany.tresc": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.rejestr_nr": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.dzial_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.forma_prawna_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.forma_prawna_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krs_podmioty_zmiany.podmiot_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.numer_rubryki": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.nazwa_skrocona": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.nazwa_organu_nadzoru": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.rozdzial_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.wpis_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.forma_prawna_typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.numer_dzialu": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty_zmiany.ord": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.nazwa_organu_reprezentacji": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "details": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

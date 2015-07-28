@@ -1,0 +1,65 @@
+{
+  "title": "Krak\u00f3w \/ Posiedzenia Komisji Rady Miasta",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krakow_komisje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje_posiedzenia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje_posiedzenia.komisja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje_posiedzenia.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje_posiedzenia.zapowiedz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje_posiedzenia.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krakow_komisje_posiedzenia.yt_video_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje_posiedzenia.liczba_debat": {
+              "type": "integer",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "punkty": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

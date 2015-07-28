@@ -1,0 +1,42 @@
+{
+  "title": "Umowy",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "umowy.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "umowy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "umowy.krs_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "umowy.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

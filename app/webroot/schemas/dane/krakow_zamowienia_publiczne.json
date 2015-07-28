@@ -1,0 +1,62 @@
+{
+  "title": "Krak\u00f3w \/ Zam\u00f3wienia Publiczne",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krakow_zamowienia_publiczne.jednostka_realizujaca": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.rok": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.wartosc_brutto": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.wykonawca": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.wartosc_netto": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_zamowienia_publiczne.wykonawca_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

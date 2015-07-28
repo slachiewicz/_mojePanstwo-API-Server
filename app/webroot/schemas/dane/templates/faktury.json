@@ -1,0 +1,47 @@
+{
+  "title": "Faktury",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "faktury.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "faktury.krs_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "faktury.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "faktury.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "faktury.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

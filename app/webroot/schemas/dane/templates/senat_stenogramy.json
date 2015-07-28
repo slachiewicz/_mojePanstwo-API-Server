@@ -1,0 +1,45 @@
+{
+  "title": "",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_stenogramy.posiedzenie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_stenogramy.posiedzenie_sid": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_stenogramy.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "senat_stenogramy.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "html": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

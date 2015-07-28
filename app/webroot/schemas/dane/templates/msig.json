@@ -1,0 +1,49 @@
+{
+  "title": "Monitor S\u0105dowy i Gospodarczy",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "msig.dokument_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "msig.rocznik": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "msig.nr": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "msig.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "msig.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "toc": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

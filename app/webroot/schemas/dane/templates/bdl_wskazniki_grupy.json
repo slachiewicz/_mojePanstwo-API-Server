@@ -1,0 +1,54 @@
+{
+  "title": "BDL \/ Grupy wska\u017anik\u00f3w",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "bdl_wskazniki_grupy.kategoria_tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki_grupy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki_grupy.liczba_podgrup": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "bdl_wskazniki_grupy.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki_grupy.okres": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki_grupy.kategoria_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "bdl_wskazniki_grupy.slug": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

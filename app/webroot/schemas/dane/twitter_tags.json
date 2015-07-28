@@ -1,0 +1,57 @@
+{
+  "title": "Tematy w twittach pos\u0142\u00f3w",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "twitter_tags.liczba_all_retweet_count": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "twitter_tags.liczba_all_statuses_count": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "twitter_tags.tag": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "twitter_tags.liczba_previous_year_statuses_count": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "twitter_tags.liczba_recent_statuses_count": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "twitter_tags.liczba_previous_year_retweet_count": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "twitter_tags.liczba_recent_retweet_count": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "twitter_tags.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          }
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

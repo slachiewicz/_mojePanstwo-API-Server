@@ -1,0 +1,85 @@
+{
+  "title": "Orzeczenia S\u0105d\u00f3w Powszechnych",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sp_orzeczenia.str_ident": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.hasla_tematyczne": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.sad": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.sad_sp_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.sygnatura": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.akcept": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.teza": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.typ": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.wydzial": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.podstawa_prawna": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.dopelniacz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sp_orzeczenia.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sp_orzeczenia.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "bloki": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

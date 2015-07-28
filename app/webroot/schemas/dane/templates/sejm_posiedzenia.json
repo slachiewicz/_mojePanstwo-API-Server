@@ -1,0 +1,157 @@
+{
+  "title": "Sejm \/ Posiedzenia",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_posiedzenia.liczba_odrzuconych_inne": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_przyjetych_powolan_odwolan": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_glosowan": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_przyjetych_sprawozdan_kontrolnych": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.stats": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_przyjetych_ustaw": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.komunikat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.opis": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_przyjetych_uchwal": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_odrzuconych_zmian_komisji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.data_stop": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sejm_posiedzenia.liczba_przyjetych_referendow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_odrzuconych_uchwal": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_odrzuconych_referendow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.zapowiedz": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_odrzuconych_sprawozdan_kontrolnych": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_odrzuconych_umow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_ratyfikowanych_umow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.img": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.data_start": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "sejm_posiedzenia.numer": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_wystapien": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_przyjetych_inne": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.str_data": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_punktow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_przyjetych_zmian_komisji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_odrzuconych_ustaw": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.informacja_marszalka_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_odrzuconych_powolan_odwolan": {
+              "type": "integer",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "projekty": {
+              "description": "TODO"
+            },
+            "related": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

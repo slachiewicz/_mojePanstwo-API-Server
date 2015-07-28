@@ -1,0 +1,81 @@
+{
+  "title": "Krak\u00f3w \/ Umowy Urz\u0119du Miasta",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krakow_umowy.jednostka_realizujaca": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_umowy.wartosc_brutto": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "krakow_umowy.data_zawarcia": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krakow_umowy_wykonawcy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_umowy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_umowy.wykonawca": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_umowy.numer": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krakow_umowy.rok": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krakow_umowy.wykonawca_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_umowy.data_obowiazywania_start": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krakow_umowy_wykonawcy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_umowy.data_obowiazywania_stop": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krakow_umowy.przedmiot_umowy": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

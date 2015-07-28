@@ -1,0 +1,58 @@
+{
+  "title": "Urz\u0119dnicy",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "instytucje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "urzednicy.pkw_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "urzednicy.instytucja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "urzednicy.stanowisko": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "urzednicy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "urzednicy.stanowisko_aktywne": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "instytucje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "urzednicy.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

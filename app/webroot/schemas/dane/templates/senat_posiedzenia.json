@@ -1,0 +1,52 @@
+{
+  "title": "Posiedzenia Senatu",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_posiedzenia.data_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_posiedzenia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_posiedzenia.sid": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_posiedzenia.data_start": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "senat_posiedzenia.data_stop": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "senat_posiedzenia.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

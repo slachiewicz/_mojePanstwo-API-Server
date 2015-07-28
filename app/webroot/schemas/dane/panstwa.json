@@ -1,0 +1,40 @@
+{
+  "title": "Pa\u0144stwa",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "panstwa.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "panstwa.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "panstwa.symbol": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "stats": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

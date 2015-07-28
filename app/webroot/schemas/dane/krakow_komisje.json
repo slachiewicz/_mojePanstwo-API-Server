@@ -1,0 +1,60 @@
+{
+  "title": "Krak\u00f3w \/ Komisje Rady Miasta",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krakow_komisje.slug": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje.liczba_posiedzen": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krakow_komisje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje.przewodniczacy_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje.przewodniczacy_email": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje.s_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_komisje.kadencja_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "sklad": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,52 @@
+{
+  "title": "Sejm \/ Komunikaty Kancelarii Sejmu",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "sejm_komunikaty.opis": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komunikaty.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komunikaty.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komunikaty.datetime": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komunikaty.date": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_komunikaty.img": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "html": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

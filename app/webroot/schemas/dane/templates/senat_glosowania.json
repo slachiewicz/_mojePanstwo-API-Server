@@ -1,0 +1,50 @@
+{
+  "title": "",
+  "allOf": [
+    {
+      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_glosowania.day": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_glosowania.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_glosowania.action": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_glosowania.sid": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_glosowania.motion": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_glosowania.posiedzenie_id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

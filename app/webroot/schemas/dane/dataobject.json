@@ -17,7 +17,7 @@
       "type": "integer",
       "description": "Identifikator obiektu wewnątrz datasetu"
     },
-    "mpurl": {
+    "mp_url": {
       "type": "string",
       "format": "url",
       "description": "URL obiektu, pod którym jest widoczny w serwisie MojePanstwo.pl"
@@ -26,8 +26,7 @@
       "type": "string",
       "description": "Nazwa obiektu"
     },
-    "schema": {
-      "_TODO": "zrealizować to w API",
+    "schema_url": {
       "type": "string",
       "format": "uri",
       "description": "Link do JSON-schema opisującej dany obiekt."

@@ -15,8 +15,12 @@ class Dataobject extends AppModel
     }
 
     public static function mpUrl($dataset, $object_id) {
-        return 'http://mojepanstwo.pl/dane/' . $dataset .'/' . $object_id;
+        return 'https://mojepanstwo.pl/dane/' . $dataset .'/' . $object_id;
     }
+
+	public static function schemaUrl($dataset) {
+		return 'https://api-v3.mojepanstwo.pl/schemas/dane/' . $dataset .'.json';
+	}
 	
 	/*
     public function setId($id)

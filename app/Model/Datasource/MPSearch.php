@@ -50,11 +50,12 @@ class MPSearch {
 		}
 
 	    $output = array(
-            'global_id' => $doc['_id'],
-            'dataset' => $dataset,
-    		'id' => $id,
+			'id' => $id,
+			'dataset' => $dataset,
 			'url' => Dataobject::apiUrl($dataset, $id),
-			'mpurl' => Dataobject::mpUrl($dataset, $id),
+			'mp_url' => Dataobject::mpUrl($dataset, $id),
+			'schema_url' => Dataobject::schemaUrl($dataset),
+			'global_id' => $doc['_id'],
     		'slug' => $doc['fields']['slug'][0],
             'score' => $doc['_score'],
             'data' => $doc['fields']['source'][0]['data'],

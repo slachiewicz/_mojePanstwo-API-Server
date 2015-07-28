@@ -31,6 +31,132 @@
       "description": "Nazwa zbioru danych, pełna lista dostępna pod https://api-v3.mojepanstwo.pl/dane/zbiory",
       "required": true,
       "type": "string",
+      "enum": [
+        "bdl_wskazniki",
+        "bdl_wskazniki_grupy",
+        "bdl_wskazniki_kategorie",
+        "budzet_wydatki_czesci",
+        "budzet_wydatki_dzialy",
+        "budzet_wydatki_rozdzialy",
+        "coe_sittings",
+        "crawler_pages",
+        "crawler_sites",
+        "dotacje_ue",
+        "dzialania",
+        "dzielnice",
+        "faktury",
+        "gminy",
+        "gminy_okregi_wyborcze",
+        "handel_zagraniczny_towary",
+        "instytucje",
+        "kody_pocztowe",
+        "kody_pocztowe_ulice",
+        "kolej_linie",
+        "kolej_stacje",
+        "krakow_darczyncy",
+        "krakow_dzielnice_rady_posiedzenia",
+        "krakow_dzielnice_uchwaly",
+        "krakow_glosowania",
+        "krakow_glosowania_glosy",
+        "krakow_jednostki",
+        "krakow_komisje",
+        "krakow_komisje_posiedzenia",
+        "krakow_komisje_posiedzenia_punkty",
+        "krakow_oswiadczenia",
+        "krakow_pomoc_publiczna",
+        "krakow_posiedzenia",
+        "krakow_posiedzenia_punkty",
+        "krakow_rada_uchwaly",
+        "krakow_radni_dzielnic_glosy",
+        "krakow_umowy",
+        "krakow_urzednicy",
+        "krakow_zamowienia_publiczne",
+        "krakow_zarzadzenia",
+        "krs_osoby",
+        "krs_podmioty",
+        "krs_podmioty_zmiany",
+        "miejscowosci",
+        "msig",
+        "msig_dzialy",
+        "msig_zmiany",
+        "nik_raporty",
+        "nik_raporty_dokumenty",
+        "panstwa",
+        "patenty",
+        "poslowie",
+        "poslowie_biura",
+        "poslowie_biura_wydatki",
+        "poslowie_glosy",
+        "poslowie_oswiadczenia_majatkowe",
+        "poslowie_rejestr_korzysci",
+        "poslowie_wspolpracownicy",
+        "poslowie_wyjazdy",
+        "poslowie_wyjazdy_wydarzenia",
+        "powiaty",
+        "prawo",
+        "prawo_hasla",
+        "prawo_lokalne",
+        "prawo_powiazane",
+        "prawo_projekty",
+        "prawo_urzedowe",
+        "prawo_wojewodztwa",
+        "radni_dzielnic",
+        "radni_gmin",
+        "radni_gmin_oswiadczenia_majatkowe",
+        "rady_druki",
+        "rady_druki_dokumenty",
+        "rady_gmin",
+        "rady_gmin_debaty",
+        "rady_gmin_interpelacje",
+        "rady_gmin_wystapienia",
+        "rady_posiedzenia",
+        "rcl_etapy",
+        "sa_orzeczenia",
+        "sa_sedziowie",
+        "sejm_debaty",
+        "sejm_dezyderaty",
+        "sejm_druki",
+        "sejm_glosowania",
+        "sejm_interpelacje",
+        "sejm_interpelacje_pisma",
+        "sejm_kluby",
+        "sejm_komisje",
+        "sejm_komisje_opinie",
+        "sejm_komisje_uchwaly",
+        "sejm_komunikaty",
+        "sejm_posiedzenia",
+        "sejm_posiedzenia_punkty",
+        "sejm_wystapienia",
+        "senat_druki",
+        "senat_glosowania",
+        "senat_glosowania_glosy",
+        "senat_kluby",
+        "senat_posiedzenia",
+        "senat_rejestr_korzysci",
+        "senat_stenogramy",
+        "senatorowie",
+        "senatorowie_oswiadczenia_majatkowe",
+        "senatorowie_pracownicy",
+        "sn_orzeczenia",
+        "sn_sedziowie",
+        "sp_orzeczenia",
+        "sp_tezy",
+        "tematy",
+        "twitter",
+        "twitter_accounts",
+        "twitter_tags",
+        "umowy",
+        "urzednicy",
+        "urzednicy_rejestr_korzysci",
+        "urzedy_gmin",
+        "wojewodztwa",
+        "wybory_darczyncy",
+        "zamowienia_publiczne",
+        "zamowienia_publiczne_dokumenty",
+        "zamowienia_publiczne_wykonawcy",
+        "zamowienia_publiczne_zamawiajacy",
+        "zbiory"
+      ]
     }
   },
   "paths": {
@@ -45,25 +171,49 @@
             "$ref": "#/parameters/dataset"
           },
           {
-            "name": "fields",
+            "name": "conditions",
             "in": "query",
-            "description": "Lista pól do zwrócenia",
+            "description": "Warunki, które muszą być spełnione na konkretnych polach, np. 'conditions[imie]=Jan&conditions[nazwisko]=Kowalski'",
             "required": false,
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Pełnotekstowe wyszukiwanie (z odmianą), np. ?q=epanstwo",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Sortowanie w formacie '<pole> (desc|asc)' po polach zawartych w 'data', np. ?order=poslowie.nazwisko asc",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numer strony wyników do zwrócenia. Można się także posłużyć linkami z sekcji Links odpowiedzi",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Ilość wyników zwróconych na stronie (domyślnie 50)",
+            "required": false,
+            "type": "integer"
           }
         ],
         "responses": {
           "200": {
             "description": "Stronicowana lista obiektów danego zbioru danych spełniająca kryteria",
             "schema": {
-              "$ref": "#/definitions/DataobjectsList",
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Dataobject"
-              }
+              "$ref": "#/definitions/DataobjectsList"
             }
           }
         }
@@ -82,23 +232,26 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Unique (in this dataset) identifier of the object",
+            "description": "Unikalny (w ramach tego zbioru danych) identyfikator obiektu",
             "required": true,
             "type": "integer"
           },
           {
             "name": "layers",
             "in": "query",
-            "description": "TODO",
-            "required": true,
-            "type": "string"
+            "description": "Lista warstw, które powinny zostać załadowane razem z obiektem. Załaduj obiekt bez warstw, aby poznać dostępne w tym zbiorze warstwy",
+            "type": "array",
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Obiekt danych",
             "schema": {
-              "$ref": "#/definitions/Dataobject"
+              "$ref": "https://api-v3.mojepanstwo.pl/schemas/dane/dataobject.json"
             }
           },
           "404": {
@@ -174,7 +327,7 @@
             "name": "slice",
             "in": "query",
             "type": "string",
-            "description": "Tablica id wymiarów, dla których przecięcia zostaną zwrócone dane. Format: [5478,*]. \nUzyj gwiazdki, aby zwrócić serie dla wszystkich punktów wymiaru. \nBrak argumentów oznacza wszystkie możliwe przecięcia.\nIdentyfikatory przecięć opisane są na warstwie dimensions wskaźnika, np. https://api-v2.mojepanstwo.pl/dane/bdl_wskazniki/762?layers=dimensions\n"
+            "description": "Tablica id wymiarów, dla których przecięcia zostaną zwrócone dane. Format: [5478,*]. \nUzyj gwiazdki, aby zwrócić serie dla wszystkich punktów wymiaru. \nBrak argumentów oznacza wszystkie możliwe przecięcia.\nIdentyfikatory przecięć opisane są na warstwie dimensions wskaźnika, np. https://api-v3.mojepanstwo.pl/dane/bdl_wskazniki/762?layers=dimensions\n"
           },
           {
             "name": "time_range",
@@ -187,19 +340,19 @@
             "name": "wojewodztwo_id",
             "in": "query",
             "type": "integer",
-            "description": "ID województwa, dla którego zostaną zwrócone dane lub * dla wszystkich. Województwa można wyszukać pod adresem https://api-v2.mojepanstwo.pl/dane/wojewodztwa/"
+            "description": "ID województwa, dla którego zostaną zwrócone dane lub * dla wszystkich. Województwa można wyszukać pod adresem https://api-v3.mojepanstwo.pl/dane/wojewodztwa/"
           },
           {
             "name": "powiat_id",
             "in": "query",
             "type": "integer",
-            "description": "ID powiatu, dla którego zostaną zwrócone dane lub * dla wszystkich. Powiaty można wyszukać pod adresem https://api-v2.mojepanstwo.pl/dane/powiaty/"
+            "description": "ID powiatu, dla którego zostaną zwrócone dane lub * dla wszystkich. Powiaty można wyszukać pod adresem https://api-v3.mojepanstwo.pl/dane/powiaty/"
           },
           {
             "name": "gmina_id",
             "in": "query",
             "type": "integer",
-            "description": "ID gminy, dla którego zostaną zwrócone dane lub * dla wszystkich. Gminy można wyszukać pod adresem https://api-v2.mojepanstwo.pl/dane/gminy/"
+            "description": "ID gminy, dla którego zostaną zwrócone dane lub * dla wszystkich. Gminy można wyszukać pod adresem https://api-v3.mojepanstwo.pl/dane/gminy/"
           },
           {
             "name": "meta",

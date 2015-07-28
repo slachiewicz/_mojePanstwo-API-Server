@@ -8,6 +8,14 @@
       "properties": {
         "data": {
           "properties": {
+            "sejm_posiedzenia.liczba_skierowanych_sprawozdan_kontrolnych": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_skierowanych_uchwal": {
+              "type": "integer",
+              "description": "TODO"
+            },
             "sejm_posiedzenia.liczba_odrzuconych_inne": {
               "type": "integer",
               "description": "TODO"
@@ -44,6 +52,18 @@
               "type": "string",
               "description": "TODO"
             },
+            "sejm_posiedzenia.liczba_skierowanych_umow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_skierowanych_zmian_komisji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_skierowanych_ustaw": {
+              "type": "integer",
+              "description": "TODO"
+            },
             "sejm_posiedzenia.liczba_przyjetych_uchwal": {
               "type": "integer",
               "description": "TODO"
@@ -56,6 +76,10 @@
               "type": "string",
               "description": "TODO",
               "format": "date-time"
+            },
+            "sejm_posiedzenia.liczba_skierowanych_powolan_odwolan": {
+              "type": "integer",
+              "description": "TODO"
             },
             "sejm_posiedzenia.liczba_przyjetych_referendow": {
               "type": "integer",
@@ -118,6 +142,14 @@
               "type": "integer",
               "description": "TODO"
             },
+            "sejm_posiedzenia.liczba_poprawki_senatu": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_skierowanych_referendow": {
+              "type": "integer",
+              "description": "TODO"
+            },
             "sejm_posiedzenia.liczba_przyjetych_zmian_komisji": {
               "type": "integer",
               "description": "TODO"
@@ -131,6 +163,10 @@
               "description": "TODO"
             },
             "sejm_posiedzenia.liczba_odrzuconych_powolan_odwolan": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.liczba_skierowanych_inne": {
               "type": "integer",
               "description": "TODO"
             }

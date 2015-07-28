@@ -8,11 +8,15 @@
       "properties": {
         "data": {
           "properties": {
-            "dzialania.id": {
+            "dzialania.opis": {
               "type": "string",
               "description": "TODO"
             },
-            "dzialania.opis": {
+            "dzialania.podsumowanie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "dzialania.id": {
               "type": "string",
               "description": "TODO"
             },
@@ -40,6 +44,10 @@
               "type": "string",
               "description": "TODO"
             },
+            "dzialania.status": {
+              "type": "string",
+              "description": "TODO"
+            },
             "dzialania.data_utworzenia": {
               "type": "string",
               "description": "TODO",
@@ -53,9 +61,11 @@
           "additionalProperties": "false"
         },
         "layers": {
-          "properties": [
-            
-          ]
+          "properties": {
+            "features": {
+              "description": "TODO"
+            }
+          }
         }
       },
       "required": [

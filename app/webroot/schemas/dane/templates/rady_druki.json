@@ -44,6 +44,10 @@
               "type": "string",
               "description": "TODO"
             },
+            "rady_druki.punkt_id": {
+              "type": "string",
+              "description": "TODO"
+            },
             "rady_druki.opis": {
               "type": "string",
               "description": "TODO"

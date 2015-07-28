@@ -37,11 +37,6 @@ foreach ($datasets as $dataset) {
 
     $out_schema = $output_directory . $slug . '.json';
 
-    if (file_exists($out_schema)) {
-        print("  Skipping..\n");
-        continue;
-    }
-
     $properties = array();
 
     // get fields based on sample object

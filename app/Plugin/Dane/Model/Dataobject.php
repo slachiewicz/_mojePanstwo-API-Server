@@ -468,6 +468,10 @@ class Dataobject extends AppModel
         $username = $data['username'];
         $title = $data['title'];
         $role = (int) $data['role'];
+
+        if(!$role)
+            $role = 2;
+
         $page_request_id = (int) $data['page_request_id'];
         $send_email = (bool) $data['send_email'];
         $success = true;

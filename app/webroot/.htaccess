@@ -5,5 +5,9 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-Header add Access-Control-Allow-Origin "*"
+# Apache 2.4.7 Header setifempty Access-Control-Allow-Origin "*"
+# Apache 2.2.4 below
+Header append Access-Control-Allow-Origin ""
+Header edit Access-Control-Allow-Origin "^$" "*"
+
 

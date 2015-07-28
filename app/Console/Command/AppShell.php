@@ -53,8 +53,20 @@ class AppShell extends Shell
         ));
 
         foreach($projects as $project) {
-            echo "\nsync " . $project['OrganizacjeDzialania']['id'];
+            $this->out('sync ' . $project['OrganizacjeDzialania']['id']);
             $this->OrganizacjeDzialania->sync($project['OrganizacjeDzialania']['id']);
         }
     }
+    
+    public function projectsSync() {
+		
+		if( $id = $this->args[0] ) {
+		    $this->loadModel('Dane.OrganizacjeDzialania');
+	
+	        $this->out('sync ' . $id);
+	        $this->OrganizacjeDzialania->sync($id);
+        }
+        
+    }
+    
 }

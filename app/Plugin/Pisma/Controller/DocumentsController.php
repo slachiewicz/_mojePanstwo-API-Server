@@ -274,7 +274,41 @@ class DocumentsController extends AppController
 	        	}
 	        	
 	        	$data['to_email'] = $to['email'];
-
+			
+			} elseif(
+	        	( $data['to_dataset']=='senatorowie' ) && 
+	        	( $to = $DB->selectAssoc("SELECT id, nazwa, email, plec FROM senat_senatorowie WHERE id='" . addslashes( $data['to_id'] ) . "'" ) ) 
+        	) {
+	        	        		
+	        	
+	        	if( $to['plec']=='K' ) {
+	        	
+		        	$data['to_str'] = '<p>Senator ' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+		        	$data['to_name'] = 'Senator - ' . $to['nazwa'];
+		        	$data['content'] = str_replace(array(
+		        		'{$szanowny_panie_posle}',
+		        		'{$pan_posel}',
+		        	), array(
+		        		'Szanowna Pani Posłanko',
+		        		'Pani Posłanka'
+		        	), $data['content']);
+	        	
+	        	} else {
+		        	
+		        	$data['to_str'] = '<p>Senator ' . $to['nazwa'] . '</p><p>' . $to['email'] . '</p>';
+		        	$data['to_name'] = 'Senator - ' . $to['nazwa'];
+		        	$data['content'] = str_replace(array(
+		        		'{$szanowny_panie_posle}',
+		        		'{$pan_posel}',
+		        	), array(
+		        		'Szanowny Panie Pośle',
+		        		'Pan Poseł'
+		        	), $data['content']);
+		        	
+	        	}
+	        	
+	        	$data['to_email'] = $to['email'];
+			
             } elseif(
                 ( $data['to_dataset']=='gminy' ) &&
                 ( $to = $DB->selectAssoc("SELECT pl_gminy.id, pl_gminy.nazwa, pl_gminy.email, pl_gminy.szef_stanowisko, pl_gminy.adres FROM pl_gminy WHERE pl_gminy.id='" . addslashes( $data['to_id'] ) . "'" ) )

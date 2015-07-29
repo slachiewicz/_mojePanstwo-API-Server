@@ -360,7 +360,7 @@ class DataobjectsController extends AppController
 
 			if (is_string($layers_to_load)) {
 				// load all layers?
-				if ($layers_to_load = '*') {
+				if ($layers_to_load == '*') {
 					$layers_to_load = array_keys($object['layers']);
 
 				} else {

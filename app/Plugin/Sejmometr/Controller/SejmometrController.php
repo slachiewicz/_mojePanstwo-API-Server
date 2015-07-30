@@ -67,4 +67,9 @@ class SejmometrController extends AppController
         $this->set('_serialize', 'data');
     }
 
+    public function senat() {
+        $this->set('data', $this->Sejmometr->getSenat());
+        $this->set('_serialize', 'data');
+    }
+
 }

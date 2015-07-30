@@ -231,5 +231,23 @@ class Sejmometr extends AppModel
             return $e->getMessage();
         }
     }
+
+    public function getSenat() {
+        try {
+            App::import('model','DB');
+            $db = new DB();
+            return $db->selectRows("
+                SELECT
+                  id,
+                  title,
+                  AsText(polygon) as `polygon`
+                FROM
+                  senat_areas
+            ");
+        }
+        catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
     
 } 

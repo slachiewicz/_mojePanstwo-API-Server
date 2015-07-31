@@ -239,10 +239,11 @@ class Sejmometr extends AppModel
             return $db->selectRows("
                 SELECT
                   id,
-                  title,
+                  numer,
                   AsText(polygon) as `polygon`
                 FROM
-                  senat_areas
+                  senat_okregi
+                WHERE polygon != ''
             ");
         }
         catch (Exception $e) {

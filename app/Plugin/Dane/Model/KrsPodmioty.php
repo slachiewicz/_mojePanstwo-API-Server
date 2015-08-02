@@ -232,6 +232,7 @@ class KrsPodmioty extends AppModel {
             SELECT id, complete, priority
             FROM krs_files
             WHERE
+              status!='-1' AND 
               krs_pozycje_id = $id AND
               (
                 complete = '0'

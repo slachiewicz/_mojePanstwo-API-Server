@@ -24,7 +24,11 @@ class GlosyController extends AppController
 
     public function view($id)
     {
-        $glosy = $this->UserVotes->find('all', array('conditions' => array('druk_id' => $id)));
+        $glosy = $this->UserVotes->find('count',
+            array(
+                'fields' => 'DISTINCT vote',
+                'conditions' => array('druk_id' => $id)
+            ));
         $this->setSerialized('glosy', $glosy);
     }
 }

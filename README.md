@@ -1,5 +1,6 @@
 _mojePanstwo-API-Server
 =======================
+[![Landscape](https://landscape.io/github/epforgpl/_mojePanstwo-API-Server/master/landscape.svg?style=flat)](https://landscape.io/github/epforgpl/_mojePanstwo-API-Server)
 [![Build Status](https://travis-ci.org/epforgpl/_mojePanstwo-API-Server.png)](https://travis-ci.org/epforgpl/_mojePanstwo-API-Server)
 
 Instalacja

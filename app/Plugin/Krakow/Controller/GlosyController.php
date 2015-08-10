@@ -1,48 +1,33 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: tomaszdrazewski
- * Date: 04/08/15
- * Time: 16:07
- */
 class GlosyController extends AppController
 {
 
     public $uses = array('Krakow.UserVotes');
+    public $components = array('RequestHandler');
 
-
-    public function beforeFilter()
-    {
+    public function beforeFilter() {
         parent::beforeFilter();
-
-        if ($this->request->query['apiKey'] !== ROOT_API_KEY) {
-            // deny access to Paszport from untrusted clients
+        if($this->Auth->user('type') != 'account')
             throw new ForbiddenException();
-        }
-        // deny all unauthenticated if not explicitly allowed
-        $this->Auth->deny();
     }
 
-    public function save()
-    {
+    public function save($druk_id) {
         $this->UserVotes->create();
-        if ($this->UserVotes->save($this->request->data)) {
-            $message = 1;
-        } else {
-            $message = 0;
-        }
-
-        $this->setSerialized('object', $message);
+        $this->setSerialized('response', $this->UserVotes->save(array(
+            'user_id' => (int) $this->Auth->user('id'),
+            'druk_id' => (int) $druk_id,
+            'vote' => (int) $this->data['vote'],
+            'vote_ts' => date('Y-m-d H:i:s')
+        )));
     }
 
-    public function view($id)
-    {
-        $glosy = $this->UserVotes->find('count',
-            array(
+    public function view($druk_id) {
+        $this->setSerialized('response', $this->UserVotes->find('count', array(
                 'fields' => 'DISTINCT vote',
-                'conditions' => array('druk_id' => $id)
-            ));
-        $this->setSerialized('glosy', $glosy);
+                'conditions' => array('druk_id' => $druk_id)
+            )
+        ));
     }
+
 }

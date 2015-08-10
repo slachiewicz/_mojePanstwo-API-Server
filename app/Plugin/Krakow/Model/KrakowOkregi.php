@@ -16,7 +16,8 @@ class KrakowOkregi extends AppModel {
                   AsText(polygon),
                   dzielnice,
                   ilosc_mieszkancow,
-                  liczba_mandatow
+                  liczba_mandatow,
+                  okreg_id
                 FROM
                   pl_gminy_krakow_okregi
                 WHERE id = $id

@@ -23,11 +23,13 @@ class GlosyController extends AppController
     }
 
     public function view($druk_id) {
-        $this->setSerialized('response', $this->UserVotes->find('count', array(
-                'fields' => 'DISTINCT vote',
-                'conditions' => array('druk_id' => $druk_id)
+        $this->setSerialized(
+            'response',
+            $this->UserVotes->getVotes(
+                $druk_id,
+                (int) $this->Auth->user('id')
             )
-        ));
+        );
     }
 
 }

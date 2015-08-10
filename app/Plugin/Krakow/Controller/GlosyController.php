@@ -13,13 +13,11 @@ class GlosyController extends AppController
     }
 
     public function save($druk_id) {
-        $this->UserVotes->create();
-        $this->setSerialized('response', $this->UserVotes->save(array(
-            'user_id' => (int) $this->Auth->user('id'),
-            'druk_id' => (int) $druk_id,
-            'vote' => (int) $this->data['vote'],
-            'vote_ts' => date('Y-m-d H:i:s')
-        )));
+        $this->setSerialized('response', $this->UserVotes->vote(
+            (int) $this->Auth->user('id'),
+            (int) $druk_id,
+            (int) $this->data['vote']
+        ));
     }
 
     public function view($druk_id) {

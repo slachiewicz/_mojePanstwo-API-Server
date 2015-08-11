@@ -17,7 +17,8 @@ class KrakowOkregi extends AppModel {
                   dzielnice,
                   ilosc_mieszkancow,
                   liczba_mandatow,
-                  okreg_id
+                  okreg_id,
+                  ilosc_miesz_norma_przedst
                 FROM
                   pl_gminy_krakow_okregi
                 WHERE id = $id

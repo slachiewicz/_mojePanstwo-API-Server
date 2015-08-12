@@ -118,7 +118,8 @@ class Mysql extends DboSource
         'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
         'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
         'binary' => array('name' => 'blob'),
-        'boolean' => array('name' => 'tinyint', 'limit' => '1')
+        'boolean' => array('name' => 'tinyint', 'limit' => '1'),
+        'enum' => array('name' => 'enum'),
     );
 
     /**
@@ -351,6 +352,21 @@ class Mysql extends DboSource
                 'default' => $column->Default,
                 'length' => $this->length($column->Type),
             );
+
+            // handle enums dynamically
+            $enum_elements = array();
+            if ($fields[$column->Field]['type'] == 'enum') {
+                if (!preg_match('/^enum\((.*)\)$/', $column->Type, $enum_elements)) {
+                    throw new Exception("Couldn't parse enum declaration: " . $column->Type);
+                }
+
+                // nasty hack in DboSource:3208, not adding enum handling there
+                $fields[$column->Field]['length'] = $enum_elements[1];
+
+                preg_match_all('/\'([^\']+)\'/', $enum_elements[1], $enum_elements);
+                $fields[$column->Field]['values'] = $enum_elements[1];
+            }
+
             if (!empty($column->Key) && isset($this->index[$column->Key])) {
                 $fields[$column->Field]['key'] = $this->index[$column->Key];
             }
@@ -788,7 +804,7 @@ class Mysql extends DboSource
             return 'float';
         }
         if (strpos($col, 'enum') !== false) {
-            return "enum($vals)";
+            return "enum";
         }
         return 'text';
     }

@@ -39,6 +39,7 @@ class KrsPodmioty extends AppModel {
                 'status' => $data['status'],
                 'podsumowanie' => $data['podsumowanie'],
                 'cover_photo' => $data['cover_photo'] ? '1' : '0',
+                'photo_disabled' => isset($data['photo_disabled']) ? '1' : '0',
                 'folder' => isset($data['folder']) ? $data['folder'] : '1',
                 'geo_lat' => (float) $data['geo_lat'],
                 'geo_lng' => (float) $data['geo_lng']
@@ -77,7 +78,7 @@ class KrsPodmioty extends AppModel {
             $toUpdate['mts'] = date('Y-m-d H:i:s');
             $toUpdate['id'] = $object['OrganizacjeDzialania']['id'];
 
-            $fields = array('tytul', 'opis', 'folder', 'status', 'podsumowanie', 'geo_lat', 'geo_lng');
+            $fields = array('tytul', 'opis', 'folder', 'status', 'podsumowanie', 'geo_lat', 'geo_lng', 'photo_disabled');
             if($deleted)
                 $fields[] = 'deleted';
 
@@ -88,7 +89,7 @@ class KrsPodmioty extends AppModel {
 
             $this->_update_activity_tags($object['OrganizacjeDzialania']['id'], @$data['tagi']);
             $this->_update_activity_photo($object['OrganizacjeDzialania']['id'], $data);
-            $toUpdateFields = array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng');
+            $toUpdateFields = array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng', 'photo_disabled');
             if($deleted)
                 $toUpdateFields[] = 'deleted';
 

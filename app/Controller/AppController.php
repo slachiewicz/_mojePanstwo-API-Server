@@ -116,7 +116,7 @@ class AppController extends Controller {
             }
         } else {
             // missing API key
-            if (!preg_match('/^http(s)?\:\/\/mojepanstwo\.pl$/', $origin)) {
+            if (!preg_match('/^http(s)?\:\/\/mojepanstwo\.pl$/', $origin) && !Configure::read('debug')) {
                 // now there is no excuse!
                 throw new ForbiddenException('Please register your application on https://mojepanstwo.pl/paszport/apps and specify apiKey');
             }

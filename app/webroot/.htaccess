@@ -10,5 +10,3 @@
 Header append Access-Control-Allow-Origin ""
 Header edit Access-Control-Allow-Origin "^$" "*"
 Header edit Access-Control-Allow-Origin "^(.+),\s*$" "$1"
-
-

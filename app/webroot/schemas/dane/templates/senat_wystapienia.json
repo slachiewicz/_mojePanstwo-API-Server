@@ -1,0 +1,59 @@
+{
+  "title": "Wyst\u0105pienia w Senacie",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_wystapienia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_wystapienia.posiedzenie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_wystapienia.tytul_punktu": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_wystapienia.posiedzenie_sid": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_wystapienia.data": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "senat_wystapienia.senator_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_wystapienia.wypowiedz_ref": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_wystapienia.typ_punktu": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

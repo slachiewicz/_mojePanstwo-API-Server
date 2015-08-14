@@ -1,0 +1,42 @@
+{
+  "title": "Komisje senackie",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "senat_komisje.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_komisje.url": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_komisje.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "senat_komisje.sid": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": [
+            
+          ]
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

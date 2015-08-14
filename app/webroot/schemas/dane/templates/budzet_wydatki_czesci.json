@@ -2,7 +2,7 @@
   "title": "Bud\u017cet \/ Cz\u0119\u015bci",
   "allOf": [
     {
-      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

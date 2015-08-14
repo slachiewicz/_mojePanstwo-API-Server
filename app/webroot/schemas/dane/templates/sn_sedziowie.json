@@ -2,7 +2,7 @@
   "title": "S\u0119dziowie S\u0105du Najwy\u017cszego",
   "allOf": [
     {
-      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

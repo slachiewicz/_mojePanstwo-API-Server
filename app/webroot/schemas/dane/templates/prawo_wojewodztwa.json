@@ -2,7 +2,7 @@
   "title": "Prawo w dziennikach wojew\u00f3dzkich",
   "allOf": [
     {
-      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

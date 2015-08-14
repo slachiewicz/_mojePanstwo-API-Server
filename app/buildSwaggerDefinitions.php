@@ -3,7 +3,7 @@
 require_once("Vendor/functions.php");
 
 $output_directory = 'webroot/schemas/dane/templates/';
-$api_root = 'http://api-server.dev/';
+$api_root = 'https://api-v3.mojepanstwo.pl/';
 
 $response = file_get_contents($api_root . 'dane/zbiory');
 $response = json_decode($response, true);

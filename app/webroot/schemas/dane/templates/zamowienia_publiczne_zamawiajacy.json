@@ -2,7 +2,7 @@
   "title": "Zam\u00f3wienia Publiczne \/ Zamawiaj\u0105cy",
   "allOf": [
     {
-      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

@@ -2,7 +2,7 @@
   "title": "KRS \/ Zmiany w organizacjach",
   "allOf": [
     {
-      "$ref": "http:\/\/api-server.dev\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

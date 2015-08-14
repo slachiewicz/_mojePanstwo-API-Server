@@ -2,7 +2,7 @@
   "properties": {
     "url": {
       "type": "string",
-      "format": "url",
+      "format": "uri",
       "description": "Unikalny identifykator obiektu, bedący zarówno URL pod jakim obiekt jest dostępny"
     },
     "global_id": {
@@ -19,7 +19,7 @@
     },
     "mpurl": {
       "type": "string",
-      "format": "url",
+      "format": "uri",
       "description": "URL obiektu, pod którym jest widoczny w serwisie MojePanstwo.pl"
     },
     "slug": {

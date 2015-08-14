@@ -2,7 +2,7 @@
   "title": "Zbiory danych portalu _mojePa\u0144stwo",
   "allOf": [
     {
-      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

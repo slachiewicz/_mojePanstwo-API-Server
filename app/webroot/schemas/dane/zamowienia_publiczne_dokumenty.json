@@ -3,7 +3,7 @@
   "description": "TODO wspomniec o hierarchicznej strukturze dokumentow, przez kogo moze byc skladane? Moze wojeowdztwo_id itp. zastapic url zamawiajacego..",
   "allOf": [
     {
-      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

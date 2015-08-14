@@ -2,7 +2,7 @@
   "title": "BDL \/ Grupy wska\u017anik\u00f3w",
   "allOf": [
     {
-      "$ref": "https:\/\/api-v2.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
     },
     {
       "properties": {

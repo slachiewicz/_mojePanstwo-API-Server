@@ -7,15 +7,33 @@
     {
       "properties": {
         "data": {
-          "properties": [
-            
-          ],
+          "properties": {
+            "wojewodztwa.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "wojewodztwa.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
           "additionalProperties": "false"
         },
         "layers": {
-          "properties": [
-            
-          ]
+          "properties": {
+            "geojson": {
+              "description": "TODO"
+            },
+            "geojson_gminy": {
+              "description": "TODO"
+            },
+            "geojson_powiaty": {
+              "description": "TODO"
+            },
+            "geojson_simplified": {
+              "description": "TODO"
+            }
+          }
         }
       },
       "required": [

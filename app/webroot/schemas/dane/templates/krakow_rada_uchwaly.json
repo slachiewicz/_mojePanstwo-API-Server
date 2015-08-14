@@ -8,11 +8,31 @@
       "properties": {
         "data": {
           "properties": {
-            "krakow_rada_uchwaly.archiwalna_str": {
+            "krakow_rada_uchwaly.druk_id": {
               "type": "string",
               "description": "TODO"
             },
-            "krakow_rada_uchwaly.druk_id": {
+            "krakow_rada_uchwaly.kadencja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_rada_uchwaly.opis": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_rada_uchwaly.str_numer": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_rada_uchwaly.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_rada_uchwaly.tytul": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krakow_rada_uchwaly.archiwalna_str": {
               "type": "string",
               "description": "TODO"
             },
@@ -32,28 +52,12 @@
               "type": "string",
               "description": "TODO"
             },
-            "krakow_rada_uchwaly.opis": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "krakow_rada_uchwaly.str_numer": {
-              "type": "string",
-              "description": "TODO"
-            },
             "krakow_rada_uchwaly.data": {
               "type": "string",
               "description": "TODO",
               "format": "date-time"
             },
-            "krakow_rada_uchwaly.typ_id": {
-              "type": "string",
-              "description": "TODO"
-            },
             "krakow_rada_uchwaly.dokument_id": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "krakow_rada_uchwaly.tytul": {
               "type": "string",
               "description": "TODO"
             }
@@ -63,6 +67,9 @@
         "layers": {
           "properties": {
             "druki": {
+              "description": "TODO"
+            },
+            "docs": {
               "description": "TODO"
             }
           }

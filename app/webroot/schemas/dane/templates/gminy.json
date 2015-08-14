@@ -7,15 +7,160 @@
     {
       "properties": {
         "data": {
-          "properties": [
-            
-          ],
+          "properties": {
+            "gminy.szef_stanowisko_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.nts": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.typ_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.liczba_ludnosci": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "gminy.adres": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.email": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "wojewodztwa.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.zadluzenie_roczne": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.wydatki_roczne": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "wojewodztwa.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.powierzchnia": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.rada_nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.teryt": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.telefon": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.sejm_okreg_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.bip_www": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.powiat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.nazwa_urzedu": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.wojewodztwo_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.fax": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.dochody_roczne": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
           "additionalProperties": "false"
         },
         "layers": {
-          "properties": [
-            
-          ]
+          "properties": {
+            "enspat": {
+              "description": "TODO"
+            },
+            "rada_komitety": {
+              "description": "TODO"
+            },
+            "wskazniki": {
+              "description": "TODO"
+            },
+            "radni_powiazania": {
+              "description": "TODO"
+            },
+            "szef": {
+              "description": "TODO"
+            },
+            "ostatnie_posiedzenie": {
+              "description": "TODO"
+            },
+            "dzielnice": {
+              "description": "TODO"
+            },
+            "urzednicy_powiazania": {
+              "description": "TODO"
+            },
+            "geojson": {
+              "description": "TODO"
+            },
+            "geojson_simplified": {
+              "description": "TODO"
+            },
+            "radni": {
+              "description": "TODO"
+            },
+            "finanse": {
+              "description": "TODO"
+            },
+            "wpf": {
+              "description": "TODO"
+            }
+          }
         }
       },
       "required": [

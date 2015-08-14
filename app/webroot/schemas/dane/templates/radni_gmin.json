@@ -8,23 +8,11 @@
       "properties": {
         "data": {
           "properties": {
-            "radni_gmin.imie": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.obywatelstwo": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.oswiadczenie": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.liczba_interpelacji": {
-              "type": "integer",
-              "description": "TODO"
-            },
             "radni_gmin.avatar_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.www": {
               "type": "string",
               "description": "TODO"
             },
@@ -32,11 +20,7 @@
               "type": "string",
               "description": "TODO"
             },
-            "radni_gmin.imie_nazwisko": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.rezygnacja_podstawa_prawna": {
+            "radni_gmin.dyzury_tel": {
               "type": "string",
               "description": "TODO"
             },
@@ -48,20 +32,16 @@
               "type": "string",
               "description": "TODO"
             },
-            "gminy.typ_id": {
+            "radni_gmin.tel": {
               "type": "string",
               "description": "TODO"
             },
-            "radni_gmin.funkcja_id": {
+            "gminy.typ_id": {
               "type": "string",
               "description": "TODO"
             },
             "radni_gmin.liczba_glosow": {
               "type": "integer",
-              "description": "TODO"
-            },
-            "radni_gmin.komitet": {
-              "type": "string",
               "description": "TODO"
             },
             "radni_gmin.data_wybrania": {
@@ -77,15 +57,15 @@
               "type": "string",
               "description": "TODO"
             },
+            "radni_gmin.fb": {
+              "type": "string",
+              "description": "TODO"
+            },
             "radni_gmin.wybranie_akcja_wyborcza_link": {
               "type": "string",
               "description": "TODO"
             },
             "radni_gmin.okreg_nr": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.gmina_id": {
               "type": "string",
               "description": "TODO"
             },
@@ -101,31 +81,11 @@
               "type": "number",
               "description": "TODO"
             },
-            "radni_gmin.id": {
+            "radni_gmin.blog": {
               "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.liczba_wystapien": {
-              "type": "integer",
-              "description": "TODO"
-            },
-            "radni_gmin.wybranie_akcja_wyborcza": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.bez_wyborow": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.rok_urodzenia": {
-              "type": "integer",
               "description": "TODO"
             },
             "gminy.id": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.nazwa": {
               "type": "string",
               "description": "TODO"
             },
@@ -153,6 +113,102 @@
               "type": "string",
               "description": "TODO"
             },
+            "radni_gmin.okreg_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.plec": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "gminy.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.nazwisko": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.twitter": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.kandydat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.kadencja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.email2": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.imie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.obywatelstwo": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.oswiadczenie": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.liczba_interpelacji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "radni_gmin.imie_nazwisko": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.rezygnacja_podstawa_prawna": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.funkcja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.komitet": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.wiki": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.liczba_wystapien": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "radni_gmin.wybranie_akcja_wyborcza": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.bez_wyborow": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.rok_urodzenia": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "radni_gmin.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
             "gminy.powiat_id": {
               "type": "string",
               "description": "TODO"
@@ -165,35 +221,15 @@
               "type": "string",
               "description": "TODO"
             },
-            "radni_gmin.okreg_id": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.plec": {
-              "type": "string",
-              "description": "TODO"
-            },
             "radni_gmin.wybrany": {
               "type": "string",
               "description": "TODO"
             },
-            "gminy.nazwa": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.nazwisko": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.kandydat_id": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "radni_gmin.kadencja_id": {
-              "type": "string",
-              "description": "TODO"
-            },
             "radni_gmin.nazwa_odwrocona": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "radni_gmin.dyzury": {
               "type": "string",
               "description": "TODO"
             },
@@ -225,6 +261,9 @@
               "description": "TODO"
             },
             "obietnice": {
+              "description": "TODO"
+            },
+            "okreg": {
               "description": "TODO"
             }
           }

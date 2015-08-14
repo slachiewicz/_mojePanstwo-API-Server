@@ -8,35 +8,11 @@
       "properties": {
         "data": {
           "properties": {
-            "sejm_glosowania.g": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "sejm_glosowania.wb": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "sejm_glosowania.l": {
-              "type": "string",
-              "description": "TODO"
-            },
             "sejm_glosowania.posiedzenie_id": {
               "type": "string",
               "description": "TODO"
             },
-            "sejm_posiedzenia.id": {
-              "type": "string",
-              "description": "TODO"
-            },
             "sejm_posiedzenia.tytul": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "sejm_glosowania.kluby_za": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "sejm_glosowania.debata_id": {
               "type": "string",
               "description": "TODO"
             },
@@ -57,18 +33,6 @@
               "description": "TODO"
             },
             "sejm_glosowania.w": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "sejm_glosowania.typ_id": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "sejm_glosowania.wynik_id": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "sejm_glosowania.wystapienie_id": {
               "type": "string",
               "description": "TODO"
             },
@@ -96,11 +60,51 @@
               "type": "string",
               "description": "TODO"
             },
-            "sejm_glosowania_typy.id": {
+            "sejm_glosowania.punkt_id": {
               "type": "string",
               "description": "TODO"
             },
-            "sejm_glosowania.punkt_id": {
+            "sejm_glosowania.g": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.wb": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.kluby_wstrzymane": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.l": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_posiedzenia.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.kluby_za": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.debata_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.wynik_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania.wystapienie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "sejm_glosowania_typy.id": {
               "type": "string",
               "description": "TODO"
             }

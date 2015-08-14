@@ -28,6 +28,10 @@
               "type": "string",
               "description": "TODO"
             },
+            "senatorowie.okreg_id": {
+              "type": "string",
+              "description": "TODO"
+            },
             "senatorowie.bio": {
               "type": "string",
               "description": "TODO"

@@ -7,15 +7,61 @@
     {
       "properties": {
         "data": {
-          "properties": [
-            
-          ],
+          "properties": {
+            "powiaty.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "wojewodztwa.id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.wojewodztwo_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "wojewodztwa.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.sejm_okreg_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.nts": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.senat_okreg_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "powiaty.id": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
           "additionalProperties": "false"
         },
         "layers": {
-          "properties": [
-            
-          ]
+          "properties": {
+            "gmina": {
+              "description": "TODO"
+            },
+            "geojson": {
+              "description": "TODO"
+            },
+            "geojson_gminy": {
+              "description": "TODO"
+            },
+            "geojson_simplified": {
+              "description": "TODO"
+            }
+          }
         }
       },
       "required": [

@@ -20,6 +20,10 @@
               "type": "string",
               "description": "TODO"
             },
+            "rady_gmin_interpelacje.kadencja_id": {
+              "type": "string",
+              "description": "TODO"
+            },
             "radni_gmin.komitet_id": {
               "type": "string",
               "description": "TODO"

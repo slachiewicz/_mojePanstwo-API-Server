@@ -80,23 +80,26 @@ class DocsController extends AppController
             ) {
                 $this->Rotatedoc->updateAll(array('Rotatedoc.rotate' => $page['rotate']), array('Rotatedoc.numer' => $page['numer'], 'Rotatedoc.dokument_id' => $page['dokument_id']));
             } else {
+                $this->Rotatedoc->create();
                 $this->Rotatedoc->save($page);
             }
         }
 
         foreach ($this->request->data['bookmarks'] as $bookmark) {
-            if ($id = @$this->Bookmark->find('first', array('conditions' => array(
+            if ($id = $this->Bookmark->find('first', array('conditions' => array(
                 'strona_numer' => $bookmark['strona_numer'],
                 'dokument_id' => $bookmark['dokument_id']
             ), 'fields' => 'id'))
             ) {
                 $bookmark['id'] = $id['Bookmark']['id'];
             }
+            $this->Bookmark->create();
             $this->Bookmark->save($bookmark);
+
         }
 
         $this->set(array(
-            'message' => true,
+            'message' => $this->request->data['bookmarks'],
             '_serialize' => array('message'),
         ));
     }

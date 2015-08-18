@@ -103,4 +103,19 @@ class DocsController extends AppController
             '_serialize' => array('message'),
         ));
     }
+
+    public function doc_id_from_attach() {
+
+        $this->loadModel("Bookmark");
+        $data=$this->Bookmark->find('first', array(
+            'conditions'=>array(
+                'id'=>$this->request->id
+            )));
+
+        $id=$data['Bookmark']['dokument_id'];
+        $this->set(array(
+            'doc_id'=> $id,
+            '_serialize' => array('doc_id')
+        ));
+    }
 } 

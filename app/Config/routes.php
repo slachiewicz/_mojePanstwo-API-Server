@@ -49,6 +49,7 @@ Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'
 
 Router::connect('/docs/:id', array('controller' => 'docs', 'action' => 'save_document','[method]' => 'POST'));
 Router::connect('/docs/:id', array('controller' => 'docs', 'action' => 'view'));
+Router::connect('/docs/attachments/:id', array('controller' => 'docs', 'action' => 'doc_id_from_attach'));
 Router::connect('/docs/:id/html/:package', array('controller' => 'docs', 'action' => 'html'));
 
 

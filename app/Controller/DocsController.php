@@ -104,17 +104,36 @@ class DocsController extends AppController
         ));
     }
 
-    public function doc_id_from_attach() {
-
+    public function bookmarks()
+    {
         $this->loadModel("Bookmark");
-        $data=$this->Bookmark->find('first', array(
-            'conditions'=>array(
-                'id'=>$this->request->id
+        $data = $this->Bookmark->find('all', array(
+            'conditions' => array(
+                'source_dokument_id' => $this->request->id
+            ),
+            'fields'=> array(
+                'id','strona_numer_hex','tytul','opis'
+            ),
+            'order'=>array(
+                'strona_start'=>'ASC'
+            )));
+        $this->set(array(
+            'bookmarks' => $data,
+            '_serialize' => array('bookmarks')
+        ));
+    }
+
+    public function doc_id_from_attach()
+    {
+        $this->loadModel("Bookmark");
+        $data = $this->Bookmark->find('first', array(
+            'conditions' => array(
+                'id' => $this->request->id
             )));
 
-        $id=$data['Bookmark']['dokument_id'];
+        $id = $data['Bookmark']['dokument_id'];
         $this->set(array(
-            'doc_id'=> $id,
+            'doc_id' => $id,
             '_serialize' => array('doc_id')
         ));
     }

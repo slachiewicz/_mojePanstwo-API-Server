@@ -24,18 +24,40 @@ class DocsController extends AppController
 	        
 	        $path = 'htmlex/' . $document_id . '/' . $document_id . '_1.html';	        	        
 	        
-	        if(
+	        if( 
 	        	isset($this->request->query['package']) && 
-	        	( is_numeric( $this->request->query['package'] ) ) && 
-	        	( $package = $this->request->query['package'] ) && 
-	        	( $s3_response = @$this->S3->getObject('docs.sejmometr.pl', $path) ) && 
-	        	( $html = @$s3_response->body )
+	        	( $package = $this->request->query['package'] )
 	        ) {
-		        		        
-		        $this->set('Package', $html);
+		        
+		        
+		        if( $package === '*' ) {
+			        
+			        
+			        $html = '';
+			        
+			        for( $i=0; $i<$document['packages_count']; $i++ ) {
+				        
+				        $p = $i + 1;
+				        if( $s3_response = @$this->S3->getObject('docs.sejmometr.pl', 'htmlex/' . $document_id . '/' . $document_id . '_' . $p . '.html') )
+				        	$html .= @$s3_response->body;
+				        
+			        }
+			        
+			        $this->set('Package', $html);
+			        
+			        
+		        } elseif(
+			        ( is_numeric( $this->request->query['package'] ) ) && 
+		        	( $package = $this->request->query['package'] ) && 
+		        	( $s3_response = @$this->S3->getObject('docs.sejmometr.pl', $path) ) && 
+		        	( $html = @$s3_response->body )
+		        ) 
+			        $this->set('Package', $html);
+			        		        
 		        $_serialize[] = 'Package';
 		        
 	        }
+
 	        
 	        $this->set(array(
 	            'Document' => $document,

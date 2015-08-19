@@ -246,120 +246,10 @@ class MPSearch {
 			
 		}
 		
-		// var_export( $queryData ); die();
 		
-		if( isset( $queryData['aggs'] ) ) {
-			if (!is_array($queryData['aggs'])) {
-				throw new BadRequestException();
-			}
-			
-			// debug( $queryData['aggs'] );
-			$aggs = array();
-						
-			foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
-				
-				if( 
-					( $agg_id === '_channels' ) && 
-					isset( $queryData['conditions']['_feed'] )
-				) {
-														
-					$aggs['_channels'] = array(
-	                    'global' => new \stdClass(),
-	                    'aggs' => array(
-	                        'feed_data' => array(
-	                            'nested' => array(
-	                                'path' => 'feeds_channels',
-	                            ),
-	                            'aggs' => array(
-	                                'feed' => array(
-	                                    'filter' => array(
-	                                        'and' => array(
-	                                            'filters' => array(
-	                                                array(
-	                                                    'term' => array(
-	                                                        'feeds_channels.dataset' => $queryData['conditions']['_feed']['dataset'],
-	                                                    ),
-	                                                ),
-	                                                array(
-	                                                    'term' => array(
-	                                                        'feeds_channels.object_id' => $queryData['conditions']['_feed']['object_id'],
-	                                                    ),
-	                                                )
-	                                            ),
-	                                        ),
-	                                    ),
-	                                    'aggs' => array(
-	                                        'channel' => array(
-	                                            'terms' => array(
-	                                                'field' => 'feeds_channels.channel',
-	                                                'size' => 100,
-	                                            ),
-	                                        ),
-	                                    ),
-	                                ),
-	                            ),
-	                        ),
-	                    ),
-	                );
-	                
-	                $this->Aggs[ '_channels' ][ 'global' ] = array();
-	            
-				} else {
-					if (!is_array($agg_data)) {
-						throw new BadRequestException();
-					}
-					
-					array_walk_recursive($agg_data, function(&$item, $key){
-						if( $item === '_empty' )
-							$item = new \stdClass();
-					});
-														
-					foreach( $agg_data as $agg_type => $agg_params ) {
-						
-						// if( in_array($agg_type, array_keys($this->aggs_allowed)) ) {
-															
-							$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
-							$es_params = array();
-							
-							if( $agg_type=='global' ) {
-								
-								$aggs[ $agg_id ]['global'] = new \stdClass();
-								
-								
-							} else {
-							
-								foreach( $agg_params as $key => $value ) {
-									// if( ($agg_type == 'aggs') || in_array($key, $this->aggs_allowed[$agg_type]) ) {
-										
-										if( 
-											( $key == 'field' ) && 
-											!in_array($value, array('date', 'dataset'))
-										) {
-											$value = 'data.' . $value;
-										}
-										
-										$es_params[ $key ] = $value;
-									
-									// }
-								}
-							
-							}
-													
-							if( !empty($es_params) )
-								$aggs[ $agg_id ][ $agg_type ] = $es_params;
-						
-						// }
-						
-					}
-				
-				}
-			}
-							
-			if( !empty($aggs) )
-				$params['body']['aggs'] = $aggs;
-						
-		}
 		
+		
+		// FILTERS
 				
 		$and_filters = array();
         
@@ -767,7 +657,182 @@ class MPSearch {
 
         }
 		
-
+		
+		// var_export( $queryData ); die();
+		
+		if( isset( $queryData['aggs'] ) ) {
+			if (!is_array($queryData['aggs'])) {
+				throw new BadRequestException();
+			}
+			
+			// debug( $queryData['aggs'] );
+			$aggs = array();
+						
+			foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
+				
+				if( 
+					( $agg_id === '_channels' ) && 
+					isset( $queryData['conditions']['_feed'] )
+				) {
+														
+					$aggs['_channels'] = array(
+	                    'global' => new \stdClass(),
+	                    'aggs' => array(
+	                        'feed_data' => array(
+	                            'nested' => array(
+	                                'path' => 'feeds_channels',
+	                            ),
+	                            'aggs' => array(
+	                                'feed' => array(
+	                                    'filter' => array(
+	                                        'and' => array(
+	                                            'filters' => array(
+	                                                array(
+	                                                    'term' => array(
+	                                                        'feeds_channels.dataset' => $queryData['conditions']['_feed']['dataset'],
+	                                                    ),
+	                                                ),
+	                                                array(
+	                                                    'term' => array(
+	                                                        'feeds_channels.object_id' => $queryData['conditions']['_feed']['object_id'],
+	                                                    ),
+	                                                )
+	                                            ),
+	                                        ),
+	                                    ),
+	                                    'aggs' => array(
+	                                        'channel' => array(
+	                                            'terms' => array(
+	                                                'field' => 'feeds_channels.channel',
+	                                                'size' => 100,
+	                                            ),
+	                                        ),
+	                                    ),
+	                                ),
+	                            ),
+	                        ),
+	                    ),
+	                );
+	                
+	                $this->Aggs[ '_channels' ][ 'global' ] = array();
+	            
+				} else {
+					
+					if (!is_array($agg_data)) {
+						throw new BadRequestException();
+					}
+					
+					array_walk_recursive($agg_data, function(&$item, $key){
+						if( $item === '_empty' )
+							$item = new \stdClass();
+					});
+					
+					$scope = 'results';
+										
+					if( array_key_exists('scope', $agg_data) ) {
+						$scope = $agg_data['scope'];
+						unset( $agg_data['scope'] );
+					}
+					
+					foreach( $agg_data as $agg_type => $agg_params ) {
+																									
+						$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
+						$es_params = array();
+						
+						foreach( $agg_params as $key => $value ) {
+									
+							if( 
+								( $key == 'field' ) && 
+								!in_array($value, array('date', 'dataset'))
+							)
+								$value = 'data.' . $value;
+							
+							$es_params[ $key ] = $value;
+							
+						}
+												
+						if( !empty($es_params) )
+							$aggs[ $scope ][ $agg_id ][ $agg_type ] = $es_params;
+												
+					}
+				
+				}
+			}
+			
+			
+			
+			$es_aggs = array();
+			
+			
+			if( 
+				array_key_exists('global', $aggs) || 
+				array_key_exists('query', $aggs) || 
+				array_key_exists('query_main', $aggs) 
+			) {
+				
+				$es_aggs['__global'] = array(
+					'global' => new \stdClass(),
+					'aggs' => array(),
+				);
+				
+				if( array_key_exists('global', $aggs) )
+					$es_aggs['__global']['aggs'] = $aggs['global'];
+				
+			}
+			
+			
+			if( 
+				array_key_exists('query', $aggs) || 
+				array_key_exists('query_main', $aggs) 
+			) {
+				
+				if( isset($params['body']['query']['function_score']['query']['filtered']['query']) )
+					$filter = array(
+						'query' => $params['body']['query']['function_score']['query']['filtered']['query'],
+					);
+				else
+					$filter = array(
+						'match_all' => new \stdClass(),
+					);
+				
+				$es_aggs['__global']['aggs']['__query'] = array(
+					'filter' => $filter,
+					'aggs' => array(),
+				);
+				
+				if( array_key_exists('query', $aggs) )
+					$es_aggs['__global']['aggs']['__query']['aggs'] = $aggs['query'];
+				
+			}
+			
+			
+			if( array_key_exists('query_main', $aggs) ) {
+				
+				$es_aggs['__global']['aggs']['__query']['aggs']['__query_main'] = array(
+					'filter' => array(
+						'term' => array(
+			    			'weights.main.enabled' => true,
+			    		),
+					),
+					'aggs' => $aggs['query_main'],
+				);
+								
+			}
+			
+			
+			if( array_key_exists('results', $aggs) ) {
+				$es_aggs = array_merge($es_aggs, $aggs['results']);
+			}
+			
+			
+			// var_export( $es_aggs ); die();
+						
+			if( !empty($es_aggs) ) {
+				$params['body']['aggs'] = $es_aggs;
+			}
+										
+		}
+		
 		// debug($params); die();
 		$params['body']['query']['function_score']['query']['filtered']['filter']['and']['filters'] = $and_filters;
 		
@@ -793,7 +858,7 @@ class MPSearch {
 			
 		}
 		
-		// debug($params); die();
+		// var_export($params); die();
 		
 		return $params;
 		
@@ -828,9 +893,10 @@ class MPSearch {
 	}
 	
     public function read(Model $model, $queryData = array()) {
+		
 		$params = $this->buildESQuery($queryData);
 		
-		// debug($params); die();
+		// var_export( $params ); die();
 		
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );
@@ -842,15 +908,58 @@ class MPSearch {
 		if (isset($response['took'])) {
 			$this->lastResponseStats['took_ms'] = $response['took'];
 		}
-                
+        
+        // var_export( $response['aggregations'] ); die();
+               
         if( !empty($this->Aggs) ) {
+	        	        
+	        $aggs = array();
+	        $_aggs = $response['aggregations'];
 	        
-	        foreach( $this->Aggs as $agg_id => &$agg_data ) {
-			    
-		        if( isset($response['aggregations'][$agg_id]) )
-		        	$agg_data = $response['aggregations'][$agg_id];
+	        
+	        
+	        // copying results aggs
+	        
+	        if( $temp = @$_aggs['__global'] )
+		        unset( $_aggs['__global'] );
+	        $aggs = array_merge($aggs, $_aggs);
+	        
+	        if( $_aggs = $temp ) {
+		        
+		        // copying global aggs
+		        
+				if( $temp = @$_aggs['__query'] )
+			        unset( $_aggs['__query'] );
+		        $aggs = array_merge($aggs, $_aggs);
+		        
+		        if( $_aggs = $temp ) {
+			        
+			        // copying query aggs
+		        
+					if( $temp = @$_aggs['__query_main'] )
+				        unset( $_aggs['__query_main'] );
+			        $aggs = array_merge($aggs, $_aggs);
+			        
+			        if( $_aggs = $temp ) {
+				    	
+				    	// copying query_main aggs
+		        
+				        $aggs = array_merge($aggs, $_aggs);
+				    	   			        
+				    }
 			        			        
-	        }
+			    }
+		        
+		    }
+		    
+		    unset( $aggs['doc_count'] );
+	        	        
+	        foreach( $this->Aggs as $agg_id => &$agg_data ) {
+		    	if( isset($aggs[$agg_id]) ) {
+		        	$agg_data = $aggs[$agg_id];
+		        }
+		    }
+		    		 			 	       			        				        			        
         }
                 
         $hits = $response['hits']['hits'];

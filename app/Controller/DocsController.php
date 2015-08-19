@@ -11,10 +11,10 @@ class DocsController extends AppController
      */
     public function view()
     {
-    
+
         $document_id = $this->request->params['id'];
-        
-        if( $document = $this->Doc->find('first', array(
+
+        if ($document = $this->Doc->find('first', array(
             'fields' => array('id', 'url', 'filename', 'fileextension', 'pages_count', 'packages_count', 'filesize', 'version'),
             'conditions' => array('id' => $document_id),
         )) ) {
@@ -66,7 +66,7 @@ class DocsController extends AppController
 	        
 	        
         } else {
-	        throw new NotFoundException();
+            throw new NotFoundException();
         }
 
     }
@@ -82,6 +82,61 @@ class DocsController extends AppController
         $this->set(array(
             'html' => $html->body,
             '_serialize' => array('html'),
+        ));
+    }
+
+    public function save_document()
+    {
+
+        $this->loadModel("Rotatedoc");
+        $this->loadModel("Bookmark");
+
+
+        foreach ($this->request->data['pages'] as $page) {
+
+            if ($this->Rotatedoc->find('first', array('conditions' => array(
+                'numer' => $page['numer'],
+                'dokument_id' => $page['dokument_id']
+            )))
+            ) {
+                $this->Rotatedoc->updateAll(array('Rotatedoc.rotate' => $page['rotate']), array('Rotatedoc.numer' => $page['numer'], 'Rotatedoc.dokument_id' => $page['dokument_id']));
+            } else {
+                $this->Rotatedoc->create();
+                $this->Rotatedoc->save($page);
+            }
+        }
+
+        foreach ($this->request->data['bookmarks'] as $bookmark) {
+            if ($id = $this->Bookmark->find('first', array('conditions' => array(
+                'strona_numer' => $bookmark['strona_numer'],
+                'dokument_id' => $bookmark['dokument_id']
+            ), 'fields' => 'id'))
+            ) {
+                $bookmark['id'] = $id['Bookmark']['id'];
+            }
+            $this->Bookmark->create();
+            $this->Bookmark->save($bookmark);
+
+        }
+
+        $this->set(array(
+            'message' => $this->request->data['bookmarks'],
+            '_serialize' => array('message'),
+        ));
+    }
+
+    public function doc_id_from_attach() {
+
+        $this->loadModel("Bookmark");
+        $data=$this->Bookmark->find('first', array(
+            'conditions'=>array(
+                'id'=>$this->request->id
+            )));
+
+        $id=$data['Bookmark']['dokument_id'];
+        $this->set(array(
+            'doc_id'=> $id,
+            '_serialize' => array('doc_id')
         ));
     }
 } 

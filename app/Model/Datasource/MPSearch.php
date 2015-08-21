@@ -675,46 +675,43 @@ class MPSearch {
 					isset( $queryData['conditions']['_feed'] )
 				) {
 														
-					$aggs['_channels'] = array(
-	                    'global' => new \stdClass(),
-	                    'aggs' => array(
-	                        'feed_data' => array(
-	                            'nested' => array(
-	                                'path' => 'feeds_channels',
-	                            ),
-	                            'aggs' => array(
-	                                'feed' => array(
-	                                    'filter' => array(
-	                                        'and' => array(
-	                                            'filters' => array(
-	                                                array(
-	                                                    'term' => array(
-	                                                        'feeds_channels.dataset' => $queryData['conditions']['_feed']['dataset'],
-	                                                    ),
-	                                                ),
-	                                                array(
-	                                                    'term' => array(
-	                                                        'feeds_channels.object_id' => $queryData['conditions']['_feed']['object_id'],
-	                                                    ),
-	                                                )
-	                                            ),
-	                                        ),
-	                                    ),
-	                                    'aggs' => array(
-	                                        'channel' => array(
-	                                            'terms' => array(
-	                                                'field' => 'feeds_channels.channel',
-	                                                'size' => 100,
-	                                            ),
-	                                        ),
-	                                    ),
-	                                ),
-	                            ),
-	                        ),
-	                    ),
+					$aggs['global'] = array(
+	                    'feed_data' => array(
+                            'nested' => array(
+                                'path' => 'feeds_channels',
+                            ),
+                            'aggs' => array(
+                                'feed' => array(
+                                    'filter' => array(
+                                        'and' => array(
+                                            'filters' => array(
+                                                array(
+                                                    'term' => array(
+                                                        'feeds_channels.dataset' => $queryData['conditions']['_feed']['dataset'],
+                                                    ),
+                                                ),
+                                                array(
+                                                    'term' => array(
+                                                        'feeds_channels.object_id' => $queryData['conditions']['_feed']['object_id'],
+                                                    ),
+                                                )
+                                            ),
+                                        ),
+                                    ),
+                                    'aggs' => array(
+                                        'channel' => array(
+                                            'terms' => array(
+                                                'field' => 'feeds_channels.channel',
+                                                'size' => 100,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
 	                );
 	                
-	                $this->Aggs[ '_channels' ][ 'global' ] = array();
+	                $this->Aggs['feed_data'] = array();
 	            
 				} else {
 					
@@ -910,13 +907,14 @@ class MPSearch {
 		}
         
         // var_export( $response['aggregations'] ); die();
-               
+        // var_export( $this->Aggs );
+        
         if( !empty($this->Aggs) ) {
 	        	        
 	        $aggs = array();
 	        $_aggs = $response['aggregations'];
 	        
-	        
+	        // debug($_aggs);
 	        
 	        // copying results aggs
 	        
@@ -961,6 +959,8 @@ class MPSearch {
 		    }
 		    		 			 	       			        				        			        
         }
+         
+        // debug( $this->Aggs ); 
                 
         $hits = $response['hits']['hits'];
         for( $h=0; $h<count($hits); $h++ ) 

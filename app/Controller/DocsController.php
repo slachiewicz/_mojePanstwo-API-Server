@@ -17,54 +17,55 @@ class DocsController extends AppController
         if ($document = $this->Doc->find('first', array(
             'fields' => array('id', 'url', 'filename', 'fileextension', 'pages_count', 'packages_count', 'filesize', 'version'),
             'conditions' => array('id' => $document_id),
-        )) ) {
-	        
-	        $_serialize = array('Document');
-	        $document = $document['Doc'];
-	        
-	        $path = 'htmlex/' . $document_id . '/' . $document_id . '_1.html';	        	        
-	        
-	        if( 
-	        	isset($this->request->query['package']) && 
-	        	( $package = $this->request->query['package'] )
-	        ) {
-		        
-		        
-		        if( $package === '*' ) {
-			        
-			        
-			        $html = '';
-			        
-			        for( $i=0; $i<$document['packages_count']; $i++ ) {
-				        
-				        $p = $i + 1;
-				        if( $s3_response = @$this->S3->getObject('docs.sejmometr.pl', 'htmlex/' . $document_id . '/' . $document_id . '_' . $p . '.html') )
-				        	$html .= @$s3_response->body;
-				        
-			        }
-			        
-			        $this->set('Package', $html);
-			        
-			        
-		        } elseif(
-			        ( is_numeric( $this->request->query['package'] ) ) && 
-		        	( $package = $this->request->query['package'] ) && 
-		        	( $s3_response = @$this->S3->getObject('docs.sejmometr.pl', $path) ) && 
-		        	( $html = @$s3_response->body )
-		        ) 
-			        $this->set('Package', $html);
-			        		        
-		        $_serialize[] = 'Package';
-		        
-	        }
+        ))
+        ) {
 
-	        
-	        $this->set(array(
-	            'Document' => $document,
-	            '_serialize' => $_serialize,
-	        ));
-	        
-	        
+            $_serialize = array('Document');
+            $document = $document['Doc'];
+
+            $path = 'htmlex/' . $document_id . '/' . $document_id . '_1.html';
+
+            if (
+                isset($this->request->query['package']) &&
+                ($package = $this->request->query['package'])
+            ) {
+
+
+                if ($package === '*') {
+
+
+                    $html = '';
+
+                    for ($i = 0; $i < $document['packages_count']; $i++) {
+
+                        $p = $i + 1;
+                        if ($s3_response = @$this->S3->getObject('docs.sejmometr.pl', 'htmlex/' . $document_id . '/' . $document_id . '_' . $p . '.html'))
+                            $html .= @$s3_response->body;
+
+                    }
+
+                    $this->set('Package', $html);
+
+
+                } elseif (
+                    (is_numeric($this->request->query['package'])) &&
+                    ($package = $this->request->query['package']) &&
+                    ($s3_response = @$this->S3->getObject('docs.sejmometr.pl', $path)) &&
+                    ($html = @$s3_response->body)
+                )
+                    $this->set('Package', $html);
+
+                $_serialize[] = 'Package';
+
+            }
+
+
+            $this->set(array(
+                'Document' => $document,
+                '_serialize' => $_serialize,
+            ));
+
+
         } else {
             throw new NotFoundException();
         }
@@ -132,11 +133,11 @@ class DocsController extends AppController
             'conditions' => array(
                 'source_dokument_id' => $this->request->id
             ),
-            'fields'=> array(
-                'id','strona_numer_hex','tytul','opis'
+            'fields' => array(
+                'id', 'strona_numer_hex', 'tytul', 'opis'
             ),
-            'order'=>array(
-                'strona_start'=>'ASC'
+            'order' => array(
+                'strona_start' => 'ASC'
             )));
         $this->set(array(
             'bookmarks' => $data,
@@ -156,6 +157,36 @@ class DocsController extends AppController
         $this->set(array(
             'doc_id' => $id,
             '_serialize' => array('doc_id')
+        ));
+    }
+
+    public function save_budget_spendings()
+    {
+        $this->loadModel("BudgetSpendings");
+
+        $this->BudgetSpendings->create();
+
+        $data = $this->request->data;
+        reset($data);
+        $rl_data = key($data);
+        $dane = json_decode($rl_data);
+        $dane=(array) $dane;
+        $toSend = array();
+        foreach ($dane as $key => $wiersz) {
+            $toSend[$key]=array();
+            foreach($wiersz as $k => $v){
+                $toSend[$key][$k]=str_replace('_',' ',$v);
+            }
+        }
+        if($this->BudgetSpendings->saveMany($toSend, array('atomic'=>false))){
+            $res=true;
+        }else{
+            $res=false;
+        }
+
+        $this->set(array(
+            'dane' => $res,
+            '_serialize' => array('dane')
         ));
     }
 } 

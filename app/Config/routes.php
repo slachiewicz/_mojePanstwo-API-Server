@@ -45,6 +45,7 @@ Configure::write(
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */
+Router::connect('/docs/budget_spendings', array('controller' => 'docs', 'action' => 'save_budget_spendings'));
 Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
 
 Router::connect('/docs/:id', array('controller' => 'docs', 'action' => 'save_document','[method]' => 'POST'));

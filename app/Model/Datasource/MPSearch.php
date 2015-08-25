@@ -731,8 +731,18 @@ class MPSearch {
 						unset( $agg_data['scope'] );
 					}
 					
+					$filters_excludes = false;
+					if( strpos($scope, 'filters_exclude(')===0 ) {
+						
+						$filters_excludes = substr($scope, 16, strlen($scope)-17);
+						$scope = 'filters_exclude';
+						
+					}
+					
 					foreach( $agg_data as $agg_type => $agg_params ) {
-																									
+						
+						
+																						
 						$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
 						$es_params = array();
 						
@@ -752,18 +762,25 @@ class MPSearch {
 							$aggs[ $scope ][ $agg_id ][ $agg_type ] = $es_params;
 												
 					}
+					
+					if(
+						$filters_excludes && 
+						isset( $aggs['filters_exclude'][$agg_id] )
+					)
+						$aggs['filters_exclude'][$agg_id]['filters_excludes'] = $filters_excludes;
 				
 				}
 			}
 			
 			
-			
+			// var_export($aggs);
 			$es_aggs = array();
 			
 			
 			if( 
 				array_key_exists('global', $aggs) || 
 				array_key_exists('query', $aggs) || 
+				array_key_exists('filters_excludes', $aggs) || 
 				array_key_exists('query_main', $aggs) 
 			) {
 				
@@ -780,6 +797,7 @@ class MPSearch {
 			
 			if( 
 				array_key_exists('query', $aggs) || 
+				array_key_exists('filters_excludes', $aggs) || 
 				array_key_exists('query_main', $aggs) 
 			) {
 				
@@ -799,6 +817,44 @@ class MPSearch {
 				
 				if( array_key_exists('query', $aggs) )
 					$es_aggs['__global']['aggs']['__query']['aggs'] = $aggs['query'];
+					
+				if( array_key_exists('filters_exclude', $aggs) ) {
+					
+					// var_export( $aggs['filters_exclude'] ); die();
+					
+					foreach( $aggs['filters_exclude'] as $_k => $_v ) {
+						
+						$filters_excludes = $_v['filters_excludes'];
+						unset( $_v['filters_excludes'] );
+						
+						$_and_filters = array();
+						foreach( $and_filters as $f )
+							if( 
+								isset( $f['term'] ) && 
+								( $keys = array_keys($f['term']) ) && 
+								( $key = array_shift($keys) ) && 
+								(
+									( $key == 'data.' . $filters_excludes )
+								)
+							) {} else {
+								$_and_filters[] = $f;
+							}
+																		
+						$es_aggs['__global']['aggs']['__query']['aggs']['__filters_exclude']['aggs'][$_k] = array(
+							'filter' => array(
+								'bool' => array(
+									'must' => $_and_filters,
+								),
+							),
+							'aggs' => array(
+								$_k => $_v,
+							),
+						);
+						
+					}
+					
+					$es_aggs['__global']['aggs']['__query']['aggs']['__filters_exclude']['filter']['match_all'] = new \stdClass();
+				}
 				
 			}
 			
@@ -927,25 +983,39 @@ class MPSearch {
 		        // copying global aggs
 		        
 				if( $temp = @$_aggs['__query'] )
-			        unset( $_aggs['__query'] );
+			        unset( $_aggs['__query'] );			        			    
 		        $aggs = array_merge($aggs, $_aggs);
 		        
 		        if( $_aggs = $temp ) {
-			        
+			        			        
 			        // copying query aggs
 		        
-					if( $temp = @$_aggs['__query_main'] )
+					if( $temp_main = @$_aggs['__query_main'] )
 				        unset( $_aggs['__query_main'] );
+				        
+				    if( $temp_filters = @$_aggs['__filters_exclude'] )
+				        unset( $_aggs['__filters_exclude'] );
+				    
 			        $aggs = array_merge($aggs, $_aggs);
 			        
-			        if( $_aggs = $temp ) {
+			        if( $_aggs = $temp_main ) {
 				    	
 				    	// copying query_main aggs
 		        
 				        $aggs = array_merge($aggs, $_aggs);
 				    	   			        
 				    }
-			        			        
+				    
+				    if( $_aggs = $temp_filters ) {
+				    	
+				    	// copying filters aggs
+		        
+				        unset( $_aggs['doc_count'] );
+				        foreach( $_aggs as $k => $v )
+				        	$aggs[ $k ] = $v[ $k ];
+				        				    	   			        
+				    }
+				    			        			        
 			    }
 		        
 		    }
@@ -959,9 +1029,7 @@ class MPSearch {
 		    }
 		    		 			 	       			        				        			        
         }
-         
-        // debug( $this->Aggs ); 
-                
+                         
         $hits = $response['hits']['hits'];
         for( $h=0; $h<count($hits); $h++ ) 
         	$hits[$h] = $this->doc2object( $hits[$h] );

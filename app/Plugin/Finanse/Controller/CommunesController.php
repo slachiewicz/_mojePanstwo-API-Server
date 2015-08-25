@@ -17,7 +17,7 @@ class CommunesController extends AppController {
 
         $this->set(array(
             'sections' => $sections,
-            '_serialize' => array('sections')
+            '_serialize' => 'sections'
         ));
     }
 
@@ -27,7 +27,7 @@ class CommunesController extends AppController {
 
         $this->set(array(
             'section' => $section,
-            '_serialize' => array('section')
+            '_serialize' => 'section'
         ));
     }
 
@@ -54,6 +54,9 @@ class CommunesController extends AppController {
                 }
             }
         }
+
+        if(count($quarters) === 0)
+            $quarters = array(1, 2, 3, 4);
 
         return array(
             'year' => $year,

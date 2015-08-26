@@ -138,6 +138,9 @@ CakePlugin::loadAll(array(
     ),
     'Admin' => array(
         'routes' => true
+    ),
+    'Survey' => array(
+        'routes' => true
     )
 ));
 

@@ -107,10 +107,11 @@ class DocsController extends AppController
             }
         }
 
-        foreach ($this->request->data['bookmarks'] as $bookmark) {
+        $bookmarks=(array)$this->request->data['bookmarks'];
+        foreach ($bookmarks as $bookmark) {
             if ($id = $this->Bookmark->find('first', array('conditions' => array(
-                'strona_numer' => $bookmark['strona_numer'],
-                'dokument_id' => $bookmark['dokument_id']
+                'strona_numer_hex' => $bookmark['strona_numer_hex'],
+                'source_dokument_id' => $bookmark['dokument_id']
             ), 'fields' => 'id'))
             ) {
                 $bookmark['id'] = $id['Bookmark']['id'];
@@ -119,9 +120,8 @@ class DocsController extends AppController
             $this->Bookmark->save($bookmark);
 
         }
-
         $this->set(array(
-            'message' => $this->request->data['bookmarks'],
+            'message' => $this->request->data,
             '_serialize' => array('message'),
         ));
     }

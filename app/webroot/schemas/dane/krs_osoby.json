@@ -1,0 +1,168 @@
+{
+  "title": "Osoby",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krs_osoby.liczba_nadzorcow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.nazwisko": {
+              "type": "string",
+              "description": "Nazwisko"
+            },
+            "krs_osoby.liczba_akcjonariusze": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.liczba_reprezentanci": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.id": {
+              "_TODO": "usunac",
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.str": {
+              "_TODO": "rozdzielic (osobno funkcja, osobno spolka, spolki id/url, a nie mpurl), wrzucic to w static",
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.privacy": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_osoby.liczba_zalozyciele": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.plec": {
+              "enum": ["M", "K"],
+              "description": "M - mezczyzna, K - kobieta"
+            },
+            "krs_osoby.gmina_id": {
+              "type": "string",
+              "description": "!Array ID gminy, która TODO jak jest powiązana?"
+            },
+            "krs_osoby.gmina_url": {
+              "_TODO": "dodac",
+              "type": "string",
+              "description": "TODO jw."
+            },
+            "krs_osoby.imie_drugie": {
+              "type": "string",
+              "description": "Drugie imię"
+            },
+            "krs_osoby.imie_pierwsze": {
+              "type": "string",
+              "description": "Pierwsze imię"
+            },
+            "krs_osoby.data_urodzenia": {
+              "type": "string",
+              "description": "Data urodzenia",
+              "format": "date-time"
+            },
+            "krs_osoby.liczba_wspolnicy": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.imiona": {
+              "type": "string",
+              "description": "Wszystkie imiona razem"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "powiazania": {
+              "description": "TODO z kim? posel_id? z jakimi datasetami moga byc powiazania?"
+            },
+            "organizacje": {
+              "description": "Podmioty, w których dana osoba pełni jakąś funkcję. TODO moze zmienic nazwe na podmioty?",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "ID obiektu w zbiorze krs_podmioty"
+                },
+                "url": {
+                  "_TODO": "dodac",
+                  "type": "string",
+                  "format": "uri",
+                  "description": "Unikalny URL obiektu w API"
+                },
+                "nazwa": {
+                  "type": "string",
+                  "description": "nazwa podmiotu"
+                },
+                "forma_prawna_str": {
+                  "type": "string",
+                  "description": "forma prawna podmiotu"
+                },
+                "data_rejestracji": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Data rejestracji"
+                },
+                "kapital_zakladowy": {
+                  "_TODO": "usunac na rzecz ponizszego",
+                  "type": "string"
+                },
+                "wartosc_kapital_zakladowy": {
+                  "_TODO": "dodac",
+                  "type": "float",
+                  "description": "Kapitał zakładowy podmiotu"
+                },
+                "wykreslony": {
+                  "_TODO": "usunac na rzecz ponizszego",
+                  "enum": ["0", "1"]
+                },
+                "czy_wykreslony": {
+                  "_TODO": "dodac, typ boolean",
+                  "type": "boolean",
+                  "description": "Czy podmiot został wykreślony z rejestru"
+                },
+                "adres_miejscowosc": {
+                  "type": "string",
+                  "description": "Miejscowość zarejestrowania podmiotu TODO tak?"
+                },
+                "role": {
+                  "type": "array",
+                  "description": "Role jakie pełni osoba w tej spółce",
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "description": "TODO"
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Nazwa roli w jakiej występuje"
+                      },
+                      "params": {
+                        "description": "TODO co to?"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "graph": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

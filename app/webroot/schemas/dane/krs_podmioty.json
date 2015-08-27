@@ -1,0 +1,335 @@
+{
+  "title": "Podmioty w KRS",
+  "allOf": [
+    {
+      "$ref": "https:\/\/api-v3.mojepanstwo.pl\/schemas\/dane\/dataobject.json"
+    },
+    {
+      "properties": {
+        "data": {
+          "properties": {
+            "krs_podmioty.email": {
+              "type": "string",
+              "description": "Oficjalny adres email"
+            },
+            "krs_podmioty.knf_ostrzezenie_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.nip": {
+              "type": "string",
+              "description": "NIP podmiotu"
+            },
+            "krs_podmioty.cel_dzialania": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_nadzorcow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_zmian": {
+              "type": "integer",
+              "description": "Liczba zmian w KRS od początku działalności"
+            },
+            "krs_podmioty.www": {
+              "type": "string",
+              "description": "Oficjalna strona www"
+            },
+            "krs_podmioty.sposob_reprezentacji": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.wartosc_kapital_zakladowy": {
+              "type": "number",
+              "description": "Wartość kapitału zakładowego w PLN"
+            },
+            "krs_podmioty.adres": {
+              "type": "string",
+              "description": "Pełen adres siedziby"
+            },
+            "krs_podmioty.adres_ulica": {
+              "type": "string",
+              "description": "Nazwa ulicy"
+            },
+            "krs_podmioty.adres_numer": {
+              "type": "string",
+              "description": "Numer budynku"
+            },
+            "krs_podmioty.adres_lokal": {
+              "type": "string",
+              "description": "Numer lokalu"
+            },
+            "krs_podmioty.adres_miejscowosc": {
+              "type": "string",
+              "description": "Miejscowość siedziby"
+            },
+            "krs_podmioty.adres_kod_pocztowy": {
+              "type": "string",
+              "description": "Kod pocztowy"
+            },
+            "krs_podmioty.adres_poczta": {
+              "type": "string",
+              "description": "Poczta"
+            },
+            "krs_podmioty.adres_kraj": {
+              "type": "string",
+              "description": "Kraj"
+            },
+            "krs_podmioty.gmina_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.miejscowosc_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.powiat_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.wojewodztwo_id": {
+              "type": "string",
+              "description": "ID województwa, w którym podmiot ma siedzibę TODO tak?"
+            },
+            "krs_podmioty.wojewodztwo_url": {
+              "type": "string",
+              "description": "URL obiektu województwa, w którym podmiot ma siedzibę TODO tak?"
+            },
+            "krs_podmioty.nazwa_skrocona": {
+              "type": "string",
+              "description": "Skrócona nazwa podmiotu"
+            },
+            "krs_podmioty.data_dokonania_wpisu": {
+              "type": "string",
+              "description": "Data dokonania wpisu w KRS",
+              "format": "date"
+            },
+            "krs_podmioty.dotacje_ue_beneficjent_id": {
+              "_TODO": "Null, jeżeli niepełne",
+              "type": "string",
+              "description": "ID beneficjenta, jeżeli podmiot jest beneficjentem środków UE"
+            },
+            "krs_podmioty.opp": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.regon": {
+              "type": "string",
+              "description": "Numer REGON"
+            },
+            "krs_podmioty.nazwa": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.data_rejestracji": {
+              "type": "string",
+              "description": "Data rejestracji",
+              "format": "date"
+            },
+            "krs_podmioty.liczba_jedynych_akcjonariuszy": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.wykreslony": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_akcji_wszystkich_emisji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.wartosc_nominalna_akcji": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "krs_podmioty.forma_prawna_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_oddzialow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_wspolnikow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.sygnatura_akt": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.forma_prawna_typ_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.wartosc_kapital_docelowy": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_zmian_umow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.nazwa_organu_reprezentacji": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.wczesniejsza_rejestracja_str": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.rejestr": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.wartosc_czesc_kapitalu_wplaconego": {
+              "type": "number",
+              "description": "TODO"
+            },
+            "krs_podmioty.rejestr_stowarzyszen": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.nieprzedsiebiorca": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.oznaczenie_sadu": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.kod_pocztowy_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.nazwa_organu_nadzoru": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_reprezentantow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.siedziba": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.data_sprawdzenia": {
+              "type": "string",
+              "description": "TODO",
+              "format": "date-time"
+            },
+            "krs_podmioty.ostatni_wpis_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_czlonkow_komitetu_zal": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.krs": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_emisji_akcji": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.numer_wpisu": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.forma_prawna_id": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_prokurentow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.liczba_dzialalnosci": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_podmioty.firma": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.umowa_spolki_cywilnej": {
+              "type": "string",
+              "description": "TODO"
+            },
+            "krs_podmioty.wartosc_nominalna_podwyzszenia_kapitalu": {
+              "type": "number",
+              "description": "TODO"
+            }
+          },
+          "additionalProperties": "false"
+        },
+        "layers": {
+          "properties": {
+            "counters": {
+              "description": "TODO"
+            },
+            "dzialalnosci": {
+              "description": "TODO"
+            },
+            "emisje_akcji": {
+              "description": "TODO"
+            },
+            "graph": {
+              "description": "TODO"
+            },
+            "jedynyAkcjonariusz": {
+              "description": "TODO"
+            },
+            "komitetZalozycielski": {
+              "description": "TODO"
+            },
+            "nadzor": {
+              "description": "TODO"
+            },
+            "oddzialy": {
+              "description": "TODO"
+            },
+            "odpis": {
+              "description": "TODO"
+            },
+            "prokurenci": {
+              "description": "TODO"
+            },
+            "reprezentacja": {
+              "description": "TODO"
+            },
+            "wspolnicy": {
+              "description": "TODO"
+            },
+            "zmiany_umow": {
+              "description": "TODO"
+            },
+            "kultura": {
+              "description": "TODO"
+            },
+            "pkd_dzialy": {
+              "description": "TODO"
+            },
+            "firmy": {
+              "description": "TODO"
+            },
+            "powiazania": {
+              "description": "TODO"
+            },
+            "odpisy": {
+              "description": "TODO"
+            }
+          }
+        }
+      },
+      "required": [
+        "data"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

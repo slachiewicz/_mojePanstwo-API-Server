@@ -6,6 +6,7 @@
  * Time: 13:21
  */
 
-return $id;
+$output=$this->DB->query("SELECT pl_budzety_wydatki.* FROM pl_budzety_wydatki JOIN budzety ON pl_budzety_wydatki.rocznik=budzety.rok WHERE budzety.id=$id");
 
-//$this->DB->selectAssoc()
+
+return $output;

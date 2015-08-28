@@ -517,9 +517,9 @@ class Dataobject extends AppModel
                 $status = $Email->template('Dane.moderate_request')
                     ->addHeaders(array('X-Mailer' => 'mojePaństwo'))
                     ->emailFormat('html')
-                    ->subject('Zarządzanie profilem | _mojePaństwo')
+                    ->subject('Udało się! Witam na Moim Państwie!')
                     ->to($to_email, $to_name)
-                    ->from('noreply@mojepanstwo.pl', 'Zarządzanie profilem | _mojePaństwo')
+                    ->from('asia.przybylska@epf.org.pl', 'Asia Przybylska')
                     ->send();
 
                 if(!$status)
@@ -573,6 +573,25 @@ class Dataobject extends AppModel
         foreach($form_fields as $field)
             if(isset($data[$field]))
                 $form[$field] = $data[$field];
+
+        App::uses('CakeEmail', 'Network/Email');
+        $Email = new CakeEmail('noreply');
+
+        if( defined('MODERATE_REQUEST_test_email') ) {
+            $to_email = MODERATE_REQUEST_test_email;
+            $to_name = MODERATE_REQUEST_test_name;
+        } else {
+            $to_email = $data['email'];
+            $to_name =  $data['firstname'] . ' ' . $data['lastname'];
+        }
+
+        $status = $Email->template('Dane.moderate_request_begin')
+            ->addHeaders(array('X-Mailer' => 'mojePaństwo'))
+            ->emailFormat('html')
+            ->subject('Cześć! Fajnie, że jesteś!')
+            ->to($to_email, $to_name)
+            ->from('asia.przybylska@epf.org.pl', 'Asia Przybylska')
+            ->send();
 
         return $request->save(array(
             'PageRequest' => array_merge($form, array(

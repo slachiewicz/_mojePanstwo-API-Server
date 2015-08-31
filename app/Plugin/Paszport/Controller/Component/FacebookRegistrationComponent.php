@@ -31,6 +31,7 @@ class FacebookRegistrationComponent extends Component {
             $this->setFacebookId();
 
         $this->updatePhoto();
+        $this->updateLoggedAt();
     }
 
     private function createNewUser() {
@@ -67,6 +68,17 @@ class FacebookRegistrationComponent extends Component {
             )
         ));
         $this->Users->save($this->Users->data, false, array('facebook_id'));
+    }
+
+    private function updateLoggedAt() {
+        if(!isset($this->user['User']['id']))
+            return false;
+
+        $this->Users->clear();
+        $this->Users->id = $this->user['User']['id'];
+        $this->Users->save(array(
+            'logged_at' => date('Y-m-d H:i:s', time())
+        ));
     }
 
     private function updatePhoto() {

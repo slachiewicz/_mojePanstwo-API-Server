@@ -193,6 +193,12 @@ class UsersController extends PaszportAppController
                             'id' => $this->User->id,
                         ));
 
+                        $this->User->clear();
+                        $this->User->id = $user['User']['id'];
+                        $this->User->save(array(
+                            'logged_at' => date('Y-m-d H:i:s', time())
+                        ));
+
 
                     } else $errors = array('Internal error');
                 } else $errors = $this->User->validationErrors; // email verification
@@ -219,6 +225,12 @@ class UsersController extends PaszportAppController
                 if($user['User']['password'] == $this->Auth->password($data['password'])) {
                     unset($user['User']['password']);
                     unset($user['User']['repassword']);
+                    $this->User->clear();
+                    $this->User->id = $user['User']['id'];
+                    $this->User->save(array(
+                        'logged_at' => date('Y-m-d H:i:s', time())
+                    ));
+
                     $this->set(array(
                         'user' => $user,
                         '_serialize' => 'user',

@@ -2,7 +2,20 @@
 
 class PanstwoInternetController extends AppController
 {
+	
+	public function getAccountsPropositions()
+    {
 
+
+        $accounts = $this->PanstwoInternet->getAccountsPropositions();
+
+        $this->set('accounts', $accounts);
+        $this->set('_serialize', 'accounts');
+
+
+    }
+
+	
     public function getAnnualTwitterStats()
     {
 

@@ -614,7 +614,10 @@ class MPSearch {
         	} else {
 	        	
 	        	
-	        	if( preg_match('^\[(.*?)(\s*)TO(\s*)(.*?)\]^i', $value, $match) ) {
+	        	if( 
+		        	is_string($value) && 
+	        		preg_match('^\[(.*?)(\s*)TO(\s*)(.*?)\]^i', $value, $match)
+	        	) {
 		        			        	
 		        	$range = array();
 					

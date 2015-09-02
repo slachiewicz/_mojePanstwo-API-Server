@@ -275,14 +275,27 @@ class MPSearch {
         
         foreach( $queryData['conditions'] as $key => $value ) {
         	
+        	
+        	
         	$operator = '=';
-        	if(
-	        	( $key_length = strlen($key) ) && 
-	        	( @substr($key, -2) === '!=' )
-        	) {
+        	if( $key_length = strlen($key) ) {
 	        	
-	        	$operator = '!=';
-	        	$key = @substr($key, 0, $key_length-2);
+	        	if( @substr($key, -2) === '!=' ) {
+	        	
+		        	$operator = '!=';
+		        	$key = @substr($key, 0, $key_length-2);
+	        	
+	        	} elseif( @substr($key, -1) === '>' ) {
+		        	
+		        	$operator = '>';
+		        	$key = @substr($key, 0, $key_length-1);
+		        			        	
+	        	} elseif( @substr($key, -1) === '<' ) {
+		        	
+		        	$operator = '<';
+		        	$key = @substr($key, 0, $key_length-1);
+		        			        	
+	        	}
 	        	
         	}
         	 
@@ -648,6 +661,26 @@ class MPSearch {
 				        	'not' => array(
 					        	'term' => array(
 						        	'data.' . $key => $value,
+					        	),
+				        	),
+			        	);
+			        	
+		        	} elseif( $operator==='>' ) {
+			        	
+			        	$and_filters[] = array(
+				        	'range' => array(
+					        	'data.' . $key => array(
+						        	'gt' => $value,
+					        	),
+				        	),
+			        	);
+			        	
+		        	} elseif( $operator==='<' ) {
+			        	
+			        	$and_filters[] = array(
+				        	'range' => array(
+					        	'data.' . $key => array(
+						        	'lt' => $value,
 					        	),
 				        	),
 			        	);

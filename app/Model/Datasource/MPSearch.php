@@ -275,14 +275,27 @@ class MPSearch {
         
         foreach( $queryData['conditions'] as $key => $value ) {
         	
+        	
+        	
         	$operator = '=';
-        	if(
-	        	( $key_length = strlen($key) ) && 
-	        	( @substr($key, -2) === '!=' )
-        	) {
+        	if( $key_length = strlen($key) ) {
 	        	
-	        	$operator = '!=';
-	        	$key = @substr($key, 0, $key_length-2);
+	        	if( @substr($key, -2) === '!=' ) {
+	        	
+		        	$operator = '!=';
+		        	$key = @substr($key, 0, $key_length-2);
+	        	
+	        	} elseif( @substr($key, -1) === '>' ) {
+		        	
+		        	$operator = '>';
+		        	$key = @substr($key, 0, $key_length-1);
+		        			        	
+	        	} elseif( @substr($key, -1) === '<' ) {
+		        	
+		        	$operator = '<';
+		        	$key = @substr($key, 0, $key_length-1);
+		        			        	
+	        	}
 	        	
         	}
         	 
@@ -485,7 +498,7 @@ class MPSearch {
 	        	
 	        	$key = 'date';
 	        	
-	        	if( $_value == 'LAST_24H' ) {   		
+	        	if( ($_value == 'LAST_24H') || ($_value == '1D') ) {   		
 						
 					$range = array(
 						'gte' => 'now-1d',
@@ -497,7 +510,7 @@ class MPSearch {
 						),
 					);
 				
-				} elseif( $_value == 'LAST_1D' ) {   		
+				} elseif( ($_value == 'LAST_1D') || ($_value == '1D') ) {   		
 					
 					$range = array(
 						'gte' => 'now-1d',
@@ -509,7 +522,7 @@ class MPSearch {
 						),
 					);
 				
-				} elseif( $_value == 'LAST_3D' ) {   		
+				} elseif( ($_value == 'LAST_3D') || ($_value == '3D') ) {   		
 					
 					$range = array(
 						'gte' => 'now-3d',
@@ -521,7 +534,7 @@ class MPSearch {
 						),
 					);
 				
-				} elseif( $_value == 'LAST_7D' ) {   		
+				} elseif( ($_value == 'LAST_7D') || ($_value == '1W') ) {   		
 					
 					$range = array(
 						'gte' => 'now-7d',
@@ -533,7 +546,7 @@ class MPSearch {
 						),
 					);
 				
-				} elseif( $_value == 'LAST_1M' ) {   		
+				} elseif( ($_value == 'LAST_1M') || ($_value == '1M') ) {   		
 					
 					$range = array(
 						'gte' => 'now-1M',
@@ -545,7 +558,7 @@ class MPSearch {
 						),
 					);
 				
-				} elseif( $_value == 'LAST_1Y' ) {   		
+				} elseif( ($_value == 'LAST_1Y') || ($_value == '1Y') ) {   		
 					
 					$range = array(
 						'gte' => 'now-1Y',
@@ -614,7 +627,10 @@ class MPSearch {
         	} else {
 	        	
 	        	
-	        	if( preg_match('^\[(.*?)(\s*)TO(\s*)(.*?)\]^i', $value, $match) ) {
+	        	if( 
+		        	is_string($value) && 
+	        		preg_match('^\[(.*?)(\s*)TO(\s*)(.*?)\]^i', $value, $match)
+	        	) {
 		        			        	
 		        	$range = array();
 					
@@ -645,6 +661,26 @@ class MPSearch {
 				        	'not' => array(
 					        	'term' => array(
 						        	'data.' . $key => $value,
+					        	),
+				        	),
+			        	);
+			        	
+		        	} elseif( $operator==='>' ) {
+			        	
+			        	$and_filters[] = array(
+				        	'range' => array(
+					        	'data.' . $key => array(
+						        	'gt' => $value,
+					        	),
+				        	),
+			        	);
+			        	
+		        	} elseif( $operator==='<' ) {
+			        	
+			        	$and_filters[] = array(
+				        	'range' => array(
+					        	'data.' . $key => array(
+						        	'lt' => $value,
 					        	),
 				        	),
 			        	);
@@ -739,6 +775,7 @@ class MPSearch {
 						
 					}
 					
+					
 					foreach( $agg_data as $agg_type => $agg_params ) {
 						
 						
@@ -767,20 +804,21 @@ class MPSearch {
 						$filters_excludes && 
 						isset( $aggs['filters_exclude'][$agg_id] )
 					)
-						$aggs['filters_exclude'][$agg_id]['filters_excludes'] = $filters_excludes;
+						$aggs['filters_exclude'][$agg_id]['filters_exclude'] = $filters_excludes;
 				
 				}
 			}
 			
 			
-			// var_export($aggs);
+			
+			
 			$es_aggs = array();
 			
 			
 			if( 
 				array_key_exists('global', $aggs) || 
 				array_key_exists('query', $aggs) || 
-				array_key_exists('filters_excludes', $aggs) || 
+				array_key_exists('filters_exclude', $aggs) || 
 				array_key_exists('query_main', $aggs) 
 			) {
 				
@@ -793,11 +831,12 @@ class MPSearch {
 					$es_aggs['__global']['aggs'] = $aggs['global'];
 				
 			}
-			
+						
+
 			
 			if( 
 				array_key_exists('query', $aggs) || 
-				array_key_exists('filters_excludes', $aggs) || 
+				array_key_exists('filters_exclude', $aggs) || 
 				array_key_exists('query_main', $aggs) 
 			) {
 				
@@ -819,13 +858,11 @@ class MPSearch {
 					$es_aggs['__global']['aggs']['__query']['aggs'] = $aggs['query'];
 					
 				if( array_key_exists('filters_exclude', $aggs) ) {
-					
-					// var_export( $aggs['filters_exclude'] ); die();
-					
+										
 					foreach( $aggs['filters_exclude'] as $_k => $_v ) {
 						
-						$filters_excludes = $_v['filters_excludes'];
-						unset( $_v['filters_excludes'] );
+						$filters_excludes = $_v['filters_exclude'];
+						unset( $_v['filters_exclude'] );
 						
 						$_and_filters = array();
 						foreach( $and_filters as $f )
@@ -876,9 +913,7 @@ class MPSearch {
 			if( array_key_exists('results', $aggs) ) {
 				$es_aggs = array_merge($es_aggs, $aggs['results']);
 			}
-			
-			
-			// var_export( $es_aggs ); die();
+						
 						
 			if( !empty($es_aggs) ) {
 				$params['body']['aggs'] = $es_aggs;
@@ -965,7 +1000,10 @@ class MPSearch {
         // var_export( $response['aggregations'] ); die();
         // var_export( $this->Aggs );
         
-        if( !empty($this->Aggs) ) {
+        if(
+        	!empty($this->Aggs) && 
+        	isset( $response['aggregations'] )
+        ) {
 	        	        
 	        $aggs = array();
 	        $_aggs = $response['aggregations'];
@@ -1021,6 +1059,14 @@ class MPSearch {
 		    }
 		    
 		    unset( $aggs['doc_count'] );
+		    
+		    /*
+		    if( array_keys($aggs)!=array('zamowienia', 'prawo') ) {
+			    
+			    var_export($params);
+			    
+		    }
+		    */
 	        	        
 	        foreach( $this->Aggs as $agg_id => &$agg_data ) {
 		    	if( isset($aggs[$agg_id]) ) {
@@ -1033,7 +1079,7 @@ class MPSearch {
         $hits = $response['hits']['hits'];
         for( $h=0; $h<count($hits); $h++ ) 
         	$hits[$h] = $this->doc2object( $hits[$h] );
-        
+                
         return $hits;        
 
     }

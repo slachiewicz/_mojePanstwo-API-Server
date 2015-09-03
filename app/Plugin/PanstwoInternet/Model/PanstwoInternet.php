@@ -5,6 +5,13 @@ class PanstwoInternet extends AppModel
 
     public $useTable = false;
 
+	public function getAccountsPropositions()
+	{
+		
+		return 2;
+		
+	}
+	
     public function get_annual_twitter_stats($year)
     {
 

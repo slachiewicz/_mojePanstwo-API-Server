@@ -4,7 +4,77 @@ class PanstwoInternet extends AppModel
 {
 
     public $useTable = false;
-
+	
+	public function getAccountsPropositions()
+	{
+		
+		App::import('model', 'MPCache');
+        $this->MPCache = new MPCache();
+        
+        if(
+	        ( $data = $this->MPCache->get('admin/media/twitter/new_accounts') ) && 
+	        ( $data = json_decode($data, true) )
+        )
+        	return $data;
+        else
+			return false;
+		
+	}
+	
+	public function manage_account($data)
+	{
+		
+		$map = array(
+			'Komentatorzy' => '2',
+	        'Urzędy' => '3',
+	        'Media' => '6',
+	        'Politycy' => '7',
+	        'Partie' => '8',
+	        'NGO' => '9',
+        );
+        
+        if(
+	        isset( $data['id'] ) &&
+	        isset( $data['add'] ) && 
+	        array_key_exists($data['add'], $map)
+        ) {
+		
+			App::import('model', 'DB');
+	        $this->DB = new DB();
+	        
+	        $params = array(
+		        'typ_id' => $map[ $data['add'] ],
+		        'twitter_id' => $data['id'],
+		        'track' => '1',
+		        'status' => '0',
+		        'status_ts' => 'NOW()',
+	        );
+	        
+	        $account = $this->DB->selectValue("SELECT id FROM twitter_accounts WHERE twitter_id='" . $params['twitter_id'] . "'");
+	        
+	        if( $account ) {
+		        
+		        return array(
+			        'msg' => 'Account already exists',
+		        );
+		        
+	        } else {
+		        
+		        $this->DB->insertIgnoreAssoc('twitter_accounts', $params);
+		        return array(
+			        'msg' => 'OK',
+		        );
+		        
+	        }
+	        
+	        return array(
+		        'msg' => 'Unkown error',
+	        );
+        
+        }
+		
+	}
+	
     public function get_annual_twitter_stats($year)
     {
 

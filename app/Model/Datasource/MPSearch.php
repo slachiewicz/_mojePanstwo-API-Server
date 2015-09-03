@@ -647,44 +647,64 @@ class MPSearch {
 							        	
 	        	} else {
 	        		
-	        		if( $operator==='=' ) {
-		        		 	
+	        		if( 
+	        			( $nested_parts = explode(':', $key) ) && 
+	        			( count($nested_parts) > 1 ) 
+	        		) {
+		        		
 		        		$and_filters[] = array(
-				        	'term' => array(
-					        	'data.' . $key => $value,
-				        	),
-			        	);
-		        	
-		        	} elseif( $operator==='!=' ) {
-			        	
-			        	$and_filters[] = array(
-				        	'not' => array(
+			        		'nested' => array(
+				        		'path' => $nested_parts[0],
+				        		'filter' => array(
+					        		'term' => array(
+						        		$nested_parts[1] => $value,
+					        		),
+				        		),
+			        		),
+		        		);
+		        		
+	        		} else {
+	        			        		
+		        		if( $operator==='=' ) {
+			        		 	
+			        		$and_filters[] = array(
 					        	'term' => array(
 						        	'data.' . $key => $value,
 					        	),
-				        	),
-			        	);
+				        	);
 			        	
-		        	} elseif( $operator==='>' ) {
-			        	
-			        	$and_filters[] = array(
-				        	'range' => array(
-					        	'data.' . $key => array(
-						        	'gt' => $value,
+			        	} elseif( $operator==='!=' ) {
+				        	
+				        	$and_filters[] = array(
+					        	'not' => array(
+						        	'term' => array(
+							        	'data.' . $key => $value,
+						        	),
 					        	),
-				        	),
-			        	);
-			        	
-		        	} elseif( $operator==='<' ) {
-			        	
-			        	$and_filters[] = array(
-				        	'range' => array(
-					        	'data.' . $key => array(
-						        	'lt' => $value,
+				        	);
+				        	
+			        	} elseif( $operator==='>' ) {
+				        	
+				        	$and_filters[] = array(
+					        	'range' => array(
+						        	'data.' . $key => array(
+							        	'gt' => $value,
+						        	),
 					        	),
-				        	),
-			        	);
-			        	
+				        	);
+				        	
+			        	} elseif( $operator==='<' ) {
+				        	
+				        	$and_filters[] = array(
+					        	'range' => array(
+						        	'data.' . $key => array(
+							        	'lt' => $value,
+						        	),
+					        	),
+				        	);
+				        	
+			        	}
+		        	
 		        	}
 	        	
 	        	}
@@ -984,7 +1004,7 @@ class MPSearch {
 		
 		$params = $this->buildESQuery($queryData);
 		
-		// var_export( $params ); die();
+		// debug( $params ); die();
 		
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );

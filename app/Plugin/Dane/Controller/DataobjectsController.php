@@ -398,9 +398,14 @@ class DataobjectsController extends AppController
 						array(
 							'table' => 'users',
 							'alias' => 'Users',
-							'type' => 'LEFT',
+							'type' => 'RIGHT',
 							'conditions' => array(
-								'Subscriptions.user_id = Users.id'
+								'Subscriptions.user_id = Users.id',
+                                array(
+                                    'not' => array(
+                                        'Users.username' => ''
+                                    )
+                                )
 							)
 						)
 					),

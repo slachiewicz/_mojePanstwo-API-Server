@@ -193,13 +193,14 @@ class DocumentsController extends AppController
         if(
 	        isset( $data['template_id'] ) && 
         	$data['template_id'] && 
-        	$template = $DB->selectAssoc("SELECT nazwa, tresc, tytul FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'")
+        	$template = $DB->selectAssoc("SELECT nazwa, tresc, tytul, nadawca_opis FROM pisma_szablony WHERE id='" . addslashes( $data['template_id'] ) . "'")
         ) {
 	        
         	$data['title'] = $template['tytul'] ? $template['tytul'] : $template['nazwa'];
-        	
+            $data['nadawca_opis'] = $template['nadawca_opis'];
+
         	if( $data['saved']=='0' ) {
-	        	
+
 	        	$data['content'] = $template['tresc'];
 	        	
 	        	if( !$data['name'] && $template['nazwa'] )

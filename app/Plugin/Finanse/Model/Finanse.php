@@ -5,6 +5,12 @@ class Finanse extends AppModel
 
     public $useTable = false;
 
+    public function getCommunePopCount($id) {
+        App::import('model','DB');
+        $DB = new DB();
+        return (int) $DB->selectValue('SELECT liczba_ludnosci FROM pl_gminy WHERE id = ' . ((int) $id ));
+    }
+
     public function getBudgetSpendings()
     {
 		

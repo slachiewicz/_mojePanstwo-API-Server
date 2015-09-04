@@ -10,6 +10,12 @@ class FinanseController extends AppController
         $this->set('data', $data);
         $this->set('_serialize', 'data');
     }
+
+    public function getCommunePopCount($id) {
+        $data = $this->Finanse->getCommunePopCount($id);
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+    }
     
     public function getBudgetSections()
     {

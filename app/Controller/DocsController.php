@@ -162,7 +162,7 @@ class DocsController extends AppController
 
     public function save_budget_spendings()
     {
-        $this->loadModel("BudgetSpendings");
+     /*   $this->loadModel("BudgetSpendings");
 
         $this->BudgetSpendings->create();
 
@@ -183,9 +183,31 @@ class DocsController extends AppController
         }else{
             $res=false;
         }
+*/
+
+        $this->loadModel("BudgetEarnings");
+
+        $this->BudgetEarnings->create();
+
+        $data = $this->request->data;
+        $rl_data = $data[0];
+        $dane = json_decode($rl_data);
+        $dane=(array) $dane;
+        $toSend = array();
+        foreach ($dane as $key => $wiersz) {
+            $toSend[$key]=array();
+            foreach($wiersz as $k => $v){
+                $toSend[$key][$k]=str_replace('_',' ',$v);
+            }
+        }
+        if($this->BudgetEarnings->saveMany($toSend, array('atomic'=>false))){
+            $res=true;
+        }else{
+            $res=false;
+        }
 
         $this->set(array(
-            'dane' => $res,
+            'dane' => $toSend,
             '_serialize' => array('dane')
         ));
     }

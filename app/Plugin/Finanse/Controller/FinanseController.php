@@ -55,6 +55,13 @@ class FinanseController extends AppController
         $this->set('data', $data);
         $this->set('_serialize', 'data');
     }
+    public function getPkb()
+    {
+        $data = $this->Finanse->getPkb();
+
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+    }
     
 
 } 

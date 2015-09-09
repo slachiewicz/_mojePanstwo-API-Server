@@ -520,6 +520,7 @@ class Dataobject extends AppModel
                     ->subject('Udało się! Witam na Moim Państwie!')
                     ->to($to_email, $to_name)
                     ->from('asia.przybylska@epf.org.pl', 'Asia Przybylska')
+                    ->replyTo('asia.przybylska@epf.org.pl', 'Asia Przybylska')
                     ->send();
 
                 if(!$status)
@@ -591,6 +592,7 @@ class Dataobject extends AppModel
             ->subject('Cześć! Fajnie, że jesteś!')
             ->to($to_email, $to_name)
             ->from('asia.przybylska@epf.org.pl', 'Asia Przybylska')
+            ->replyTo('asia.przybylska@epf.org.pl', 'Asia Przybylska')
             ->send();
 
         return $request->save(array(

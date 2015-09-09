@@ -3,4 +3,4 @@ Dziękujemy za rejestracje. Miło Cię gościć na Moim Państwie. Mam nadzieję
 W tej chwili trwa weryfikacja Twojego konta. Wrócę wkrótce do Ciebie z informacją. Proszę o chwilę cierpliwości.<br/>
 <br/>
 Jesteśmy w kontakcie!
-Asia z MojePanstwo.pl 
+Asia z <a href="https://mojepanstwo.pl/">MojePanstwo.pl</a>

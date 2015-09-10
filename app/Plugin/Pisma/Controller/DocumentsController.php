@@ -197,7 +197,9 @@ class DocumentsController extends AppController
         ) {
 	        
         	$data['title'] = $template['tytul'] ? $template['tytul'] : $template['nazwa'];
-            $data['nadawca_opis'] = $template['nadawca_opis'];
+            if(isset($template['nadawca_opis'])) {
+                $data['nadawca_opis'] = $template['nadawca_opis'];
+            }
 
         	if( $data['saved']=='0' ) {
 

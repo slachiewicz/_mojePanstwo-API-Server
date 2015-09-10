@@ -555,13 +555,14 @@ class Finanse extends AppModel
         $dol = $DB->selectAssocs("SELECT rocznik, USD FROM kursy_srednie ORDER BY rocznik ASC");
 $bezrobocie= $DB->selectAssocs("SELECT rocznik, v FROM `BDL_data_pl` WHERE `kombinacja_id` = 13931 AND deleted='0' ORDER BY `BDL_data_pl`.`rocznik`  ASC");
         $inflacja= $DB->selectAssocs("SELECT rocznik, v FROM `BDL_data_pl` WHERE `kombinacja_id` = 18971 AND deleted='0' ORDER BY `BDL_data_pl`.`rocznik`  ASC");
+        $dlug=$DB->selectAssocs("SELECT * FROM `dlug_publiczny` ORDER BY `rocznik`  ASC");
 
         $usd = array();
         foreach ($dol as $row) {
             $usd[$row['rocznik']] = $row;
         }
 
-        $dane = array('PKB'=>$data, 'USD'=>$usd, 'bezrobocie'=>$bezrobocie, 'inflacja'=>$inflacja);
+        $dane = array('PKB'=>$data, 'USD'=>$usd, 'bezrobocie'=>$bezrobocie, 'inflacja'=>$inflacja, 'dlug'=>$dlug);
 
         return $dane;
     }

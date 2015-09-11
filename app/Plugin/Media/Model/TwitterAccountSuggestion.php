@@ -3,7 +3,7 @@
 class TwitterAccountSuggestion extends AppModel {
 
     public $useTable = 'twitter_account_suggestions';
-    private $types = array(2,3,7,8,9);
+    private $types = array(2,3,7,8,9,10);
 
     public function suggest($data) {
         $required = array('user_id', 'type_id', 'name');

@@ -91,8 +91,22 @@ class KrsPodmioty extends AppModel {
                     $toUpdate[$field] = $data[$field];
             }
 
+            if(strlen($data['cover_photo']) > 100) {
+                $toUpdate['cover_photo'] = '1';
+            } else {
+                $toUpdate['cover_photo'] = '0';
+            }
+
             $this->_update_activity_tags($object['OrganizacjeDzialania']['id'], @$data['tagi']);
-            $this->_update_activity_photo($object['OrganizacjeDzialania']['id'], $data);
+
+            try {
+                $this->_update_activity_photo($object['OrganizacjeDzialania']['id'], $data);
+            } catch(Exception $e) {
+                return array(
+                    'flash_message' => $e->getMessage()
+                );
+            }
+
             $toUpdateFields = array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng', 'photo_disabled', 'zakonczone');
             if($deleted)
                 $toUpdateFields[] = 'deleted';
@@ -139,6 +153,9 @@ class KrsPodmioty extends AppModel {
             $data = explode(',', $image);
             $decoded = base64_decode($data[1]);
 
+            if(!$decoded)
+                throw new Exception('base64_decode error');
+
             $object = $this->S3->putObject(
                 $decoded,
                 'portal',
@@ -148,7 +165,14 @@ class KrsPodmioty extends AppModel {
                 array('Content-Type' => 'image/' . $ext)
             );
 
+            if(!$object)
+                throw new Exception('S3 putObject error');
+
             $tmp_image = file_put_contents($tmp_src, file_get_contents('http://sds.tiktalik.com/portal/0/' . $src));
+
+            if(!$tmp_image)
+                throw new Exception('tmp_image error');
+
             exec("convert $tmp_src -resize $zoom% $tmp_src_zoom");
 
             $x = $x >= 0 ? '-' . $x : '+' . (-$x);

@@ -307,6 +307,14 @@ class MPSearch {
 	        			$key => $value,
 	        		),
 	        	);
+	        	
+	        } elseif( $key == 'geohash' ) {
+		        
+		        $and_filters[] = array(
+	        		'term' => array(
+		        		'position.geohash' => $value,
+	        		),
+	        	);
         	        		        		
         	} elseif( $key == 'q' ) {
 				
@@ -561,7 +569,7 @@ class MPSearch {
 				} elseif( ($_value == 'LAST_1Y') || ($_value == '1Y') ) {   		
 					
 					$range = array(
-						'gte' => 'now-1Y',
+						'gte' => 'now-1y',
 					);
 					
 					$and_filters[] = array(
@@ -725,6 +733,17 @@ class MPSearch {
 			$aggs = array();
 						
 			foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
+				
+				
+				array_walk_recursive($agg_data, function(&$value, $key){
+					if( 
+						$key && 
+						is_string($key) && 
+						in_array($key, array('size', 'precision')) 
+					) {
+						$value = (int) $value;
+					}
+				});
 				
 				if( 
 					( $agg_id === '_channels' ) && 
@@ -1003,8 +1022,8 @@ class MPSearch {
     public function read(Model $model, $queryData = array()) {
 		
 		$params = $this->buildESQuery($queryData);
-		
-		// debug( $params ); die();
+				
+		// var_export( $params ); die();
 		
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );

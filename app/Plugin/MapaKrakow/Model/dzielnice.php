@@ -7,5 +7,7 @@
  */
 
 class Dzielnice extends AppModel{
+
     public $useTable='mapa_krakow_dzielnice';
+
 }

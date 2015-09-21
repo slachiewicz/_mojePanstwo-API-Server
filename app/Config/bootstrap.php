@@ -141,7 +141,10 @@ CakePlugin::loadAll(array(
     ),
     'Survey' => array(
         'routes' => true
-    )
+    ),
+    'MapaKrakow' => array(
+        'routes' => true
+    ),
 ));
 
 /**

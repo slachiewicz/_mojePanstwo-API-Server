@@ -145,6 +145,9 @@ CakePlugin::loadAll(array(
     'MapaKrakow' => array(
         'routes' => true
     ),
+    'Collections' => array(
+        'routes' => true
+    ),
 ));
 
 /**

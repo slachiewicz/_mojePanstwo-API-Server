@@ -8,6 +8,7 @@ class Collection extends AppModel {
         'name' => array(
             'rule' => array('minLength', '3'),
             'required' => true,
+            'message' => 'Nazwa kolekcji musi zawierać przynajmniej 3 znaki'
         ),
         'user_id' => array(
             'required' => true

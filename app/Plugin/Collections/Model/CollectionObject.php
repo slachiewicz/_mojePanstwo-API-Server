@@ -6,9 +6,11 @@ class CollectionObject extends AppModel {
 
     public $validate = array(
         'collection_id' => array(
+            'rule' => 'notEmpty',
             'required' => true
         ),
         'object_id' => array(
+            'rule' => 'notEmpty',
             'required' => true
         )
     );

@@ -11,6 +11,7 @@ class Collection extends AppModel {
             'message' => 'Nazwa kolekcji musi zawierać przynajmniej 3 znaki'
         ),
         'user_id' => array(
+            'rule' => 'notEmpty',
             'required' => true
         )
     );

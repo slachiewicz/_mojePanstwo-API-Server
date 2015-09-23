@@ -21,18 +21,44 @@ class ObjectPage extends AppModel {
             'conditions' => $conditions
         ));
 
+        if(isset($data['areas']) && is_array($data['areas'])) {
+            $db = ConnectionManager::getDataSource('default');
+            $db->query("DELETE FROM organizacja_obszar WHERE object_id = " . ((int) $id));
+            foreach($data['areas'] as $area_id)
+                $db->query("INSERT INTO organizacja_obszar VALUES (" . (int) $id . ", " . (int) $area_id. ")");
+        }
+
+        $fields = array(
+            'description',
+            'phone',
+            'email',
+            'wwww',
+            'facebook',
+            'twitter',
+            'instagram',
+            'youtube',
+            'vine'
+        );
+
         if($object) {
-            $success = $this->updateAll(array(
-                'description' => "'".Sanitize::escape($data['description'])."'"
-            ), $conditions);
+            $d = array();
+            foreach($fields as $i => $field)
+                if(isset($data[$field]))
+                    $d[$field] = "'".Sanitize::escape($data[$field])."'";
+
+            $success = $this->updateAll($d, $conditions);
         } else {
+            $d = array();
+            foreach($fields as $i => $field)
+                if(isset($data[$field]))
+                    $d[$field] = $field;
+
             $success = $this->save(array(
-                'ObjectPage' => array(
+                'ObjectPage' => array_merge(array(
                     'dataset' => $dataset,
                     'object_id' => (int) $id,
-                    'moderated' => '1',
-                    'description' => $data['description']
-                )
+                    'moderated' => '1'
+                ), $d)
             ));
         }
 

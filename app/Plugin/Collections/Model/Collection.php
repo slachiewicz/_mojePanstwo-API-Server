@@ -13,6 +13,14 @@ class Collection extends AppModel {
         'user_id' => array(
             'rule' => 'notEmpty',
             'required' => true
+        ),
+        'description' => array(
+            'rule' => array('maxLength', '16383'),
+            'required' => false
+        ),
+        'image' => array(
+            'rule' => 'numeric',
+            'required' => false
         )
     );
 

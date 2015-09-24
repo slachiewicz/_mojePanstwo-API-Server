@@ -24,7 +24,7 @@ class Subscription extends AppModel
 	        'user_id' => $data['user_id'],
 		   	'cts' => date('Y-m-d h:i:j'),
         );
-        	        
+                	        
         if( $_sub = $this->find('first', array(
 	        'fields' => array('id'),
 	        'conditions' => array(
@@ -37,7 +37,7 @@ class Subscription extends AppModel
 	    	
 	    	$sub['id'] = $_sub['Subscription']['id'];
 	        
-	    }	        
+	    }        
         
         $channels = array();
     	foreach( $data['channel'] as $ch )
@@ -48,8 +48,7 @@ class Subscription extends AppModel
 		$data = array(
 			'Subscription' => $sub,
 			'SubscriptionChannel' => $channels,
-		);
-		
+		);		
 		
 		if( isset($sub['id']) ) {
 			$this->query("DELETE FROM `subscription_channels` WHERE `subscription_id`='" . addslashes( $sub['id'] ) . "'");
@@ -123,16 +122,22 @@ class Subscription extends AppModel
     
     
     public function syncByData($data = array()) {
-	    
-	    if( empty($data) || !isset($data['Subscription']) || !isset($data['SubscriptionChannel']) )
+	    	    
+	    if( 
+	    	empty($data) || 
+	    	!isset($data['Subscription'])
+	    )
 	    	return false;
-	    
+	    		    
 	    $sub = $data['Subscription'];
 	    $channels = array();
-	    foreach( $data['SubscriptionChannel'] as &$ch ) {
-	    	$ch['qs'] = array();
-	    	$ch['channel'] = (int) $ch['channel'];
-	    	$channels[] = (int) $ch['channel'];
+	    
+	    if( isset($data['SubscriptionChannel']) ) {
+		    foreach( $data['SubscriptionChannel'] as &$ch ) {
+		    	$ch['qs'] = array();
+		    	$ch['channel'] = (int) $ch['channel'];
+		    	$channels[] = (int) $ch['channel'];
+		    }
 	    }
 	    
 	    $channels = array_unique($channels);
@@ -216,7 +221,7 @@ class Subscription extends AppModel
 				'cts' => date($mask, $cts),
 				'user_type' => $sub['user_type'],
 				'user_id' => $sub['user_id'],
-				'channels' => $data['SubscriptionChannel'],
+				'channels' => isset($data['SubscriptionChannel']) ? $data['SubscriptionChannel'] : array(),
 			);
 			
 			/*

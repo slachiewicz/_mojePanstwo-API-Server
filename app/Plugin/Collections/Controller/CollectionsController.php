@@ -34,7 +34,11 @@ class CollectionsController extends AppController {
                     )
                 )
             ),
-            'fields' => array('Collection.*', 'CollectionObject.*')
+            'fields' => array('Collection.*', 'CollectionObject.*'),
+            'order' => array(
+                'CollectionObject.object_id' => 'desc',
+                'Collection.created_at' => 'desc',
+            )
         )));
         $this->set('_serialize', 'response');
     }
@@ -211,4 +215,27 @@ class CollectionsController extends AppController {
         $this->set('response', $this->CollectionObject->query('DELETE FROM collection_object WHERE collection_id = ' . (int) $id . ' AND object_id = '. (int) $object_id));
         $this->set('_serialize', 'response');
     }
+
+    public function removeObjects($id) {
+        $collection = $this->Collection->find('first', array(
+            'conditions' => array(
+                'Collection.id' => $id
+            )
+        ));
+
+        if(!$collection)
+            throw new NotFoundException;
+
+        if($collection['Collection']['user_id'] != $this->Auth->user('id'))
+            throw new ForbiddenException;
+
+        $ids = array();
+        foreach(((array) @$this->request->data['ids']) as $id) {
+            $ids[] = (int) $id;
+        }
+
+        $this->set('response', $this->CollectionObject->query('DELETE FROM collection_object WHERE collection_id = ' . (int) $id . ' AND object_id IN (' . implode(",", $ids) . ')'));
+        $this->set('_serialize', 'response');
+    }
+
 }

@@ -14,5 +14,39 @@ class CollectionObject extends AppModel {
             'required' => true
         )
     );
+    
+    public function afterSave($created, $options) {
+	    
+	    $this->syncByData($this->data);
+	    
+    }
+    
+    public function syncByData($data) {
+	    
+	    if( 
+	    	empty($data) || 
+	    	!isset($data['CollectionObject'])
+	    )
+	    	return false;
+	    		    
+	    $data = $data['CollectionObject'];
+
+	    $ES = ConnectionManager::getDataSource('MPSearch');	    
+	   	    
+	    $params = array();
+		$params['index'] = 'mojepanstwo_v1';
+		$params['type']  = 'collections-objects';
+		$params['id']    = $data['id'];
+		$params['parent'] = $data['object_id'];
+		$params['refresh'] = true;
+		$params['body']  = array(
+			'collection_id' => $data['collection_id'],
+		);		
+		
+		$ret = $ES->API->index($params);	
+		// var_export( $ret ); die();
+		return $data['id'];	    
+	    
+    }
 
 }

@@ -163,13 +163,35 @@ class CollectionsController extends AppController {
 
         if($collection['Collection']['user_id'] != $this->Auth->user('id'))
             throw new ForbiddenException;
-
-        $this->set('response', $this->CollectionObject->save(array(
+		
+		$collection_object_id = $this->CollectionObject->find('first', array(
+			'fields' => array('CollectionObject.id'),
+			'conditions' => array(
+				'CollectionObject.collection_id' => $id,
+				'CollectionObject.object_id' => $object_id,
+			),
+		));
+		
+		$data = array(
             'CollectionObject' => array(
                 'collection_id' => (int) $id,
                 'object_id' => (int) $object_id
             )
-        )));
+        );
+		
+		if( $collection_object_id ) {
+			
+			$data['CollectionObject']['id'] = $collection_object_id['CollectionObject']['id'];
+			$this->CollectionObject->syncByData($data);
+			$response = true;
+			
+		} else {
+		
+	        $response = $this->CollectionObject->save($data);
+        
+        }
+        
+        $this->set('response', $response);
         $this->set('_serialize', 'response');
     }
 

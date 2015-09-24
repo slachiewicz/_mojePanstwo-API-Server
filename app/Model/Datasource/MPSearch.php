@@ -332,6 +332,25 @@ class MPSearch {
 	        	
 	        	}
         	
+        	} elseif( $key == 'collection_id' ) {
+	        	
+	        	$and_filters[] = array(
+		        	'has_child' => array(
+			        	'type' => 'collections-objects',
+			        	'query' => array(
+				        	'bool' => array(
+					        	'must' => array(
+						        	array(
+							        	'term' => array(
+								        	'collection_id' => $value
+							        	),
+						        	),
+					        	),
+				        	),
+			        	),
+		        	),
+	        	);
+        	
         	} elseif( $key == '_object' ) {
 				
 				if( $value && ($parts = explode('.', $value)) && (count($parts)>1) ) {

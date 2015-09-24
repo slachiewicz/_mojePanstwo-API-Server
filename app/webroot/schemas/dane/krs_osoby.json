@@ -8,26 +8,30 @@
       "properties": {
         "data": {
           "properties": {
-            "krs_osoby.liczba_nadzorcow": {
-              "type": "integer",
-              "description": "TODO"
+            "krs_osoby.imie_pierwsze": {
+              "type": "string",
+              "description": "Pierwsze imię"
+            },
+            "krs_osoby.imie_drugie": {
+              "type": "string",
+              "description": "Drugie imię"
+            },
+            "krs_osoby.imiona": {
+              "type": "string",
+              "description": "Wszystkie imiona razem"
             },
             "krs_osoby.nazwisko": {
               "type": "string",
               "description": "Nazwisko"
             },
-            "krs_osoby.liczba_akcjonariusze": {
-              "type": "integer",
-              "description": "TODO"
-            },
-            "krs_osoby.liczba_reprezentanci": {
-              "type": "integer",
-              "description": "TODO"
-            },
-            "krs_osoby.id": {
-              "_TODO": "usunac",
+            "krs_osoby.data_urodzenia": {
               "type": "string",
-              "description": "TODO"
+              "description": "Data urodzenia",
+              "format": "date-time"
+            },
+            "krs_osoby.plec": {
+              "enum": ["M", "K"],
+              "description": "M - mezczyzna, K - kobieta"
             },
             "krs_osoby.str": {
               "_TODO": "rozdzielic (osobno funkcja, osobno spolka, spolki id/url, a nie mpurl), wrzucic to w static",
@@ -38,13 +42,21 @@
               "type": "string",
               "description": "TODO"
             },
-            "krs_osoby.liczba_zalozyciele": {
+            "krs_osoby.liczba_akcjonariusze": {
               "type": "integer",
               "description": "TODO"
             },
-            "krs_osoby.plec": {
-              "enum": ["M", "K"],
-              "description": "M - mezczyzna, K - kobieta"
+            "krs_osoby.liczba_reprezentanci": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.liczba_nadzorcow": {
+              "type": "integer",
+              "description": "TODO"
+            },
+            "krs_osoby.liczba_zalozyciele": {
+              "type": "integer",
+              "description": "TODO"
             },
             "krs_osoby.gmina_id": {
               "type": "string",
@@ -55,26 +67,9 @@
               "type": "string",
               "description": "TODO jw."
             },
-            "krs_osoby.imie_drugie": {
-              "type": "string",
-              "description": "Drugie imię"
-            },
-            "krs_osoby.imie_pierwsze": {
-              "type": "string",
-              "description": "Pierwsze imię"
-            },
-            "krs_osoby.data_urodzenia": {
-              "type": "string",
-              "description": "Data urodzenia",
-              "format": "date-time"
-            },
             "krs_osoby.liczba_wspolnicy": {
               "type": "integer",
               "description": "TODO"
-            },
-            "krs_osoby.imiona": {
-              "type": "string",
-              "description": "Wszystkie imiona razem"
             }
           },
           "additionalProperties": "false"

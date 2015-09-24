@@ -60,6 +60,7 @@ class MPSearch {
             'data' => $doc['fields']['source'][0]['data'],
     	);
 
+		unset($output['data'][$dataset . '.id']);
 
     	if( 
 	    	isset( $doc['fields']['source'][0]['static'] ) && 
@@ -148,9 +149,21 @@ class MPSearch {
 		    	
 	    	}	    	
     	}
-    	
+
+		$classname = str_replace(' ', '', ucwords(str_replace('_',' ', $dataset))) .'PostProcess';
+		$filename = ROOT . DS . APP_DIR . DS . 'Model' . DS . 'PostProcess' . DS . $classname . '.php';
+		if (file_exists($filename)) {
+			if (!class_exists($classname)) {
+				require_once($filename);
+			}
+
+			$classname::mapFields($output);
+		}
+
+		// posortuj po kluczach
+		ksort($output['data']);
+
     	return $output;
-	    
     }	
 	
 	public function buildESQuery( $queryData = array() ) {

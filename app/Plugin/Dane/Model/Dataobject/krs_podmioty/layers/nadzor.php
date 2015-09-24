@@ -9,13 +9,18 @@ $data = $this->DB->query("SELECT `krs_nadzorcy`.nazwa, `krs_nadzorcy`.imiona, `k
 
 $output = array();
 foreach ($data as $d) {
-
-    $output[] = array(
+    $osoba = array(
         'nazwa' => _ucfirst($d['krs_nadzorcy']['nazwa'] . ' ' . $d['krs_nadzorcy']['imiona']),
-        'data_urodzenia' => $d['krs_osoby']['data_urodzenia'],
-        'privacy_level' => $d['krs_osoby']['privacy_level'],
-        'osoba_id' => @$d['krs_osoby']['id'],
     );
+
+    if (isset($d['krs_osoby']['id'])) {
+        $osoba['data_urodzenia'] = $d['krs_osoby']['data_urodzenia'];
+        $osoba['privacy_level'] = $d['krs_osoby']['privacy_level'];
+        $osoba['osoba_id'] = $d['krs_osoby']['id'];
+        $osoba['krs_osoby.url'] = Dataobject::apiUrl('krs_osoby', $d['krs_osoby']['id']);
+    }
+
+    $output[] = $osoba;
 }
 
 

@@ -2,6 +2,14 @@
 
 class MpUtils
 {
+    public static function clean_hyphens($value) {
+        $value = trim($value, '-');
+
+        if (empty($value)) {
+            return null;
+        }
+        return $value;
+    }
 
     public static function check_netmask($mask, $ip)
     {

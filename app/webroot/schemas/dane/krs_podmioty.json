@@ -68,6 +68,15 @@
               "type": "string",
               "description": "Kod pocztowy"
             },
+            "krs_podmioty.adres_kod_pocztowy_url": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL obiektu kodu pocztowego"
+            },
+            "krs_podmioty.kod_pocztowy_id": {
+              "_deprecated": true,
+              "type": "string"
+            },
             "krs_podmioty.adres_poczta": {
               "type": "string",
               "description": "Poczta"
@@ -120,7 +129,7 @@
             },
             "krs_podmioty.nazwa": {
               "type": "string",
-              "description": "TODO"
+              "description": "Pełna nazwa podmiotu"
             },
             "krs_podmioty.data_rejestracji": {
               "type": "string",
@@ -145,7 +154,24 @@
             },
             "krs_podmioty.forma_prawna_str": {
               "type": "string",
-              "description": "TODO"
+              "description": "Forma prawna podmiotu w postaci tekstu"
+            },
+            "krs_podmioty.forma_prawna": {
+              "enum": ["badawczo-rozwojowa", "cech-rzemieslniczy", "federacja-pracodawcow", "fundacja", "inst-gospodarki-budzet", "instytut-badawczy", "izba-gospodarcza", "izba-rzemieslnicza", "kolko-rolnicze", "opp-inne", "opp-kosciol", "opp-kosciol-nop", "opp-nop", "przedsiebiorstwo-panstwowe", "przedsieborca-zagraniczny-oddzial", "skok", "skok-blad", "sp-akcyjna", "sp-europejska", "sp-jawna", "sp-komandytowa", "sp-komandytowo-akcyjna", "sp-partnerska", "sp-zoo", "spoldzielnia", "spzoz", "stowarzyszenie", "stowarzyszenie-jterenowa", "stowarzyszenie-kult-fiz", "stowarzyszenie-kult-fiz-krajowe", "stowarzyszenie-ogrodowe", "transport-sanitarny", "tuw", "zrzeszenie-handlu-uslug", "zrzeszenie-handlu-uslug-repr", "zrzeszenie-miedzybranzowe", "zrzeszenie-rolnicze", "zrzeszenie-rolnicze-zwiazek", "zrzeszenie-transportu", "zrzeszenie-transportu-repr", "zwiazek-miedzybranzowy", "zwiazek-pracodawcow", "zwiazek-rzemiosla", "zwiazek-sportowy", "zwiazek-sportowy", "zwiazek-stowarzyszen", "zwiazek-zawodowy", "zwiazek-zawodowy-rolnikow-ind", "zwiazki-rolnikow", "zzu-go"],
+              "description": "Forma prawna podmiotu"
+            },
+            "krs_podmioty.forma_prawna_id": {
+              "_deprecated": true,
+              "type": "string",
+              "description": "Na razie udostepnia filtrowanie"
+            },
+            "krs_podmioty.forma_prawna_typ_id": {
+              "_deprecated": true,
+              "type": "string"
+            },
+            "krs_podmioty.forma_prawna_kategoria": {
+              "enum": ["biznes", "ngo", "spzoz"],
+              "description": "Kategorie podmiotów wg. Mojego Państwa: Biznes, NGO - Organizacje pozarządowe, spzoz - Samodzielne publiczne zakłady opieki zdrowotnej"
             },
             "krs_podmioty.liczba_oddzialow": {
               "type": "integer",
@@ -156,10 +182,6 @@
               "description": "TODO"
             },
             "krs_podmioty.sygnatura_akt": {
-              "type": "string",
-              "description": "TODO"
-            },
-            "krs_podmioty.forma_prawna_typ_id": {
               "type": "string",
               "description": "TODO"
             },
@@ -199,10 +221,6 @@
               "type": "string",
               "description": "TODO"
             },
-            "krs_podmioty.kod_pocztowy_id": {
-              "type": "string",
-              "description": "TODO"
-            },
             "krs_podmioty.nazwa_organu_nadzoru": {
               "type": "string",
               "description": "TODO"
@@ -230,7 +248,7 @@
             },
             "krs_podmioty.krs": {
               "type": "string",
-              "description": "TODO"
+              "description": "Numer w KRS, jest on identyczny id obiektu, bez początkowych zer"
             },
             "krs_podmioty.liczba_emisji_akcji": {
               "type": "integer",
@@ -238,10 +256,6 @@
             },
             "krs_podmioty.numer_wpisu": {
               "type": "integer",
-              "description": "TODO"
-            },
-            "krs_podmioty.forma_prawna_id": {
-              "type": "string",
               "description": "TODO"
             },
             "krs_podmioty.liczba_prokurentow": {
@@ -254,7 +268,7 @@
             },
             "krs_podmioty.firma": {
               "type": "string",
-              "description": "TODO"
+              "description": "TODO firma?!"
             },
             "krs_podmioty.umowa_spolki_cywilnej": {
               "type": "string",
@@ -279,7 +293,82 @@
               "description": "TODO"
             },
             "graph": {
-              "description": "TODO"
+              "description": "Graf powiązań",
+              "properties": {
+                "root": {
+                  "type": "string",
+                  "description": "ID bazowego wezla - podmiotu"
+                },
+                "nodes":{
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "label": {
+                        "enum": ["podmiot", "osoba"]
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "ID wezla"
+                      },
+                      "data": {
+                        "oneOf": [
+                          {
+                            "properties": {
+                              "imiona": {
+                                "type": "string",
+                                "description": "Imiona osoby"
+                              },
+                              "nazwisko": {
+                                "type": "string",
+                                "description": "Nazwisko"
+                              },
+                              "plec": {
+                                "enum": ["M", "K"]
+                              },
+                              "data_urodzenia": {
+                                "type": "string",
+                                "format": "date",
+                                "description": "Data urodzenia"
+                              },
+                              "privacy_level": {
+                                "enum": [
+                                  "0",
+                                  "1"
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "properties": {
+                              "krs": {
+                                "type": "string",
+                                "description": "Numer KRS podmiotu"
+                              },
+                              "miejscowosc": {
+                                "type": "string",
+                                "description": "Siedziba - miejscowość"
+                              },
+                              "data-rejestracji": {
+                                "type": "string",
+                                "format": "date",
+                                "description": "Data rejestracji w KRS"
+                              },
+                              "forma": {
+                                "type": "string",
+                                "description": "Forma prawna"
+                              },
+                              "nazwa": {
+                                "type": "string",
+                                "description": "Pełna nazwa podmiotu"
+                              }
+                            }
+                          }
+                          ]
+                      }
+                    }
+                  }
+                }
+              }
             },
             "jedynyAkcjonariusz": {
               "description": "TODO"
@@ -288,25 +377,110 @@
               "description": "TODO"
             },
             "nadzor": {
-              "description": "TODO"
+              "description": "Członkowie organu nadzoru podmiotu. Linkowanie z KRS może być puste, jeżeli nie udało znaleźć się osoby w polskim KRS",
+              "type": "array",
+              "items": {
+                "properties": {
+                  "nazwa": {
+                    "type": "string",
+                    "description": "Imię nazwisko osoby"
+                  },
+                  "data_urodzenia": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Data urodzenia"
+                  },
+                  "privacy_level": {
+                    "enum": [
+                      "0",
+                      "1"
+                    ],
+                    "description": "TODO"
+                  },
+                  "osoba_id": {
+                    "type": "string",
+                    "description": "ID obiektu osoby"
+                  },
+                  "krs_osoby.url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL obiektu osoby"
+                  }
+                },
+                "required": ["nazwa"]
+              }
             },
             "oddzialy": {
               "description": "TODO"
             },
             "odpis": {
-              "description": "TODO"
+              "description": "TODO",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "description": "TODO"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "TODO"
+                }
+              }
             },
             "prokurenci": {
               "description": "TODO"
             },
             "reprezentacja": {
-              "description": "TODO"
+              "description": "Członkowie organu reprezentacji podmiotu, np. zarząd",
+              "type": "array",
+              "items": {
+                "properties": {
+                  "nazwa": {
+                    "type": "string",
+                    "description": "Imię nazwisko osoby"
+                  },
+                  "funkcja": {
+                    "type": "string",
+                    "description": "Funkcja osoby, np. członek lub prezes zarządu"
+                  },
+                  "data_urodzenia": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Data urodzenia"
+                  },
+                  "privacy_level": {
+                    "enum": [
+                      "0",
+                      "1"
+                    ],
+                    "description": "TODO"
+                  },
+                  "osoba_id": {
+                    "type": "string",
+                    "description": "ID obiektu osoby"
+                  },
+                  "krs_osoby.url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL obiektu osoby"
+                  }
+                }
+              }
             },
             "wspolnicy": {
               "description": "TODO"
             },
             "zmiany_umow": {
-              "description": "TODO"
+              "description": "TODO",
+              "type": "array",
+              "items": {
+                "properties": {
+                  "zmiana_tekst": {
+                    "type": "string",
+                    "description": "TODO"
+                  }
+                }
+              }
             },
             "kultura": {
               "description": "TODO"
@@ -321,7 +495,30 @@
               "description": "TODO"
             },
             "odpisy": {
-              "description": "TODO"
+              "description": "TODO",
+              "type": "array",
+              "items": {
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "TODO"
+                  },
+                  "complete": {
+                    "type": "string",
+                    "description": "TODO"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "TODO"
+                  },
+                  "complete_ts": {
+                    "_TODO": "'T' needed between daate and time",
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "TODO"
+                  }
+                }
+              }
             }
           }
         }

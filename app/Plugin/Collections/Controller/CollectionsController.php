@@ -155,6 +155,38 @@ class CollectionsController extends AppController {
         $this->set('_serialize', 'response');
     }
 
+    public function edit($id) {
+        $collection = $this->Collection->find('first', array(
+            'conditions' => array(
+                'Collection.id' => $id
+            )
+        ));
+
+        if(!$collection)
+            throw new NotFoundException;
+
+        if($collection['Collection']['user_id'] != $this->Auth->user('id'))
+            throw new ForbiddenException;
+
+        $data = array_merge($this->request->data, array(
+            'user_id' => $this->Auth->user('id'),
+            'image' => 0,
+            'id' => $id,
+        ));
+
+        $this->Collection->set($data);
+        if($this->Collection->validates()) {
+            $response = $this->Collection->save(array(
+                'Collection' => $data
+            ));
+        } else {
+            $response = $this->Collection->validationErrors;
+        }
+
+        $this->set('response', $response);
+        $this->set('_serialize', 'response');
+    }
+
     public function addObject($id, $object_id) {
         $collection = $this->Collection->find('first', array(
             'conditions' => array(
@@ -235,6 +267,23 @@ class CollectionsController extends AppController {
         }
 
         $this->set('response', $this->CollectionObject->query('DELETE FROM collection_object WHERE collection_id = ' . (int) $id . ' AND object_id IN (' . implode(",", $ids) . ')'));
+        $this->set('_serialize', 'response');
+    }
+
+    public function delete($id) {
+        $collection = $this->Collection->find('first', array(
+            'conditions' => array(
+                'Collection.id' => $id
+            )
+        ));
+
+        if(!$collection)
+            throw new NotFoundException;
+
+        if($collection['Collection']['user_id'] != $this->Auth->user('id'))
+            throw new ForbiddenException;
+
+        $this->set('response', $this->Collection->delete($id));
         $this->set('_serialize', 'response');
     }
 

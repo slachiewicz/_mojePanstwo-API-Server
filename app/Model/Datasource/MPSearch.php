@@ -753,16 +753,17 @@ class MPSearch {
 						
 			foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
 				
-				
-				array_walk_recursive($agg_data, function(&$value, $key){
-					if( 
-						$key && 
-						is_string($key) && 
-						in_array($key, array('size', 'precision')) 
-					) {
-						$value = (int) $value;
-					}
-				});
+				if( is_array($agg_data) ) {
+					array_walk_recursive($agg_data, function(&$value, $key){
+						if( 
+							$key && 
+							is_string($key) && 
+							in_array($key, array('size', 'precision')) 
+						) {
+							$value = (int) $value;
+						}
+					});
+				}
 				
 				if( 
 					( $agg_id === '_channels' ) && 
@@ -806,7 +807,43 @@ class MPSearch {
 	                );
 	                
 	                $this->Aggs['feed_data'] = array();
-	            
+	                
+	            } elseif( $agg_id=='subscribtions' ) {
+	            	
+	            	$aggs['global'] = array(
+	                    'subscribtions' => array(
+                            
+                            'filter' => array(
+	                            'has_child' => array(
+				        			'type' => '.percolator',
+				        			'filter' => array(
+					        			'and' => array(
+						        			'filters' => array(
+							        			array(
+								        			'term' => array(
+									        			'user_type' => $value['user_type'],
+								        			),
+							        			),
+							        			array(
+								        			'term' => array(
+									        			'user_id' => $value['user_id'],
+								        			),
+							        			),
+						        			),
+					        			),
+				        			),
+				        			'inner_hits' => array(
+					        			'name' => 'inner',
+						        		'fields' => array('id', 'title', 'url'),
+					        		),
+				        		),
+                            ),
+                            'aggs' => new \stdClass(),
+                        ),
+	                );
+	                
+	                $this->Aggs['subscribtions'] = array();
+	            	
 				} else {
 					
 					if (!is_array($agg_data)) {

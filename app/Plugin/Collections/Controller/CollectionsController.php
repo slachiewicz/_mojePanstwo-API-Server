@@ -271,19 +271,23 @@ class CollectionsController extends AppController {
     }
 
     public function delete($id) {
-        $collection = $this->Collection->find('first', array(
-            'conditions' => array(
-                'Collection.id' => $id
-            )
+        
+        $this->loadModel('Dane.Dataobject');
+        $collection = $this->Dataobject->find('first', array(
+	        'conditions' => array(
+		        'dataset' => 'kolekcje',
+		        'id' => $id,
+	        ),
         ));
-
+        
         if(!$collection)
             throw new NotFoundException;
-
-        if($collection['Collection']['user_id'] != $this->Auth->user('id'))
+				
+        if($collection['data']['kolekcje.user_id'] != $this->Auth->user('id'))
             throw new ForbiddenException;
-
-        $this->set('response', $this->Collection->delete($id));
+		
+        $this->set('response', $this->Collection->delete($collection['id']));
+        $this->Collection->deleteSync($collection);
         $this->set('_serialize', 'response');
     }
 

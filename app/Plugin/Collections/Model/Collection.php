@@ -30,6 +30,22 @@ class Collection extends AppModel {
 	    
     }
     
+    public function deleteSync($collection) {
+	    	    
+	    $ES = ConnectionManager::getDataSource('MPSearch');	    
+	   	   
+	    $params = array();
+		$params['index'] = 'mojepanstwo_v1';
+		$params['type']  = 'objects';
+		$params['id']    = $collection['global_id'];
+		$params['refresh'] = true;
+		$params['ignore'] = 404;
+		
+		$ret = $ES->API->delete($params);
+		return $ret;
+	    
+	}
+    
     public function syncById($id) {
 	    
 	    if( !$id )

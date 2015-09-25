@@ -18,15 +18,13 @@ class Collection extends AppModel {
             'rule' => array('maxLength', '16383'),
             'required' => false
         ),
-        'image' => array(
-            'rule' => 'numeric',
-            'required' => false
-        )
     );
     
     public function afterSave($created, $options) {
-	    
-	    $this->syncByData($this->data);
+
+        if(isset($this->data['Collection']['id'])) {
+            $this->syncById($this->data['Collection']['id']);
+        }
 	    
     }
     
@@ -108,9 +106,10 @@ class Collection extends AppModel {
 			'dataset' => 'kolekcje',
 			'slug' => Inflector::slug($data['name']),
 			'data' => array(
-				// 'kolekcje.czas_utworzenia' => '2015-09-24 15:01:45',
+				'kolekcje.czas_utworzenia' => $data['created_at'],
 			    'kolekcje.id' => $data['id'],
 			    'kolekcje.nazwa' => $data['name'],
+			    'kolekcje.description' => $data['description'],
 			    'kolekcje.user_id' => $data['user_id'],
 			    'kolekcje.items_count' => $data['items_count'],
 			),

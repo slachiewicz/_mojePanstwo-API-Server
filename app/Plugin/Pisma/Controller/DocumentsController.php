@@ -429,7 +429,7 @@ class DocumentsController extends AppController
         if ($doc = $this->Document->save(array('Document' => $data))) {
             $this->response->statusCode(201);  // 201 Created
             
-            $url = '/pisma/' . $doc['Document']['alphaid'];
+            $url = '/moje-pisma/' . $doc['Document']['alphaid'];
                         
             if( $doc['Document']['slug'] )
             	$url .= ',' . $doc['Document']['slug'];

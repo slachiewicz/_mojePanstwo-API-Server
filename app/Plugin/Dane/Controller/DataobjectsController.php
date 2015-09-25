@@ -346,7 +346,8 @@ class DataobjectsController extends AppController
 			'dataset' => null,
 			'channels' => null,
 			'page' => null,
-			'subscribers' => null
+			'subscribers' => null,
+			''
 		);
 		$dataset_info = $this->MPCache->getDataset($dataset);
 		foreach($dataset_info['Layer'] as $layer) {
@@ -371,7 +372,14 @@ class DataobjectsController extends AppController
 			// load only available layers
 			$layers_to_load = array_intersect($layers_to_load, array_keys($object['layers']));
 		}
-
+		
+		if( $this->Auth->user('type')=='account') {
+			
+			if( !in_array('subscription', $layers_to_load) )
+				$layers_to_load[] = 'subscription';
+			
+		}
+		
 		// load layers
 		foreach( $layers_to_load as $layer ) {
 
@@ -483,7 +491,7 @@ class DataobjectsController extends AppController
                         'object_id' => $object['id'],
                     )
                 ));
-
+                
             } else {
 				$object['layers'][ $layer ] = $this->Dataobject->getObjectLayer($dataset, $id, $layer);
 			}

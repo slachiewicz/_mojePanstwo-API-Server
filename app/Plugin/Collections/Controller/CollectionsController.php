@@ -36,7 +36,6 @@ class CollectionsController extends AppController {
             ),
             'fields' => array('Collection.*', 'CollectionObject.*'),
             'order' => array(
-                'CollectionObject.object_id' => 'desc',
                 'Collection.created_at' => 'desc',
             )
         )));

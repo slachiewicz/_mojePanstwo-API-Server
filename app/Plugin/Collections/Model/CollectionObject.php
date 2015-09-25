@@ -43,8 +43,9 @@ class CollectionObject extends AppModel {
 			'collection_id' => $data['collection_id'],
 		);		
 		
-		$ret = $ES->API->index($params);	
-		// var_export( $ret ); die();
+		$ret = $ES->API->index($params);		
+		$this->Collection = ClassRegistry::init('Collections.Collection');	
+		$this->Collection->syncById($data['collection_id']);
 		return $data['id'];	    
 	    
     }

@@ -21,8 +21,9 @@ class ObjectPage extends AppModel {
             'conditions' => $conditions
         ));
 
+        $db = ConnectionManager::getDataSource('default');
+
         if(isset($data['areas']) && is_array($data['areas'])) {
-            $db = ConnectionManager::getDataSource('default');
             $db->query("DELETE FROM organizacja_obszar WHERE object_id = " . ((int) $id));
             foreach($data['areas'] as $area_id)
                 $db->query("INSERT INTO organizacja_obszar VALUES (" . (int) $id . ", " . (int) $area_id. ")");
@@ -51,7 +52,7 @@ class ObjectPage extends AppModel {
             $d = array();
             foreach($fields as $i => $field)
                 if(isset($data[$field]))
-                    $d[$field] = $field;
+                    $d[$field] = $data[$field];
 
             $success = $this->save(array(
                 'ObjectPage' => array_merge(array(
@@ -60,6 +61,9 @@ class ObjectPage extends AppModel {
                     'moderated' => '1'
                 ), $d)
             ));
+
+            $row = $this->query('SELECT id FROM objects WHERE dataset = ? AND object_id = ?', array($dataset, $id));
+            $this->query('UPDATE `objects-pages` SET id = ? WHERE dataset = ? AND object_id = ?', array($row[0]['objects']['id'], $dataset, $id));
         }
 
         return (bool) $success;

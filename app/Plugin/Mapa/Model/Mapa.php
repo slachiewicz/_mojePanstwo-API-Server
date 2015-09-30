@@ -1,5 +1,7 @@
 <?php
 
+App::uses('GeoJsonMP', 'Geo.Model');
+
 class Mapa extends AppModel
 {
 
@@ -82,9 +84,33 @@ class Mapa extends AppModel
 		}
 		
 		if( $places ) {
-			
-			// $places[0]['polygons']
-			
+
+            $types = array(
+                'gmina_id' => 'gminy',
+                'wojewodztwo_id' => 'wojewodztwa',
+                'powiat_id' => 'powiaty'
+            );
+
+            $geo = new GeoJsonMP();
+
+            foreach($places as $p => $place) {
+
+                foreach($types as $t => $type) {
+
+                    if(isset($place['data']['miejsca.' . $t]) &&
+                    is_numeric($place['data']['miejsca.' . $t]) &&
+                    $place['data']['miejsca.' . $t] > 0) {
+
+                        $places[$p]['polygons'][$t] = $geo->getMapData(4, array($type), array(
+                            $type => array($place['data']['miejsca.' . $t])
+                        ));
+
+                    }
+
+                }
+
+            }
+
 		}
 		
 		

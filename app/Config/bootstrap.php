@@ -148,6 +148,9 @@ CakePlugin::loadAll(array(
     'Collections' => array(
         'routes' => true
     ),
+    'Mapa' => array(
+        'routes' => true
+    ),
 ));
 
 /**

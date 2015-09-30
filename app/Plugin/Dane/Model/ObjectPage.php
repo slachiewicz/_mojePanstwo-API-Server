@@ -12,7 +12,6 @@ class ObjectPage extends AppModel {
 
     public function setData($data, $id, $dataset)
     {
-        $this->log('setData(), data: ' . $data .', id: ' . $id .', dataset: ' . $dataset, 'debug');
         $conditions = array(
             'ObjectPage.dataset' => $dataset,
             'ObjectPage.object_id' => (int) $id
@@ -194,8 +193,6 @@ class ObjectPage extends AppModel {
             $id = false;
         }
 
-        $this->log('afterSave() : id = ' . $id, 'debug');
-
         if($id)
             $this->syncById($id);
     }
@@ -210,8 +207,6 @@ class ObjectPage extends AppModel {
                 'ObjectPage.id' => $id,
             ),
         ));
-
-        $this->log('syncById() : data = ' . $data, 'debug');
 
         if( $data ) {
 
@@ -234,9 +229,6 @@ class ObjectPage extends AppModel {
         $this->DB = new DB();
 
         $data = $data['ObjectPage'];
-
-        $this->log('syncByData() : data = ' . $data, 'debug');
-
         $ES = ConnectionManager::getDataSource('MPSearch');
 
         $params = array();
@@ -246,8 +238,8 @@ class ObjectPage extends AppModel {
         $params['refresh'] = true;
         $params['parent'] = $data['id'];
         $params['body']  = array(
-            'title' => $data['name'],
-            'text' => $data['name'],
+            'title' => @$data['name'],
+            'text' => @$data['name'],
             'dataset' => 'objects_pages',
             'slug' => Inflector::slug($data['id']),
             'data' => array(

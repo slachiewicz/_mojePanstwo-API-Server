@@ -12,6 +12,7 @@ class ObjectPage extends AppModel {
 
     public function setData($data, $id, $dataset)
     {
+        $this->log('setData(), data: ' . $data .', id: ' . $id .', dataset: ' . $dataset, 'debug');
         $conditions = array(
             'ObjectPage.dataset' => $dataset,
             'ObjectPage.object_id' => (int) $id

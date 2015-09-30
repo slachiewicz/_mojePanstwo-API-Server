@@ -183,6 +183,8 @@ class ObjectPage extends AppModel {
             $id = false;
         }
 
+        $this->log('afterSave() : id = ' . $id, 'debug');
+
         if($id)
             $this->syncById($id);
     }
@@ -197,6 +199,8 @@ class ObjectPage extends AppModel {
                 'ObjectPage.id' => $id,
             ),
         ));
+
+        $this->log('syncById() : data = ' . $data, 'debug');
 
         if( $data ) {
 
@@ -219,6 +223,8 @@ class ObjectPage extends AppModel {
         $this->DB = new DB();
 
         $data = $data['ObjectPage'];
+
+        $this->log('syncByData() : data = ' . $data, 'debug');
 
         $ES = ConnectionManager::getDataSource('MPSearch');
 

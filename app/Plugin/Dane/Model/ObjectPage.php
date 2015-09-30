@@ -67,6 +67,16 @@ class ObjectPage extends AppModel {
             $this->query('UPDATE `objects-pages` SET id = ? WHERE dataset = ? AND object_id = ?', array($row[0]['objects']['id'], $dataset, $id));
         }
 
+        $row = $this->query('SELECT id FROM objects WHERE dataset = ? AND object_id = ?', array(
+            $dataset,
+            $id
+        ));
+
+        $id = $row[0]['objects']['id'];
+
+        if($id)
+            $this->syncById($id);
+
         return (bool) $success;
     }
 

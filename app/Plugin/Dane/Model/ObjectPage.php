@@ -169,4 +169,89 @@ class ObjectPage extends AppModel {
         }
     }
 
+    public function afterSave($created, $options) {
+        if(isset($this->data['ObjectPage']['id'])) {
+            $id = $this->data['ObjectPage']['id'];
+        } else if(isset($this->data['ObjectPage']['dataset']) && isset($this->data['ObjectPage']['object_id'])) {
+            $row = $this->query('SELECT id FROM objects WHERE dataset = ? AND object_id = ?', array(
+                $this->data['ObjectPage']['dataset'],
+                $this->data['ObjectPage']['object_id']
+            ));
+
+            $id = $row[0]['objects']['id'];
+        } else {
+            $id = false;
+        }
+
+        if($id)
+            $this->syncById($id);
+    }
+
+    public function syncById($id) {
+
+        if( !$id )
+            return false;
+
+        $data = $this->find('first', array(
+            'conditions' => array(
+                'ObjectPage.id' => $id,
+            ),
+        ));
+
+        if( $data ) {
+
+            return $this->syncByData( $data );
+
+        } else
+            return false;
+
+    }
+
+    public function syncByData($data) {
+
+        if(
+            empty($data) ||
+            !isset($data['ObjectPage'])
+        )
+            return false;
+
+        App::import('model', 'DB');
+        $this->DB = new DB();
+
+        $data = $data['ObjectPage'];
+
+        $ES = ConnectionManager::getDataSource('MPSearch');
+
+        $params = array();
+        $params['index'] = 'mojepanstwo_v1';
+        $params['type']  = 'objects_pages';
+        $params['id']    = $data['id'];
+        $params['refresh'] = true;
+        $params['parent'] = $data['id'];
+        $params['body']  = array(
+            'title' => $data['name'],
+            'text' => $data['name'],
+            'dataset' => 'objects_pages',
+            'slug' => Inflector::slug($data['id']),
+            'data' => array(
+                'cover' => $data['cover'],
+                'logo' => $data['logo'],
+                'moderated' => $data['moderated'],
+                'description' => $data['description'],
+                'credits' => $data['credits'],
+                'phone' => $data['phone'],
+                'www' => $data['www'],
+                'email' => $data['email'],
+                'facebook' => $data['facebook'],
+                'twitter' => $data['twitter'],
+                'instagram' => $data['instagram'],
+                'youtube' => $data['youtube'],
+                'vine' => $data['vine']
+            ),
+        );
+
+        $ret = $ES->API->index($params);
+        return $data['id'];
+    }
+
 }

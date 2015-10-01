@@ -171,6 +171,8 @@ class MPSearch {
 		if( isset($queryData['layers']) )
 			$this->layers_requested = $queryData['layers'];
 		
+		// debug( $this->layers_requested );
+		
 		$from = ( $queryData['page'] - 1 ) * $queryData['limit'];
 		$size = $queryData['limit'];
 		
@@ -757,33 +759,11 @@ class MPSearch {
 				throw new BadRequestException();
 			}
 			
-			// debug( $queryData['aggs'] );
 			$aggs = array();
-						
-			if( 
-				!empty( $this->layers_requested ) && 
-				in_array('page', $this->layers_requested)
-			) {
-								
-				$aggs['global']['_page'] = array(
-					'children' => array(
-						'type' => 'objects-pages',
-					),
-					'aggs' => array(
-						'page' => array(
-							'top_hits' => array(
-								'size' => 1,
-								'_source' => array(
-		                            'include' => '*',
-		                        ),
-							),
-						),
-					),
-				);
-				
-			}
-			
+			$es_aggs = array();
+												
 			if( isset($queryData['aggs']) ) {
+				
 				foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
 					
 					if( is_array($agg_data) ) {
@@ -941,7 +921,9 @@ class MPSearch {
 			
 			
 				$es_aggs = array();
-							
+				
+				// debug($aggs); die();
+					
 				if( 
 					array_key_exists('global', $aggs) || 
 					array_key_exists('query', $aggs) || 
@@ -1043,7 +1025,33 @@ class MPSearch {
 				$es_aggs = array_merge($es_aggs, $aggs['results']);
 			}
 						
-						
+			
+			if( 
+				!empty( $this->layers_requested ) && 
+				in_array('page', $this->layers_requested)
+			) {
+				
+				/*				
+				$es_aggs['__global']['aggs']['_page'] = array(
+					'children' => array(
+						'type' => 'objects-pages',
+					),
+					'aggs' => array(
+						'page' => array(
+							'top_hits' => array(
+								'size' => 1,
+								'_source' => array(
+		                            'include' => '*',
+		                        ),
+							),
+						),
+					),
+				);
+				*/
+				
+			}
+			
+					
 			if( !empty($es_aggs) ) {
 				$params['body']['aggs'] = $es_aggs;
 			}
@@ -1118,6 +1126,8 @@ class MPSearch {
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );
 
+		// debug($response); die();
+		
 		$this->lastResponseStats = array();
 		if (isset($response['hits']['total'])) {
 			$this->lastResponseStats['count'] = $response['hits']['total'];

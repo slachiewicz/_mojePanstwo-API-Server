@@ -1031,8 +1031,7 @@ class MPSearch {
 				in_array('page', $this->layers_requested)
 			) {
 				
-				/*				
-				$es_aggs['__global']['aggs']['_page'] = array(
+				$es_aggs['_page'] = array(
 					'children' => array(
 						'type' => 'objects-pages',
 					),
@@ -1047,11 +1046,12 @@ class MPSearch {
 						),
 					),
 				);
-				*/
+				
+				$this->Aggs['_page'] = array();
+
 				
 			}
-			
-					
+								
 			if( !empty($es_aggs) ) {
 				$params['body']['aggs'] = $es_aggs;
 			}

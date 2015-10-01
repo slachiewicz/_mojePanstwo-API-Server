@@ -16,9 +16,14 @@ class TwitterController extends AppController {
 
         try {
 
+            if(preg_match("|https?://(www\.)?twitter\.com/(#!/)?@?([^/]*)|", @$this->request->data['name'], $matches)) {
+                $name = $matches[3];
+            } else
+                throw new Exception('Nieprawidłowy link do profilu');
+
             if($this->TwitterAccount->find('count', array(
                 'conditions' => array(
-                    'TwitterAccount.twitter_name' => @$this->request->data['name']
+                    'TwitterAccount.twitter_name' => $name
                 )
             )))
                 throw new Exception('Konto o podanej nazwie już istnieje');

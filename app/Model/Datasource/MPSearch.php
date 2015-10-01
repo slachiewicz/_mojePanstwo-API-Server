@@ -20,6 +20,9 @@ class MPSearch {
 	    'filter' => array('term'),
     );
     
+    private $layers_requested = array();
+    private $layers = array();
+    
     public function query(){
 	    return null;
     }
@@ -155,7 +158,7 @@ class MPSearch {
     }	
 	
 	public function buildESQuery( $queryData = array() ) {
-				
+					
 		if( !isset($queryData['conditions']) )
 			$queryData['conditions'] = array();
 		
@@ -164,6 +167,11 @@ class MPSearch {
 			
 		if( !isset($queryData['limit']) )
 			$queryData['limit'] = 50;
+			
+		if( isset($queryData['layers']) )
+			$this->layers_requested = $queryData['layers'];
+		
+		// debug( $this->layers_requested );
 		
 		$from = ( $queryData['page'] - 1 ) * $queryData['limit'];
 		$size = $queryData['limit'];
@@ -743,249 +751,257 @@ class MPSearch {
 		
 		// var_export( $queryData ); die();
 		
-		if( isset( $queryData['aggs'] ) ) {
-			if (!is_array($queryData['aggs'])) {
+		if( 
+			isset( $queryData['aggs'] ) || 
+			!empty( $this->layers_requested )
+		) {
+			if (isset( $queryData['aggs'] ) && !is_array($queryData['aggs'])) {
 				throw new BadRequestException();
 			}
 			
-			// debug( $queryData['aggs'] );
 			$aggs = array();
-						
-			foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
+			$es_aggs = array();
+												
+			if( isset($queryData['aggs']) ) {
 				
-				if( is_array($agg_data) ) {
-					array_walk_recursive($agg_data, function(&$value, $key){
-						if( 
-							$key && 
-							is_string($key) && 
-							in_array($key, array('size', 'precision')) 
-						) {
-							$value = (int) $value;
-						}
-					});
-				}
-				
-				if( 
-					( $agg_id === '_channels' ) && 
-					isset( $queryData['conditions']['_feed'] )
-				) {
-														
-					$aggs['global'] = array(
-	                    'feed_data' => array(
-                            'nested' => array(
-                                'path' => 'feeds_channels',
-                            ),
-                            'aggs' => array(
-                                'feed' => array(
-                                    'filter' => array(
-                                        'and' => array(
-                                            'filters' => array(
-                                                array(
-                                                    'term' => array(
-                                                        'feeds_channels.dataset' => $queryData['conditions']['_feed']['dataset'],
-                                                    ),
-                                                ),
-                                                array(
-                                                    'term' => array(
-                                                        'feeds_channels.object_id' => $queryData['conditions']['_feed']['object_id'],
-                                                    ),
-                                                )
-                                            ),
-                                        ),
-                                    ),
-                                    'aggs' => array(
-                                        'channel' => array(
-                                            'terms' => array(
-                                                'field' => 'feeds_channels.channel',
-                                                'size' => 100,
-                                            ),
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        ),
-	                );
-	                
-	                $this->Aggs['feed_data'] = array();
-	                
-	            } elseif( $agg_id=='subscribtions' ) {
-	            	
-	            	$aggs['global'] = array(
-	                    'subscribtions' => array(
-                            
-                            'filter' => array(
-	                            'has_child' => array(
-				        			'type' => '.percolator',
-				        			'filter' => array(
-					        			'and' => array(
-						        			'filters' => array(
-							        			array(
-								        			'term' => array(
-									        			'user_type' => $value['user_type'],
+				foreach( $queryData['aggs'] as $agg_id => $agg_data ) {
+					
+					if( is_array($agg_data) ) {
+						array_walk_recursive($agg_data, function(&$value, $key){
+							if( 
+								$key && 
+								is_string($key) && 
+								in_array($key, array('size', 'precision')) 
+							) {
+								$value = (int) $value;
+							}
+						});
+					}
+					
+					if( 
+						( $agg_id === '_channels' ) && 
+						isset( $queryData['conditions']['_feed'] )
+					) {
+															
+						$aggs['global'] = array(
+		                    'feed_data' => array(
+	                            'nested' => array(
+	                                'path' => 'feeds_channels',
+	                            ),
+	                            'aggs' => array(
+	                                'feed' => array(
+	                                    'filter' => array(
+	                                        'and' => array(
+	                                            'filters' => array(
+	                                                array(
+	                                                    'term' => array(
+	                                                        'feeds_channels.dataset' => $queryData['conditions']['_feed']['dataset'],
+	                                                    ),
+	                                                ),
+	                                                array(
+	                                                    'term' => array(
+	                                                        'feeds_channels.object_id' => $queryData['conditions']['_feed']['object_id'],
+	                                                    ),
+	                                                )
+	                                            ),
+	                                        ),
+	                                    ),
+	                                    'aggs' => array(
+	                                        'channel' => array(
+	                                            'terms' => array(
+	                                                'field' => 'feeds_channels.channel',
+	                                                'size' => 100,
+	                                            ),
+	                                        ),
+	                                    ),
+	                                ),
+	                            ),
+	                        ),
+		                );
+		                
+		                $this->Aggs['feed_data'] = array();
+		                
+		            } elseif( $agg_id=='subscribtions' ) {
+		            	
+		            	$aggs['global'] = array(
+		                    'subscribtions' => array(
+	                            
+	                            'filter' => array(
+		                            'has_child' => array(
+					        			'type' => '.percolator',
+					        			'filter' => array(
+						        			'and' => array(
+							        			'filters' => array(
+								        			array(
+									        			'term' => array(
+										        			'user_type' => $value['user_type'],
+									        			),
 								        			),
-							        			),
-							        			array(
-								        			'term' => array(
-									        			'user_id' => $value['user_id'],
+								        			array(
+									        			'term' => array(
+										        			'user_id' => $value['user_id'],
+									        			),
 								        			),
 							        			),
 						        			),
 					        			),
-				        			),
-				        			'inner_hits' => array(
-					        			'name' => 'inner',
-						        		'fields' => array('id', 'title', 'url'),
+					        			'inner_hits' => array(
+						        			'name' => 'inner',
+							        		'fields' => array('id', 'title', 'url'),
+						        		),
 					        		),
-				        		),
-                            ),
-                            'aggs' => new \stdClass(),
-                        ),
-	                );
-	                
-	                $this->Aggs['subscribtions'] = array();
-	            	
-				} else {
-					
-					if (!is_array($agg_data)) {
-						throw new BadRequestException();
-					}
-					
-					array_walk_recursive($agg_data, function(&$item, $key){
-						if( $item === '_empty' )
-							$item = new \stdClass();
-					});
-					
-					$scope = 'results';
-										
-					if( array_key_exists('scope', $agg_data) ) {
-						$scope = $agg_data['scope'];
-						unset( $agg_data['scope'] );
-					}
-					
-					$filters_excludes = false;
-					if( strpos($scope, 'filters_exclude(')===0 ) {
+	                            ),
+	                            'aggs' => new \stdClass(),
+	                        ),
+		                );
+		                
+		                $this->Aggs['subscribtions'] = array();
+		            	
+					} else {
 						
-						$filters_excludes = substr($scope, 16, strlen($scope)-17);
-						$scope = 'filters_exclude';
+						if (!is_array($agg_data)) {
+							throw new BadRequestException();
+						}
 						
-					}
-					
-					
-					foreach( $agg_data as $agg_type => $agg_params ) {
+						array_walk_recursive($agg_data, function(&$item, $key){
+							if( $item === '_empty' )
+								$item = new \stdClass();
+						});
 						
+						$scope = 'results';
+											
+						if( array_key_exists('scope', $agg_data) ) {
+							$scope = $agg_data['scope'];
+							unset( $agg_data['scope'] );
+						}
 						
-																						
-						$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
-						$es_params = array();
-						
-						foreach( $agg_params as $key => $value ) {
-									
-							if( 
-								( $key == 'field' ) && 
-								!in_array($value, array('date', 'dataset'))
-							)
-								$value = 'data.' . $value;
+						$filters_excludes = false;
+						if( strpos($scope, 'filters_exclude(')===0 ) {
 							
-							$es_params[ $key ] = $value;
+							$filters_excludes = substr($scope, 16, strlen($scope)-17);
+							$scope = 'filters_exclude';
 							
 						}
-												
-						if( !empty($es_params) )
-							$aggs[ $scope ][ $agg_id ][ $agg_type ] = $es_params;
-												
-					}
-					
-					if(
-						$filters_excludes && 
-						isset( $aggs['filters_exclude'][$agg_id] )
-					)
-						$aggs['filters_exclude'][$agg_id]['filters_exclude'] = $filters_excludes;
-				
-				}
-			}
-			
-			
-			
-			
-			$es_aggs = array();
-			
-			
-			if( 
-				array_key_exists('global', $aggs) || 
-				array_key_exists('query', $aggs) || 
-				array_key_exists('filters_exclude', $aggs) || 
-				array_key_exists('query_main', $aggs) 
-			) {
-				
-				$es_aggs['__global'] = array(
-					'global' => new \stdClass(),
-					'aggs' => array(),
-				);
-				
-				if( array_key_exists('global', $aggs) )
-					$es_aggs['__global']['aggs'] = $aggs['global'];
-				
-			}
 						
-
-			
-			if( 
-				array_key_exists('query', $aggs) || 
-				array_key_exists('filters_exclude', $aggs) || 
-				array_key_exists('query_main', $aggs) 
-			) {
-				
-				if( isset($params['body']['query']['function_score']['query']['filtered']['query']) )
-					$filter = array(
-						'query' => $params['body']['query']['function_score']['query']['filtered']['query'],
-					);
-				else
-					$filter = array(
-						'match_all' => new \stdClass(),
-					);
-				
-				$es_aggs['__global']['aggs']['__query'] = array(
-					'filter' => $filter,
-					'aggs' => array(),
-				);
-				
-				if( array_key_exists('query', $aggs) )
-					$es_aggs['__global']['aggs']['__query']['aggs'] = $aggs['query'];
-					
-				if( array_key_exists('filters_exclude', $aggs) ) {
+						
+						foreach( $agg_data as $agg_type => $agg_params ) {
+							
+							
+																							
+							$this->Aggs[ $agg_id ][ $agg_type ] = $agg_params;
+							$es_params = array();
+							
+							foreach( $agg_params as $key => $value ) {
 										
-					foreach( $aggs['filters_exclude'] as $_k => $_v ) {
-						
-						$filters_excludes = $_v['filters_exclude'];
-						unset( $_v['filters_exclude'] );
-						
-						$_and_filters = array();
-						foreach( $and_filters as $f )
-							if( 
-								isset( $f['term'] ) && 
-								( $keys = array_keys($f['term']) ) && 
-								( $key = array_shift($keys) ) && 
-								(
-									( $key == 'data.' . $filters_excludes )
+								if( 
+									( $key == 'field' ) && 
+									!in_array($value, array('date', 'dataset'))
 								)
-							) {} else {
-								$_and_filters[] = $f;
+									$value = 'data.' . $value;
+								
+								$es_params[ $key ] = $value;
+								
 							}
-																		
-						$es_aggs['__global']['aggs']['__query']['aggs']['__filters_exclude']['aggs'][$_k] = array(
-							'filter' => array(
-								'bool' => array(
-									'must' => $_and_filters,
-								),
-							),
-							'aggs' => array(
-								$_k => $_v,
-							),
-						);
+													
+							if( !empty($es_params) )
+								$aggs[ $scope ][ $agg_id ][ $agg_type ] = $es_params;
+													
+						}
 						
+						if(
+							$filters_excludes && 
+							isset( $aggs['filters_exclude'][$agg_id] )
+						)
+							$aggs['filters_exclude'][$agg_id]['filters_exclude'] = $filters_excludes;
+					
+					}
+				}
+			
+			
+			
+			
+				$es_aggs = array();
+				
+				// debug($aggs); die();
+					
+				if( 
+					array_key_exists('global', $aggs) || 
+					array_key_exists('query', $aggs) || 
+					array_key_exists('filters_exclude', $aggs) || 
+					array_key_exists('query_main', $aggs) 
+				) {
+					
+					$es_aggs['__global'] = array(
+						'global' => new \stdClass(),
+						'aggs' => array(),
+					);
+					
+					if( array_key_exists('global', $aggs) )
+						$es_aggs['__global']['aggs'] = $aggs['global'];
+					
+				}
+							
+	
+				
+				if( 
+					array_key_exists('query', $aggs) || 
+					array_key_exists('filters_exclude', $aggs) || 
+					array_key_exists('query_main', $aggs) 
+				) {
+					
+					if( isset($params['body']['query']['function_score']['query']['filtered']['query']) )
+						$filter = array(
+							'query' => $params['body']['query']['function_score']['query']['filtered']['query'],
+						);
+					else
+						$filter = array(
+							'match_all' => new \stdClass(),
+						);
+					
+					$es_aggs['__global']['aggs']['__query'] = array(
+						'filter' => $filter,
+						'aggs' => array(),
+					);
+					
+					if( array_key_exists('query', $aggs) )
+						$es_aggs['__global']['aggs']['__query']['aggs'] = $aggs['query'];
+						
+					if( array_key_exists('filters_exclude', $aggs) ) {
+											
+						foreach( $aggs['filters_exclude'] as $_k => $_v ) {
+							
+							$filters_excludes = $_v['filters_exclude'];
+							unset( $_v['filters_exclude'] );
+							
+							$_and_filters = array();
+							foreach( $and_filters as $f )
+								if( 
+									isset( $f['term'] ) && 
+									( $keys = array_keys($f['term']) ) && 
+									( $key = array_shift($keys) ) && 
+									(
+										( $key == 'data.' . $filters_excludes )
+									)
+								) {} else {
+									$_and_filters[] = $f;
+								}
+																			
+							$es_aggs['__global']['aggs']['__query']['aggs']['__filters_exclude']['aggs'][$_k] = array(
+								'filter' => array(
+									'bool' => array(
+										'must' => $_and_filters,
+									),
+								),
+								'aggs' => array(
+									$_k => $_v,
+								),
+							);
+							
+						}
+						
+						$es_aggs['__global']['aggs']['__query']['aggs']['__filters_exclude']['filter']['match_all'] = new \stdClass();
 					}
 					
-					$es_aggs['__global']['aggs']['__query']['aggs']['__filters_exclude']['filter']['match_all'] = new \stdClass();
 				}
 				
 			}
@@ -1009,7 +1025,33 @@ class MPSearch {
 				$es_aggs = array_merge($es_aggs, $aggs['results']);
 			}
 						
-						
+			
+			if( 
+				!empty( $this->layers_requested ) && 
+				in_array('page', $this->layers_requested)
+			) {
+				
+				/*				
+				$es_aggs['__global']['aggs']['_page'] = array(
+					'children' => array(
+						'type' => 'objects-pages',
+					),
+					'aggs' => array(
+						'page' => array(
+							'top_hits' => array(
+								'size' => 1,
+								'_source' => array(
+		                            'include' => '*',
+		                        ),
+							),
+						),
+					),
+				);
+				*/
+				
+			}
+			
+					
 			if( !empty($es_aggs) ) {
 				$params['body']['aggs'] = $es_aggs;
 			}
@@ -1079,11 +1121,13 @@ class MPSearch {
 		
 		$params = $this->buildESQuery($queryData);
 				
-		// var_export( $params ); die();
+		// debug( $params ); die();
 		
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );
 
+		// debug($response); die();
+		
 		$this->lastResponseStats = array();
 		if (isset($response['hits']['total'])) {
 			$this->lastResponseStats['count'] = $response['hits']['total'];
@@ -1094,6 +1138,16 @@ class MPSearch {
         
         // var_export( $response['aggregations'] ); die();
         // var_export( $this->Aggs );
+                
+        if( !empty($this->layers_requested) ) {
+	        
+	        if( $page = @$response['aggregations']['__global']['_page']['page']['hits']['hits'][0]['_source'] ) {
+		        
+		        $this->layers['page'] = $page;
+		        
+	        }
+	        
+        }
         
         if(
         	!empty($this->Aggs) && 
@@ -1154,14 +1208,6 @@ class MPSearch {
 		    }
 		    
 		    unset( $aggs['doc_count'] );
-		    
-		    /*
-		    if( array_keys($aggs)!=array('zamowienia', 'prawo') ) {
-			    
-			    var_export($params);
-			    
-		    }
-		    */
 	        	        
 	        foreach( $this->Aggs as $agg_id => &$agg_data ) {
 		    	if( isset($aggs[$agg_id]) ) {

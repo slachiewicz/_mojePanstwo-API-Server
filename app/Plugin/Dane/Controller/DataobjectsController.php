@@ -326,7 +326,10 @@ class DataobjectsController extends AppController
 			'conditions' => array(
 				'dataset' => $dataset,
 				'id' => $id
-			)
+			),
+			'layers' => array(
+				'page'
+			),
 		);
 
 		if (isset($query['aggs'])) {
@@ -501,7 +504,13 @@ class DataobjectsController extends AppController
 		if( !empty($this->Dataobject->getDataSource()->Aggs) ) {
 			$object['Aggs'] = $this->Dataobject->getDataSource()->Aggs;
 		}
+		
+		// debug($this->Dataobject->getDataSource()->lastResponseStats);
+		
+		if( isset($this->Dataobject->getDataSource()->lastResponseStats['took_ms']) )
+			header('X-ES-Took: ' . $this->Dataobject->getDataSource()->lastResponseStats['took_ms']);
 
+		
 		$this->setSerialized('object', $object);
     }
     

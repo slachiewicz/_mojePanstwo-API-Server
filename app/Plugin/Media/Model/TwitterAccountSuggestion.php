@@ -21,11 +21,6 @@ class TwitterAccountSuggestion extends AppModel {
         if(!strlen($data['name']))
             throw new Exception('Nazwa konta nie może być pusta');
 
-        if(preg_match("|https?://(www\.)?twitter\.com/(#!/)?@?([^/]*)|", $data['name'], $matches)) {
-            $row['name'] = $matches[3];
-        } else
-            throw new Exception('Nieprawidłowy link do profilu');
-
         return $this->save($row);
     }
 

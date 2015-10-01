@@ -233,7 +233,7 @@ class ObjectPage extends AppModel {
 
         $params = array();
         $params['index'] = 'mojepanstwo_v1';
-        $params['type']  = 'objects_pages';
+        $params['type']  = 'objects-pages';
         $params['id']    = $data['id'];
         $params['refresh'] = true;
         $params['parent'] = $data['id'];
@@ -260,6 +260,7 @@ class ObjectPage extends AppModel {
         );
 
         $ret = $ES->API->index($params);
+        $this->log($ret, 'debug');
         return $data['id'];
     }
 

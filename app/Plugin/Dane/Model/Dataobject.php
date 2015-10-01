@@ -631,6 +631,7 @@ class Dataobject extends AppModel
         $this->OrganizacjeDzialania->save(array(
             'OrganizacjeDzialania' => array(
                 'owner_dataset' => $dataset,
+                'owner_name' => $data['owner_name'],
                 'owner_object_id' => $id,
                 'cts' => date('Y-m-d H:i:s'),
                 'user_id' => (int) CakeSession::read('Auth.User.id'),
@@ -680,7 +681,7 @@ class Dataobject extends AppModel
             $toUpdate['mts'] = date('Y-m-d H:i:s');
             $toUpdate['id'] = $object['OrganizacjeDzialania']['id'];
 
-            $fields = array('tytul', 'opis', 'folder', 'status', 'podsumowanie', 'geo_lat', 'geo_lng', 'photo_disabled', 'zakonczone');
+            $fields = array('tytul', 'owner_name', 'opis', 'folder', 'status', 'podsumowanie', 'geo_lat', 'geo_lng', 'photo_disabled', 'zakonczone');
             if($deleted)
                 $fields[] = 'deleted';
 
@@ -705,7 +706,7 @@ class Dataobject extends AppModel
                 );
             }
 
-            $toUpdateFields = array('mts', 'cover_photo', 'tytul', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng', 'photo_disabled', 'zakonczone');
+            $toUpdateFields = array('mts', 'cover_photo', 'tytul', 'owner_name', 'opis', 'status', 'podsumowanie', 'folder', 'geo_lat', 'geo_lng', 'photo_disabled', 'zakonczone');
             if($deleted)
                 $toUpdateFields[] = 'deleted';
 

@@ -52,6 +52,49 @@ class AppModel extends Model
 		} else return false;
 	
 	}
+
+    /* public function syncObject($dataset, $dataset_id, $data) {
+        App::import('model', 'DB');
+        $this->DB = new DB();
+
+        $row = $this->query('SELECT id FROM objects WHERE dataset_id = ? AND object_id = ?', array(
+            $dataset_id,
+            $data['id']
+        ));
+
+        $id = 0;
+
+        if(!isset($row[0]['objects']['id'])) {
+
+            $this->query("INSERT IGNORE INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `a`='1', `a_ts` = NOW()", array(
+                $dataset,
+                $dataset_id,
+                $data['id']
+            ));
+
+            $id = $this->getLastInsertId();
+
+        } else {
+            $id = $row[0]['objects']['id'];
+        }
+
+        $ES = ConnectionManager::getDataSource('MPSearch');
+
+        if(!$id)
+            throw new Exception('Object not found');
+
+        $params = array();
+        $params['index'] = 'mojepanstwo_v1';
+        $params['type']  = $dataset;
+        $params['id']    = $id;
+        $params['refresh'] = true;
+        $params['parent'] = $data['id'];
+        $params['body']  = $data;
+
+        $ret = $ES->API->index($params);
+
+        return $data['id'];
+    } */
 	
 	public function objectIndex($data) {
 		

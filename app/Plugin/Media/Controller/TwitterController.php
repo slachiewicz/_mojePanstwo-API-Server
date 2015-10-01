@@ -16,7 +16,7 @@ class TwitterController extends AppController {
 
         try {
 
-            if(preg_match("|https?://(www\.)?twitter\.com/(#!/)?@?([^/]*)|", @$this->request->data['name'], $matches)) {
+            if(preg_match("|https?://(www\.)?twitter\.com/(#!/)?@?([^/\?]*)|", @$this->request->data['name'], $matches)) {
                 $name = $matches[3];
             } else
                 throw new Exception('Nieprawidłowy link do profilu');

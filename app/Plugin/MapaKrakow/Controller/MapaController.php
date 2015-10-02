@@ -8,58 +8,74 @@
  */
 class MapaController extends AppController
 {
-    public $uses = array('MapaKrakow.Dzielnice');
+    public $uses = array('MapaKrakow.Layers', 'MapaKrakow.Dzielnice', 'MapaKrakow.Edukacja');
 
-    public function dzielnice()
+    public function layers()
     {
-        $data = $this->Dzielnice->find('all', array(
-            'conditions' => array(
-                'layer_id' => 6,
-                //'or'=>array(array('numer'=>'X'),array('numer'=>'XIII'))
-            ),
-            'fields' => array(
-                'nazwa', 'numer', 'spat'
-            )
-        ));
-        $dane = array(
-            'type'=>'poly',
-            'layer'=>'dzielnice',
-            'dane'=>array()
-        );
-        foreach ($data as $row) {
-            $ret=array(
-                'id'=>$row['Dzielnice']['numer'],
-                'spat'=>$row['Dzielnice']['spat']
-            );
-            $dane['dane'][]=$ret;
 
+        $typ = $this->request->query['type'];
+        $dane = array();
+
+        switch ($typ) {
+            case 'dzielnice': {
+                $data = $this->Layers->find('all', array(
+                    'conditions' => array(
+                        'layer_id' => 6
+                    ),
+                    'fields' => array(
+                        'nazwa', 'numer', 'spat'
+                    )
+                ));
+                $dane = array(
+                    'type' => 'poly',
+                    'layer' => 'dzielnice',
+                    'dane' => array()
+                );
+                foreach ($data as $row) {
+                    $ret = array(
+                        'id' => $row['Layers']['numer'],
+                        'spat' => $row['Layers']['spat']
+                    );
+                    $dane['dane'][] = $ret;
+                }
+                break;
+            }
+            case 'edukacja': {
+
+                $data = $this->Layers->find('all', array(
+                    'conditions' => array(
+                        'dataset_id' => 41
+                    ),
+                    'fields' => array(
+                        'layer_id', 'nazwa', 'ulica', 'numer', 'lokal', 'latlng', 'kod_pocztowy'
+                    )
+                ));
+
+                $dane = array(
+                    'type' => 'markers',
+                    'layer' => 'edukacja',
+                    'dane' => array()
+                );
+
+                foreach ($data as $row) {
+
+                    if (!isset($dane['dane'][$row['Layers']['layer_id']])) {
+                        $dane['dane'][$row['Layers']['layer_id']] = array();
+                    }
+
+                    $ret = array(
+                        'etykieta' => $row['Layers']['nazwa'],
+                        'adres' => $row['Layers']['ulica'] . ' ' . $row['Layers']['numer'] . ' ' . $row['Layers']['lokal'] . ' ' . $row['Layers']['kod_pocztowy'],
+                        'latlng' => $row['Layers']['latlng']
+                    );
+                    $dane['dane'][$row['Layers']['layer_id']][] = $ret;
+
+                }
+                break;
+            }
         }
-        $this->setSerialized('response', $dane);
-    }
 
-    public function edukacja()
-    {
-        $data = $this->Edukacja->find('all', array(
-            'conditions' => array(
-                'layer_id' => 0,
-            ),
-            'fields' => array(
-                'nazwa', 'numer', 'spat'
-            )
-        ));
-        $dane = array(
-            'type'=>'markers',
-            'layer'=>'edukacja',
-            'dane'=>array()
-        );
-        foreach ($data as $row) {
-            $ret=array(
-                'id'=>$row['Dzielnice']['numer'],
-                'spat'=>$row['Dzielnice']['spat']
-            );
-            $dane['dane'][]=$ret;
-
-        }
         $this->setSerialized('response', $dane);
+
     }
 }

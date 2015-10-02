@@ -8,6 +8,6 @@
 
 class Edukacja extends AppModel{
 
-    public $useTable='mapa_krakow_edukacja';
+    public $useTable='mapa_krakow_placowki_edukacyjne';
 
 }

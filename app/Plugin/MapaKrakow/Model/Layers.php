@@ -6,8 +6,8 @@
  * Time: 15:17
  */
 
-class Dzielnice extends AppModel{
+class Layers extends AppModel{
 
-    public $useTable='mapa_krakow_dzielnice';
+    public $useTable='mapa_krakow';
 
 }

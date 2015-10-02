@@ -101,7 +101,7 @@ class Mapa extends AppModel
                     is_numeric($place['data']['miejsca.' . $t]) &&
                     $place['data']['miejsca.' . $t] > 0) {
 
-                        $places[$p]['polygons'][$t] = $geo->getMapData(4, array($type), array(
+                        $places[$p]['polygons'][$t] = $geo->getMapData('gm', array($type), array(
                             $type => array($place['data']['miejsca.' . $t])
                         ));
 

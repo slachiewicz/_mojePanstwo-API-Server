@@ -33,7 +33,7 @@ class ObjectPage extends AppModel {
             'description',
             'phone',
             'email',
-            'wwww',
+            'www',
             'facebook',
             'twitter',
             'instagram',
@@ -231,6 +231,39 @@ class ObjectPage extends AppModel {
         $data = $data['ObjectPage'];
         $ES = ConnectionManager::getDataSource('MPSearch');
 
+        $obszary_dzialan = array();
+        $res = $this->DB->query("
+          SELECT
+            organizacja_obszar.obszar_id,
+            organizacje_obszary.nazwa
+          FROM organizacja_obszar
+          LEFT JOIN organizacje_obszary ON
+            organizacje_obszary.id = organizacja_obszar.obszar_id
+          WHERE organizacja_obszar.object_id = " . $data['object_id']);
+        foreach($res as $r) {
+            $obszary_dzialan[] = array(
+                'id' => $r['organizacja_obszar']['obszar_id'],
+                'label' => $r['organizacje_obszary']['nazwa']
+            );
+        }
+
+        $users = array();
+        $res = $this->DB->query("
+            SELECT
+              user_id,
+              role
+            FROM `objects-users`
+            WHERE
+                dataset = '". $data['dataset'] ."' AND
+                object_id = ". $data['object_id'] ."
+        ");
+        foreach($res as $r) {
+            $users[] = array(
+                'user_id' => $r['objects-users']['user_id'],
+                'role_id' => $r['objects-users']['role']
+            );
+        }
+
         $params = array();
         $params['index'] = 'mojepanstwo_v1';
         $params['type']  = 'objects-pages';
@@ -255,12 +288,13 @@ class ObjectPage extends AppModel {
                 'twitter' => $data['twitter'],
                 'instagram' => $data['instagram'],
                 'youtube' => $data['youtube'],
-                'vine' => $data['vine']
+                'vine' => $data['vine'],
+                'users' => $users,
+                'obszary_dzialan' => $obszary_dzialan
             ),
         );
 
         $ret = $ES->API->index($params);
-        $this->log($ret, 'debug');
         return $data['id'];
     }
 

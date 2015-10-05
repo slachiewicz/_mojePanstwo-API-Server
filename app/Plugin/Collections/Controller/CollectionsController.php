@@ -32,9 +32,21 @@ class CollectionsController extends AppController {
                         'CollectionObject.collection_id = Collection.id',
                         'CollectionObject.object_id' => (int) $id
                     )
+                ),
+                array(
+                    'table' => 'objects',
+                    'alias' => 'Object',
+                    'type' => 'LEFT',
+                    'conditions' => array(
+                        'Object.id = Collection.object_id'
+                    )
                 )
             ),
-            'fields' => array('Collection.*', 'CollectionObject.*'),
+            'fields' => array(
+                'Collection.*',
+                'CollectionObject.*',
+                'Object.slug'
+            ),
             'order' => array(
                 'Collection.created_at' => 'desc',
             )

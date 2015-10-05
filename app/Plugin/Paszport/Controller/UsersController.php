@@ -1008,6 +1008,36 @@ class UsersController extends PaszportAppController
         ));
     }
 
+    /*
+     * Pobieranie obiektów (objects.id, objects.slug)
+     * administrowanych przez zalogowanego użytkownika.
+     */
+    public function getObjects() {
+        $this->Auth->deny();
+        if($this->Auth->user('type') != 'account')
+            throw new ForbiddenException();
+
+        $objects = $this->User->query("
+            SELECT
+              `objects`.`id`,
+              `objects`.`slug`
+            FROM
+              `objects-users`
+            INNER JOIN
+              `objects` ON
+                `objects`.`dataset` = `objects-users`.`dataset` AND
+                `objects`.`object_id` = `objects-users`.`object_id`
+            WHERE
+              `objects-users`.`user_id` = ". $this->Auth->user('id') ." AND
+              `objects-users`.`role` > 0
+        ");
+
+        $this->set(array(
+            'objects' => $objects,
+            '_serialize' => 'objects'
+        ));
+    }
+
     public function getUsersByEmail() {
         $suggestions = array();
         $query = @$this->data['query'];

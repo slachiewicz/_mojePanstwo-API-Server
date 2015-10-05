@@ -171,8 +171,6 @@ class ObjectUsersManagementController extends AppController {
                 return false;
             }
         }
-
-        return true;
     }
 
 }

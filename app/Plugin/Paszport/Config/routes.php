@@ -17,3 +17,5 @@ Router::connect('/paszport/user/forgotNewPassword', array('plugin' => 'Paszport'
 Router::connect('/paszport/user/find', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'find'));
 Router::connect('/paszport/user/canCreatePassword', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'canCreatePassword'));
 Router::connect('/paszport/users/email', array('plugin' => 'paszport', 'controller' => 'Users', 'action' => 'getUsersByEmail', '[method]' => 'POST'));
+
+Router::connect('/paszport/user/getObjects', array('plugin' => 'Paszport', 'controller' => 'Users', 'action' => 'getObjects', '[method]' => 'GET'));

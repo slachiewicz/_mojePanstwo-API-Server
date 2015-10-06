@@ -3,12 +3,10 @@
 class MapaController extends AppController
 {
 
-    public function geocode()
+    public function geodecode()
     {
-		
-		$q = @$this->request->query['q'];
-		
-        $data = $this->Mapa->geocode($q);
+				
+        $data = $this->Mapa->geodecode($this->request->query['lat'], $this->request->query['lon']);
 
         $this->set('data', $data);
         $this->set('_serialize', 'data');

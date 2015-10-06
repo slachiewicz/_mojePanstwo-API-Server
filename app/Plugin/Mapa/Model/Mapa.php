@@ -7,10 +7,11 @@ class Mapa extends AppModel
 
     public $useTable = false;
 	
-	public function geocode($q) {
+	public function geodecode($lat, $lon) {
 		
-		$point = explode(' ', $q);
-		
+		$lat = (float) $lat;
+		$lon = (float) $lon;
+			
 		$ES = ConnectionManager::getDataSource('MPSearch');	    
 	   	   
 	    $params = array();
@@ -39,8 +40,8 @@ class Mapa extends AppModel
 										array(
 											'_geo_distance' => array(
 												'location' => array(
-													'lat' => $point[0],
-													'lon' => $point[1],
+													'lat' => $lat,
+													'lon' => $lon,
 												),
 												'order' => 'asc',
 												'distance_type' => 'plane',
@@ -57,8 +58,8 @@ class Mapa extends AppModel
 				array(
 					'_geo_distance' => array(
 						'miejsca-numery.location' => array(
-							'lat' => $point[0],
-							'lon' => $point[1],
+							'lat' => $lat,
+							'lon' => $lon,
 						),
 						'order' => 'asc',
 						'distance_type' => 'plane',
@@ -69,20 +70,24 @@ class Mapa extends AppModel
 		
 		$ret = $ES->API->search($params);
 		
-		$places = array();
+		$place = false;
+		
 		foreach( $ret['hits']['hits'] as $h ) {
 						
 			$locations = array();
 			foreach( $h['inner_hits']['miejsca-numery']['hits']['hits'] as $l )
 				$locations[] = $l['_source'];
 			
-			$places[] = array(
+			$place = array(
 				'data' => $h['_source']['data'],
 				'locations' => $locations,
 			);
 			
+			break;
+			
 		}
 		
+		/*
 		if( $places ) {
 
             $types = array(
@@ -112,11 +117,10 @@ class Mapa extends AppModel
             }
 
 		}
+		*/
 		
 		
-		return array(
-			'places' => $places,
-		);		
+		return $place;		
 				
 	}
 

@@ -27,7 +27,7 @@ class MapaController extends AppController
                     )
                 ));
                 $dane = array(
-                    'type' => 'poly',
+                    'type' => 'polygon',
                     'layer' => 'dzielnice',
                     'dane' => array()
                 );
@@ -67,6 +67,42 @@ class MapaController extends AppController
                         'etykieta' => $row['Layers']['nazwa'],
                         'adres' => $row['Layers']['ulica'] . ' ' . $row['Layers']['numer'] . ' ' . $row['Layers']['lokal'] . ' ' . $row['Layers']['kod_pocztowy'],
                         'latlng' => $row['Layers']['latlng']
+                    );
+                    $dane['dane'][$row['Layers']['layer_id']][] = $ret;
+
+                }
+                break;
+            }
+            case 'komunikacja': {
+                $data = $this->Layers->find('all', array(
+                    'conditions' => array(
+                        'dataset_id' => 32,
+                        'layer_id' => 68
+                    ),
+                    'fields' => array(
+                        'layer_id', 'nazwa', 'ulica', 'rodzaj', 'type', 'latlng', 'spat'
+                    )
+                ));
+
+                $dane = array(
+                    'type' => 'mixed',
+                    'layer' => 'komunikacja',
+                    'dane' => array()
+                );
+
+
+                foreach ($data as $row) {
+
+                    if (!isset($dane['dane'][$row['Layers']['layer_id']])) {
+                        $dane['dane'][$row['Layers']['layer_id']] = array();
+                    }
+
+                    $ret = array(
+                        'etykieta' => $row['Layers']['nazwa'],
+                        'adres' => $row['Layers']['ulica'] . ' ' . $row['Layers']['numer'] . ' ' . $row['Layers']['lokal'] . ' ' . $row['Layers']['kod_pocztowy'],
+                        'type' => $row['Layers']['type'],
+                        'latlng' => $row['Layers']['latlng'],
+                        'spat' => $row
                     );
                     $dane['dane'][$row['Layers']['layer_id']][] = $ret;
 

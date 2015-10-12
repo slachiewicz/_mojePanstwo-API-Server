@@ -15,6 +15,7 @@ class ResponsesController extends AppController {
                     'letter_id' => $letter_id,
                     'user_id' => $this->Auth->user('id'),
                     'title' => $data['name'],
+                    'content' => $data['content'],
                     'date' => $data['date'],
                 )
             ));
@@ -25,7 +26,8 @@ class ResponsesController extends AppController {
                     $this->ResponseFile->save(array(
                         'ResponseFile' => array(
                             'letter_response_id' => $letter_response_id,
-                            'filename' => $file
+                            'filename' => $file['filename'],
+                            'src_filename' => $file['src_filename']
                         )
                     ));
                 }

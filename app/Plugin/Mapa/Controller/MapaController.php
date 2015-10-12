@@ -12,5 +12,15 @@ class MapaController extends AppController
         $this->set('_serialize', 'data');
 
     }
+    
+    public function getCode($code)
+    {
+	    
+	    $data = $this->Mapa->getCode($code);
+
+        $this->set('data', $data);
+        $this->set('_serialize', 'data');
+	    
+    }
 
 }

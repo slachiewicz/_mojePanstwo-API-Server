@@ -120,8 +120,173 @@ class Mapa extends AppModel
 		*/
 		
 		
+		
+		
 		return $place;		
 				
 	}
-
+	
+	function getCode($code) {
+		
+		App::import('model','Dane.Dataobject');
+		$this->Dataobject = new Dataobject();
+		
+		$code_data = $this->Dataobject->find('first', array(
+			'conditions' => array(
+				'dataset' => 'kody_pocztowe',
+				'kody_pocztowe.kod' => $code,
+			),
+			'aggs' => array(
+				'miejsca' => array(
+					'scope' => 'global',
+					'filter' => array(
+						'term' => array(
+							'dataset' => 'miejsca',
+						),
+					),
+					'aggs' => array(
+						'numery' => array(
+							'nested' => array(
+								'path' => 'miejsca-numery',
+							),
+							'aggs' => array(
+								'miejsca' => array(
+									'filter' => array(
+										'term' => array(
+											'kod' => $code,
+										),
+									),
+									'aggs' => array(
+										'viewport' => array(
+											'geo_bounds' => array(
+												'field' => 'miejsca-numery.location', 
+											),
+										),
+										'miejsca' => array(
+											'reverse_nested' => new \stdClass(),
+											'aggs' => array(
+												'gminy' => array(
+													'terms' => array(
+														'field' => 'data.miejsca.gmina_id',
+														'size' => 10000,
+													),
+													'aggs' => array(
+														'label' => array(
+															'terms' => array(
+																'field' => 'data.miejsca.gmina.raw',
+																'size' => 1,
+															),
+														),
+														'miejscowosci' => array(
+															'terms' => array(
+																'field' => 'data.miejsca.miejscowosc_id',
+																'size' => 10000,
+															),
+															'aggs' => array(
+																'label' => array(
+																	'terms' => array(
+																		'field' => 'data.miejsca.miejscowosc.raw',
+																		'size' => 1,
+																	),
+																),
+																'ulice' => array(
+																	'terms' => array(
+																		'field' => 'data.miejsca.ulica_id',
+																		'size' => 10000,
+																	),
+																	'aggs' => array(
+																		'label' => array(
+																			'terms' => array(
+																				'field' => 'data.miejsca.ulica.raw',
+																				'size' => 1,
+																			),
+																		),
+																	),
+																),
+															),
+														),
+													),
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+					
+					
+					
+					/*
+					'filter' => array(
+						'nested' => array(
+							'path' => 'miejsca-numery',
+							'filter' => array(
+								'term' => array(
+									'miejsca-numery.kod' => $code,
+								),
+							),
+						),
+					),
+					'aggs' => array(
+						'gminy' => array(
+							'terms' => array(
+								'field' => 'gmina_id',
+							),
+						),
+					),
+					*/
+				),
+			),
+		));
+		
+		$gminy = array();
+		$obszar = false;
+		
+		if(
+			( $miejsca = $this->Dataobject->getDataSource()->Aggs ) && 
+			( $miejsca = @$miejsca['miejsca']['numery']['miejsca'] )
+		) {
+			
+			$obszar = @$miejsca['viewport']['bounds'];
+			$gminy = $miejsca['miejsca']['gminy']['buckets'];
+			
+			foreach( $gminy as &$g ) {
+				
+				$miejscowosci = array();
+				foreach( $g['miejscowosci']['buckets'] as $m ) {
+					
+					$ulice = array();
+					foreach( $m['ulice']['buckets'] as $u )
+						$ulice[] = array(
+							'id' => $u['key'],
+							'nazwa' => $u['label']['buckets'][0]['key'],
+						);
+											
+					$miejscowosci[] = array(
+						'id' => $m['key'],
+						'nazwa' => $m['label']['buckets'][0]['key'],
+						'ulice' => $ulice,
+					);
+					
+				}
+				
+				$g = array(
+					'id' => $g['key'],
+					'nazwa' => $g['label']['buckets'][0]['key'],
+					'miejscowosci' => $miejscowosci,
+				);
+				
+			}
+			
+		}
+		
+		return array(
+			'kod' => $code_data,
+			'gminy' => $gminy,
+			'obszar' => $obszar,
+		);
+		
+	}
+	
 } 

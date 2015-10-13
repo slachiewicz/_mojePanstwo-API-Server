@@ -10,7 +10,7 @@ class KrsCandidate extends AppModel
         App::import('model', 'DB');
         $DB = new DB();
 
-        $list_id = $DB->selectAssocs("SELECT DISTINCT kandydat_id FROM krs_kandydaci WHERE typ='" . $args['type'] . "' AND correct='" . $args['stan'] . "' LIMIT " . ($args['page'] - 1) * 50 . "," . ($args['page']) * 50);
+        $list_id = $DB->selectAssocs("SELECT DISTINCT kandydat_id FROM krs_kandydaci WHERE typ='" . $args['type'] . "' AND correct='" . $args['stan'] . "' ORDER BY id LIMIT " . ($args['page'] - 1) * 50 . "," . ($args['page']) * 50);
 
         $ids = '(';
         foreach ($list_id as $single_id) {
@@ -20,9 +20,9 @@ class KrsCandidate extends AppModel
         $ids .= ')';
 
         if ($args['type'] == 'sejm') {
-            $list_kand = $DB->selectAssocs("SELECT id, imiona, nazwisko, zawod,miejsce_zamieszkania, data_urodzenia FROM PKW_parlament_2015_kandydaci_sejm WHERE id IN $ids");
+            $list_kand = $DB->selectAssocs("SELECT id, imiona, nazwisko, zawod,miejsce_zamieszkania, data_urodzenia FROM PKW_parlament_2015_kandydaci_sejm WHERE id IN $ids ORDER BY id");
         } else {
-            $list_kand = $DB->selectAssocs("SELECT * FROM PKW_parlament_2015_kandydaci_senat WHERE id IN $ids");
+            $list_kand = $DB->selectAssocs("SELECT * FROM PKW_parlament_2015_kandydaci_senat WHERE id IN $ids ORDER BY id");
         }
         $ret = array();
         foreach ($list_kand as $kandydat) {

@@ -102,7 +102,7 @@ class MapaController extends AppController
                         'adres' => $row['Layers']['ulica'] . ' ' . $row['Layers']['numer'] . ' ' . $row['Layers']['lokal'] . ' ' . $row['Layers']['kod_pocztowy'],
                         'type' => $row['Layers']['type'],
                         'latlng' => $row['Layers']['latlng'],
-                        'spat' => $row
+                        'spat' => $row['Layers']['spat']
                     );
                     $dane['dane'][$row['Layers']['layer_id']][] = $ret;
 

@@ -95,3 +95,10 @@ Router::connect('/dane/:dataset/:object_id/pages/setLogo', array('plugin' => 'Da
 Router::connect('/dane/:dataset/:object_id/pages/setCover', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'setCover', '[method]' => 'POST'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
 Router::connect('/dane/:dataset/:object_id/pages/deleteLogo', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'deleteLogo', '[method]' => 'DELETE'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
 Router::connect('/dane/:dataset/:object_id/pages/deleteCover', array('plugin' => 'Dane', 'controller' => 'ObjectPagesManagement', 'action' => 'deleteCover', '[method]' => 'DELETE'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
+
+
+
+Router::connect('/dane/:controller/:object_id/:action/:id', array('plugin' => 'Dane'), array('dataset' => '([a-zA-Z\_]+)', 'object_id' => '[0-9]+'));
+
+
+

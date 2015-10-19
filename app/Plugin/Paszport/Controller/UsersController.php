@@ -194,7 +194,7 @@ class UsersController extends PaszportAppController
                         ));
 
                         $this->User->clear();
-                        $this->User->id = $this->User->id;
+                        $this->User->id = $user['User']['id'];
                         $this->User->save(array(
                             'logged_at' => date('Y-m-d H:i:s', time())
                         ));

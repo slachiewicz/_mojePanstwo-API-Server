@@ -137,6 +137,24 @@ class Mapa extends AppModel
 				'kody_pocztowe.kod' => $code,
 			),
 			'aggs' => array(
+				'kody_miejsca' => array(
+					'nested' => array(
+						'path' => 'kody_pocztowe-miejsca',
+					),
+					'aggs' => array(
+						'top' => array(
+							'top_hits' => array(
+								'size' => 100000,
+								'_source' => true,
+								'sort' => array(
+									'kody_pocztowe-miejsca.nazwa.raw' => array(
+										'order' => 'asc',
+									),
+								),
+							),
+						),
+					),
+				),
 				'miejsca' => array(
 					'scope' => 'global',
 					'filter' => array(
@@ -165,10 +183,64 @@ class Mapa extends AppModel
 										'miejsca' => array(
 											'reverse_nested' => new \stdClass(),
 											'aggs' => array(
+												'parl_obwody' => array(
+													'terms' => array(
+														'field' => 'miejsca-numery.parl_obwod_id',
+														'size' => 3,
+													),
+												),
+											    'viewport' => array(
+													'geo_bounds' => array(
+                                                        'field' => 'miejsca-numery.location',
+													),
+												),
+												'wojewodztwa' => array(
+													'terms' => array(
+														'field' => 'data.miejsca.wojewodztwo_id',
+														'size' => 10000,
+														'exclude' => '0',
+													),
+													'aggs' => array(
+														'label' => array(
+															'terms' => array(
+																'field' => 'data.miejsca.wojewodztwo.raw',
+																'size' => 1,
+															),
+														),
+														'miejsce_id' => array(
+															'terms' => array(
+																'field' => 'data.miejsca.wojewodztwo_miejsce_id',
+																'size' => 1,
+															),
+														),
+													),
+												),
+												'powiaty' => array(
+													'terms' => array(
+														'field' => 'data.miejsca.powiat_id',
+														'size' => 10000,
+														'exclude' => '0',
+													),
+													'aggs' => array(
+														'label' => array(
+															'terms' => array(
+																'field' => 'data.miejsca.powiat.raw',
+																'size' => 1,
+															),
+														),
+														'miejsce_id' => array(
+															'terms' => array(
+																'field' => 'data.miejsca.powiat_miejsce_id',
+																'size' => 1,
+															),
+														),
+													),
+												),
 												'gminy' => array(
 													'terms' => array(
 														'field' => 'data.miejsca.gmina_id',
 														'size' => 10000,
+														'exclude' => '0',
 													),
 													'aggs' => array(
 														'label' => array(
@@ -177,32 +249,10 @@ class Mapa extends AppModel
 																'size' => 1,
 															),
 														),
-														'miejscowosci' => array(
+														'miejsce_id' => array(
 															'terms' => array(
-																'field' => 'data.miejsca.miejscowosc_id',
-																'size' => 10000,
-															),
-															'aggs' => array(
-																'label' => array(
-																	'terms' => array(
-																		'field' => 'data.miejsca.miejscowosc.raw',
-																		'size' => 1,
-																	),
-																),
-																'ulice' => array(
-																	'terms' => array(
-																		'field' => 'data.miejsca.ulica_id',
-																		'size' => 10000,
-																	),
-																	'aggs' => array(
-																		'label' => array(
-																			'terms' => array(
-																				'field' => 'data.miejsca.ulica.raw',
-																				'size' => 1,
-																			),
-																		),
-																	),
-																),
+																'field' => 'data.miejsca.gmina_miejsce_id',
+																'size' => 1,
 															),
 														),
 													),
@@ -240,52 +290,44 @@ class Mapa extends AppModel
 			),
 		));
 		
+		$wojewodztwa = array();
+		$powiaty = array();
 		$gminy = array();
-		$obszar = false;
+		$miejsca = array();
+		$viewport = false;
 		
-		if(
-			( $miejsca = $this->Dataobject->getDataSource()->Aggs ) && 
-			( $miejsca = @$miejsca['miejsca']['numery']['miejsca'] )
-		) {
+		if( $aggs = @$this->Dataobject->getDataSource()->Aggs ) {
 			
-			$obszar = @$miejsca['viewport']['bounds'];
-			$gminy = $miejsca['miejsca']['gminy']['buckets'];
+			if( $miejsca = @$aggs['kody_miejsca']['top']['hits']['hits'] )
+				$miejsca = array_column($miejsca, '_source');			
 			
-			foreach( $gminy as &$g ) {
-				
-				$miejscowosci = array();
-				foreach( $g['miejscowosci']['buckets'] as $m ) {
-					
-					$ulice = array();
-					foreach( $m['ulice']['buckets'] as $u )
-						$ulice[] = array(
-							'id' => $u['key'],
-							'nazwa' => $u['label']['buckets'][0]['key'],
-						);
-											
-					$miejscowosci[] = array(
-						'id' => $m['key'],
-						'nazwa' => $m['label']['buckets'][0]['key'],
-						'ulice' => $ulice,
-					);
-					
-				}
-				
-				$g = array(
-					'id' => $g['key'],
-					'nazwa' => $g['label']['buckets'][0]['key'],
-					'miejscowosci' => $miejscowosci,
-				);
-				
+			if( $aggs = $aggs['miejsca']['numery']['miejsca'] ) {
+						
+				$viewport = @$aggs['viewport']['bounds'] ? $aggs['viewport']['bounds'] : false;
+				$wojewodztwa = @$aggs['miejsca']['wojewodztwa']['buckets'];
+				$powiaty = @$aggs['miejsca']['powiaty']['buckets'];
+				$gminy = @$aggs['miejsca']['gminy']['buckets'];
+			
 			}
 			
 		}
 		
 		return array(
 			'kod' => $code_data,
+			'wojewodztwa' => $wojewodztwa,
 			'gminy' => $gminy,
-			'obszar' => $obszar,
+			'powiaty' => $powiaty,
+			'miejsca' => $miejsca,
+			'viewport' => $viewport,
 		);
+		
+	}
+	
+	public function obwody($id) {
+		
+		App::import('model','DB');
+		$this->DB = new DB();
+		return $this->DB->selectAssocs("SELECT pkw_parl_obwody_2015.id, pkw_parl_obwody_2015.nr_obwodu, pkw_parl_obwody_2015.adres_obwodu, pkw_parl_obwody_2015.przystosowany_dla_niepelnosprawnych, pkw_parl_obwody_2015.typ_obwodu, pkw_parl_obwody_2015.granice_obwodu, pl_punkty_adresowe.lat, pl_punkty_adresowe.lon FROM pkw_parl_obwody_2015 LEFT JOIN pl_punkty_adresowe ON pkw_parl_obwody_2015.punkt_id = pl_punkty_adresowe.id WHERE pkw_parl_obwody_2015.`id`='" . implode("' OR pkw_parl_obwody_2015.`id`='", $id) . "'");
 		
 	}
 	

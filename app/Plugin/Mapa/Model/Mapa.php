@@ -327,7 +327,30 @@ class Mapa extends AppModel
 		
 		App::import('model','DB');
 		$this->DB = new DB();
-		return $this->DB->selectAssocs("SELECT pkw_parl_obwody_2015.id, pkw_parl_obwody_2015.nr_obwodu, pkw_parl_obwody_2015.adres_obwodu, pkw_parl_obwody_2015.przystosowany_dla_niepelnosprawnych, pkw_parl_obwody_2015.typ_obwodu, pkw_parl_obwody_2015.granice_obwodu, pl_punkty_adresowe.lat, pl_punkty_adresowe.lon FROM pkw_parl_obwody_2015 LEFT JOIN pl_punkty_adresowe ON pkw_parl_obwody_2015.punkt_id = pl_punkty_adresowe.id WHERE pkw_parl_obwody_2015.`id`='" . implode("' OR pkw_parl_obwody_2015.`id`='", $id) . "'");
+		
+		$id = array_map('addslashes', $id);
+		
+		$_data = $this->DB->selectAssocs("SELECT pkw_parl_obwody_2015.punkt_id, pkw_parl_obwody_2015.id, pkw_parl_obwody_2015.nr_obwodu, pkw_parl_obwody_2015.adres_obwodu, pkw_parl_obwody_2015.przystosowany_dla_niepelnosprawnych, pkw_parl_obwody_2015.typ_obwodu, pkw_parl_obwody_2015.granice_obwodu, pl_punkty_adresowe.lat, pl_punkty_adresowe.lon FROM pkw_parl_obwody_2015 LEFT JOIN pl_punkty_adresowe ON pkw_parl_obwody_2015.punkt_id = pl_punkty_adresowe.id WHERE pkw_parl_obwody_2015.`id`='" . implode("' OR pkw_parl_obwody_2015.`id`='", $id) . "'");
+				
+		$data = array();
+		foreach( $_data as $d ) {
+		
+			$punkt = array(
+				'id' => $d['punkt_id'],
+				'lat' => $d['lat'],
+				'lon' => $d['lon'],
+			);
+			
+			unset( $d['lat'] );
+			unset( $d['lon'] );
+			unset( $d['punkt_id'] );
+					
+			$data[ $punkt['id'] ]['punkt'] = $punkt;
+			$data[ $punkt['id'] ]['komisje'][] = $d;
+		
+		}
+		
+		return array_values($data);
 		
 	}
 	

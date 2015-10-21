@@ -324,33 +324,35 @@ class Mapa extends AppModel
 	}
 	
 	public function obwody($id) {
-		
-		App::import('model','DB');
-		$this->DB = new DB();
-		
-		$id = array_map('addslashes', $id);
-		
-		$_data = $this->DB->selectAssocs("SELECT pkw_parl_obwody_2015.punkt_id, pkw_parl_obwody_2015.id, pkw_parl_obwody_2015.nr_obwodu, pkw_parl_obwody_2015.adres_obwodu, pkw_parl_obwody_2015.przystosowany_dla_niepelnosprawnych, pkw_parl_obwody_2015.typ_obwodu, pkw_parl_obwody_2015.granice_obwodu, pl_punkty_adresowe.lat, pl_punkty_adresowe.lon FROM pkw_parl_obwody_2015 LEFT JOIN pl_punkty_adresowe ON pkw_parl_obwody_2015.punkt_id = pl_punkty_adresowe.id WHERE pkw_parl_obwody_2015.`id`='" . implode("' OR pkw_parl_obwody_2015.`id`='", $id) . "'");
 				
-		$data = array();
-		foreach( $_data as $d ) {
+		App::import('model','Dane.Dataobject');
+		$this->Dataobject = new Dataobject();
 		
+		$obwody = $this->Dataobject->find('all', array(
+			'conditions' => array(
+				'dataset' => 'wybory_parl_obwody',
+				'id' => $id,
+			),
+			'limit' => 1000,
+		));
+		
+		$data = array();
+		foreach( $obwody as $o ) {
+						
 			$punkt = array(
-				'id' => $d['punkt_id'],
-				'lat' => $d['lat'],
-				'lon' => $d['lon'],
+				'id' => (int) $o['data']['wybory_parl_obwody.punkt_id'],
+				'lat' => (float) $o['data']['wybory_parl_obwody.location']['lat'],
+				'lon' => (float) $o['data']['wybory_parl_obwody.location']['lon'],
 			);
-			
-			unset( $d['lat'] );
-			unset( $d['lon'] );
-			unset( $d['punkt_id'] );
 					
 			$data[ $punkt['id'] ]['punkt'] = $punkt;
-			$data[ $punkt['id'] ]['komisje'][] = $d;
+			$data[ $punkt['id'] ]['komisje'][] = $o['data'];
 		
 		}
 		
 		return array_values($data);
+				
+		
 		
 	}
 	

@@ -65,7 +65,7 @@ class PowiadomieniaShell extends Shell
                 $status = $this->Document->notify($user['email'], '3dni');
 
                 if ($status == true) {
-                    $db->query("UPDATE `pisma_documents` SET `powiadomienie_zbliza`='1', `powiadomienie_2dni_ts`=NOW() WHERE `alphaid`='" . addslashes($pismo['id']) . "'");
+                    $db->query("UPDATE `pisma_documents` SET `powiadomienie_zbliza`='1', `powiadomienie_zbliza_ts`=NOW() WHERE `alphaid`='" . addslashes($pismo['id']) . "'");
                 }
                 var_dump($status);
             }

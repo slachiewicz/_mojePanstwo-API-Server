@@ -2,17 +2,31 @@
 
 $html='Dzień dobry,
 <br><br>
-Właśnie minął czas uzyskania odpowiedzi na Twój wniosek o udostępnienie informacji
+Za 3 dni mija czas uzyskania odpowiedzi na Twój wniosek o udostępnienie informacji
 <br><br>
-publicznej. Urząd, do którego wysłano wniosek ma 14 dni na odpowiedzenie. Czy
+publicznej. Sprawdź swoją skrzynkę mailową i monitoruj na bieżąco sprawę. Urząd, do
 <br><br>
-pojawiła się odpowiedź na wysłany wniosek? Jeśli nie, przysługuje Ci prawo złożenia
+którego wysłano wniosek ma 14 dni na udzielenie Ci odpowiedzi.
 <br><br>
-skargi na bezczynność organu.
+Przypominamy również, że zgodnie z ustawą  o dostępie do informacji publicznej
 <br><br>
-Zajrzyj, do zakładki Pisma na stronie www.mojepanstwo.pl i złóż skargę na bezczynność
+realizacja prawa do informacji publicznej w przewidzianych ustawą formach jest
 <br><br>
-organu.
+uzależniona od spełnienia 3 warunków:
+<br><br>
+1. przedmiotem żądania informacji musi być informacja publiczna w rozumieniu art. 1
+<br><br>
+oraz art. 3 ust. 2 z uwzględnieniem interpretacji rozszerzającej wynikającej z art. 61
+<br><br>
+ust. 1 Konstytucji RP;
+<br><br>
+2. adresatem żądania udostępnienia informacji publicznej, na zasadach tej ustawy,
+<br><br>
+mogą być wyłącznie podmioty zobowiązane zgodnie z art. 4,
+<br><br>
+3. według art. 4 ust. 3 obowiązane do udostępnienia informacji publicznej są podmioty,
+<br><br>
+o których mowa w ust. 1 i 2, będące w posiadaniu takich informacji.
 <br><br><br><br>
 Pozdrawiamy,
 <br><br>

@@ -340,9 +340,9 @@ class Mapa extends AppModel
 		foreach( $obwody as $o ) {
 						
 			$punkt = array(
-				'id' => (int) $o['data']['wybory_parl_obwody.punkt_id'],
-				'lat' => (float) $o['data']['wybory_parl_obwody.location']['lat'],
-				'lon' => (float) $o['data']['wybory_parl_obwody.location']['lon'],
+				'id' => (int) @$o['data']['wybory_parl_obwody.punkt_id'],
+				'lat' => (float) @$o['data']['wybory_parl_obwody.location']['lat'],
+				'lon' => (float) @$o['data']['wybory_parl_obwody.location']['lon'],
 			);
 					
 			$data[ $punkt['id'] ]['punkt'] = $punkt;

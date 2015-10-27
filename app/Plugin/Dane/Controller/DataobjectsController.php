@@ -106,6 +106,14 @@ class DataobjectsController extends AppController
 				'user_id' => $this->Auth->user('id'),
 			);
 		}
+		
+		if( isset( $query['conditions']['user-pages'] ) && $query['conditions']['user-pages'] ) {
+						
+			$query['conditions']['user-pages'] = array(
+				'user_type' => $this->Auth->user('type'),
+				'user_id' => $this->Auth->user('id'),
+			);
+		}
 
 		// ograniczenie limit
 		if (isset($query['limit'])) {

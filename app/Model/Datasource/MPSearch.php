@@ -359,6 +359,28 @@ class MPSearch {
 		        	),
 	        	);
         	
+        	} elseif( ($key == 'user-pages') && $value ) {
+												
+	        	$and_filters[] = array(
+		        	'has_child' => array(
+	        			'type' => 'objects-pages',
+	        			'filter' => array(
+		        			'term' => array(
+			        			'users.user_id' => $value['user_id'],
+		        			),	        			
+	        			),
+	        			/*
+	        			'inner_hits' => array(
+		        			'name' => 'pages',
+			        		'fields' => array('objects-pages.users'),
+			        	),
+			        	*/
+        			),
+	        	);
+	        	
+	        								
+
+	        	        	
         	} elseif( $key == '_object' ) {
 				
 				if( $value && ($parts = explode('.', $value)) && (count($parts)>1) ) {
@@ -1121,7 +1143,7 @@ class MPSearch {
 		
 		$params = $this->buildESQuery($queryData);
 				
-		// debug( $params ); die();
+		// var_export( $params ); die();
 		
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );

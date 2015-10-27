@@ -307,6 +307,22 @@ class ObjectPage extends AppModel {
                 'user_id' => $user_id,
                 'obszary_dzialan' => $obszary_dzialan
             ),
+            'cover' => $data['cover'],
+            'logo' => $data['logo'],
+            'moderated' => $data['moderated'],
+            'description' => $data['description'],
+            'credits' => $data['credits'],
+            'phone' => $data['phone'],
+            'www' => $data['www'],
+            'email' => $data['email'],
+            'facebook' => $data['facebook'],
+            'twitter' => $data['twitter'],
+            'instagram' => $data['instagram'],
+            'youtube' => $data['youtube'],
+            'vine' => $data['vine'],
+            'users' => $users,
+            'user_id' => $user_id,
+            'obszary_dzialan' => $obszary_dzialan
         );
 
         $ret = $ES->API->index($params);

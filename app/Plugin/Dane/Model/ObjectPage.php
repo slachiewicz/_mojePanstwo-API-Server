@@ -273,6 +273,11 @@ class ObjectPage extends AppModel {
             );
         }
 
+        $user_id = array();
+        foreach($users as $u) {
+            $user_id[] = $u['user_id'];
+        }
+
         $params = array();
         $params['index'] = 'mojepanstwo_v1';
         $params['type']  = 'objects-pages';
@@ -299,7 +304,7 @@ class ObjectPage extends AppModel {
                 'youtube' => $data['youtube'],
                 'vine' => $data['vine'],
                 'users' => $users,
-                'user_id' => array_column($users, 'user_id'),
+                'user_id' => $user_id,
                 'obszary_dzialan' => $obszary_dzialan
             ),
         );

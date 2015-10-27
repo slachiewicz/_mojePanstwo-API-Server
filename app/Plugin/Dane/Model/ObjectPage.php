@@ -197,6 +197,15 @@ class ObjectPage extends AppModel {
             $this->syncById($id);
     }
 
+    public function syncAll() {
+        $rows = $this->query('SELECT id FROM `objects-pages`');
+        foreach($rows as $row) {
+            $this->syncById(
+                $row['objects-pages']['id']
+            );
+        }
+    }
+
     public function syncById($id) {
 
         if( !$id )
@@ -290,6 +299,7 @@ class ObjectPage extends AppModel {
                 'youtube' => $data['youtube'],
                 'vine' => $data['vine'],
                 'users' => $users,
+                'user_id' => array_column($users, 'user_id'),
                 'obszary_dzialan' => $obszary_dzialan
             ),
         );

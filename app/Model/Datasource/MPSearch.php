@@ -366,7 +366,7 @@ class MPSearch {
 	        			'type' => 'objects-pages',
 	        			'filter' => array(
 		        			'term' => array(
-			        			'users.user_id' => $value['user_id'],
+			        			'user_id' => $value['user_id'],
 		        			),	        			
 	        			),
 	        			/*

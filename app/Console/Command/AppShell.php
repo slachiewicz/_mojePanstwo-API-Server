@@ -30,7 +30,11 @@ App::uses('Shell', 'Console');
 class AppShell extends Shell
 {
 	
-	public $uses = array('Pisma.Document');
+	public $uses = array('Pisma.Document', 'Dane.ObjectPage');
+
+    public function objectPagesSyncAll() {
+        $this->ObjectPage->syncAll();
+    }
 	
 	public function lettersSyncAll() {
         

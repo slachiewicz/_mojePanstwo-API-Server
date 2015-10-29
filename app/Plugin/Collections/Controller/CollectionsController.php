@@ -73,6 +73,16 @@ class CollectionsController extends AppController {
         $this->set('_serialize', 'response');
     }
 
+    public function publish($id) {
+        $this->set('response', $this->Collection->publish($id));
+        $this->set('_serialize', 'response');
+    }
+
+    public function unpublish($id) {
+        $this->set('response', $this->Collection->unpublish($id));
+        $this->set('_serialize', 'response');
+    }
+
     public function edit($id) {
         $collection = $this->Collection->find('first', array(
             'conditions' => array(

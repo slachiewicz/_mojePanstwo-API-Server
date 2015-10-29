@@ -19,6 +19,22 @@ class Collection extends AppModel {
             'required' => false
         ),
     );
+
+	public function publish($id) {
+		return $this->syncById($id, true);
+	}
+
+	public function unpublish($id) {
+		return $this->syncById($id);
+	}
+
+	public function syncAll($public = false) {
+		foreach(
+			$this->DB->selectAssocs("SELECT id FROM `collections`")
+			as $id
+		)
+			$this->syncById($id, $public);
+	}
     
     public function afterSave($created, $options) {
 
@@ -44,7 +60,7 @@ class Collection extends AppModel {
 	    
 	}
     
-    public function syncById($id) {
+    public function syncById($id, $public = false) {
 	    
 	    if( !$id )
 	    	return false;
@@ -57,14 +73,14 @@ class Collection extends AppModel {
 	    
 	    if( $data ) {
 		    
-	    	return $this->syncByData( $data );
+	    	return $this->syncByData( $data , $public);
 	    
 	    } else
 	    	return false;
 	    
     }
     
-    public function syncByData($data) {
+    public function syncByData($data, $public = false) {
 	    	        
 	    if( 
 	    	empty($data) || 
@@ -96,7 +112,7 @@ class Collection extends AppModel {
 	   	   
 	    $params = array();
 		$params['index'] = 'mojepanstwo_v1';
-		$params['type']  = 'objects';
+		$params['type']  = 'collections';
 		$params['id']    = $global_id;
 		$params['refresh'] = true;
 		$params['body']  = array(
@@ -113,9 +129,23 @@ class Collection extends AppModel {
 			    'kolekcje.user_id' => $data['user_id'],
 			    'kolekcje.items_count' => $data['items_count'],
 			),
-		);															
+		);
 				
 		$ret = $ES->API->index($params);
+
+		if($public) {
+			$params['type'] = 'objects';
+			$ret = $ES->API->index($params);
+		} else {
+			$deleteParams = array();
+			$deleteParams['index'] = 'mojepanstwo_v1';
+			$deleteParams['type'] = 'objects';
+			$deleteParams['id'] = $global_id;
+			$deleteParams['refresh'] = true;
+			$deleteParams['ignore'] = array(404);
+			$ES->API->delete($deleteParams);
+		}
+
 		return $data['id'];	    
 	    
     }

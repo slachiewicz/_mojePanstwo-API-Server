@@ -97,14 +97,9 @@ class Collection extends AppModel {
         $global_id = $this->DB->selectValue("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $data['id'] ) . "' LIMIT 1");
         
 	    if( !$global_id ) {
-		    
-		    $this->DB->insertIgnoreAssoc('objects', array(
-			    'dataset' => 'kolekcje',
-			    'dataset_id' => 210,
-			    'object_id' => $data['id'],
-		    ));
-		    
-		    $global_id = $this->DB->_getInsertId();
+
+			$this->query("INSERT INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES ('kolekcje', 210, ".$data['id'].")");
+		    $global_id = $this->getLastInsertID();
 		    
 	    }
 	    

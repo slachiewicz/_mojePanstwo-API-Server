@@ -50,7 +50,7 @@ class AppShell extends Shell
 
     public function collectionsSyncAll() {
         $this->loadModel('Collections.Collection');
-        $this->Collection->syncAll();
+        $this->Collection->syncAll(((bool) (@$this->args[0])));
     }
     
     public function projectsSyncAll() {

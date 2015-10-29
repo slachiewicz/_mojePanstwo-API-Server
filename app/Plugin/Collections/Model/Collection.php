@@ -146,6 +146,7 @@ class Collection extends AppModel {
 			    'kolekcje.nazwa' => $data['name'],
 			    'kolekcje.notatka' => $data['description'],
 			    'kolekcje.user_id' => $data['user_id'],
+			    'kolekcje.is_public' => $data['is_public'],
 			    'kolekcje.object_id' => $data['object_id'],
 			    'kolekcje.items_count' => $data['items_count'],
 			),
@@ -153,7 +154,7 @@ class Collection extends AppModel {
 				
 		$ret = $ES->API->index($params);
 
-		if($public) {
+		if($data['is_public'] == '1' || $public) {
 			$params['type'] = 'objects';
 			$ret = $ES->API->index($params);
 		} else {

@@ -88,14 +88,16 @@ class Collection extends AppModel {
 	    )
 	    	return false;
 	    	       	    
-	    App::import('model', 'DB');
-        $this->DB = new DB();
+	    #App::import('model', 'DB');
+        #$this->DB = new DB();
         
         $data = $data['Collection'];
-        
-        $data['items_count'] = (int) $this->DB->selectValue("SELECT COUNT(*) FROM `collection_object` WHERE `collection_id`='" . $data['id'] . "'");
-        $global_id = $this->DB->selectValue("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $data['id'] ) . "' LIMIT 1");
-        
+
+		$res = $this->query("SELECT COUNT(*) FROM `collection_object` WHERE `collection_id`='" . $data['id'] . "'");
+        $data['items_count'] = (int) (@$res[0][0]['COUNT(*)']);
+		$res = $this->query("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $data['id'] ) . "' LIMIT 1");
+		$global_id = (int)(@$res[0]['objects']['id']);
+
 	    if( !$global_id ) {
 
 			$this->query("INSERT INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES ('kolekcje', 210, ".$data['id'].")");

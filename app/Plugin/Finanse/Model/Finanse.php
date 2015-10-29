@@ -566,5 +566,13 @@ $bezrobocie= $DB->selectAssocs("SELECT rocznik, v FROM `BDL_data_pl` WHERE `komb
 
         return $dane;
     }
+    
+    public function getCompareData($p1, $p2) {
+	    
+	    return array(
+		    'a' => 'b',
+	    );
+	    
+    }
 
 }

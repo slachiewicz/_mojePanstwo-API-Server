@@ -30,10 +30,10 @@ class Collection extends AppModel {
 
 	public function syncAll($public = false) {
 		foreach(
-			$this->DB->selectAssocs("SELECT id FROM `collections`")
-			as $id
+			$this->query("SELECT id FROM `collections`")
+			as $obj
 		)
-			$this->syncById($id, $public);
+			$this->syncById($obj['collections']['id'], $public);
 	}
     
     public function afterSave($created, $options) {

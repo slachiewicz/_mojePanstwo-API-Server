@@ -124,6 +124,7 @@ class Collection extends AppModel {
 			    'kolekcje.nazwa' => $data['name'],
 			    'kolekcje.description' => $data['description'],
 			    'kolekcje.user_id' => $data['user_id'],
+			    'kolekcje.object_id' => $data['object_id'],
 			    'kolekcje.items_count' => $data['items_count'],
 			),
 		);

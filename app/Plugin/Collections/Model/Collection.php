@@ -43,6 +43,28 @@ class Collection extends AppModel {
         }
 	    
     }
+
+	public function afterDelete() {
+		if(isset($this->data['Collection']['id'])) {
+			$id = (int) $this->data['Collection']['id'];
+			$res = $this->query("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $id ) . "' LIMIT 1");
+			$global_id = (int)(@$res[0]['objects']['id']);
+			if($global_id) {
+				$params = array(
+					'index' => 'mojepanstwo_v1',
+					'type' => 'objects',
+					'id' => $global_id,
+					'refresh' => true,
+					'ignore' => 404
+				);
+
+				$ES = ConnectionManager::getDataSource('MPSearch');
+				$ret = $ES->API->delete($params);
+				$params['type'] = 'collections';
+				$ret = $ES->API->delete($params);
+			}
+		}
+	}
     
     public function deleteSync($collection) {
 	    	    

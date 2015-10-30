@@ -572,9 +572,8 @@ class Finanse extends AppModel
         App::import('model', 'DB');
         $DB = new DB();
 
-        $wyd_czesci = $DB->selectAssocs("SELECT pl_budzety_wydatki.rocznik, pl_budzety_wydatki.czesc_str, pl_budzety_wydatki_czesci.tresc, SUM( pl_budzety_wydatki.plan ) AS plan
+        $wyd_czesci = $DB->selectAssocs("SELECT pl_budzety_wydatki.rocznik, pl_budzety_wydatki.czesc_str, pl_budzety_wydatki.tresc, SUM( pl_budzety_wydatki.plan ) AS plan
           FROM pl_budzety_wydatki
-          JOIN pl_budzety_wydatki_czesci ON pl_budzety_wydatki.czesc_str = pl_budzety_wydatki_czesci.src
           WHERE pl_budzety_wydatki.rocznik
           IN ( $p1, $p2 )
           AND pl_budzety_wydatki.type =  'czesc'
@@ -584,15 +583,15 @@ class Finanse extends AppModel
 
         $wyd_czesci2 = array();
         foreach ($wyd_czesci as $row) {
-            $czesc_str = (string)$row['czesc_str'];
-            if (!isset($wyd_czesci2[$czesc_str])) {
-                $wyd_czesci2[$czesc_str] = array();
-                $wyd_czesci2[$czesc_str]['tresc'] = $row['tresc'];
+            $czesc_str = str_pad($row['czesc_str'], 3,'0', STR_PAD_LEFT);
+            if (!isset($wyd_czesci2[trim($czesc_str)])) {
+                $wyd_czesci2[trim($czesc_str)] = array();
+                $wyd_czesci2[trim($czesc_str)]['tresc'] = $row['tresc'];
             }
             if ($row['rocznik'] == $p1) {
-                $wyd_czesci2[$czesc_str]['p1'] = $row['plan'];
+                $wyd_czesci2[trim($czesc_str)]['p1'] = $row['plan'];
             } else {
-                $wyd_czesci2[$czesc_str]['p2'] = $row['plan'];
+                $wyd_czesci2[trim($czesc_str)]['p2'] = $row['plan'];
             }
         }
         $wyd_czesci = array(
@@ -600,10 +599,13 @@ class Finanse extends AppModel
             'spadek' => array(),
             'bd' => array()
         );
+
         foreach ($wyd_czesci2 as $row) {
-            $zmiana = 0;
-            if (isset($row['p1']) && isset($row['p2'])) {
-                $zmiana = $row['p2'] * 100 / $row['p1'] -100;
+            $zmiana = false;
+            $zmiana2 = false;
+
+            if (isset($row['p1']) && isset($row['p2']) && $row['p1'] !== 0) {
+                $zmiana = $row['p2'] * 100 / $row['p1'] - 100;
                 $zmiana2 = $row['p2'] / $row['p1'];
             }
             if ($zmiana > 0) {
@@ -613,7 +615,7 @@ class Finanse extends AppModel
                     'p2' => $row['p2'],
                     'zmiana' => $zmiana, 'zmiana2' => $zmiana2
                 );
-            } elseif ($zmiana == 0) {
+            } elseif ($zmiana === false) {
                 $wyd_czesci['bd'][] = array(
                     'tresc' => $row['tresc'],
                     'p1' => @$row['p1'],
@@ -628,11 +630,10 @@ class Finanse extends AppModel
                     'zmiana' => $zmiana, 'zmiana2' => $zmiana2
                 );
             }
-        }
 
+        }
         $wyd_dzial = $DB->selectAssocs("SELECT pl_budzety_wydatki.rocznik, pl_budzety_wydatki.dzial_str, pl_budzety_wydatki.tresc, SUM( pl_budzety_wydatki.plan ) AS plan
           FROM pl_budzety_wydatki
-          JOIN pl_budzety_wydatki_dzialy ON pl_budzety_wydatki.dzial_str = pl_budzety_wydatki_dzialy.src
           WHERE pl_budzety_wydatki.rocznik
           IN ( $p1, $p2 )
          AND pl_budzety_wydatki.type =  'dzial'
@@ -642,15 +643,15 @@ class Finanse extends AppModel
 
         $wyd_dzial2 = array();
         foreach ($wyd_dzial as $row) {
-            $dzial_str = (string)$row['dzial_str'];
-            if (!isset($wyd_dzial2[$dzial_str])) {
-                $wyd_dzial2[$dzial_str] = array();
-                $wyd_dzial2[$dzial_str]['tresc'] = $row['tresc'];
+            $dzial_str = str_pad($row['dzial_str'], 3,'0', STR_PAD_LEFT);
+            if (!isset($wyd_dzial2[trim($dzial_str)])) {
+                $wyd_dzial2[trim($dzial_str)] = array();
+                $wyd_dzial2[trim($dzial_str)]['tresc'] = $row['tresc'];
             }
             if ($row['rocznik'] == $p1) {
-                $wyd_dzial2[$dzial_str]['p1'] = $row['plan'];
+                $wyd_dzial2[trim($dzial_str)]['p1'] = $row['plan'];
             } else {
-                $wyd_dzial2[$dzial_str]['p2'] = $row['plan'];
+                $wyd_dzial2[trim($dzial_str)]['p2'] = $row['plan'];
             }
         }
         $wyd_dzial = array(
@@ -659,9 +660,10 @@ class Finanse extends AppModel
             'bd' => array()
         );
         foreach ($wyd_dzial2 as $row) {
-            $zmiana = 0;
+            $zmiana = false;
+            $zmiana2 = false;
             if (isset($row['p1']) && isset($row['p2'])) {
-                $zmiana = $row['p2'] * 100 / $row['p1'] -100;
+                $zmiana = $row['p2'] * 100 / $row['p1'] - 100;
                 $zmiana2 = $row['p2'] / $row['p1'];
             }
             if ($zmiana > 0) {
@@ -671,7 +673,7 @@ class Finanse extends AppModel
                     'p2' => $row['p2'],
                     'zmiana' => $zmiana, 'zmiana2' => $zmiana2
                 );
-            } elseif ($zmiana == 0) {
+            } elseif ($zmiana === false) {
                 $wyd_dzial['bd'][] = array(
                     'tresc' => $row['tresc'],
                     'p1' => @$row['p1'],
@@ -688,7 +690,7 @@ class Finanse extends AppModel
             }
         }
 
-        $wyd_rozdzial = $DB->selectAssocs("SELECT pl_budzety_wydatki.rocznik, pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki_rozdzialy.tresc, SUM( pl_budzety_wydatki.plan ) AS plan FROM pl_budzety_wydatki
+        $wyd_rozdzial = $DB->selectAssocs("SELECT pl_budzety_wydatki.rocznik, pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.tresc, SUM( pl_budzety_wydatki.plan ) AS plan FROM pl_budzety_wydatki
 JOIN pl_budzety_wydatki_rozdzialy
 ON pl_budzety_wydatki.rozdzial_str = pl_budzety_wydatki_rozdzialy.src
 WHERE pl_budzety_wydatki.rocznik
@@ -700,15 +702,15 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
 
         $wyd_rozdzial2 = array();
         foreach ($wyd_rozdzial as $row) {
-            $rozdzial_str = (string)$row['rozdzial_str'];
-            if (!isset($wyd_rozdzial2[$rozdzial_str])) {
-                $wyd_rozdzial2[$rozdzial_str] = array();
-                $wyd_rozdzial2[$rozdzial_str]['tresc'] = $row['tresc'];
+            $rozdzial_str = str_pad($row['rozdzial_str'], 5,'0', STR_PAD_LEFT);
+            if (!isset($wyd_rozdzial2[trim($rozdzial_str)])) {
+                $wyd_rozdzial2[trim($rozdzial_str)] = array();
+                $wyd_rozdzial2[trim($rozdzial_str)]['tresc'] = $row['tresc'];
             }
             if ($row['rocznik'] == $p1) {
-                $wyd_rozdzial2[$rozdzial_str]['p1'] = $row['plan'];
+                $wyd_rozdzial2[trim($rozdzial_str)]['p1'] = $row['plan'];
             } else {
-                $wyd_rozdzial2[$rozdzial_str]['p2'] = $row['plan'];
+                $wyd_rozdzial2[trim($rozdzial_str)]['p2'] = $row['plan'];
             }
         }
         $wyd_rozdzial = array(
@@ -717,9 +719,10 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
             'bd' => array()
         );
         foreach ($wyd_rozdzial2 as $row) {
-            $zmiana = 0;
+            $zmiana = false;
+            $zmiana2 = false;
             if (isset($row['p1']) && isset($row['p2'])) {
-                $zmiana = $row['p2'] * 100 / $row['p1'] -100;
+                $zmiana = $row['p2'] * 100 / $row['p1'] - 100;
                 $zmiana2 = $row['p2'] / $row['p1'];
             }
             if ($zmiana > 0) {
@@ -730,7 +733,7 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
                     'zmiana' => $zmiana,
                     'zmiana2' => $zmiana2
                 );
-            } elseif ($zmiana == 0) {
+            } elseif ($zmiana === false) {
                 $wyd_rozdzial['bd'][] = array(
                     'tresc' => $row['tresc'],
                     'p1' => @$row['p1'],
@@ -758,15 +761,15 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
 
         $doch_dzial2 = array();
         foreach ($doch_dzial as $row) {
-            $dzial_str = (string)$row['dzial_str'];
-            if (!isset($doch_dzial2[$dzial_str])) {
-                $doch_dzial2[$dzial_str] = array();
-                $doch_dzial2[$dzial_str]['tresc'] = $row['tresc'];
+            $dzial_str = str_pad($row['dzial_str'], 3,'0', STR_PAD_LEFT);
+            if (!isset($doch_dzial2[trim($dzial_str)])) {
+                $doch_dzial2[trim($dzial_str)] = array();
+                $doch_dzial2[trim($dzial_str)]['tresc'] = $row['tresc'];
             }
             if ($row['rocznik'] == $p1) {
-                $doch_dzial2[$dzial_str]['p1'] = $row['plan'];
+                $doch_dzial2[trim($dzial_str)]['p1'] = $row['plan'];
             } else {
-                $doch_dzial2[$dzial_str]['p2'] = $row['plan'];
+                $doch_dzial2[trim($dzial_str)]['p2'] = $row['plan'];
             }
         }
         $doch_dzial = array(
@@ -775,9 +778,10 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
             'bd' => array()
         );
         foreach ($doch_dzial2 as $row) {
-            $zmiana = 0;
+            $zmiana = false;
+            $zmiana2 = false;
             if (isset($row['p1']) && isset($row['p2'])) {
-                $zmiana = $row['p2'] * 100 / $row['p1'] -100;
+                $zmiana = $row['p2'] * 100 / $row['p1'] - 100;
                 $zmiana2 = $row['p2'] / $row['p1'];
             }
             if ($zmiana > 0) {
@@ -788,7 +792,7 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
                     'zmiana' => $zmiana,
                     'zmiana2' => $zmiana2
                 );
-            } elseif ($zmiana == 0) {
+            } elseif ($zmiana === false) {
                 $doch_dzial['bd'][] = array(
                     'tresc' => $row['tresc'],
                     'p1' => @$row['p1'],
@@ -816,15 +820,15 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
 
         $doch_czesci2 = array();
         foreach ($doch_czesci as $row) {
-            $czesc_str = (string)$row['czesc_str'];
-            if (!isset($doch_czesci2[$czesc_str])) {
-                $doch_czesci2[$czesc_str] = array();
-                $doch_czesci2[$czesc_str]['tresc'] = $row['tresc'];
+            $czesc_str = str_pad($row['czesc_str'], 3,'0', STR_PAD_LEFT);
+            if (!isset($doch_czesci2[trim($czesc_str)])) {
+                $doch_czesci2[trim($czesc_str)] = array();
+                $doch_czesci2[trim($czesc_str)]['tresc'] = $row['tresc'];
             }
             if ($row['rocznik'] == $p1) {
-                $doch_czesci2[$czesc_str]['p1'] = $row['plan'];
+                $doch_czesci2[trim($czesc_str)]['p1'] = $row['plan'];
             } else {
-                $doch_czesci2[$czesc_str]['p2'] = $row['plan'];
+                $doch_czesci2[trim($czesc_str)]['p2'] = $row['plan'];
             }
         }
         $doch_czesci = array(
@@ -833,9 +837,10 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
             'bd' => array()
         );
         foreach ($doch_czesci2 as $row) {
-            $zmiana = 0;
+            $zmiana = false;
+            $zmiana2 = false;
             if (isset($row['p1']) && isset($row['p2'])) {
-                $zmiana = $row['p2'] * 100 / $row['p1'] -100;
+                $zmiana = $row['p2'] * 100 / $row['p1'] - 100;
                 $zmiana2 = $row['p2'] / $row['p1'];
             }
             if ($zmiana > 0) {
@@ -846,7 +851,7 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
                     'zmiana' => $zmiana,
                     'zmiana2' => $zmiana2
                 );
-            } elseif ($zmiana == 0) {
+            } elseif ($zmiana === false) {
                 $doch_czesci['bd'][] = array(
                     'tresc' => $row['tresc'],
                     'p1' => @$row['p1'],
@@ -862,9 +867,8 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
                 );
             }
         }
-/*
- * 
-*/
+
+
         usort($wyd_rozdzial['spadek'], function ($a, $b) {
             return $a['zmiana'] - $b['zmiana'];
         });
@@ -908,6 +912,7 @@ GROUP BY pl_budzety_wydatki.rozdzial_str, pl_budzety_wydatki.rocznik");
                 'dzialy' => $doch_dzial
             )
         );
+
 
     }
 }

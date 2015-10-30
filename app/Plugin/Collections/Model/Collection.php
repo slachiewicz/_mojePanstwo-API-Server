@@ -43,6 +43,28 @@ class Collection extends AppModel {
         }
 	    
     }
+
+	public function afterDelete() {
+		if(isset($this->data['Collection']['id'])) {
+			$id = (int) $this->data['Collection']['id'];
+			$res = $this->query("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $id ) . "' LIMIT 1");
+			$global_id = (int)(@$res[0]['objects']['id']);
+			if($global_id) {
+				$params = array(
+					'index' => 'mojepanstwo_v1',
+					'type' => 'objects',
+					'id' => $global_id,
+					'refresh' => true,
+					'ignore' => 404
+				);
+
+				$ES = ConnectionManager::getDataSource('MPSearch');
+				$ret = $ES->API->delete($params);
+				$params['type'] = 'collections';
+				$ret = $ES->API->delete($params);
+			}
+		}
+	}
     
     public function deleteSync($collection) {
 	    	    
@@ -122,8 +144,9 @@ class Collection extends AppModel {
 				'kolekcje.czas_utworzenia' => $data['created_at'],
 			    'kolekcje.id' => $data['id'],
 			    'kolekcje.nazwa' => $data['name'],
-			    'kolekcje.description' => $data['description'],
+			    'kolekcje.notatka' => $data['description'],
 			    'kolekcje.user_id' => $data['user_id'],
+			    'kolekcje.is_public' => $data['is_public'],
 			    'kolekcje.object_id' => $data['object_id'],
 			    'kolekcje.items_count' => $data['items_count'],
 			),
@@ -131,7 +154,7 @@ class Collection extends AppModel {
 				
 		$ret = $ES->API->index($params);
 
-		if($public) {
+		if($data['is_public'] == '1' || $public) {
 			$params['type'] = 'objects';
 			$ret = $ES->API->index($params);
 		} else {

@@ -128,7 +128,7 @@ class Collection extends AppModel {
 	    }
 	    
 	    $ES = ConnectionManager::getDataSource('MPSearch');	    
-	   	   
+
 	    $params = array();
 		$params['index'] = 'mojepanstwo_v1';
 		$params['type']  = 'collections';
@@ -139,7 +139,7 @@ class Collection extends AppModel {
 			'text' => $data['name'],
 			'dataset' => 'kolekcje',
 			'slug' => Inflector::slug($data['name']),
-			'date' => $data['created_at'],
+			'date' => es_date($data['created_at']),
 			'id' => $data['id'],
 			'nazwa' => $data['name'],
 			'description' => $data['description'],

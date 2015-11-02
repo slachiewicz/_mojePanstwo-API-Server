@@ -73,6 +73,8 @@ class ResponsesController extends AppController {
         if(!$attachment_id)
             throw new NotFoundException;
 
+        $attachment_id = (int) $attachment_id;
+
         $filename = $this->Response->query("
             SELECT filename
             FROM letters_responses_files

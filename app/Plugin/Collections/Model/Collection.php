@@ -135,26 +135,36 @@ class Collection extends AppModel {
 		$params['id']    = $global_id;
 		$params['refresh'] = true;
 		$params['body']  = array(
-			'id' => $data['id'],
 			'title' => $data['name'],
 			'text' => $data['name'],
 			'dataset' => 'kolekcje',
 			'slug' => Inflector::slug($data['name']),
-			'data' => array(
-				'kolekcje.czas_utworzenia' => $data['created_at'],
-			    'kolekcje.id' => $data['id'],
-			    'kolekcje.nazwa' => $data['name'],
-			    'kolekcje.notatka' => $data['description'],
-			    'kolekcje.user_id' => $data['user_id'],
-			    'kolekcje.is_public' => $data['is_public'],
-			    'kolekcje.object_id' => $data['object_id'],
-			    'kolekcje.items_count' => $data['items_count'],
-			),
+			'date' => $data['created_at'],
+			'id' => $data['id'],
+			'nazwa' => $data['name'],
+			'description' => $data['description'],
+			'user_id' => $data['user_id'],
+			'is_public' => $data['is_public'],
+			'object_id' => $data['object_id'],
+			'items_count' => $data['items_count'],
 		);
 				
 		$ret = $ES->API->index($params);
 
 		if($data['is_public'] == '1' || $public) {
+			foreach(array('date', 'nazwa', 'description', 'user_id', 'is_public', 'object_id', 'items_count') as $f)
+				unset($params[$f]);
+
+			$params['data'] = array(
+				'kolekcje.czas_utworzenia' => $data['created_at'],
+				'kolekcje.id' => $data['id'],
+				'kolekcje.nazwa' => $data['name'],
+				'kolekcje.notatka' => $data['description'],
+				'kolekcje.user_id' => $data['user_id'],
+				'kolekcje.is_public' => $data['is_public'],
+				'kolekcje.object_id' => $data['object_id'],
+				'kolekcje.items_count' => $data['items_count'],
+			);
 			$params['type'] = 'objects';
 			$ret = $ES->API->index($params);
 		} else {

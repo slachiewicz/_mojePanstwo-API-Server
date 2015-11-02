@@ -139,7 +139,7 @@ class Collection extends AppModel {
 			'text' => $data['name'],
 			'dataset' => 'kolekcje',
 			'slug' => Inflector::slug($data['name']),
-			'date' => date('Ymd\TGis', strtotime($data['created_at'])),
+			'date' => date('Ymd\THis\Z', strtotime($data['created_at'])),
 			'id' => $data['id'],
 			'nazwa' => $data['name'],
 			'description' => $data['description'],
@@ -148,14 +148,14 @@ class Collection extends AppModel {
 			'object_id' => $data['object_id'],
 			'items_count' => $data['items_count'],
 		);
-				
+		
 		$ret = $ES->API->index($params);
 
 		if($data['is_public'] == '1' || $public) {
 			foreach(array('date', 'nazwa', 'description', 'user_id', 'is_public', 'object_id', 'items_count') as $f)
-				unset($params[$f]);
+				unset($params['body'][$f]);
 
-			$params['data'] = array(
+			$params['body']['data'] = array(
 				'kolekcje.czas_utworzenia' => $data['created_at'],
 				'kolekcje.id' => $data['id'],
 				'kolekcje.nazwa' => $data['name'],

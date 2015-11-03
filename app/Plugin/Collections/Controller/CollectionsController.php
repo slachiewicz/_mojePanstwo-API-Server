@@ -110,6 +110,9 @@ class CollectionsController extends AppController {
             'id' => $id,
         ));
 
+        if(!isset($data['name']))
+            $this->Collection->validator()->remove('name');
+
         $this->Collection->set($data);
         if($this->Collection->validates()) {
             $response = $this->Collection->save(array(

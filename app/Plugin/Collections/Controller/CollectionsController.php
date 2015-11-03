@@ -221,6 +221,10 @@ class CollectionsController extends AppController {
 
         if($collection['Collection']['user_id'] != $this->Auth->user('id'))
             throw new ForbiddenException;
+
+        $id = (int) $collection['Collection']['id'];
+        $res = $this->Collection->query("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $id ) . "' LIMIT 1");
+        $this->Collection->global_id = (int)(@$res[0]['objects']['id']);
 		
         $this->set('response', $this->Collection->delete($collection['Collection']['id']));
         $this->set('_serialize', 'response');

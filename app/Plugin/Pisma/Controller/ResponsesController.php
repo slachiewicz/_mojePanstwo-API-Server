@@ -23,6 +23,7 @@ class ResponsesController extends AppController {
             if(isset($data['files']) && is_array($data['files'])) {
                 $letter_response_id = $this->Response->getLastInsertID();
                 foreach($data['files'] as $file) {
+                    $this->ResponseFile->clear();
                     $this->ResponseFile->save(array(
                         'ResponseFile' => array(
                             'letter_response_id' => $letter_response_id,

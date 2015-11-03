@@ -4,6 +4,7 @@ class Collection extends AppModel {
 
     public $useTable = 'collections';
 	public $global_id = 0;
+	public $collection_id = 0;
 
     public $validate = array(
         'name' => array(
@@ -77,38 +78,28 @@ class Collection extends AppModel {
     }
 
 	public function afterDelete() {
-		if($this->global_id > 0) {
-			$params = array(
+		$ES = ConnectionManager::getDataSource('MPSearch');
+		if($this->collection_id) {
+			$ES->API->delete(array(
+				'index' => 'mojepanstwo_v1',
+				'type' => 'collections',
+				'id' => $this->collection_id,
+				'refresh' => true,
+				'ignore' => 404
+			));
+			$this->collection_id = 0;
+		}
+
+		if($this->global_id) {
+			$ES->API->delete(array(
 				'index' => 'mojepanstwo_v1',
 				'type' => 'objects',
 				'id' => $this->global_id,
 				'refresh' => true,
 				'ignore' => 404
-			);
-
-			$ES = ConnectionManager::getDataSource('MPSearch');
-			$ret = $ES->API->delete($params);
-			$params['type'] = 'collections';
-			$ret = $ES->API->delete($params);
-
+			));
 			$this->global_id = 0;
 		}
-	}
-    
-    public function deleteSync($collection) {
-	    	    
-	    $ES = ConnectionManager::getDataSource('MPSearch');	    
-	   	   
-	    $params = array();
-		$params['index'] = 'mojepanstwo_v1';
-		$params['type']  = 'objects';
-		$params['id']    = $collection['global_id'];
-		$params['refresh'] = true;
-		$params['ignore'] = 404;
-		
-		$ret = $ES->API->delete($params);
-		return $ret;
-	    
 	}
     
     public function syncById($id, $public = false) {
@@ -138,31 +129,25 @@ class Collection extends AppModel {
 	    	!isset($data['Collection'])
 	    )
 	    	return false;
-	    	       	    
-	    #App::import('model', 'DB');
-        #$this->DB = new DB();
         
         $data = $data['Collection'];
 
+		$public = (
+			$public ||
+			(
+				isset($data['is_public']) &&
+				$data['is_public'] == '1'
+			)
+		);
+
 		$res = $this->query("SELECT COUNT(*) FROM `collection_object` WHERE `collection_id`='" . $data['id'] . "'");
-        $data['items_count'] = (int) (@$res[0][0]['COUNT(*)']);
-		$res = $this->query("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $data['id'] ) . "' LIMIT 1");
-		$global_id = (int)(@$res[0]['objects']['id']);
+		$data['items_count'] = (int) (@$res[0][0]['COUNT(*)']);
 
-	    if( !$global_id ) {
-
-			$this->query("INSERT INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES ('kolekcje', 210, ".$data['id'].")");
-		    $res = $this->query('select last_insert_id() as id;');
-			$global_id = $res[0][0]['id'];
-
-	    }
-	    
-	    $ES = ConnectionManager::getDataSource('MPSearch');	    
-
-	    $params = array();
+		$ES = ConnectionManager::getDataSource('MPSearch');
+		$params = array();
 		$params['index'] = 'mojepanstwo_v1';
 		$params['type']  = 'collections';
-		$params['id']    = $global_id;
+		$params['id']    = $data['id'];
 		$params['refresh'] = true;
 		$params['body']  = array(
 			'title' => $data['name'],
@@ -179,12 +164,23 @@ class Collection extends AppModel {
 			'items_count' => $data['items_count'],
 		);
 
-		$ret = $ES->API->index($params);
+		$ES->API->index($params);
 
-		if($data['is_public'] == '1' || $public) {
+		$res = $this->query("SELECT id FROM objects WHERE `dataset_id`='210' AND `object_id`='" . addslashes( $data['id'] ) . "' LIMIT 1");
+		$global_id = (int)(@$res[0]['objects']['id']);
+
+		if($public) {
+
+			if(!$global_id) {
+				$this->query("INSERT INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES ('kolekcje', 210, ".$data['id'].")");
+				$res = $this->query('select last_insert_id() as id;');
+				$global_id = $res[0][0]['id'];
+			}
+
 			foreach(array('date', 'nazwa', 'description', 'user_id', 'is_public', 'object_id', 'items_count') as $f)
 				unset($params['body'][$f]);
 
+			$params['id'] = $global_id;
 			$params['body']['data'] = array(
 				'kolekcje.czas_utworzenia' => $data['created_at'],
 				'kolekcje.id' => $data['id'],
@@ -196,8 +192,10 @@ class Collection extends AppModel {
 				'kolekcje.items_count' => $data['items_count'],
 			);
 			$params['type'] = 'objects';
-			$ret = $ES->API->index($params);
-		} else {
+			$ES->API->index($params);
+
+		} elseif($global_id) {
+
 			$deleteParams = array();
 			$deleteParams['index'] = 'mojepanstwo_v1';
 			$deleteParams['type'] = 'objects';
@@ -205,10 +203,10 @@ class Collection extends AppModel {
 			$deleteParams['refresh'] = true;
 			$deleteParams['ignore'] = array(404);
 			$ES->API->delete($deleteParams);
+
 		}
 
-		return $data['id'];	    
-	    
+		return $data['id'];
     }
 
 }

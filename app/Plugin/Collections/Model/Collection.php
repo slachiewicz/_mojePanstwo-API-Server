@@ -77,8 +77,8 @@ class Collection extends AppModel {
     }
 
 	public function afterDelete() {
-		$this->log($this->global_id);
-		if($this->global_id > 0) {
+
+		if($this->global_id > 0 && false) {
 			$params = array(
 				'index' => 'mojepanstwo_v1',
 				'type' => 'objects',
@@ -153,8 +153,9 @@ class Collection extends AppModel {
 	    if( !$global_id ) {
 
 			$this->query("INSERT INTO `objects` (`dataset`, `dataset_id`, `object_id`) VALUES ('kolekcje', 210, ".$data['id'].")");
-		    $global_id = $this->getLastInsertID();
-		    
+		    $res = $this->query('select last_insert_id() as id;');
+			$global_id = $res[0][0]['id'];
+
 	    }
 	    
 	    $ES = ConnectionManager::getDataSource('MPSearch');	    
@@ -178,7 +179,7 @@ class Collection extends AppModel {
 			'object_id' => $data['object_id'],
 			'items_count' => $data['items_count'],
 		);
-		
+
 		$ret = $ES->API->index($params);
 
 		if($data['is_public'] == '1' || $public) {

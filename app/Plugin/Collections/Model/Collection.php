@@ -77,8 +77,7 @@ class Collection extends AppModel {
     }
 
 	public function afterDelete() {
-
-		if($this->global_id > 0 && false) {
+		if($this->global_id > 0) {
 			$params = array(
 				'index' => 'mojepanstwo_v1',
 				'type' => 'objects',

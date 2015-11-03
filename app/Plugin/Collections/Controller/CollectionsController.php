@@ -17,6 +17,14 @@ class CollectionsController extends AppController {
         if($this->Auth->user('type') != 'account')
             throw new ForbiddenException;
     }
+    
+    public function view() {
+	    
+	    $collection = $this->Collection->load($this->request->params['id'], $this->Auth->user('id'));
+	    $this->set('collection', $collection);
+	    $this->set('_serialize', 'collection');
+	    
+    }
 
     public function get($id) {
         $this->set('response', $this->Collection->find('all', array(

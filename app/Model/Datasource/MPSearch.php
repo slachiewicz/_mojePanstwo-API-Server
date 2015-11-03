@@ -175,10 +175,11 @@ class MPSearch {
 		
 		$from = ( $queryData['page'] - 1 ) * $queryData['limit'];
 		$size = $queryData['limit'];
-		
+		$_type = isset( $queryData['_type'] ) ? $queryData['_type'] : 'objects';
+				
 		$params = array(
 			'index' => $this->_index,
-			'type' => 'objects',
+			'type' => $_type,
 			'body' => array(
 				'from' => $from, 
 				'size' => $size,
@@ -190,12 +191,6 @@ class MPSearch {
 				        ),
 		        	),
 				),
-				'fields' => array('dataset', 'id', 'slug'),
-				'partial_fields' => array(
-					'source' => array(
-						'include' => array('data', 'static'),
-					),
-				),
 				'sort' => array(
 					array(
 						'date' => 'desc',
@@ -206,6 +201,25 @@ class MPSearch {
 				),
 			),
 		);
+		
+		if( $queryData['_type']=='objects' ) {
+			
+			$params['body'] = array_merge($params['body'], array(
+				'fields' => array('dataset', 'id', 'slug'),
+				'partial_fields' => array(
+					'source' => array(
+						'include' => array('data', 'static'),
+					),
+				),
+			));
+			
+			$fields_prefix = 'data.';
+			
+		} else {
+			
+			$fields_prefix = '';
+			
+		}
 		
 		// debug($queryData); die();
 		
@@ -261,22 +275,25 @@ class MPSearch {
 				
 		$and_filters = array();
         
-                
-        if(
-        	(
-        		!isset($queryData['conditions']['dataset']) || 
-				empty($queryData['conditions']['dataset'])
-			) &&
-        	(
-        		!isset($queryData['conditions']['_feed']) || 
-	        	empty($queryData['conditions']['_feed']) 
-	        )
-        ) {
-	        $and_filters[] = array(
-	    		'term' => array(
-	    			'weights.main.enabled' => true,
-	    		),
-	    	);
+        if( $queryData['_type']=='objects' ) {      
+	        if(
+	        	(
+	        		!isset($queryData['conditions']['dataset']) || 
+					empty($queryData['conditions']['dataset'])
+				) &&
+	        	(
+	        		!isset($queryData['conditions']['_feed']) || 
+		        	empty($queryData['conditions']['_feed']) 
+		        )
+	        ) {
+		        
+		        $and_filters[] = array(
+		    		'term' => array(
+		    			'weights.main.enabled' => true,
+		    		),
+		    	);
+		    	
+	    	}
     	}
         
         // debug($queryData['conditions']);
@@ -698,7 +715,7 @@ class MPSearch {
 					
 					$and_filters[] = array(
 						'range' => array(
-							'data.' . $key => $range,
+							$fields_prefix . $key => $range,
 						),
 					);
 							        	
@@ -726,7 +743,7 @@ class MPSearch {
 			        		 	
 			        		$and_filters[] = array(
 					        	'term' => array(
-						        	'data.' . $key => $value,
+						        	$fields_prefix . $key => $value,
 					        	),
 				        	);
 			        	
@@ -735,7 +752,7 @@ class MPSearch {
 				        	$and_filters[] = array(
 					        	'not' => array(
 						        	'term' => array(
-							        	'data.' . $key => $value,
+							        	$fields_prefix . $key => $value,
 						        	),
 					        	),
 				        	);
@@ -744,7 +761,7 @@ class MPSearch {
 				        	
 				        	$and_filters[] = array(
 					        	'range' => array(
-						        	'data.' . $key => array(
+						        	$fields_prefix . $key => array(
 							        	'gt' => $value,
 						        	),
 					        	),
@@ -754,7 +771,7 @@ class MPSearch {
 				        	
 				        	$and_filters[] = array(
 					        	'range' => array(
-						        	'data.' . $key => array(
+						        	$fields_prefix . $key => array(
 							        	'lt' => $value,
 						        	),
 					        	),
@@ -919,7 +936,7 @@ class MPSearch {
 									( $key == 'field' ) && 
 									!in_array($value, array('date', 'dataset'))
 								)
-									$value = 'data.' . $value;
+									$value = $fields_prefix . $value;
 								
 								$es_params[ $key ] = $value;
 								
@@ -1002,7 +1019,7 @@ class MPSearch {
 									( $keys = array_keys($f['term']) ) && 
 									( $key = array_shift($keys) ) && 
 									(
-										( $key == 'data.' . $filters_excludes )
+										( $key == $fields_prefix . $filters_excludes )
 									)
 								) {} else {
 									$_and_filters[] = $f;
@@ -1148,7 +1165,7 @@ class MPSearch {
 		$this->lastResponseStats = null;
 		$response = $this->API->search( $params );
 
-		// debug($response); die();
+		// var_export($response); die();
 		
 		$this->lastResponseStats = array();
 		if (isset($response['hits']['total'])) {
@@ -1240,9 +1257,11 @@ class MPSearch {
         }
                          
         $hits = $response['hits']['hits'];
-        for( $h=0; $h<count($hits); $h++ ) 
-        	$hits[$h] = $this->doc2object( $hits[$h] );
-                
+        
+        if( $queryData['_type']=='objects' ) {
+	        for( $h=0; $h<count($hits); $h++ ) 
+	        	$hits[$h] = $this->doc2object( $hits[$h] );
+        }
         return $hits;        
 
     }

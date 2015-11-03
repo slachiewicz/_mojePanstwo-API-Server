@@ -19,7 +19,38 @@ class Collection extends AppModel {
             'required' => false
         ),
     );
-
+	
+	public function load($id, $user_id) {
+		
+		$ES = ConnectionManager::getDataSource('MPSearch');
+				
+		$ret = $ES->API->search(array(
+			'index' => 'mojepanstwo_v1',
+			'type' => 'collections',
+			'body' => array(
+				'query' => array(
+					'bool' => array(
+						'must' => array(
+							array(
+								'term' => array(
+									'id' => $id,
+								),
+							),
+							array(
+								'term' => array(
+									'user_id' => $user_id,
+								),
+							),
+						),
+					),
+				),
+			),
+		));
+		
+		return @$ret['hits']['hits'][0];
+		
+	}
+	
 	public function publish($id) {
 		return $this->syncById($id, true);
 	}

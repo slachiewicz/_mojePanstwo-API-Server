@@ -26,3 +26,13 @@ Router::connect('/collections/collections/delete/:id', array(
 	'id' => '[0-9]+',
 	'pass' => array('id'),
 ));
+
+Router::connect('/collections/collections/editObject/:collection_id/:object_id', array(
+	'plugin' => 'Collections',
+	'controller' => 'Collections',
+	'action' => 'editObject',
+), array(
+	'collection_id' => '([0-9]+)',
+	'object_id' => '([0-9]+)',
+	'pass' => array('collection_id', 'object_id'),
+));

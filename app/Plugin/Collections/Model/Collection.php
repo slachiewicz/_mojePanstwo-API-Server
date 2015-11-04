@@ -208,5 +208,41 @@ class Collection extends AppModel {
 
 		return $data['id'];
     }
+    
+    public function editObject($collection_id, $object_id, $data) {
+	    
+	    $response = false;
+	    
+	    if( isset($data['note']) ) {
+		    
+		    if( $_id = $this->query("SELECT id FROM `collection_object` WHERE `collection_id`='" . addslashes($collection_id) . "' AND `object_id`='" . addslashes($object_id) . "' LIMIT 1") ) {
+			    
+			    $_id = $_id[0]['collection_object']['id'];
+			    
+			    $this->query("UPDATE `collection_object` SET `note`='" . addslashes( $data['note'] ) . "' WHERE `id`='$_id'");
+			    
+			    $ES = ConnectionManager::getDataSource('MPSearch');
+			    $params = array(
+				    'index' => 'mojepanstwo_v1',
+				    'type'=> 'collections-objects',
+				    'id' => $_id,
+				    'parent' => $object_id,
+				    'refresh' => true,
+				    'body' => array(
+					    'doc' => array(
+						    'note' => $data['note'],
+					    ),
+				    ),
+			    );
+			    
+			    return $ES->API->update($params);
+			    
+		    }
+		    
+	    }
+	    
+	    return $response;
+	    
+    }
 
 }

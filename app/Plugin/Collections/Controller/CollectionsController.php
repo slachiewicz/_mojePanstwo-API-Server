@@ -230,5 +230,14 @@ class CollectionsController extends AppController {
         $this->set('response', $this->Collection->delete($collection['Collection']['id']));
         $this->set('_serialize', 'response');
     }
+    
+    public function editObject($collection_id, $object_id) {
+	    
+	    $response = $this->Collection->editObject($collection_id, $object_id, $this->request->data);
+	    
+	    $this->set('response', $response);
+        $this->set('_serialize', 'response');
+	    
+    }
 
 }
